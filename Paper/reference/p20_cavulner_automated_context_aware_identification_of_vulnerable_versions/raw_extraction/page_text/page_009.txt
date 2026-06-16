@@ -1,0 +1,97 @@
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 9
+blame to obtain the previous commit, establishing an initial VIC candidate (lines 1-4). To address
+potential inaccuracies arising from code evolution, an iterative verification mechanism is triggered
+to examine the candidate’s parent commit.
+This verification involves a branching logic: if the vulnerable method does not exist in the parent
+commit, it indicates that the current commit introduced the vulnerable method, triggering the
+process to terminate and identify the current commit as the VIC (lines 7-9). In cases where the
+vulnerable method exists, an LLM performs a semantic assessment to determine if the vulnerability
+remains active in the parent version, using the CVE and CWE information together with the source
+code of the method in the parent commit. It is important to highlight that the LLM input is carefully
+curated to exclude the fix commit message, because the parent commit’s message is likely unrelated
+to the vulnerability. If the LLM determines that the method in the parent commit is not vulnerable,
+then the previous commit is confirmed as the VIC (lines 10-14). Otherwise, the LLM identifies the
+vulnerable lines in the commit. We then apply the git blame command and further LLM analysis
+to these lines to trace earlier commits (lines 15-20).
+3.3 Vulnerable Version Determination
+In the context of version control systems (e.g., GitHub), tags are commonly used to denote versions.
+Once the LLM identifies the vulnerability-inducing commit (VIC) corresponding to a given fix
+commit, we can determine the set of vulnerable tags by examining the tags that include the VIC
+but not the fix commit.
+However, in the real world, repositories often maintain multiple active branches (e.g., main,
+release-1.0 and release-2.0), and developers often propagate both VICs and fix commits across these
+branches through merges, cherry-picks, or manual copying. These operations result in duplicate
+commits, which are commits that introduce the same changes but have different commit IDs.
+Failure to identify all instances of duplicate fix commits or VICs can result in inaccurate reporting
+of vulnerable tags, leading to an underestimation or overestimation of their scope.
+Duplicate Commit Identification. We identify duplicate commits by comparing the content
+of their patches. Specifically, we compute a hash for each hunk in every commit. For a given
+commit, we identify all other commits that share the same hunk hashes. If the set of hunk hashes
+in the candidate commit is equal to, or a subset of, that of another commit, we regard them as
+duplicates. This enables us to track semantically equivalent changes across branches, ensuring a
+more comprehensive identification of commits that introduce or fix vulnerabilities.
+Vulnerable Tags Determination. Given a CVE, along with its associated fix commits and
+VICs, we analyse the git tags in the project’s repository to identify the vulnerable tags. For each fix
+commit and its duplicates, we collect all tags that contain these commits, labeled 𝑇𝑓 . Similarly, for
+each VIC and its duplicates, we gather all the corresponding tags, 𝑇𝑖 . The set of vulnerable tags 𝑇𝑣
+is then those tags that belong to 𝑇𝑖 but not to 𝑇𝑓 :
+𝑇𝑣 = {𝑡 |𝑡 ∈𝑇𝑖 ∧𝑡 ∉ 𝑇𝑓 }
+This approach enables accurate identification of affected tags, even in complex branching sce-
+narios involving cherry-picks or manual copying.
+Version Normalization. We normalize GitHub tags to address non-standard naming conven-
+tions (e.g., 2016-04-03_UMLet_v14.2 or STRUTS_2_0_0) that do not follow semantic versioning. In
+real-world development workflows, developers typically retrieve precompiled libraries from the
+Maven Central Repository [4] rather than building them directly from GitHub source code. There-
+fore, we treat Maven Central as the authoritative source for version identifiers and align GitHub tags
+accordingly. Specifically, we design project-specific normalization strategies to map non-standard
+GitHub tags to their corresponding Maven Central versions (e.g., mapping2016-04-03_UMLet_v14.2
+, Vol. 1, No. 1, Article . Publication date: January 2018.

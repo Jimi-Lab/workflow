@@ -1,0 +1,23 @@
+Domain Concepts Introduced:
+- 2 Background and Related Work 2.1 SZZ Algorithms The SZZ algorithm [33] is the foundational approach for automated BIC identification.
+- Given a bug-fixing commit, it traces deleted or modified lines back to the commits that last touched them, treating those commits as BIC candidates.
+Task Definition:
+- Inferred from title and extracted sections: identify vulnerability-introducing commits, bug-introducing commits, vulnerable/affected versions, or evidence useful for version validation. [NEEDS CITATION VERIFICATION]
+Threat Model / Assumptions:
+- [NEEDS EVIDENCE] not asserted unless explicitly stated in the paper.
+Motivating Case:
+- [NEEDS EVIDENCE] no clean motivating case extracted
+Why the Case Is Chosen:
+- [NEEDS EVIDENCE]
+Definitions Needed by Readers:
+- Vulnerability-introducing commit / bug-inducing commit, patch evidence, developer log, vulnerable version, SZZ-style tracing, depending on the paper scope.
+How Background Leads to Method:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+Writing Pattern:
+- Build from concrete artifact evidence toward why naive blame or simple version matching is insufficient.
+Relevance to Our Paper:
+- Useful for affected versions background and related-work positioning.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json

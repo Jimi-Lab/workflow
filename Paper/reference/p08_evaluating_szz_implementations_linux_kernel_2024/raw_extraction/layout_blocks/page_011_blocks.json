@@ -1,0 +1,167 @@
+[
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2229",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:002",
+    "block_type": "text",
+    "text": "Fig. 4.\nOverlap between SZZ variants on KFC dataset and datasetRosa.",
+    "bbox": [
+      37.58,
+      295.45,
+      276.79,
+      305.38
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:003",
+    "block_type": "text",
+    "text": "TABLE V\nAN OVERVIEW OF THE PROJECTS AND GHOST COMMIT’\nFREQUENCY. RMG, AMG STAND FOR REMOVE MAPPING\nGHOST AND ADD MAPPING GHOST",
+    "bbox": [
+      68.49,
+      327.46,
+      257.74,
+      363.26
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:004",
+    "block_type": "text",
+    "text": "Project\nCommits\nRMG\nAMG",
+    "bbox": [
+      65.56,
+      374.81,
+      259.57,
+      384.0
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:005",
+    "block_type": "text",
+    "text": "Previous Mean [17]\n12,216\n8.05%\n2.41%\nPrevious Median [17]\n9,231\n7.64%\n2.68%\nLinux kernel (Our study)\n1,138,001\n17.47%\n5.30%",
+    "bbox": [
+      65.56,
+      389.27,
+      260.69,
+      416.1
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:006",
+    "block_type": "text",
+    "text": "RQ1 Findings: Compared to Rosa’s dataset, the\naverage precision in our dataset slightly improved\nfrom 0.46 to 0.47 (↑2.2%), while the average recall\ndecreased from 0.60 to 0.52 (↓13.8%). Similar with\nthe ﬁndings from the previous study [28], R-SZZ\nand B-SZZ remain the top performers in terms\nof precision and recall. The similarities between all\nthe SZZ algorithms increase in the current dataset.",
+    "bbox": [
+      53.17,
+      454.33,
+      273.08,
+      549.51
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:007",
+    "block_type": "text",
+    "text": "B. RQ2: Ghost Commits’ Impact",
+    "bbox": [
+      37.58,
+      584.98,
+      172.26,
+      595.94
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:008",
+    "block_type": "text",
+    "text": "In this RQ, we aim to investigate the frequency of ghost com-\nmits in our dataset. Table V shows the ghost commit frequency\nfrom the dataset of Rezk et al. [17], derived from 12 Apache\nprojects, as well as our study. The results reveal that in the Linux\nkernel, 17.47% of all bug-ﬁxing commits are Remove Mapping\nGhost (i.e., bug-ﬁxing commits involving do not have removed\nlines). In the previous study by Rezk et al. [17], the highest\npercentage of Remove Mapping Ghost observed was 11.72%,\nwith a median of 7.64% across the 12 Apache projects. Our\nRemove Mapping Ghost result is thus 128.66% higher than\nthe median from the previous study, suggesting that Remove\nMapping Ghost occurrences are more common in Linux kernel,",
+    "bbox": [
+      37.58,
+      601.77,
+      288.64,
+      744.4
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:009",
+    "block_type": "text",
+    "text": "approaching one in six cases. This highlights the need to address\nthis issue.\nAdd Mapping Ghost is also more prevalent in the Linux\nkernel compared to the datasets examined in prior studies.\nRezk et al. reported the highest proportion of Add Mapping\nGhost at 4.6%, with a median of 2.68%. However, in our\nKFC dataset, Add Mapping Ghost constituted 5.3% of all\ncommits, which is 97.76% higher than the median observed\nin previous research. In Rezk et al.’s study, the ground truth\nof bug-inducing commits was unknown. Consequently, it was\nimpossible to determine the number of bug-ﬁxing commits\nfor which SZZ algorithms could not identify their correspond-\ning bug-inducing commits due to the Add Mapping Ghost\nproblem. In contrast, our study has access to the ground truth,\nallowing us to more accurately assess the impact of Add\nMapping Ghost. In our KFC dataset, we identiﬁed 482 bug-\ninducing commits as Add Mapping Ghost, which appeared\n585 times in 584 bug-ﬁxing commits. As a result, a mere\n0.77% of bug-ﬁxing commits are associated with an Add\nMapping Ghost bug-inducing commit. In addition, Add Map-\nping Ghost bug-inducing commits account for only 0.73% of\nall bug-inducing commits (585 out of 79649). However, some\nbug-ﬁxing commits associated with Add Mapping Ghost bug-\ninducing commits experience partial success (at least one bug-\ninducing commit is found) or failure due to Remove Mapping\nGhosts. In the end, for 361 bug-ﬁxing commits (0.47%), SZZ\nalgorithms were unable to detect any bug-inducing commits due\nto Add Mapping Ghosts.\nWe also discovered Ghost Commits within Rosa’s dataset",
+    "bbox": [
+      300.6,
+      325.67,
+      551.67,
+      671.54
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:010",
+    "block_type": "text",
+    "text": "[28]. Given that previous work has not studied the Ghost Com-\nmit problem in a developer-informed dataset, we decided to\ninvestigate the Mapping Ghosts in Rosa’s dataset. We found\nthat out of the 1115 bug-ﬁxes, only 1084 bug-ﬁxing commits’\nrepositories are still accessible on GitHub. Among these 1084\nbug-ﬁxing commits, 96 (8.86%) are Remove Mapping Ghosts;",
+    "bbox": [
+      300.6,
+      672.38,
+      552.39,
+      743.27
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 11,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:011:011",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

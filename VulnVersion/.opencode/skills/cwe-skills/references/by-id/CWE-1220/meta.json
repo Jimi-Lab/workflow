@@ -1,0 +1,240 @@
+{
+  "cwe_id": "CWE-1220",
+  "name": "Insufficient Granularity of Access Control",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product implements access controls via a policy or other feature with the intention to disable or restrict accesses (reads and/or writes) to assets in a system from untrusted agents. However, implemented access controls lack required granularity, which renders the control policy too broad because it allows accesses from unauthorized agents to the security-sensitive assets.",
+  "extended_description": "Integrated circuits and hardware engines can expose accesses to assets (device configuration, keys, etc.) to trusted firmware or a software module (commonly set by BIOS/bootloader). This access is typically access-controlled. Upon a power reset, the hardware or system usually starts with default values in registers, and the trusted firmware (Boot firmware) configures the necessary access-control protection. A common weakness that can exist in such protection schemes is that access controls or policies are not granular enough. This condition allows agents beyond trusted agents to access assets and could lead to a loss of functionality or the ability to set up the device securely. This further results in security risks from leaked, sensitive, key material to modification of device configuration.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-284",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Access Control"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product implements access controls via a policy or other feature with the intention to disable or restrict accesses (reads and/or writes) to assets in a system from untrusted agents. However, implemented access...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "agents",
+      "assets",
+      "accesses",
+      "controls"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "agents",
+      "assets",
+      "accesses",
+      "controls",
+      "firmware",
+      "trusted",
+      "device",
+      "configuration"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Consider a system with a register for storing AES key for encryption or decryption. The key is 128 bits, implemented as a set of four 32-bit registers. The key...",
+        "snippet": "Register Field description AES_ENC_DEC_KEY_0 AES key [0:31] for encryption or decryption Default 0x00000000 AES_ENC_DEC_KEY_1 AES key [32:63] for encryption or decryption Default 0x00000000 AES_ENC_DEC_KEY_2 AES key..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "Within the AXI node interface wrapper module in the RISC-V AXI module of the HACK@DAC'19 CVA6 SoC [REF-1346], an access control mechanism is employed to...",
+        "snippet": "... for (i=0; i<NB_SUBORDINATE; i++) begin for (j=0; j<NB_MANAGER; j++) begin assign connectivity_map_o[i][j] = access_ctrl_i[i][j][priv_lvl_i] || ((j==6) && access_ctrl_i[i][7][priv_lvl_i]); end end ..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "Consider a system with a register for storing AES key for encryption or decryption. The key is 128 bits, implemented as a set of four 32-bit registers. The key...",
+        "snippet": "AES_KEY_READ_POLICY [31:0] Default 0x00000002 - meaning only Crypto engine with identity \"1\" can read registers: AES_ENC_DEC_KEY_0, AES_ENC_DEC_KEY_1, AES_ENC_DEC_KEY_2, AES_ENC_DEC_KEY_3 AES_KEY_WRITE_POLICY [31:0]..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "Within the AXI node interface wrapper module in the RISC-V AXI module of the HACK@DAC'19 CVA6 SoC [REF-1346], an access control mechanism is employed to...",
+        "snippet": "... for (i=0; i<NB_SUBORDINATE; i++) begin for (j=0; j<NB_MANAGER; j++) begin assign connectivity_map_o[i][j] = access_ctrl_i[i][j][priv_lvl_i]; end end ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-24985",
+        "description": "A form hosting website only checks the session authentication status for a single form, making it possible to bypass authentication when there are multiple forms",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-24985"
+      },
+      {
+        "reference": "CVE-2021-36934",
+        "description": "An operating system has an overly permission Access Control List onsome system files, including those related to user passwords",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-36934"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

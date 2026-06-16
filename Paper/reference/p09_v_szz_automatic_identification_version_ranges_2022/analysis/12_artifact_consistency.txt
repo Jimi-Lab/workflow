@@ -1,0 +1,28 @@
+# 12 Artifact Consistency
+
+Static Source Inventory:
+- Local source path exists and contains 133 observed files.
+- The root README states this is the replication package of V-SZZ accepted by ICSE 2022.
+- The package includes Python workflow scripts, nested baseline SZZ tooling, Java/Ruby components from prior SZZ replication packages, zip artifacts, and data/result-related files.
+
+Paper Claim Alignment:
+- Paper claim: V-SZZ modifies SZZ to go backward through vulnerable-line history.
+  Static evidence: `icse2021-szz-replication-package/tools/pyszz/szz/my_szz.py` contains `find_bic`, `map_modified_line_java`, `map_modified_line`, and records `previous_commits`.
+- Paper claim: Java uses AST mapping and C/C++ uses string similarity/locality.
+  Static evidence: `my_szz.py` calls an ASTMapEval jar path for Java and uses Levenshtein line similarity for mapping.
+- Paper claim: duplicate changes are detected.
+  Static evidence: `identify_duplicated_patch.py` computes hashes of normalized patch hunks and builds commit-patch mappings.
+- Paper claim: affected versions are inferred from inducing/fixing commits.
+  Static evidence: `extract_tag.py` computes inducing-reachable tags minus fixing-reachable tags in `generate_vulnerable_versions`.
+- Paper claim: evaluation compares SZZ variants.
+  Static evidence: `main.py` imports B-SZZ, AG-SZZ, MA-SZZ, RA-SZZ, and MySZZ/V-SZZ style classes; `evaluate.py` computes precision/recall/F1-style outputs.
+
+Important Static Caveats:
+- `setting.py` has empty path placeholders for WORK_DIR, REPOS_DIR, input_DIR, and related directories.
+- `main.py` contains a visible debug-specific branch/early exit in the `method == "my"` path; this may not represent the clean released execution path. [NEEDS SOURCE]
+- Many stages in `run.py` appear commented or require manually toggled execution.
+- No commands were executed and no reported metrics were reproduced. [EXECUTION NOT REQUESTED]
+
+Artifact Readiness:
+- Good for method/source-structure comparison.
+- Not ready for reproduction claims without a separate execution/reproduction pass. [NEEDS ARTIFACT]

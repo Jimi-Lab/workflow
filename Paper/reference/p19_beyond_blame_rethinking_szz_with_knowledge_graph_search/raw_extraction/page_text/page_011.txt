@@ -1,0 +1,46 @@
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 11
+LLM4SZZ[ 36] is the current state-of-the-art approach that leverages LLMs to identify BICs from
+blame candidates. It employs two strategies: rank-based identification that asks the LLM to rank
+buggy statements by their relevance to the root cause, and context-enhanced identification that
+provides additional context for direct BIC selection. LLM4SZZ expands context around modified
+lines (full function bodies or ±2 surrounding lines) and blames these expanded lines as well for
+candidate collection. This enables LLM4SZZ to handle blameless cases and reach some BICs beyond
+the immediate deleted-line blame set. However, LLM4SZZ does not traverse commit history, which
+is the gap that AgenticSZZ addresses through TKG-based exploration.
+In summary, LLM4SZZ’s context expansion extends blame beyond deleted lines but does not
+traverse commit history. Furthermore, only LLM4SZZ handles blameless cases; none of the other
+baselines can provide any candidates when the bug fix contains only additions.
+5.2 Evaluation Metrics
+Following LLM4SZZ, we adopt standard information retrieval metrics. Let 𝑃 denote the set of
+predicted BICs and 𝐺 denote the set of ground truth BICs for a given BFC.Precisionmeasures
+the fraction of predictions that match ground truth BICs,Recallmeasures the fraction of ground
+truth BICs that are correctly identified, andF1-scoreis the harmonic mean of Precision and Recall,
+providing a balanced measure:
+Precision= |𝑃∩𝐺|
+|𝑃| ,Recall= |𝑃∩𝐺|
+|𝐺| ,F1-score= 2×Precision×Recall
+Precision+Recall (1)
+For BFCs with multiple ground truth BICs, a prediction is considered correct if it matches any
+valid BIC in𝐺. Following prior work [36], each approach returns a single predicted BIC per case.
+5.3 Implementation
+AgenticSZZ is implemented in Python 3.12 using the following components:
+(1) LLM Backend.We use DeepSeek-V3.2 [ 9] as the agent’s reasoning engine, accessed via the
+official API. The LLM operates with temperature 0 for reproducibility.
+(2) Knowledge Graph.The TKG is stored in Neo4j 2 using the Graphiti framework [28] for temporal
+knowledge graph management. Graphiti provides native support for temporal entity and edge
+management, enabling efficient retrieval of commits and their relationships while maintaining
+chronological ordering. We design the domain-specific schema (commit, file, and function nodes;
+temporal and structural edges) and tool APIs on top of this general-purpose framework.
+(3) TKG Configuration.For commit traversal, we set the maximum file-history depth to 100 commits
+in each direction (BFC ancestor and blame ancestor), with a hard cap of 200 total candidates
+per TKG. These generous upper bounds ensure high coverage (RQ0 shows that 80% of ancestor
+BICs are reachable within depth 24); the actual number of commits collected depends on each
+file’s history length. The agent evaluates the top-𝐾=20 candidates ranked by fitness score; we
+analyze sensitivity to𝐾in Section 8.
+(4) Agent Framework.We implement the search agent using pydantic-ai,3 a Python agent framework
+that provides typed tool interfaces and structured output parsing. The agent receives the BFC
+context (commit message, modified files, extracted functions) and iteratively calls tools until it
+reaches a decision or exhausts the step limit of 50.
+2https://neo4j.com/
+3https://ai.pydantic.dev/
+, Vol. 1, No. 1, Article . Publication date: February 2026.

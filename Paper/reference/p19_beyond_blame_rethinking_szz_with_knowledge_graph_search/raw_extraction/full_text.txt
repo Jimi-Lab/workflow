@@ -1,0 +1,1189 @@
+===== Page 001 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph
+Search
+YU SHI,Queen’s University, Canada
+HAO LI,Queen’s University, Canada
+BRAM ADAMS,Queen’s University, Canada
+AHMED E. HASSAN,Queen’s University, Canada
+Identifying Bug-Inducing Commits (BICs) is fundamental for understanding software defects and enabling
+downstream tasks such as defect prediction and automated program repair. Yet existing SZZ-based approaches
+are limited by their reliance on git blame, which restricts the search space to commits that directly modified
+the fixed lines. Our preliminary study on 2,102 validated bug-fixing commits reveals that this limitation is
+significant: over 40% of cases cannot be solved by blame alone, as 28% of BICs require traversing commit
+history beyond blame results and 14% are blameless.
+We present AgenticSZZ, the first approach to apply Temporal Knowledge Graphs (TKGs) to software
+evolution analysis. AgenticSZZ reframes BIC identification from a ranking problem over blame commits into
+a graph search problem, where temporal ordering is fundamental to causal reasoning about bug introduction.
+The approach operates in two phases: (1) constructing a TKG that encodes commits with temporal and
+structural relationships, expanding the search space by traversing file history backward from two reference
+points (blame commits and the BFC); and (2) leveraging an LLM agent to navigate the graph using specialized
+tools for candidate exploration and causal analysis.
+Evaluation on three datasets shows that AgenticSZZ achieves F1-scores of 0.48 to 0.74, with statistically
+significant improvements over state-of-the-art by up to 27%. Our ablation study confirms that both components
+are essential, reflecting a classic exploration-exploitation trade-off: the TKG expands the search space while
+the agent provides intelligent selection. By transforming BIC identification into a graph search problem, we
+open a new research direction for temporal and causal reasoning in software evolution analysis.
+CCS Concepts:•Software and its engineering→Software maintenance tools.
+Additional Key Words and Phrases: Bug-inducing commit, SZZ, Temporal knowledge graph, large language
+model, LLM agent
+ACM Reference Format:
+Yu Shi, Hao Li, Bram Adams, and Ahmed E. Hassan. 2026. Beyond Blame: Rethinking SZZ with Knowledge
+Graph Search. 1, 1 (February 2026), 21 pages. https://doi.org/10.1145/nnnnnnn.nnnnnnn
+1 Introduction
+Identifying the commit that introduced a bug, known as the Bug-Inducing Commit (BIC), is a
+foundational task in software maintenance. Accurate BIC identification enables understanding when
+and how bugs are introduced [2, 3, 17, 18], supports defect prediction models [11, 15, 27, 34, 44], and
+guides history-aware automated program repair systems [30] toward effective patches by providing
+Authors’ Contact Information: Yu Shi, Queen’s University, Kingston, Canada, y.shi@queensu.ca; Hao Li, Queen’s University,
+Kingston, Canada, hao.li@queensu.ca; Bram Adams, Queen’s University, Kingston, Canada, bram.adams@queensu.ca;
+Ahmed E. Hassan, Queen’s University, Kingston, Canada, hassan@queensu.ca.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee
+provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the
+full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored.
+Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires
+prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM XXXX-XXXX/2026/2-ART
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+arXiv:2602.02934v1  [cs.SE]  3 Feb 2026
+
+===== Page 002 =====
+2 Yu Shi et al.
+precise historical context. For two decades, the dominant BIC identification approach has been the
+SZZ algorithm [32] and its variants [7, 8, 19, 24, 35, 36], which trace deleted (and modified) code
+in a bug-fixing commit (BFC) via git blame to identify commits that last modified those lines.
+Presumably, one or more of those commits are the BIC.
+While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify
+the same code elements [42], this assumption does not always hold: prior work has shown that over
+13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain
+only added lines where blame cannot be applied [23]. As the git blamemechanism constrains the
+search space to commits that directly touched the fixed lines, it misses BICs introduced through
+earlier code that was subsequently refactored [ 24, 25], or bugs in related code where the fix
+addresses the issue by adding new functionality. Despite these fundamental limitations, prior work
+has focused primarily on improving precision of the git blame-based approach through filtering
+heuristics [7, 19], refactoring detection [24, 25], deep learning [35], semantic analysis [4, 37], and
+LLM-based reasoning [36], leaving the recall problem unaddressed.
+Our key insight is that BIC identification is not a ranking problem over a static list of
+blame candidates, but a search problem over a temporal graph of the commit history.A
+commit does not exist in isolation; each change builds upon previous code snapshots, forming a
+causal chain where later commits depend on earlier ones. When a blame commit merely reformatted
+code or made cosmetic changes, the actual bug may have been introduced by an earlier commit in
+this chain, or a later one. Identifying such BICs requires traversing the commit history: for example,
+following file modifications preceding or succeeding from a blame commit to find the commit that
+originally introduced the buggy logic. Temporal Knowledge Graphs (TKGs) are well-suited for
+this task because they explicitly encode the temporal dimension alongside structural relationships
+(shared files, functions, authors), enabling principled exploration of the commit history while
+respecting causality constraints. While knowledge graphs have been successfully applied to various
+software engineering tasks such as automated program repair [5, 45], bug localization [21], and
+crash solution recommendation [10], they have not yet been applied to BIC identification.
+To expand the search space beyond direct blame results, we present AgenticSZZ, a novel approach
+that structures the BIC search space using a TKG and navigates it with an LLM agent. AgenticSZZ
+operates in two phases:
+•TKG Construction:Given a bug-fixing commit, we build a graph encoding commits as
+nodes with temporal ordering and code structure connections (shared files and functions).
+Starting from two reference points, we expand the search space by traversing file history
+backward: from blame commits to capture earlier bug introductions, and from the BFC to
+capture commits that may have transformed correct code into buggy code.
+•Agentic BIC Search:An LLM agent navigates the TKG using four specialized tools for
+candidate enumeration, structural traversal, property queries, and causal analysis. The agent
+reasons about which commits could have introduced the bug by examining code changes
+and their relationships.
+We evaluate AgenticSZZ on the same datasets used in prior work [36], comprising 2,102 validated
+BFC-BIC pairs. AgenticSZZ achieves F1-scores of 0.48 to 0.74 across datasets, outperforming the
+eight baselines by up to 27%. Our ablation study demonstrates that both the TKG and agent
+components are essential: TKG-only expansion introduces noise without intelligent filtering, while
+the agent alone (without the TKG) is limited to blame-derived candidates. This paper makes the
+following contributions:
+•A preliminary study characterizing where ground truth BICs are located relative to blame
+commits, revealing that 28% require commit history traversal and 14% are blameless.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 003 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 3
+•AgenticSZZ, the first approach to apply Temporal Knowledge Graphs to software evolution
+analysis, reframing BIC identification as a graph search problem and enabling identification
+of BICs beyond the blame-defined candidate set.
+•Comprehensive evaluation demonstrating state-of-the-art performance, with ablation analysis
+validating the contribution of each component.
+2 Background and Related Work
+SZZ Algorithm and Its Variants.The SZZ algorithm [ 32] pioneered automated BIC identification
+by tracing deleted or modified lines in bug-fixing commits via git blame. Over two decades,
+numerous variants have improved precision through annotation graphs and cosmetic change
+filtering [19], meta-change exclusion [7], refactoring detection [24, 25], deep learning [35], and LLM-
+based reasoning [36, 40]. Most recently, LLM4SZZ [36] leverages LLMs to rank blame candidates and
+expands context around modified lines for candidate collection. We provide detailed descriptions of
+our baselines in Section 5.1. Despite these advances, all approaches share a fundamental limitation:
+they restrict the search space to commits returned by git blame, inherently missing BICs that
+require broader history traversal. AgenticSZZ addresses this limitation by structuring the commit
+history as a temporal knowledge graph and navigating it through agent-guided exploration.
+Knowledge Graphs (KGs) in Software Engineering (SE).A KG is a graph-based data structure
+where nodes represent entities and edges encode relationships between them, enabling queries that
+traverse and reason over these connections [16]. KGs have been increasingly applied to SE tasks. For
+automated program repair, repository-aware KGs bridge semantic gaps between issue descriptions
+and code patches [ 45], and unified code KGs enable multilingual issue resolution [ 5]. For bug
+localization, injecting KG-derived knowledge into LLMs improves fault localization accuracy [21].
+Crash solution recommendation has been addressed by mining Stack Overflow into structured
+KGs [10]. However, none of these works address BIC identification or model the temporal evolution
+of commits. Temporal knowledge graphs (TKGs) extend KGs with time-aware reasoning, enabling
+prediction over evolving relationships [ 26, 28, 38]. To our knowledge, AgenticSZZ is the first
+approach to apply TKGs to software evolution analysis. The temporal dimension is essential for
+BIC identification: a commit can only induce a bug if it precedes the fix, and understanding causal
+relationships requires reasoning about the sequence of code changes over time.
+LLM Agents for SE.LLM-based agents have emerged as powerful tools for complex SE tasks,
+marking a shift toward Agentic SE (SE 3.0) where agents work as AI teammates [14, 20]. Recent ap-
+proaches navigate codebases autonomously to resolve GitHub issues [46, 47], using tool-augmented
+LLMs to search, read, and edit files. Simpler pipelines without persistent agent state have also proven
+effective [43], general-purpose agent frameworks provide flexible foundations [41], and unified
+agents have been proposed to orchestrate multiple SE capabilities [1]. For bug fixing specifically,
+combining code KGs with agentic reasoning has shown promise [22]. An LLM-based framework
+has been proposed for BIC localization by integrating execution traces and commit artifacts [40].
+However, this approach requires test execution for candidate filtering and does not model the tem-
+poral structure of commit history. In contrast, AgenticSZZ operates over a TKG of commit history,
+using specialized tools designed for BIC search. This design enables reasoning about historical code
+evolution rather than static code states.
+3 Preliminary Study (RQ0): Where are Bug-Inducing Commits Located?
+3.1 Motivation
+Existing SZZ techniques [7, 19, 24, 32] predominantly assume that bug-inducing commits (BICs) can
+be identified by applying git blame on the deleted or modified lines in the BFC. This is based on
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 004 =====
+4 Yu Shi et al.
+Fig. 1. Categorization of bug-inducing commits (BICs) relative to blame commits. The Blame category (green)
+contains BICs that appear in blame commits; the Blame Ancestor category (blue) requires backward search
+from blame; the BFC Ancestor category (orange) requires backward search from the BFC toward blame.
+the common assumption that the bug fix location has to be one or more lines previously modified by
+the BIC [32]. This assumption of course can be incorrect, for instance when the commit identified
+by blame only modified whitespace characters and the real BIC is older than the former commit. In
+such cases, one could recursively apply blame to trace further back (illustrated as “Blame Ancestor”
+in Figure 1); other times, the BIC actually could be more recent than the blame commit (“BFC
+Ancestor” in Figure 1), for instance when the BIC changes the value of a configuration option,
+which reveals a bug in a different part of the system. In such a situation, some other kind of code
+or commit relation should be used to navigate from the BFC to the BIC.
+However, without knowing how often each scenario occurs and how deep the search must go,
+such extensions to the base SZZ techniques remain impractical. While prior work has examined
+file and statement overlap between BICs and bug-fixing commits (BFCs) [42], the distribution of
+ground truth BICs across different positions in the commit history relative to blame results has not
+been systematically characterized. Understanding this distribution is essential for better guiding
+the search strategy across the commit history of a project. For instance, if one would find that BICs
+requiring backward traversal are common, how far back in history should one go to search the
+BIC? If BICs instead lie in between the blame commit and the BFC, how much closer to the BFC
+are they typically located? This preliminary study addresses this gap by categorizing where BICs
+appear with respect to blame commits, in order to assess the completeness of blame-based search
+and to determine whether broader history traversal is necessary.
+3.2 Approach
+3.2.1 Datasets.We use the same three developer-annotated datasets as LLM4SZZ [ 36], where
+BFC-BIC pairs are extracted from bug reports or commit messages authored by developers. These
+datasets provide higher ground truth quality than SZZ-generated datasets [8, 25].DS_LINUX[ 23]
+is derived from the Linux kernel (written in C), where developers explicitly label bug-inducing
+commits in their fix messages. We use the exact same 1,500 pairs provided by LLM4SZZ [ 36].
+DS_APACHE[ 42] is constructed from five Apache Software Foundation Java projects, with BIC
+annotations extracted from issue tracking systems and commit messages. This dataset contains 241
+validated pairs.DS_GITHUB[ 29] spans 295 open-source repositories with developer-annotated
+BIC information mined from commit messages. This dataset contains 361 pairs, which we further
+split into DS_GITHUB-c (C language, 286 pairs) and DS_GITHUB-j (Java, 75 pairs) for language-
+specific analysis. In total, our evaluation covers 2,102 BFC-BIC pairs with 2,272 ground truth BICs,
+as some fixes address bugs introduced by multiple commits.
+3.2.2 BIC Categorization.To characterize the search space, we execute git blameon the modified
+lines of each BFC and automatically classify the ground truth BIC based on its reachability from
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 005 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 5
+Table 1. Distribution of ground truth BIC categories across datasets.
+Dataset Cases BICs Blame Blame Anc. BFC Anc. Blameless Unreachable
+DS_LINUX 1,500 1,562 901 (57.7%) 170 (10.9%) 219 (14.0%) 268 (17.2%) 4 (0.3%)
+DS_APACHE 241 353 164 (46.5%) 48 (13.6%) 116 (32.9%) 15 (4.2%) 10 (2.8%)
+DS_GITHUB 361 357 234 (65.5%) 17 (4.8%) 67 (18.8%) 37 (10.4%) 2 (0.6%)
+Total 2,102 2,272 1,299 (57.2%) 235 (10.3%) 402 (17.7%) 320 (14.1%) 16 (0.7%)
+these blame results. We define five mutually exclusive categories (see Figure 1).Blameincludes
+BICs that appear directly in the blame set.Blame Ancestorincludes BICs that are ancestors of
+blame commits and require backward traversal.BFC Ancestorincludes BICs that are descendants
+of blame commits but precede the BFC, requiring traversal backward from the BFC.
+We also account for cases where standard traversal fails.Blamelesscaptures cases where the
+BFC contains no deleted or modified lines (i.e., only new code was added and nothing togit blame),
+rendering standard SZZ approaches inapplicable. Finally,Unreachablerefers to BICs on parallel
+branches not reachable via backward traversal from blame commits. For example, suppose the BIC
+is on branch A while the blame commit is on branch B; after both branches merge, the buggy code
+is present, but git blame points to the branch B commit that last modified the same lines, making
+the true BIC on branch A unreachable through backward traversal. This classification determines
+the specific graph traversal capabilities required to identify the root cause.
+To determine whether broader history traversal is necessary and to quantify the search space, we
+analyze each BIC category with a tailored measurement strategy. For the Blame category, we study
+the number of blame commits per case to understand candidate complexity. For the Blame Ancestor
+and BFC Ancestor categories, we measure the file-history depth required to reach the BIC. Given
+the scale of commit graphs (e.g., Linux has over 1 million commits), we filter candidates to those
+that modified exactly the same files as the BFC, as file co-modification is a necessary condition for
+code-level bug introduction. This file-scoped traversal is far more tractable than full DAG distance
+(median 13,786 commits across our raw datasets vs. median 2 commits for file-history) and focuses
+on commits most likely to be relevant. For Blameless cases where no deleted lines exist, we analyze
+a fallback strategy that applies git blameto the context lines surrounding each addition (2 lines
+before and after each added hunk [36], i.e., contiguous block of added lines), under the assumption
+that the BIC likely modified code adjacent to where the fix adds new logic.
+3.3 Results
+57.2% of BICs are directly identifiable via git blame, while 28.0% require extended commit
+history traversal (Blame Ancestor or BFC Ancestor).Table 1 presents the category distribution
+across three datasets. The Blame category dominates with 57.2% of all BICs, confirming that git
+blame provides a strong baseline for BIC identification. However, a substantial portion of BICs
+require traversing the commit graph beyond blame commits: 10.3% are Blame Ancestors (requiring
+backward traversal from blame commits) and 17.7% are BFC Ancestors (requiring backward traversal
+from the BFC). Notably, 14.1% of cases are Blameless where traditional blame-based approaches
+cannot provide any candidates. These findings reveal that any approach relying solely on direct
+blame commits will miss nearly half of all BICs. Even for the majority Blame category, correctly
+identifying the true BIC among multiple blame candidates remains challenging.
+Even within the Blame category, identifying the correct BIC among multiple candi-
+dates is non-trivial.Figure 2 shows the joint distribution of deleted lines and blame commits
+across datasets. The heatmap reveals distinct complexity patterns across datasets. DS_LINUX and
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 006 =====
+6 Yu Shi et al.
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+307 115
+37
+89
+47
+10
+4
+74
+44
+19
+1
+1
+3
+25
+17
+22
+13
+3
+4
+6
+7
+10
+6
+7
+17
+3
+1
+2
+3
+2
+1
+1
+0
+50
+100
+150
+200
+250
+300
+Cases
+(a) DS_LINUX (n=901)
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+20 13
+4
+8
+11
+1
+12
+11
+6
+1
+4
+7
+9
+5
+1
+2
+3
+2
+4
+4
+4
+4
+4
+1
+1
+3
+1
+8
+1
+2
+1
+4
+1
+1
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+Cases (b) DS_APACHE (n=164)
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+73 28
+2
+20
+17
+4
+10
+12
+7
+3
+1
+1
+6
+7
+2
+4
+3
+3
+2
+3
+3
+4
+4
+5 2
+2
+6
+0
+10
+20
+30
+40
+50
+60
+70
+Cases (c) DS_GITHUB (n=234)
+Fig. 2. Distribution of blame complexity for Blame category cases. Each cell shows the number of cases with
+a given combination of deleted lines and blame commits.
+0 25 50 75 100 125 150 175 200
+File-History Depth Limit
+0
+20
+40
+60
+80
+100Coverage (%)
+80%
+24
+14
+90%
+56
+44
+Blame Ancestor
+BFC Ancestor
+(a) Blame Ancestor and BFC Ancestor.
+0 20 40 60 80 100
+File-History Depth Limit
+0
+20
+40
+60
+80
+100Coverage (%)
+50%
+19
+37
++ Fallback Direct: 172 cases (54% of blameless)
+Blame Ancestor
+BFC Ancestor (b) Blameless with fallback strategy.
+Fig. 3. File-history traversal depth required to reach BICs. (a) 28% of cases require traversal beyond blame
+(Blame Ancestor and BFC Ancestor categories). (b) The 14.1% Blameless cases have no deleted lines.
+DS_GITHUB concentrate in the low-complexity region (1 to 2 deleted lines with 1 blame commit):
+422 cases (47%) and 101 cases (43%) respectively. In contrast, DS_APACHE is more scattered, with
+only 33 cases (20%) in this region but 49 cases (30%) with ≥10 deleted lines and ≥3 blame commits.
+Overall, 476 of 1,299 Blame category cases (36.6%) involve multiple blame commits, requiring
+intelligent selection rather than simply returning all blame candidates.
+For the remaining 28% of BICs that fall into the Blame Ancestor and BFC Ancestor categories,
+the challenge shifts from ranking candidates to determining how far to traverse the commit history.
+File-history depth provides a tractable search space for BIC identification.Figure 3 shows the
+percentage of BICs found as file-history traversal depth increases. For blameable cases (Figure 3a),
+traversing 24 ancestor commits covers 80% of Blame Ancestor BICs (backward from blame), while
+14 descendant commits cover 80% of BFC Ancestor BICs (backward from BFC).
+Fallback strategy provides useful candidates for 54% of Blameless cases.For the 14.1% of
+Blameless cases where git blame cannot be applied, we investigate whether blaming lines adjacent
+to additions could provide useful candidates. Figure 3b shows that 54% of Blameless BICs appear
+directly in these fallback blame commits. For the remaining cases, traversal depths of 19 (Blame
+Ancestor) to 37 (BFC Ancestor) commits achieve 50% coverage.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 007 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 7
+Fig. 4. AgenticSZZ architecture. Given a Bug-Fixing Commit (BFC) and its repository, TKG Construction
+identifies blame commits and expands the search space by traversing file history backward from two starting
+points (Blame Ancestor and BFC Ancestor). Agentic BIC Search then navigates the resulting graph using four
+specialized tools to identify the Bug-Inducing Commit (BIC).
+Summary of RQ0
+•While 57.2% of BICs do appear directly in blame commits, 36.6% of these Blame category cases involve
+multiple candidates requiring intelligent selection.
+•28.0% of BICs require commit history traversal beyond blame results (Blame Ancestor or BFC Ancestor),
+and 14.1% of cases are blameless (traditional blame-based approaches cannot apply).
+Implication:Differentiating between these three categories is a promising direction for improving BIC
+identification. However, it requires intelligent reasoning to predict which category applies to a given case,
+as exhaustive graph traversal for all potential BIC candidates would be prohibitively expensive.
+4 Methodology
+Based on the findings of the preliminary study, we propose a new BIC identification approach
+called AgenticSZZ that goes beyond focusing only on commits of the Blame category, where prior
+approaches are confined to. AgenticSZZ has two phases as shown in Figure 4: (1) constructing a
+Temporal Knowledge Graph (TKG) that expands the candidate set beyond direct blame commits
+to include ancestor commits, and (2) leveraging an LLM agent equipped with specialized tools to
+navigate and reason over this graph, allowing to identify other commits such as BIC, for instance a
+BFC Ancestor or even a Blameless commit.
+Given a bug-fixing commit (BFC) and its repository, we first construct a TKG through blame
+analysis and commit history traversal in two directions: backward from blame commits (Blame
+Ancestor) and backward from the BFC itself (BFC Ancestor). The TKG encodes commits as nodes
+with temporal ordering and code structure connections in the form of shared files and functions. An
+LLM agent then navigates this graph using specialized tools that support candidate enumeration,
+commit property inspection, causal analysis, and structural relationship exploration. The TKG
+should be as complete as possible to ensure the true BIC is reachable, while the agent must be as
+precise as possible to avoid overwhelming false positives from simply returning all graph nodes as
+candidates.
+4.1 Temporal Knowledge Graph Construction
+The TKG construction phase transforms raw repository data into a structured search space that
+captures both temporal commit relationships and code entity connections.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 008 =====
+8 Yu Shi et al.
+4.1.1 Blame Analysis.For each BFC, we extract the set of modified files and execute git blameon
+deleted and modified lines to identify blame commits. These are the commits that last touched the
+lines removed or changed by the fix, serving as initial BIC candidates. For blameless cases where the
+fix only adds code, we apply a fallback strategy that blames the context lines surrounding additions
+(2 lines before and 2 lines after each added hunk) to obtain candidates. Note that LLM4SZZ expands
+context around all modified lines for all cases, whereas our fallback applies only to blameless cases.
+The reason for this key difference is that we rely on ancestor traversal to build the TKG (described
+below), enabling systematic exploration of commit history.
+4.1.2 Commit Traversal.Based on the preliminary study findings (Section 3) that 28% of BICs
+require traversal beyond direct blame commits, we expand the search space through file-history
+traversal in two directions:
+(1) Blame Ancestor traversal: Starting from each blame commit, we walk backward through the
+file history (using git log –follow) to collect commits that previously modified the same
+files. These candidates may have introduced bugs that were later touched but not fixed by the
+blamed commit.
+(2) BFC Ancestor traversal: Starting from the BFC, we walk backward through file history toward
+the blame commits. This captures commits that occurred after the blamed code was introduced
+but before the fix, which may have transformed correct code into buggy code.
+Depth limits (how many ancestor commits to traverse in each direction) and candidate caps
+(maximum number of commits to include in the TKG) are configurable parameters that balance
+coverage against computational cost; we discuss specific settings in Section 5.3.
+4.1.3 Graph Building.The graph contains three node types representing different aspects of the
+commit landscape:
+(1) Commitnodes represent commits, storing commit messages, timestamps, modified files, ex-
+tracted functions, and code diffs. Each commit is labeled with its type:bfc, blame, blame_ancestor,
+or bfc_ancestor. The BFC node additionally storesblame statistics: the total number of blame
+commits, whether a single commit is responsible for all blamed lines, and whether a dominant
+commit accounts for the majority of blamed lines. These statistics enable fast-path decisions
+during agent search.
+(2)Filenodes represent source files modified by commits.
+(3) Functionnodes represent functions in which at least one line was changed by the union of
+identified commit nodes. We extract function names by parsing the hunk headers (i.e., the @@
+lines in git diffoutput that mark each contiguous block of changes and include the enclosing
+function name as context). Each function is associated with its containing file.
+Edges encode both temporal and structural relationships:
+(1)PRECEDES edges connect each commit to the next one by commit date within the TKG, regardless
+of branch structure or DAG parent-child relationships. This date-based linear ordering ignores
+the full DAG structure, but suffices for causality reasoning since a commit can only induce a
+bug if it precedes the fix in time.
+(2)MODIFIES_FILE and MODIFIES_FUNCTION edges connect commits to the code entities they
+changed, enabling structural queries to find commits that touched the same code.
+(3)DEFINED_IN edges link functions to their containing files, enabling hierarchical code structure
+traversal.
+This schema enables the agent to reason about code-level relationships, identifying candidates
+that share modified functions or files with the BFC. Unlike prior works on knowledge graphs in
+software engineering (e.g., for automated program repair) [45], our approach explicitly leverages
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 009 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 9
+the temporal dimension of software evolution, constructing a temporal knowledge graph that
+preserves commit ordering and enables chronological reasoning about bug introduction.
+4.2 Agentic BIC Search
+As shown in Figure 4, the Agentic BIC Search phase navigates the TKG to identify the most likely
+BIC through structural reasoning and causality verification. The search agent receives context
+about the BFC (modified files, extracted functions, commit message) and produces a prediction
+identifying the BIC commit with a reasoning chain.
+4.2.1 Design Rationale.Our agentic loop design draws inspiration from recent advances in tool-
+augmented LLM agents for software engineering tasks [43, 46, 47]. These agents demonstrate that
+LLMs can effectively navigate complex search spaces when provided with specialized tools and
+structured reasoning. We adapt this paradigm to BIC identification, where the agent must reason
+about causal relationships between code changes across time. Unlike agents for issue resolution
+that operate on static code snapshots, our agent operates on a temporal knowledge graph, using
+tools designed for graph traversal and temporal reasoning. The key insight is that an LLM can
+perform nuanced semantic analysis (e.g., distinguishing a refactoring from a bug introduction)
+that heuristic-based SZZ variants cannot, while the TKG provides the structured search space that
+enables efficient exploration.
+4.2.2 Search Tools.The agent operates on the TKG through four specialized tools:
+(1) Candidate Enumeration( list_candidates): The agent’s mandatory first step. Returns the top-
+𝐾 candidates sorted by fitness score (see Algorithm 1), following the standard SZZ assumption
+that commits directly modifying fixed lines are most likely BICs. The tool also provides blame
+statistics to help the agent assess case complexity.
+(2) Structural Traversal( traverse_graph): FollowsMODIFIES_FILEand MODIFIES_FUNCTIONedges
+to discover commits that modified the same code entities. Results are ordered by commit type
+(blame commits first, then blame ancestors, then BFC ancestors), with function-level matches
+prioritized over file-level matches since they indicate more precise code co-location.
+(3) Property Query( query_node): Accesses metadata of a specific commit node, including the
+commit message, timestamp, modified files, and any code overlap with other candidates.
+(4) Causal Analysis( read_node_content): Reads the code diff stored in a commit node to perform
+causal analysis between BFC and BIC candidates. The agent checks if lines added by a candidate
+match what the BFC fixes, validating whether the candidate actually introduced the bug.
+4.2.3 Search Strategy.Algorithm 1 presents the agentic search loop. The agent begins by calling
+list_candidatesto obtain all candidate commits ranked by fitness score. This ranking prioritizes
+commit types based on our RQ0 findings: blame commits receive the highest score (1.0) since 57.2%
+of BICs appear directly in blame results; blame ancestors receive 0.6 as they require one level of
+traversal; BFC ancestors receive 0.3 as they represent the broadest exploration. These scores serve
+as ordinal rankings to guide the agent’s attention; the key property is the relative ordering, other
+values preserving this pattern would yield similar results.
+The agent then iteratively investigates the ranked candidates using the available tools. At each
+step, the LLM receives the full ranked candidate list along with outputs accumulated from previous
+tool calls (the ‘output’ variable in Algorithm 1), and may choose any candidate to investigate:
+querying its properties, reading its code diff to verify causal relationships, or traversing the graph
+to find related commits. In other words, the LLM could override the initial ranking returned by
+list_candidates based on its reasoning process. The loop continues until the agent reaches a
+decision or exhausts the maximum step limit (50 steps). To control API costs, we empirically limit
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 010 =====
+10 Yu Shi et al.
+Algorithm 1Agentic BIC Search
+Require:TKG, BFC, top-𝐾limit
+Ensure:BIC prediction with reasoning
+1:// Candidate ranking and retrieval
+2:𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒𝑠←list_candidates(TKG)⊲Returns top-𝐾ranked by fitness
+𝑓𝑖𝑡𝑛𝑒𝑠𝑠(𝑐)=
+ 
+
+1.0blame
+0.6blame_ancestor
+0.3bfc_ancestor
+3:// Agentic exploration loop
+4:𝑠𝑡𝑒𝑝←0;𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠←0;𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛←∅
+5:while𝑠𝑡𝑒𝑝<50and𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛=∅do
+6:𝑎𝑐𝑡𝑖𝑜𝑛←LLM_Reason(𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒𝑠, output)
+7:if𝑎𝑐𝑡𝑖𝑜𝑛=query_node(𝑠ℎ𝑎)then
+8: output←qery_node(TKG,𝑠ℎ𝑎)
+9:else if𝑎𝑐𝑡𝑖𝑜𝑛=read_node_content(𝑠ℎ𝑎)and𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠<3then
+10: output←read_node_content(TKG,𝑠ℎ𝑎)
+11:𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠←𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠+1
+12:else if𝑎𝑐𝑡𝑖𝑜𝑛=traverse_graph(𝑠ℎ𝑎)then
+13: output←traverse_graph(TKG,𝑠ℎ𝑎)
+14:else if𝑎𝑐𝑡𝑖𝑜𝑛=decide(𝑠ℎ𝑎,𝑟𝑒𝑎𝑠𝑜𝑛)then⊲Agent decision
+15:𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛←(𝑠ℎ𝑎,𝑟𝑒𝑎𝑠𝑜𝑛)
+16:end if
+17:𝑠𝑡𝑒𝑝←𝑠𝑡𝑒𝑝+1
+18:end while
+19:return𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛
+diff reads to 3 per case. The agent outputs a structured prediction containing the predicted BIC
+SHA and reasoning chain.
+5 Evaluation Setup
+We use the same three datasets (DS_LINUX, DS_APACHE, and DS_GITHUB) described in Sec-
+tion 3.2.1, comprising 2,102 validated BFC-BIC pairs with 2,272 ground truth BICs.
+5.1 Baselines
+We compare AgenticSZZ against seven SZZ variants and one LLM-based approach, adopting the
+same baselines as LLM4SZZ [36] to enable direct comparison. Since we use identical datasets and
+evaluation methodology, we report baseline results from this prior work where available.1
+All SZZ baseline variants are solely based on git blameover deleted or modified lines in the
+BFC. They differ primarily in their filtering and ranking strategies:B-SZZ[ 32] is the original SZZ
+algorithm that traces deleted lines via git blame and returns all blame commits as candidates.
+AG-SZZ[ 19] extends B-SZZ by filtering cosmetic changes (blank lines, comments) and using
+annotation graphs (which map line origins across revisions, even when lines move due to insertions
+or deletions) for more precise line tracking.MA-SZZ[ 7] further excludes meta-changes (branch
+merges, property changes) that do not affect program behavior.R-SZZandL-SZZ[ 8] select a single
+BIC from AG-SZZ candidates: R-SZZ chooses the most recent commit, while L-SZZ chooses the
+commit with the most changed lines.RA-SZZ[ 24] filters refactoring operations using RefDiff [31]
+and Refactoring Miner [39], but is limited to Java projects.Neural-SZZ[ 35] applies deep learning
+by embedding code changes with CodeBERT [12] and ranking them using a heterogeneous graph
+attention network. It is also limited to Java.
+1Baseline results for B-SZZ, AG-SZZ, MA-SZZ, R-SZZ, L-SZZ, RA-SZZ, and Neural-SZZ are from the LLM4SZZ paper [36].
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 011 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 11
+LLM4SZZ[ 36] is the current state-of-the-art approach that leverages LLMs to identify BICs from
+blame candidates. It employs two strategies: rank-based identification that asks the LLM to rank
+buggy statements by their relevance to the root cause, and context-enhanced identification that
+provides additional context for direct BIC selection. LLM4SZZ expands context around modified
+lines (full function bodies or ±2 surrounding lines) and blames these expanded lines as well for
+candidate collection. This enables LLM4SZZ to handle blameless cases and reach some BICs beyond
+the immediate deleted-line blame set. However, LLM4SZZ does not traverse commit history, which
+is the gap that AgenticSZZ addresses through TKG-based exploration.
+In summary, LLM4SZZ’s context expansion extends blame beyond deleted lines but does not
+traverse commit history. Furthermore, only LLM4SZZ handles blameless cases; none of the other
+baselines can provide any candidates when the bug fix contains only additions.
+5.2 Evaluation Metrics
+Following LLM4SZZ, we adopt standard information retrieval metrics. Let 𝑃 denote the set of
+predicted BICs and 𝐺 denote the set of ground truth BICs for a given BFC.Precisionmeasures
+the fraction of predictions that match ground truth BICs,Recallmeasures the fraction of ground
+truth BICs that are correctly identified, andF1-scoreis the harmonic mean of Precision and Recall,
+providing a balanced measure:
+Precision= |𝑃∩𝐺|
+|𝑃| ,Recall= |𝑃∩𝐺|
+|𝐺| ,F1-score= 2×Precision×Recall
+Precision+Recall (1)
+For BFCs with multiple ground truth BICs, a prediction is considered correct if it matches any
+valid BIC in𝐺. Following prior work [36], each approach returns a single predicted BIC per case.
+5.3 Implementation
+AgenticSZZ is implemented in Python 3.12 using the following components:
+(1) LLM Backend.We use DeepSeek-V3.2 [ 9] as the agent’s reasoning engine, accessed via the
+official API. The LLM operates with temperature 0 for reproducibility.
+(2) Knowledge Graph.The TKG is stored in Neo4j 2 using the Graphiti framework [28] for temporal
+knowledge graph management. Graphiti provides native support for temporal entity and edge
+management, enabling efficient retrieval of commits and their relationships while maintaining
+chronological ordering. We design the domain-specific schema (commit, file, and function nodes;
+temporal and structural edges) and tool APIs on top of this general-purpose framework.
+(3) TKG Configuration.For commit traversal, we set the maximum file-history depth to 100 commits
+in each direction (BFC ancestor and blame ancestor), with a hard cap of 200 total candidates
+per TKG. These generous upper bounds ensure high coverage (RQ0 shows that 80% of ancestor
+BICs are reachable within depth 24); the actual number of commits collected depends on each
+file’s history length. The agent evaluates the top-𝐾=20 candidates ranked by fitness score; we
+analyze sensitivity to𝐾in Section 8.
+(4) Agent Framework.We implement the search agent using pydantic-ai,3 a Python agent framework
+that provides typed tool interfaces and structured output parsing. The agent receives the BFC
+context (commit message, modified files, extracted functions) and iteratively calls tools until it
+reaches a decision or exhausts the step limit of 50.
+2https://neo4j.com/
+3https://ai.pydantic.dev/
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 012 =====
+12 Yu Shi et al.
+(5) Computational Resources.Experiments were conducted on a 48-core server with 1.5TB RAM. For
+parallel evaluation, each worker runs an isolated Neo4j instance in Docker, enabling concurrent
+processing across multiple cases.
+For the main comparison (Table 2) and controlled comparison (Table 4), we follow the evaluation
+protocol of LLM4SZZ [ 36]: both approaches are run three times independently, and we report
+metrics averaged across runs to reduce variance from LLM non-determinism. For statistical tests, we
+compare the best-performing run from each approach; we additionally test robustness by comparing
+our worst run against baselines’ best. For cost analysis (Table 3), we report the average processing
+time and cost per case across all three runs. For the ablation study and category breakdown analysis
+(RQ2), we report results from a single run, as our RQ1 results showed that performance overall is
+stable across runs (both for AgenticSZZ and LLM4SZZ).
+5.4 Data Leakage Prevention
+Commit messages in real repositories can contain explicit references to the BIC, added by developers
+who manually identified the bug-inducing commit. This is particularly prevalent in the Linux kernel,
+which follows a structured commit message format including Fixes:tags that directly reference
+the bug-inducing commit (this convention is how the DS_LINUX BIC dataset was constructed).
+Since SZZ aims to automate this manual identification process, we must prevent the agent from
+exploiting these ground truth hints during evaluation.
+For this reason, we sanitize all commit messages during TKG construction by removing Fixes:
+lines, Reverts: tags, and replacing inline commit SHA references with placeholder tokens. This
+ensures the agent must reason about code relationships rather than exploiting metadata leakage.
+6 Evaluation Results
+6.1 RQ1: How Effective is TKG-Guided Agentic Search for BIC Identification?
+6.1.1 Motivation.Our preliminary study (RQ0) revealed that existing blame-based approaches face
+fundamental limitations: a significant portion of BICs require traversing commit history beyond
+direct blame results, and many cases involve multiple candidates requiring intelligent selection.
+Current state-of-the-art approaches like LLM4SZZ [ 36] expand context around modified lines
+for blame candidate collection (Section 5.1) but do not traverse commit history to systematically
+explore ancestor commits.
+6.1.2 Approach.We evaluate AgenticSZZ on the complete set of 2,102 bug-fixing cases across
+DS_LINUX (1,500 cases), DS_APACHE (241 cases), and DS_GITHUB (361 cases). DS_GITHUB is
+further split into DS_GITHUB-c (C language, 286 cases) and DS_GITHUB-j (Java, 75 cases) to
+enable language-specific analysis, as Neural-SZZ and RA-SZZ are Java-only baselines. For each
+case, AgenticSZZ constructs a TKG through blame analysis and commit history traversal from
+two starting points, then employs an LLM agent to navigate the graph using the four specialized
+tools described in Section 4.2. We compare against eight baselines (Section 5.1), including six SZZ
+variants, Neural-SZZ, and LLM4SZZ.
+For the controlled comparison (Table 4), both approaches use DeepSeek-V3.2, isolating the
+architectural contribution from LLM selection.
+All approaches are evaluated using Precision, Recall, and F1-score as defined in Section 5.2. We
+use McNemar’s test for paired binary outcomes (correct/incorrect per case) and report Cohen’s 𝑔
+as effect size, where𝑔≥0.15indicates a medium effect and𝑔≥0.25indicates a large effect [6].
+6.1.3 Results.AgenticSZZ achieves the best or comparable F1-score across all datasets.
+Table 2 presents results across all four dataset splits. AgenticSZZ outperforms all baselines including
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 013 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 13
+Table 2. AgenticSZZ effectiveness across all datasets (averaged over three runs). Underlined: best baseline;
+“-”: Java-only baselines not applicable to C projects.
+Method DS_LINUX DS_GITHUB-c DS_GITHUB-j DS_APACHE
+Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1
+B-SZZ 0.452 0.578 0.507 0.361 0.656 0.466 0.285 0.680 0.401 0.251 0.435 0.318
+AG-SZZ 0.448 0.553 0.495 0.410 0.592 0.484 0.421 0.533 0.470 0.328 0.310 0.318
+MA-SZZ 0.421 0.538 0.472 0.335 0.624 0.436 0.239 0.560 0.335 0.307 0.345 0.329
+R-SZZ 0.583 0.448 0.507 0.671 0.582 0.620 0.538 0.467 0.500 0.497 0.288 0.364
+L-SZZ 0.560 0.430 0.486 0.486 0.422 0.452 0.492 0.427 0.457 0.366 0.211 0.267
+RA-SZZ - - - - - - 0.337 0.440 0.382 0.264 0.325 0.293
+Neural-SZZ - - - - - - 0.556 0.486 0.520 0.563 0.364 0.442
+LLM4SZZ 0.628 0.552 0.588 0.687 0.641 0.663 0.607 0.569 0.587 0.610 0.398 0.482
+AgenticSZZ 0.669 0.643 0.656 0.708 0.706 0.707 0.743 0.743 0.743 0.590 0.405 0.480
+LLM4SZZ, the previous state-of-the-art, with improvements of 6.6% on DS_GITHUB-c, 11.6% on
+DS_LINUX, and 26.6% on DS_GITHUB-j; DS_APACHE shows comparable performance. Comparing
+the best-performing runs, the improvement is statistically significant (McNemar’s test, 𝑝< 0.001,
+Cohen’s 𝑔= 0.19, medium effect). Even AgenticSZZ’sworst-performing run significantly outper-
+forms LLM4SZZ’sbestrun ( 𝑝< 0.001, 𝑔= 0.17), demonstrating robust improvements across runs.
+Among baselines, traditional SZZ variants like B-SZZ achieve higher recall by returning multiple
+candidates, but suffer from low precision; conversely, heuristics like R-SZZ improve precision but
+sacrifice recall. AgenticSZZ achieves both the highest recall and highest precision by expanding
+the search space through the TKG while using intelligent agent reasoning to filter candidates.
+The recall improvements validate our RQ0 findings about BIC distribution.AgenticSZZ
+achieves higher recall than LLM4SZZ across all datasets, with the largest gains on DS_GITHUB-j
+(+0.174) and DS_LINUX (+0.091). These improvements reflect our RQ0 finding that 28% of BICs
+require exploration beyond immediate blame commits. While LLM4SZZ’s context expansion can
+reach some of these BICs, at first sight AgenticSZZ’s TKG-based history traversal seems to provide
+a more systematic approach to exploring ancestor commits (a deeper analysis of this is performed
+in RQ2). The simultaneous precision improvements indicate that the agent’s reasoning effectively
+filters false positives introduced by search space expansion.
+DS_APACHE presents unique challenges that limit improvement.While AgenticSZZ
+matches LLM4SZZ on DS_APACHE, it does not achieve the same gains as on other datasets, and
+the difference is not statistically significant (𝑝= 0.74). As shown in Figure 2, DS_APACHE has the
+highest blame complexity: 30% of cases involve ≥10 deleted lines with ≥3 blame commits, whereas
+DS_LINUX and DS_GITHUB concentrate on the low-complexity region (47% and 43% respectively
+have 1 to 2 deleted lines with only 1 blame commit). This complexity increases the difficulty of
+identifying the correct BIC among many candidates. Additionally, DS_APACHE projects span
+diverse Apache Software Foundation repositories with varying coding conventions, making it
+harder for the agent to reason about code relationships consistently.
+These observed performance improvements come with moderate time overhead.Table 3
+presents the average processing time per case. AgenticSZZ requires 34 to 54 seconds per case,
+compared to 20 to 30 seconds for LLM4SZZ [ 36]. The additional time is primarily due to TKG
+construction (7 to 30 seconds depending on repository size), while agent reasoning time (23 to 26
+seconds) is comparable to LLM4SZZ’s LLM interaction. Notably, DS_LINUX has the longest TKG
+construction time (30 seconds) because git operations are slower on large repositories, but the total
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 014 =====
+14 Yu Shi et al.
+Table 3. AgenticSZZ average processing time and cost per case. Cost is calculated based on DeepSeek-V3.2
+API pricing as of December 2025.4
+Dataset Total (s) TKG (s) Agent (s) # Input Tokens # Output Tokens Cost ($)
+DS_LINUX 54.3 30.4 23.4 28,113 461 0.003
+DS_GITHUB 33.7 10.6 22.7 24,972 459 0.003
+DS_APACHE 33.8 7.3 26.1 37,037 534 0.004
+Table 4. Controlled comparison: both approaches use DeepSeek-V3.2, averaged over three runs. ∗Significant
+(𝑝<0.05, McNemar’s test).
+Approach DS_LINUX DS_GITHUB DS_APACHE Overall
+Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1
+LLM4SZZ 0.595 0.584 0.590 0.611 0.460 0.525 0.5370.4120.467 0.590 0.538 0.563
+AgenticSZZ0.669 0.643 0.656 ∗ 0.715 0.713 0.714 ∗ 0.5900.4050.480 0.668 0.617 0.642 ∗
+time remains practical. Compared to RA-SZZ, which requires 78 seconds per case for refactoring
+detection [36], AgenticSZZ is faster while achieving substantially higher accuracy.
+Controlled comparison confirms that improvements mainly stem from the TKG-guided
+paradigm, not merely from recent advances in the underlying LLM.Since AgenticSZZ uses
+DeepSeek-V3.2 while LLM4SZZ employs GPT-4o-mini, one might question whether AgenticSZZ’s
+improvements are due to architectural contributions or simply a more capable LLM. To isolate the
+architectural impact, we conducted a controlled comparison (Table 4) where both approaches use
+DeepSeek-V3.2. LLM4SZZ with DeepSeek achieves comparable F1-scores to the original GPT-4o-
+mini version (e.g., 0.590 vs 0.588 on DS_LINUX), indicating that DeepSeek is at least as capable
+for this task. Comparing against this controlled baseline, AgenticSZZ achieves a 14.0% relative
+improvement in overall F1-score (0.642 vs 0.563), due to gains of 11.2% on DS_LINUX and 36.0% on
+DS_GITHUB. On DS_APACHE, both approaches achieve comparable F1-scores (0.480 vs 0.467),
+consistent with the blame complexity challenges discussed above. The best-vs-best comparison
+is statistically significant (McNemar’s test, 𝑝< 0.001, Cohen’s 𝑔= 0.27, large effect); even our
+worst run outperforms their best (𝑝< 0.001, 𝑔= 0.25), demonstrating that the TKG-guided search
+paradigm, not merely LLM capability or run variance, drives AgenticSZZ’s effectiveness.
+Summary of RQ1
+•AgenticSZZ outperforms all baselines with F1-score improvements up to 26.6%; even its worst run beats
+the best baseline (𝑝<0.001).
+•Controlled comparison confirms improvements stem from the TKG-guided paradigm, not LLM selection.
+Implication:Reframing BIC identification as graph search over a TKG advances the state-of-the-art.
+6.2 RQ2: What is the Contribution of Each AgenticSZZ Component?
+6.2.1 Motivation.AgenticSZZ integrates two core components: a Temporal Knowledge Graph
+(TKG) for search space construction and expansion, and an LLM agent for intelligent navigation.
+Understanding each component’s contribution is essential for validating our design decisions and
+guiding future research. We conduct an ablation study to answer: Is the TKG necessary, or can
+an LLM agent reason effectively over raw blame results alone? Does the fallback strategy for
+4https://api-docs.deepseek.com/quick_start/pricing
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 015 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 15
+blameless cases contribute meaningfully? Does combining TKG and agent produce synergistic
+benefits beyond their individual contributions?
+6.2.2 Approach.We evaluate five configurations that systematically enable or disable components:
+(1) Blame-only: Returns the most recent blame commit as the predicted BIC, following traditional
+SZZ heuristics. No LLM reasoning, no TKG traversal, and no fallback for blameless cases (returns
+empty prediction). This represents the simplest heuristic baseline.
+(2) Blame-fallback: Extends Blame-only by applying the fallback strategy for blameless cases,
+blaming ±2 lines around additions to obtain candidates. This isolates the contribution of
+handling BIC identification of blameless bug fixes.
+(3) TKG-only: Constructs the full TKG with commit history traversal from two starting points
+but replaces the LLM agent with deterministic selection. Unlike the full pipeline shown in
+Algorithm 1 where the agent iteratively investigates candidates (reading diffs, traversing rela-
+tionships, reasoning about causality), TKG-only simply returns the highest-scoring candidate
+based on tiered fitness scoring (blame > blame_ancestor > bfc_ancestor) without any LLM
+interaction. This isolates the TKG’s candidate expansion from intelligent agent reasoning.
+(4) Agent-only: Uses an LLM agent to reason over blame candidates (with fallback) but without
+constructing a TKG. The agent receives blame candidate commit SHAs and their commit
+messages as text input and uses a simplified prompt without tool-calling capabilities, directly
+outputting its prediction. This isolates the agent’s reasoning capability without the expanded
+search space provided by the TKG.
+(5) Full Pipeline (AgenticSZZ): Combines TKG construction with agent-guided search. The agent
+navigates the TKG using the four specialized tools (Section 4.2) for candidate enumeration,
+graph traversal, property queries, and causal analysis between BFC and BIC candidates.
+By comparing these configurations, we quantify each component’s marginal contribution and
+assess whether their combination produces synergistic benefits. Since in RQ1, we observed at most
+a variation of 3% for any metric across the three runs of either AgenticSZZ or LLM4SZZ, for RQ2’s
+analysis, we decided to only perform one run of each variant.
+6.2.3 Results.The full pipeline consistently outperforms all ablation configurations,
+demonstrating that both TKG and agent components are necessary for optimal per-
+formance.Table 5 presents results across five configurations. AgenticSZZ achieves the highest
+F1-score on all datasets, with the largest margin on DS_GITHUB where diverse project structures
+benefit most from TKG-based exploration. The consistent improvements indicate that neither
+component alone is sufficient: the TKG provides structured search space expansion while the agent
+provides intelligent navigation. McNemar’s tests confirm all differences are statistically significant
+(𝑝<0.05) with large effect sizes (Cohen’s𝑔from 0.40 to 0.44) [6].
+Among configurations without LLM reasoning, Blame-fallback provides the best base-
+line, while TKG-only suffers from noise introduced by search space expansion.Blame-only
+serves as the simplest baseline: it returns the most recent blame commit without handling blame-
+less cases. Blame-fallback improves over Blame-only on all datasets by providing candidates for
+blameless cases, where Blame-only returns no prediction. However, TKG-only performs worse than
+Blame-fallback despite expanding the search space, particularly on DS_GITHUB and DS_APACHE.
+This reveals that deterministic ranking cannot effectively filter the expanded candidate set of a
+TKG: commits that coincidentally modified the same files are scored similarly to those that actually
+introduced the bug, reducing precision.
+Agent-only outperforms TKG-only, but the full pipeline shows the TKG’s value when
+combined with intelligent navigation.Agent-only applies LLM reasoning to the same candidate
+set as Blame-fallback (blame commits with the fallback strategy for blameless cases). It outperforms
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 016 =====
+16 Yu Shi et al.
+Table 5. Ablation study of AgenticSZZ components. All differences between AgenticSZZ and ablations are
+statistically significant (∗𝑝<0.05, McNemar’s test).
+DS_LINUX DS_GITHUB DS_APACHE
+AblationsPrec. Recall F1-score Prec. Recall F1-score Prec. Recall F1-score
+Blame-only 0.491 0.471 0.481 0.587 0.585 0.586 0.546 0.374 0.444
+Blame-fallback 0.555 0.533 0.544 0.629 0.627 0.628 0.558 0.383 0.454
+TKG-only 0.544 0.523 0.533 0.483 0.482 0.482 0.400 0.274 0.325
+Agent-only 0.567 0.545 0.556 0.590 0.588 0.589 0.537 0.369 0.437
+AgenticSZZ 0.670 0.644 0.657 ∗ 0.722 0.720 0.721 ∗ 0.608 0.417 0.495 ∗
+Table 6. True positives by BIC category. Each BFC is assigned to a single category using priority (Blame >
+Ancestor > Blameless). Ancestor combines Blame Ancestor and BFC Ancestor categories. For fair comparison,
+LLM4SZZ uses the same LLM (DeepSeek-V3.2) as AgenticSZZ (Table 4). Results are based on the best run
+(highest F1-score) for each approach.
+Approach Blame Ancestor Blameless Total
+Blame-only 1,076 0 0 1,076
+Blame-fallback 1,076 0 114 1,190
+TKG-only 980 0 104 1,084
+Agent-only 1,077 1 112 1,190
+LLM4SZZ 1,016 35 123 1,174
+AgenticSZZ1,20919180 1,408
+TKG-only on all datasets, confirming that intelligent reasoning over a focused candidate set is more
+effective than deterministic ranking over an expanded set. The full pipeline combines the TKG’s
+structured exploration with the agent’s intelligent navigation, achieving the best performance
+across all datasets.
+Category-level analysis reveals the strengths of LLM4SZZ vs. AgenticSZZ.Table 6 and
+Figure 5 break down the true positives of each approach by BIC category. AgenticSZZ achieves
+the highest total number of true positives (1,408) through substantial gains in Blame (+193 over
+LLM4SZZ) and Blameless (+57) categories. The Venn diagrams reveal that the two approaches are
+largely complementary in the Blame category (998 shared successes, but AgenticSZZ uniquely solves
+211 cases vs. LLM4SZZ’s 18), while they solve completely different cases in the Ancestor category (no
+overlap). Interestingly, LLM4SZZ’s context expansion finds more Ancestor-category BICs (35 vs. 19),
+suggesting that expanding context around modified lines, while aimed to improve the identification
+of blameless cases, actually is more efficient in finding Ancestor cases. In contrast, AgenticSZZ’s
+superior reasoning enabled it to correctly identify 193 more Blame BICs than LLM4SZZ. This
+indicates that intelligent candidate selection matters more than search space expansion for the
+majority of cases.
+The TKG-agent synergy reflects an exploration-exploitation trade-off [ 33].The TKG
+expands the frontier of possible solutions by encoding temporal and code-level relationships,
+while the agent exploits semantic understanding to select among them. Neither component alone is
+sufficient: expansion without intelligence introduces noise, while intelligence without expansion hits
+a coverage ceiling. This complementary design suggests that future work could explore integrating
+search-based software engineering techniques [13] to further optimize the navigation strategy.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 017 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 17
+211 18998
+(a) Blame
+19 35 (b) Ancestor
+68 11112 (c) Blameless
+Fig. 5. True positives overlap by BIC category. Green: AgenticSZZ only; Orange: LLM4SZZ only.
+Summary of RQ2
+•Both TKG and agent components are necessary for optimal performance.
+•Category-level analysis (Table 6) shows how AgenticSZZ’s gains over LLM4SZZ come from better
+Blame (+193) and Blameless (+57) identification, while LLM4SZZ finds more Ancestor-category BICs.
+Implication:The TKG-agent synergy reflects an exploration-exploitation trade-off: expansion without
+intelligent selection introduces noise, while reasoning without expanded search hits a coverage ceiling.
+7 Discussion
+7.1 Project-Level Patterns Affecting BIC Identification
+Blame complexity varies across datasets.As shown in Figure 2, projects differ substantially
+in their blame complexity. DS_APACHE averages 3.3 blame commits per case, compared to 1.7
+for DS_LINUX and 2.2 for DS_GITHUB. This correlates with our observation that AgenticSZZ’s
+improvement on DS_APACHE is smaller and not statistically significant ( 𝑝= 0.74), while im-
+provements on DS_LINUX and DS_GITHUB are significant. While our evaluation did not directly
+measure the relationship between blame count and accuracy, this pattern suggests that blame
+complexity could serve as an indicator of case difficulty, warranting future investigation.
+Simple cases may benefit from fast-path heuristics.Projects with predominantly single-
+blame cases (e.g., DS_LINUX where 47% have 1 to 2 deleted lines with 1 blame commit) may benefit
+from fast-path optimizations that resolve cases with minimal LLM interaction. Future work should
+systematically evaluate accuracy stratified by blame complexity to confirm this hypothesis.
+7.2 Practical Considerations
+Cost-effectiveness.AgenticSZZ requires LLM API calls for agent reasoning, incurring computa-
+tional costs not present in traditional SZZ variants. However, as shown in Table 3, the average cost
+per case remains low ($0.003 to $0.004) due to DeepSeek-V3.2’s competitive pricing. For contexts
+where BIC identification directly impacts downstream tasks such as defect prediction model training
+or automated program repair, this cost may be justified by the improved accuracy.
+Integration with existing workflows.The TKG construction phase operates entirely on local
+repository data and can be cached across multiple queries to the same repository. This makes
+AgenticSZZ suitable for integration into CI/CD pipelines where the same repository is analyzed
+repeatedly, amortizing the graph construction cost.
+8 Threats to Validity
+Internal Validity.AgenticSZZ uses DeepSeek-V3.2 while LLM4SZZ employs GPT-4o-mini. We
+selected DeepSeek-V3.2 because it demonstrated more reliable tool invocation in our preliminary
+experiments, which is essential for TKG navigation. The controlled comparison in RQ1 (Table 4)
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 018 =====
+18 Yu Shi et al.
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8Precision
+DS_LINUX
+DS_APACHE
+DS_GITHUB
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8Recall
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8F1-score
+Fig. 6. Sensitivity of AgenticSZZ performance to candidate limit𝐾across precision, recall, and F1-score.
+confirms that our improvements over LLM4SZZ stem from the TKG-guided paradigm rather than a
+more modern LLM version. Future work could evaluate AgenticSZZ with alternative LLMs.
+AgenticSZZ uses a candidate limit parameter 𝐾 that controls the maximum number of BIC
+candidates retrieved from the TKG for agent evaluation. Figure 6 examines the extent to which our
+results are sensitive to this parameter choice. Across 𝐾 values from 5 to 50, performance remains
+remarkably stable: DS_LINUX F1-score varies within 1.0% (0.635 to 0.645), DS_GITHUB within
+2.9% (0.700 to 0.729), and DS_APACHE within 3.2% (0.460 to 0.492). This stability indicates that
+the agent’s reasoning effectively filters candidates regardless of initial pool size, and our reported
+results do not need to rely on a carefully tuned K value. Even aggressive filtering (K=5) achieves
+near-optimal performance, suggesting that TKG ranking places true BICs near the top of candidate
+lists.
+External Validity.Our evaluation uses three datasets (DS_LINUX, DS_APACHE, DS_GITHUB)
+comprising C and Java projects. While these represent diverse development practices, from the
+highly-structured Linux kernel to varied open-source DS_APACHE and GitHub projects, our
+findings may not generalize to other languages (e.g., Python, JavaScript) or proprietary codebases
+with different commit conventions. The datasets contain developer-annotated BIC labels, which
+provide higher ground truth quality but may reflect annotation biases. Future work should evaluate
+AgenticSZZ on additional languages and project types.
+9 Conclusion and Future Work
+We presented AgenticSZZ, a novel approach that reframes Bug-Inducing Commit (BIC) identifica-
+tion from a ranking problem over blame commits into a graph search problem over a Temporal
+Knowledge Graph. Our preliminary study (RQ0) on 2,102 validated cases revealed that 28% of BICs
+require traversal beyond direct blame commits and 14% of cases are blameless, motivating the
+need for expanded search capabilities. AgenticSZZ addresses these challenges through a two-phase
+architecture: TKG construction that encodes temporal and structural relationships among commits,
+and an LLM agent that navigates this graph using specialized tools for candidate enumeration,
+structural traversal, and causal analysis.
+Our evaluation demonstrates that AgenticSZZ outperforms all baselines on three of four dataset
+splits, achieving F1-scores of 0.48 to 0.74 across datasets and improving over state-of-the-art by
+up to 27%. The ablation study confirms that both the TKG and agent are essential, reflecting an
+exploration-exploitation trade-off: the TKG expands the search space while the agent provides
+intelligent selection, especially for Blame and Blameless BIC cases. The controlled comparison with
+LLM4SZZ using identical LLMs validates that our improvements stem from the TKG-guided search
+paradigm rather than LLM selection.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 019 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 19
+Future Work.Several directions emerge from our findings. First, the persistent challenges on
+high-complexity cases (e.g., DS_APACHE with 3.3 blame commits per case) suggest that incorpo-
+rating code semantic similarity or developer expertise patterns could help disambiguate among
+competing candidates. Second, while we focused on single-BIC prediction, extending AgenticSZZ
+to identify multiple co-dependent BICs would better handle cases where bugs emerge from the
+interaction of several commits. Third, exploring alternative graph schemas that capture semantic
+code relationships (e.g., data flow, call graphs) beyond file and function co-modification could
+enable more precise causal reasoning.
+References
+[1] Leonhard Applis, Yuntong Zhang, Shanchao Liang, Nan Jiang, Lin Tan, and Abhik Roychoudhury. 2025. Unified
+Software Engineering agent as AI Software Engineer.CoRRabs/2506.14683 (2025). arXiv:2506.14683 doi:10.48550/
+ARXIV.2506.14683
+[2] Muhammad Asaduzzaman, Michael C. Bullock, Chanchal K. Roy, and Kevin A. Schneider. 2012. Bug introducing
+changes: A case study with Android. In9th IEEE Working Conference of Mining Software Repositories, MSR 2012, June
+2-3, 2012, Zurich, Switzerland, Michele Lanza, Massimiliano Di Penta, and Tao Xie (Eds.). IEEE Computer Society,
+116–119. doi:10.1109/MSR.2012.6224267
+[3] Gabriele Bavota, Bernardino De Carluccio, Andrea De Lucia, Massimiliano Di Penta, Rocco Oliveto, and Orazio Strollo.
+2012. When Does a Refactoring Induce Bugs? An Empirical Study. In12th IEEE International Working Conference
+on Source Code Analysis and Manipulation, SCAM 2012, Riva del Garda, Italy, September 23-24, 2012. IEEE Computer
+Society, 104–113. doi:10.1109/SCAM.2012.20
+[4] Xiao Chen, Hengcheng Zhu, Jialun Cao, Ming Wen, and Shing-Chi Cheung. 2025. SemBIC: Semantic-Aware Identifica-
+tion of Bug-Inducing Commits.Proc. ACM Softw. Eng.2, FSE (2025), 1363–1385. doi:10.1145/3715781
+[5] Zimin Chen, Yue Pan, Siyu Lu, Jiayi Xu, Claire Le Goues, Martin Monperrus, and He Ye. 2025. Prometheus: Unified
+Knowledge Graphs for Issue Resolution in Multilingual Codebases.CoRRabs/2507.19942 (2025). arXiv:2507.19942
+doi:10.48550/ARXIV.2507.19942
+[6] Jacob Cohen. 2013.Statistical Power Analysis for the Behavioral Sciences. Routledge.
+[7] Daniel Alencar da Costa, Shane McIntosh, Weiyi Shang, Uirá Kulesza, Roberta Coelho, and Ahmed E. Hassan. 2017. A
+Framework for Evaluating the Results of the SZZ Approach for Identifying Bug-Introducing Changes.IEEE Trans.
+Software Eng.43, 7 (2017), 641–657. doi:10.1109/TSE.2016.2616306
+[8] Steven Davies, Marc Roper, and Murray Wood. 2014. Comparing text-based and dependence-based approaches for
+determining the origins of bugs.J. Softw. Evol. Process.26, 1 (2014), 107–139. doi:10.1002/SMR.1619
+[9] DeepSeek-AI. 2025. DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models.CoRRabs/2512.02556
+(2025). arXiv:2512.02556 doi:10.48550/ARXIV.2512.02556
+[10] Xueying Du, Yiling Lou, Mingwei Liu, Xin Peng, and Tianyong Yang. 2023. KG4CraSolver: Recommending Crash
+Solutions via Knowledge Graph. InProceedings of the 31st ACM Joint European Software Engineering Conference and
+Symposium on the Foundations of Software Engineering, ESEC/FSE 2023, San Francisco, CA, USA, December 3-9, 2023,
+Satish Chandra, Kelly Blincoe, and Paolo Tonella (Eds.). ACM, 1242–1254. doi:10.1145/3611643.3616317
+[11] Yuanrui Fan, Xin Xia, Daniel Alencar da Costa, David Lo, Ahmed E. Hassan, and Shanping Li. 2021. The Impact of
+Mislabeled Changes by SZZ on Just-in-Time Defect Prediction.IEEE Trans. Software Eng.47, 8 (2021), 1559–1586.
+doi:10.1109/TSE.2019.2929761
+[12] Zhangyin Feng, Daya Guo, Duyu Tang, Nan Duan, Xiaocheng Feng, Ming Gong, Linjun Shou, Bing Qin, Ting Liu,
+Daxin Jiang, and Ming Zhou. 2020. CodeBERT: A Pre-Trained Model for Programming and Natural Languages. In
+Findings of the Association for Computational Linguistics: EMNLP 2020, Online Event, 16-20 November 2020 (Findings
+of ACL, Vol. EMNLP 2020), Trevor Cohn, Yulan He, and Yang Liu (Eds.). Association for Computational Linguistics,
+1536–1547. doi:10.18653/V1/2020.FINDINGS-EMNLP.139
+[13] Mark Harman, S. Afshin Mansouri, and Yuanyuan Zhang. 2012. Search-based software engineering: Trends, techniques
+and applications.ACM Comput. Surv.45, 1 (2012), 11:1–11:61. doi:10.1145/2379776.2379787
+[14] Ahmed E. Hassan, Hao Li, Dayi Lin, Bram Adams, Tse-Hsun Chen, Yutaro Kashiwa, and Dong Qiu. 2025. Agentic
+Software Engineering: Foundational Pillars and a Research Roadmap.CoRRabs/2509.06216 (2025). arXiv:2509.06216
+doi:10.48550/ARXIV.2509.06216
+[15] Hideaki Hata, Osamu Mizuno, and Tohru Kikuno. 2012. Bug prediction based on fine-grained module histories. In34th
+International Conference on Software Engineering, ICSE 2012, June 2-9, 2012, Zurich, Switzerland, Martin Glinz, Gail C.
+Murphy, and Mauro Pezzè (Eds.). IEEE Computer Society, 200–210. doi:10.1109/ICSE.2012.6227193
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 020 =====
+20 Yu Shi et al.
+[16] Aidan Hogan, Eva Blomqvist, Michael Cochez, Claudia d’Amato, Gerard De Melo, Claudio Gutierrez, Sabrina Kirrane,
+José Emilio Labra Gayo, Roberto Navigli, Sebastian Neumaier, et al. 2021. Knowledge graphs.ACM Computing Surveys
+(Csur)54, 4 (2021), 1–37.
+[17] Yasutaka Kamei, Emad Shihab, Bram Adams, Ahmed E. Hassan, Audris Mockus, Anand Sinha, and Naoyasu Ubayashi.
+2013. A Large-Scale Empirical Study of Just-in-Time Quality Assurance.IEEE Trans. Software Eng.39, 6 (2013), 757–773.
+doi:10.1109/TSE.2012.70
+[18] Sunghun Kim and E. James Whitehead Jr. 2006. How long did it take to fix bugs?. InProceedings of the 2006 International
+Workshop on Mining Software Repositories, MSR 2006, Shanghai, China, May 22-23, 2006, Stephan Diehl, Harald C. Gall,
+and Ahmed E. Hassan (Eds.). ACM, 173–174. doi:10.1145/1137983.1138027
+[19] Sunghun Kim, Thomas Zimmermann, Kai Pan, and E. James Whitehead Jr. 2006. Automatic Identification of Bug-
+Introducing Changes. In21st IEEE/ACM International Conference on Automated Software Engineering (ASE 2006), 18-22
+September 2006, Tokyo, Japan. IEEE Computer Society, 81–90. doi:10.1109/ASE.2006.23
+[20] Hao Li, Haoxiang Zhang, and Ahmed E. Hassan. 2025. The Rise of AI Teammates in Software Engineering (SE) 3.0:
+How Autonomous Coding Agents Are Reshaping Software Engineering.CoRRabs/2507.15003 (2025). arXiv:2507.15003
+doi:10.48550/ARXIV.2507.15003
+[21] Yue Li, Bohan Liu, Ting Zhang, Zhiqi Wang, David Lo, Lanxin Yang, Jun Lyu, and He Zhang. 2025. A Knowledge
+Enhanced Large Language Model for Bug Localization.Proc. ACM Softw. Eng.2, FSE (2025), 1914–1936. doi:10.1145/
+3729356
+[22] Yizhou Liu, Pengfei Gao, Xinchen Wang, Jie Liu, Yexuan Shi, Zhao Zhang, and Chao Peng. 2024. MarsCode Agent:
+AI-native Automated Bug Fixing.CoRRabs/2409.00899 (2024). arXiv:2409.00899 doi:10.48550/ARXIV.2409.00899
+[23] Yunbo Lyu, Hong Jin Kang, Ratnadira Widyasari, Julia Lawall, and David Lo. 2024. Evaluating SZZ Implementations: An
+Empirical Study on the Linux Kernel.IEEE Trans. Software Eng.50, 9 (2024), 2219–2239. doi:10.1109/TSE.2024.3406718
+[24] Edmilson Campos Neto, Daniel Alencar da Costa, and Uirá Kulesza. 2018. The impact of refactoring changes on the
+SZZ algorithm: An empirical study. In25th International Conference on Software Analysis, Evolution and Reengineering,
+SANER 2018, Campobasso, Italy, March 20-23, 2018, Rocco Oliveto, Massimiliano Di Penta, and David C. Shepherd (Eds.).
+IEEE Computer Society, 380–390. doi:10.1109/SANER.2018.8330225
+[25] Edmilson Campos Neto, Daniel Alencar da Costa, and Uirá Kulesza. 2019. Revisiting and Improving SZZ Implementa-
+tions. In2019 ACM/IEEE International Symposium on Empirical Software Engineering and Measurement, ESEM 2019,
+Porto de Galinhas, Recife, Brazil, September 19-20, 2019. IEEE, 1–12. doi:10.1109/ESEM.2019.8870178
+[26] Namyong Park, Fuchen Liu, Purvanshi Mehta, Dana Cristofor, Christos Faloutsos, and Yuxiao Dong. 2022. EvoKG:
+Jointly Modeling Event Time and Network Structure for Reasoning over Temporal Knowledge Graphs. InWSDM ’22:
+The Fifteenth ACM International Conference on Web Search and Data Mining, Virtual Event / Tempe, AZ, USA, February
+21 - 25, 2022, K. Selcuk Candan, Huan Liu, Leman Akoglu, Xin Luna Dong, and Jiliang Tang (Eds.). ACM, 794–803.
+doi:10.1145/3488560.3498451
+[27] Luca Pascarella, Fabio Palomba, and Alberto Bacchelli. 2019. Fine-grained just-in-time defect prediction.J. Syst. Softw.
+150 (2019), 22–36. doi:10.1016/J.JSS.2018.12.001
+[28] Preston Rasmussen, Pavlo Paliychuk, Travis Beauvais, Jack Ryan, and Daniel Chalef. 2025. Zep: A Temporal Knowledge
+Graph Architecture for Agent Memory.CoRRabs/2501.13956 (2025). arXiv:2501.13956 doi:10.48550/ARXIV.2501.13956
+[29] Giovanni Rosa, Luca Pascarella, Simone Scalabrino, Rosalia Tufano, Gabriele Bavota, Michele Lanza, and Rocco
+Oliveto. 2021. Evaluating SZZ Implementations Through a Developer-informed Oracle. In43rd IEEE/ACM International
+Conference on Software Engineering, ICSE 2021, Madrid, Spain, 22-30 May 2021. IEEE, 436–447. doi:10.1109/ICSE43902.
+2021.00049
+[30] Yu Shi, Hao Li, Bram Adams, and Ahmed E. Hassan. 2025. HAFixAgent: History-Aware Automated Program Repair
+Agent.CoRRabs/2511.01047 (2025). arXiv:2511.01047 doi:10.48550/ARXIV.2511.01047
+[31] Danilo Silva and Marco Túlio Valente. 2017. RefDiff: detecting refactorings in version histories. InProceedings of the 14th
+International Conference on Mining Software Repositories, MSR 2017, Buenos Aires, Argentina, May 20-28, 2017, Jesús M.
+González-Barahona, Abram Hindle, and Lin Tan (Eds.). IEEE Computer Society, 269–279. doi:10.1109/MSR.2017.14
+[32] Jacek Sliwerski, Thomas Zimmermann, and Andreas Zeller. 2005. When do changes induce fixes?. InProceedings of the
+2005 International Workshop on Mining Software Repositories, MSR 2005, Saint Louis, Missouri, USA, May 17, 2005. ACM.
+doi:10.1145/1083142.1083147
+[33] Richard S Sutton and Andrew G Barto. 2018. Reinforcement learning: An introduction second edition.Adaptive
+computation and machine learning: The MIT Press, Cambridge, MA and London(2018).
+[34] Ming Tan, Lin Tan, Sashank Dara, and Caleb Mayeux. 2015. Online Defect Prediction for Imbalanced Data. In37th
+IEEE/ACM International Conference on Software Engineering, ICSE 2015, Florence, Italy, May 16-24, 2015, Volume 2, Antonia
+Bertolino, Gerardo Canfora, and Sebastian G. Elbaum (Eds.). IEEE Computer Society, 99–108. doi:10.1109/ICSE.2015.139
+[35] Lingxiao Tang, Lingfeng Bao, Xin Xia, and Zhongdong Huang. 2023. Neural SZZ Algorithm. In38th IEEE/ACM
+International Conference on Automated Software Engineering, ASE 2023, Luxembourg, September 11-15, 2023. IEEE,
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 021 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 21
+1024–1035. doi:10.1109/ASE56229.2023.00037
+[36] Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao. 2025. LLM4SZZ: Enhancing SZZ Algorithm
+with Context-Enhanced Assessment on Large Language Models.Proc. ACM Softw. Eng.2, ISSTA (2025), 343–365.
+doi:10.1145/3728885
+[37] Lingxiao Tang, Chao Ni, Qiao Huang, and Lingfeng Bao. 2024. Enhancing Bug-Inducing Commit Identification: A Fine-
+Grained Semantic Analysis Approach.IEEE Trans. Software Eng.50, 11 (2024), 3037–3052. doi:10.1109/TSE.2024.3468296
+[38] Rakshit Trivedi, Hanjun Dai, Yichen Wang, and Le Song. 2017. Know-Evolve: Deep Temporal Reasoning for Dynamic
+Knowledge Graphs. InProceedings of the 34th International Conference on Machine Learning, ICML 2017, Sydney, NSW,
+Australia, 6-11 August 2017 (Proceedings of Machine Learning Research, Vol. 70), Doina Precup and Yee Whye Teh (Eds.).
+PMLR, 3462–3471. http://proceedings.mlr.press/v70/trivedi17a.html
+[39] Nikolaos Tsantalis, Matin Mansouri, Laleh Mousavi Eshkevari, Davood Mazinanian, and Danny Dig. 2018. Accurate
+and efficient refactoring detection in commit history. InProceedings of the 40th International Conference on Software
+Engineering, ICSE 2018, Gothenburg, Sweden, May 27 - June 03, 2018, Michel Chaudron, Ivica Crnkovic, Marsha Chechik,
+and Mark Harman (Eds.). ACM, 483–494. doi:10.1145/3180155.3180206
+[40] Guoqing Wang, Zeyu Sun, Yizhou Chen, Yifan Zhao, Haiyang Shen, Qingyuan Liang, and Dan Hao. 2025. Beyond
+the Sum of Parts: Leveraging Entanglement for Bug Inducing Commit Localization.IEEE Transactions on Software
+Engineering(2025), 1–19. doi:10.1109/TSE.2025.3628362
+[41] Xingyao Wang, Boxuan Li, Yufan Song, Frank F. Xu, Xiangru Tang, Mingchen Zhuge, Jiayi Pan, Yueqi Song, Bowen Li,
+Jaskirat Singh, Hoang H. Tran, Fuqiang Li, Ren Ma, Mingzhang Zheng, Bill Qian, Yanjun Shao, Niklas Muennighoff,
+Yizhe Zhang, Binyuan Hui, Junyang Lin, and et al. 2025. OpenHands: An Open Platform for AI Software Developers
+as Generalist Agents. InThe Thirteenth International Conference on Learning Representations, ICLR 2025, Singapore,
+April 24-28, 2025. OpenReview.net. https://openreview.net/forum?id=OJd3ayDDoF
+[42] Ming Wen, Rongxin Wu, Yepang Liu, Yongqiang Tian, Xuan Xie, Shing-Chi Cheung, and Zhendong Su. 2019. Exploring
+and exploiting the correlations between bug-inducing and bug-fixing commits. InProceedings of the ACM Joint Meeting
+on European Software Engineering Conference and Symposium on the Foundations of Software Engineering, ESEC/SIGSOFT
+FSE 2019, Tallinn, Estonia, August 26-30, 2019, Marlon Dumas, Dietmar Pfahl, Sven Apel, and Alessandra Russo (Eds.).
+ACM, 326–337. doi:10.1145/3338906.3338962
+[43] Chunqiu Steven Xia, Yinlin Deng, Soren Dunn, and Lingming Zhang. 2024. Agentless: Demystifying LLM-based
+Software Engineering Agents.CoRRabs/2407.01489 (2024). arXiv:2407.01489 doi:10.48550/ARXIV.2407.01489
+[44] Meng Yan, Xin Xia, Yuanrui Fan, Ahmed E. Hassan, David Lo, and Shanping Li. 2022. Just-In-Time Defect Identification
+and Localization: A Two-Phase Framework.IEEE Trans. Software Eng.48, 2 (2022), 82–101. doi:10.1109/TSE.2020.2978819
+[45] Boyang Yang, Haoye Tian, Jiadong Ren, Shunfu Jin, Yang Liu, Feng Liu, and Bach Le. 2025. Enhancing Repository-
+Level Software Repair via Repository-Aware Knowledge Graphs.CoRRabs/2503.21710 (2025). arXiv:2503.21710
+doi:10.48550/ARXIV.2503.21710
+[46] John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, and Ofir Press.
+2024. SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering. InAdvances in Neural
+Information Processing Systems 38: Annual Conference on Neural Information Processing Systems 2024, NeurIPS 2024,
+Vancouver, BC, Canada, December 10 - 15, 2024, Amir Globersons, Lester Mackey, Danielle Belgrave, Angela Fan,
+Ulrich Paquet, Jakub M. Tomczak, and Cheng Zhang (Eds.). http://papers.nips.cc/paper_files/paper/2024/hash/
+5a7c947568c1b1328ccc5230172e1e7c-Abstract-Conference.html
+[47] Yuntong Zhang, Haifeng Ruan, Zhiyu Fan, and Abhik Roychoudhury. 2024. AutoCodeRover: Autonomous Program
+Improvement. InProceedings of the 33rd ACM SIGSOFT International Symposium on Software Testing and Analysis,
+ISSTA 2024, Vienna, Austria, September 16-20, 2024, Maria Christakis and Michael Pradel (Eds.). ACM, 1592–1604.
+doi:10.1145/3650212.3680384
+, Vol. 1, No. 1, Article . Publication date: February 2026.

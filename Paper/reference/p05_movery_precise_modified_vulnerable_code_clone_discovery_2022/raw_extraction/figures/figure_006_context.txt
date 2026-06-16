@@ -1,0 +1,40 @@
+at the cases, in which code lines
+of the disclosed vulnerable function were deleted or new code
+lines were added, accounted for more than 80% of the discov-
+ered VCCs. MOVERY , considering only the core lines of the
+vulnerable code, could respond to this code modification, but
+VUDDY , considering the syntax of the entire vulnerable func-
+tion, hardly discovered VCC to which this code modification
+was applied.
+All code modification types should be considered in VCC
+discovery. We confirmed thatMOVERY ’s extensible and min-
+imized signature generation made this possible while other
+existing approaches failed to handle some types of code mod-
+ifications (as demonstrated in Section 5.1).
+Out-of-bounds Read
+Out-of-bounds Write
+Improper Restriction of Operations 
+within the Bounds of a Memory Buffer
+Improper Input Validation
+Integer Underflow
+(a) Top 5 CWE distribution.
+ (b) CVSS distribution.
+Figure 6: CWE and CVSS distributions for the discovered VCCs
+by MOVERY .
+Appendix B Analysis for the discovered VCCs
+In our experiments, MOVERY discovered 415 VCCs for ten
+target software. We analyzed the vulnerability types ( i.e.,
+Common Weakness Enumeration, shortly CWE) and severity
+(i.e., Common Vulnerability Scoring System, shortly CVSS)
+for the discovered VCCs. Figure 6 depicts the analysis results.
+First, we confirmed that the 415 discovered VCCs belonged
+to 22 CWE groups; the distribution for the top five CWEs
+is shown in Figure 6a. The most frequently appeared type
+is “Out-of-bounds Read and Write” (53%); this vulnerabil-
+ity can lead to remote code execution and therefore requires
+extra attention. In addition, we confirmed that many vulnera-
+bilities related to memory buffer (11%) and input validation
+(7%) appeared; the top four CWEs groups belong to the most
+dangerous vulnerability types in 2021 [5].
+Next, we confirmed that most (84%) of the discovered
+VCCs had a medium severity, as shown 

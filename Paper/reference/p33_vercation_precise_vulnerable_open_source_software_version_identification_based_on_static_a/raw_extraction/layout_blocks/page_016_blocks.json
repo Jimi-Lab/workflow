@@ -1,0 +1,212 @@
+[
+  {
+    "page": 16,
+    "block_id": "page_016:block_001",
+    "block_type": "text",
+    "text": "CHENG et al.: V ERCATION : PRECISE VULNERABLE OPEN-SOURCE SOFTWARE VERSION IDENTIFICATION 391",
+    "bbox": [
+      37.58399963378906,
+      32.515296936035156,
+      551.68359375,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_002",
+    "block_type": "text",
+    "text": "B. Comparison With Dynamic Analysis",
+    "bbox": [
+      37.58399963378906,
+      63.937705993652344,
+      198.8545684814453,
+      74.89656066894531
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_003",
+    "block_type": "text",
+    "text": "While dynamic analysis through PoC testing provides deﬁni- tive evidence of vulnerability existence, several limitations ren- der it insufﬁcient for comprehensive and efﬁcient identiﬁcation of vulnerable versions at scale. Our analysis of CVEs published in the NVD from 1999 to 2025 reveals that only 24% of CVEs provide publicly available exploit links, and these exploit re- ports do not guarantee successful reproduction across different software versions. The portability of PoCs across different software ver- sions presents another critical challenge for dynamic analy- sis approaches. Previous studies have demonstrated that PoC reproducibility across different environments and versions is a signiﬁcant technical hurdle [4] , [7] . During the construction of our ground-truth dataset, we encountered these challenges ﬁrst- hand when attempting to validate vulnerabilities through PoC execution. Of the available PoCs in our dataset, only 55% could be successfully executed across multiple versions without mod- iﬁcation. The remaining cases failed to trigger the vulnerability due to environmental dependencies, compilation differences, or version-speciﬁc behavioral changes, which required substantial manual code-level analysis for veriﬁcation. The temporal cost of dynamic analysis further limits its prac- tical applicability for large-scale vulnerable version identiﬁca- tion. Our experience during dataset construction revealed that each CVE required an average of 3 hours for environment setup, dependency resolution, and PoC execution across different ver- sions, excluding the time needed for manual veriﬁcation when PoCs failed. For our complete dataset of 122 CVEs spanning 1,111 versions, comprehensive dynamic testing would require approximately 30 days compared to 28.61 seconds per CVE for our static approach. This represents a 742x time difference in favor of static analysis, making dynamic approaches impractical for real-world deployment scenarios where rapid vulnerability assessment is crucial.",
+    "bbox": [
+      37.58399963378906,
+      80.7257080078125,
+      288.6614074707031,
+      486.3719787597656
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_004",
+    "block_type": "text",
+    "text": "C. Threats to Validity",
+    "bbox": [
+      37.586036682128906,
+      519.2326049804688,
+      126.9505386352539,
+      530.1914672851562
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_005",
+    "block_type": "text",
+    "text": "1) Internal Validity: Static–analysis precision. V ERCATION relies on the Joern parser to build code-property graphs that combine an AST, control-ﬂow graph, and data-dependency graph. Joern struggles with certain C/C ++ constructs, notably complex pointer arithmetic, overloaded constructors, and indi- rect calls, so some data ﬂows and constructor edges are missed. Our AST expansion step further inherits the classic limitations of method outlining: it cannot always disambiguate targets reachable via function pointers, callbacks, or C ++ virtual dis- patch, which static analysis alone cannot resolve deﬁnitively [67] , [68] . These imprecisions may hide or mislocate refactor- ing patterns.",
+    "bbox": [
+      37.58300018310547,
+      535.6520385742188,
+      288.6484375,
+      678.6458740234375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_006",
+    "block_type": "text",
+    "text": "Inter-procedural dependencies. In multi-function patches, V ERCATION currently analyses each affected function indepen- dently and then merges the results. Although effective for most cases, this strategy may overlook vulnerability patterns that hinge on data/control ﬂows spanning several functions.",
+    "bbox": [
+      37.58300018310547,
+      685.095703125,
+      288.646728515625,
+      744.3990478515625
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_007",
+    "block_type": "text",
+    "text": "LLM variability and reproducibility. As LLMs continue to evolve rapidly, the performance of V ERCATION might change with newer versions of these models. This could affect the long- term consistency of our results. Additionally, LLMs may have biases or limitations in their training data that could inﬂuence their ability to understand certain types of vulnerabilities or code structures. To mitigate this, we have provided detailed information about the LLM versions and prompts used in our study, but future research may need to account for potential variations in LLM capabilities and performance as these models continue to develop. 2) External Validity: Language generalisability. V ERCATION ’s core methodology is language-agnostic and can be adapted to other programming languages. The program slicing tool Joern inherently supports multiple languages, including Java, Python, JavaScript, and PHP. The main adaptations required would be updating the sensitive function table for language-speciﬁc vulnerability patterns and modifying AST generation rules according to the target language’s syntax and semantics. Future work could involve extending V ERCATION to support a broader range of programming languages and verifying its effectiveness across different language paradigms.",
+    "bbox": [
+      300.59881591796875,
+      63.422454833984375,
+      551.708740234375,
+      337.9228515625
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_008",
+    "block_type": "text",
+    "text": "Repository branching complexity. While our approach han- dles common merge [69] and branching patterns effectively, complex branching scenarios, such as when the same vulner- able code is independently modiﬁed in multiple parallel fea- ture branches before being merged (creating diamond-shaped merge patterns), may require more sophisticated graph traversal algorithms to accurately determine the earliest vulnerability introduction point [59] , [9] .",
+    "bbox": [
+      300.6003112792969,
+      344.3726501464844,
+      551.6638793945312,
+      439.54229736328125
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_009",
+    "block_type": "text",
+    "text": "VII. R ELATED W ORK",
+    "bbox": [
+      382.0505676269531,
+      452.21038818359375,
+      470.2090759277344,
+      463.3290100097656
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_010",
+    "block_type": "text",
+    "text": "A. Vulnerability Fixing Commit Analysis",
+    "bbox": [
+      300.6001892089844,
+      470.287841796875,
+      467.18359375,
+      481.2467041015625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_011",
+    "block_type": "text",
+    "text": "Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation. VulPecker [70] extracts code patterns from VFC to detect similar vul- nerabilities in other software versions. SySeVR [71] uses a systematic approach to extract syntax- and semantic-based vul- nerability features from patches. VulDeePecker [72] leverages deep learning techniques to learn vulnerability patterns from code gadgets extracted from vulnerability ﬁxing commits. Most existing VFC analysis methods rely heavily on predeﬁned rules or patterns, which may not capture the full context of vulner- abilities. V ERCATION incorporates VFC analysis by leveraging LLMs to understand the context of code changes in ﬁxing com- mits, potentially capturing more nuanced vulnerability features.",
+    "bbox": [
+      300.59918212890625,
+      487.0768127441406,
+      551.6718139648438,
+      665.5679931640625
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_012",
+    "block_type": "text",
+    "text": "B. Vulnerable Version Detection for OSS",
+    "bbox": [
+      300.600830078125,
+      680.62744140625,
+      468.7955322265625,
+      691.5863037109375
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_013",
+    "block_type": "text",
+    "text": "Several approaches have been proposed for vulnerable ver- sion identiﬁcation. V-SZZ [17] uses the SZZ algorithm to back- track vfc s and identify vulnerability-introducing changes. MVP [12] employs program slicing to extract vulnerability and patch",
+    "bbox": [
+      300.600830078125,
+      697.4164428710938,
+      551.665283203125,
+      744.4000854492188
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_014",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

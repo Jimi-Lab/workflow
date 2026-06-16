@@ -1,0 +1,112 @@
+TABLE VII: Vulnerability Detection Result in Wild Software
+Target VULTURE SNYK V1SCAN
+Dtc Cfm Dtc Confm Dtc Cfm
+AliOS-Things 93 89 105 84 8 2
+LiteOS 19 19 22 16 3 3
+TizenRT 68 66 16 10 11 8
+Tasmota 1 1 2 0 0 0
+TDengine 0 0 3 1 0 0
+Total 181 175 148 111 22 13
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+TABLE VIII: Time cost of TPL reuse and 1-day vulnerability
+detection across different tools (in seconds)
+Target VULTURE V1SCAN
+TPL reuse 1-day TPL reuse 1-day
+AliOS-Things 20.1 3.0 23.5 11.8
+LiteOS 14.1 3.9 28.1 8.7
+Tasmota 5.5 129.9 7.1 -
+TizenRT 9.2 2.1 8.1 8.8
+TDengine 37.2 - 59.4 -
+The values in the table represent the average time (in seconds) required
+to detect a single TPL reuse or a single 1-day vulnerability. A dash (”-”)
+indicates that no reuses or vulnerabilities were identified.
+SNYK detected 111 vulnerabilities, and V1SCAN detected
+only 13. Furthermore, V ULTURE also pinpointed the exact
+locations and specific code statements that required to be
+patched, and provided 154 GitHub patch commit URLs for
+the identified vulnerabilities. However, SNYK only reported the
+CVE ID and provided 59 GitHub patch commit URLs, without
+offering further detailed information about the specific code
+requiring patching, and V1SCAN provided only 13 GitHub
+patch commits and limited information about vulnerabilities,
+such as the vulnerable file and function names,
+While manually verifying the missed cases, we observed
+that SNYK heavily relies on version information maintained by
+the target program. When a program does not maintain such
+information well, such as TizenRT, SNYK will miss numerous
+vulnerabilities. When analyzing 87 vulnerabilities missed by
+V1SCAN, we found that 64 were caused by its limited database
+and others resulted from its coarse-grained line-matching ap-
+proach. Besides, SNYK and V1SCAN incorrectly reported 37
+and 9 vulnerabilities, respectively. Our manual checks revealed
+that these inaccuracies stemmed from SNYK’s reliance on
+version-based detection and V1SCAN’s coarse-grained line-
+matching methods.
+While analyzing the six vulnerabilities missed by V UL-
+TURE , but detected by SNYK and V1SCAN, three of them
+were missed due to the absence of patch commits which are
+mandatory for V ULTURE to locate patches. The remaining
+cases involved extensive code modifications, which caused
+VULTURE to fail in pairing the reused functions.
+3) Time cost: We assessed the time cost of V ULTURE and
+V1SCAN in detecting TPL reuse and 1-day vulnerabilities.
+Table VIII illustrates the time cost. Typically, V ULTURE costs
+no more than 25s to recognize all TPL reuses and less than
+5s to identify a 1-day vulnerability even when handling large
+programs like AliOS-Things. In contrast. V1SCAN usually takes
+more than 25s to locate a reuse and more than 5s to report a
+1-day vulnerability. When analyzing programs with extensive
+TPL reuses (e.g., Tasmota), VULTURE takes longer to identify
+a single 1-day vulnerability, but V1SCAN times out without
+reporting any.
+E. Limitation
+Database Accuracy. The performance of V ULTURE heavily
+relies on the database quality. Since V ULTURE uses vulnerable
+elements and patched code to identify 1-day vulnerabilities,
+poor quality or inconsistent formats in the data provided
+by NVD significantly impact the performance of V ULTURE .
+Furthermore, V ULTURE utilizes LLM to capture vulnerable
+elements for patch identification, which makes V ULTURE
+highly dependent on the performance of LLM. Although LLM
+performs well generally when processing natural language
+contexts, manual verification might still be necessary to ensure
+the accuracy of patch mapping. Otherwise, the performance of
+the vulnerability detection can be negatively affected.
+Similarity Comparison Limitation. Although V ULTURE
+avoids using function or line matching to identify custom
+reuses, the employed LSH comparison can still bring inac-
+curacies when processing custom reuses that involve extensive
+modifications. The settings of similarity thresholds THhash
+need to be adjusted to match various databases and accommo-
+date different application scenarios.
+Dataflow Restrictions in Chunk-based Analysis. As V UL-
+TURE generates chunks by analyzing code diff and the in-
+volved variables, it may cause incomplete data flows within
+chunks, leading to certain information loss. Consequently,
+VULTURE performs poorly when analyzing target programs
+with extensive code modifications. In addition, the accuracy
+of chunk generation also depends on the recognition results
+of vulnerable elements extracted from each CVE description.
+Correspondingly, chunk-based analysis is also affected the
+capability of LLM in processing natural language descriptions.
+VI. R ELATED WORK
+Sections A, B, and C present the related work on TPL
+Reuse Detection, Security Patch Collection, and TPL Vulnera-
+bility Detection, respectively.
+A. TPL Reuse Detection
+TPL reuse detection is an essential task aimed at iden-
+tifying the TPLs that software relies on, thereby facilitating
+comprehensive software maintenance and management [32].
+Several detection approaches [14], [23], [27], [30], [33], [37],
+[44], [48], [49], [58] targeting distinct platforms have been
+proposed.
+TPL reuse tends to introduce similar or even identical code
+segments from TPL into software, based on this, some studies
+proposed keyword token-based code reuse detection. Sourcer-
+erCC [37] leveraged token-based detection, which matches
+similar blocks using a bag-of-tokens-based strategy. Further,
+CCAligner [44] introduced the concept of a code window
+and additionally considered edit distance to detect large-gap
+code reuse. However, token-based methods possessed poor
+13

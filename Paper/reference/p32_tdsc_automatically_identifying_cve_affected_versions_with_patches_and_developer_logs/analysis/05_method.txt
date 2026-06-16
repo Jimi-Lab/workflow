@@ -1,0 +1,60 @@
+System Overview:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+- The ﬁrst step is to build the version tree and obtain a version number set over which the vulnerability has been patched according to the commit-ids recorded in the changelogs.
+- Based on this version set, the second step involves three different processing directions: (R1) to determine the last vulnerable version number in the trunk of the version tree, (R2) to determine the vulnerable Authorized licensed use limited to: Huazhong University of Science and Technology.
+- ===== Page 005 ===== HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909 Fig.
+- Overview of our approach with three major steps numbered from 1 to 3.
+- version of each version branch and (R3) to determine the ﬁrst vulnerable version.
+Pipeline Stages:
+- The ﬁrst step is to build the version tree and obtain a version number set over which the vulnerability has been patched according to the commit-ids recorded in the changelogs.
+- Based on this version set, the second step involves three different processing directions: (R1) to determine the last vulnerable version number in the trunk of the version tree, (R2) to determine the vulnerable Authorized licensed use limited to: Huazhong University of Science and Technology.
+- Overview of our approach with three major steps numbered from 1 to 3.
+- To ensure the accuracy of the results, in this step, we need address some special problems, such as solving the vulnerability reappearance problem, using developer logs to detect whether there are vulnerabilities in the partial matching source code.
+- Finally, we compare the vulnerable version set of our tool against the vulnerable version set accoding to the NVD, and report the error rate of the NVD set.
+- Finally, foreach reported vulnera- bility (CVE-ID), we useV from and V upto to denote its ﬁrst and last vulnerable versions in the entire version tree, respectively.
+- We ﬁrst obtain the commit-ids corresponding to the CVE-ID, and then explore the changelog information.
+- Conse- quently, the earlier committed patches may be totally unpatched or patially unptached, and then newer patches are commited (“repatch”).
+Core Algorithm:
+- To ensure the accuracy of the results, in this step, we need address some special problems, such as solving the vulnerability reappearance problem, using developer logs to detect whether there are vulnerabilities in the partial matching source code.
+- Speciﬁcally, as shown in Fig.4, for a given CVE-ID, we will search the other vulnerable versions in the version tree in three directions R1,R 2,R 3.
+- During our research, we ﬁnd an interesting phenomenon: starting from a certain version after the maximum committed version, the code may be restored to its previous unpatched state.
+- In the case of repatch, our research found that it always includes the following two operations in the git log: (1) unpatch, consisting of complete unpatch and partial unpatch.
+- Next, we present our algorithm for determiningV upto with our running example in Fig.4.
+- First, we determine whether the unpatched code still exists in major versions afterV4.0.4 based on exact matching.
+- However, if unpatch exists, we will check if a repatch exists in the git log list indexed by the same vulnerable ﬁle, the author or the committer of the patch, and accordingly locate the diff hunk, as described in the paragraph above.
+Data Structures:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+- The ﬁrst step is to build the version tree and obtain a version number set over which the vulnerability has been patched according to the commit-ids recorded in the changelogs.
+- Based on this version set, the second step involves three different processing directions: (R1) to determine the last vulnerable version number in the trunk of the version tree, (R2) to determine the vulnerable Authorized licensed use limited to: Huazhong University of Science and Technology.
+- ===== Page 005 ===== HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909 Fig.
+- To ensure the accuracy of the results, in this step, we need address some special problems, such as solving the vulnerability reappearance problem, using developer logs to detect whether there are vulnerabilities in the partial matching source code.
+- Every tag has its commit log in which parent commits are recorded.
+Model / Agent Components:
+- Finally, we compare the vulnerable version set of our tool against the vulnerable version set accoding to the NVD, and report the error rate of the NVD set.
+- Version tree: structural model of source code release versions.
+- However, not every branch corresponds to a committed version, and the reason will be introduced in SectionIV-C.
+- The reason for its existence is that insufﬁciently large data type was used for certain extension data, which allows local users to cause a denial of service.
+- Our tool is based on the assumption of correctness of patches, so that we only consider repatches that the earlier patches are correct, then unpatched totally or partially, ﬁnnaly repatched with better patches.
+Design Choices:
+- In addition, we useV i.j.k to denote a vulnerable version, and V i.j.U is the last (or upto) vulnerable version in the branch of Vi.j.W ea l s ou s eV i.j.k(E) (‘E’ means “excluding”) to denote the vulnerable versionimmediately beforeVi.j.k, whereVi.j.k is not vulnerable (i.e., patched).
+- Finally, foreach reported vulnera- bility (CVE-ID), we useV from and V upto to denote its ﬁrst and last vulnerable versions in the entire version tree, respectively.
+- Thus, we use the commit-ids located by CVE-ID to traverse all changelogs available to obtain the committed (i.e., patched) version set.
+- We cannot easily locate the diff hunks of repatched code through a CVE because a repatch is not released as a new CVE.
+- We use it against thenf_conntrack_core.c ﬁle to judge the existence of this vulnerability.
+Why Each Choice Is Needed:
+- [NEEDS EVIDENCE] requires close reading of method subsections.
+Failure Handling:
+- Among them, if there is a CVE vulnerability in a certain version but not reported in the NVD, it is a false negative case.
+- If a certain version has no CVE vulnerability but is reported in the NVD, it is a false positive case.
+- On the other hand, if unpatched code exists in a later major version, sayV5.0, we will check if a repatch has been applied to it to avoid false reporting.
+Complexity / Cost Discussion:
+- But sometimes there are more than one commit-id to ﬁx a CVE when there are several patches for the CVE.
+- Therefore, they restored the code to its unpatched state, and put forward the method of “compile-time assertion” to repatch the vulnerability.
+- We already know that the information in the changelog is sometimes incomplete, so it is not enough to rely only on it.
+Pseudocode or Algorithm Blocks:
+- See raw_extraction/algorithms/ if present; otherwise [NEEDS ALGORITHM REPAIR].
+Static Reproducibility Signals:
+- Source path: [NEEDS ARTIFACT] no local source/artifact path detected beside the PDF; source code was not available locally in the requested path. [EXECUTION NOT REQUESTED]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Present the method as a pipeline from security evidence extraction to candidate generation/filtering/ranking/validation, with each stage tied to a specific failure mode.

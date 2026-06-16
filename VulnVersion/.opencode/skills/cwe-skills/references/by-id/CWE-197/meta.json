@@ -1,0 +1,281 @@
+{
+  "cwe_id": "CWE-197",
+  "name": "Numeric Truncation Error",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "Truncation errors occur when a primitive is cast to a primitive of a smaller size and data is lost in the conversion.",
+  "extended_description": "When a primitive is cast to a smaller primitive, the high order bits of the large value are lost in the conversion, potentially resulting in an unexpected value that is not equal to the original value. This value may be required as an index into a buffer, a loop iterator, or simply necessary state data. In any case, the value cannot be trusted and the system will be in an undefined state. While this method may be employed viably to isolate the low bits of a value, this usage is rare, and truncation usually implies that an implementation error has occurred.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-681",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Conversion between Numeric Types"
+      },
+      {
+        "cwe_id": "CWE-681",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Incorrect Conversion between Numeric Types"
+      },
+      {
+        "cwe_id": "CWE-681",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Incorrect Conversion between Numeric Types"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-195",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Signed to Unsigned Conversion Error"
+      },
+      {
+        "cwe_id": "CWE-196",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Unsigned to Signed Conversion Error"
+      },
+      {
+        "cwe_id": "CWE-192",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Integer Coercion Error"
+      },
+      {
+        "cwe_id": "CWE-194",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Unexpected Sign Extension"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++",
+      "Java",
+      "C#"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Low",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "Truncation errors occur when a primitive is cast to a primitive of a smaller size and data is lost in the conversion.",
+    "typical_preconditions": [
+      "unchecked arithmetic on size/count",
+      "signed/unsigned conversion",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "unchecked arithmetic on size/count",
+      "signed/unsigned conversion"
+    ],
+    "typical_sinks": [
+      "allocation or copy size derived from overflowed result"
+    ],
+    "typical_fix_actions": [
+      "checked arithmetic",
+      "widen type",
+      "range guard before multiplication/addition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "size/count arithmetic without overflow guard",
+      "primitive",
+      "truncation",
+      "conversion",
+      "smaller"
+    ],
+    "fix_search_patterns": [
+      "checked_mul",
+      "safe_add",
+      "if (a > MAX / b)"
+    ],
+    "guard_patterns": [
+      "arithmetic operands and sink must co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "primitive",
+      "truncation",
+      "conversion",
+      "smaller",
+      "error",
+      "bits",
+      "cast",
+      "lost"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "arithmetic operands and sink must co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "size/count arithmetic without overflow guard",
+      "checked_mul",
+      "safe_add",
+      "if (a > MAX / b)"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "size/count arithmetic without overflow guard",
+        "checked_mul",
+        "safe_add"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "size/count arithmetic without overflow guard",
+        "arithmetic operands and sink must co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "checked_mul",
+        "safe_add",
+        "size/count arithmetic without overflow guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example, while not exploitable, shows the possible mangling of values associated with truncation errors:",
+        "snippet": "int intPrimitive; short shortPrimitive; intPrimitive = (int)(~((int)0) ^ (1 << (sizeof(int)*8-1))); shortPrimitive = intPrimitive; printf(\"Int MAXINT: %d\\nShort MAXINT: %d\\n\", intPrimitive, shortPrimitive);"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java example, the method updateSalesForProduct is part of a business application class that updates the sales information for a particular...",
+        "snippet": "... // update sales database for number of product sold with product ID public void updateSalesForProduct(String productID, int amountSold) { // get the total number of products in inventory database int productCount =..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following Java example, the method updateSalesForProduct is part of a business application class that updates the sales information for a particular...",
+        "snippet": "... // update sales database for number of product sold with product ID public void updateSalesForProduct(String productID, int amountSold) { // get the total number of products in inventory database int productCount =..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2020-17087",
+        "description": "Chain: integer truncation (CWE-197) causes small buffer allocation (CWE-131) leading to out-of-bounds write (CWE-787) in kernel pool, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-17087"
+      },
+      {
+        "reference": "CVE-2009-0231",
+        "description": "Integer truncation of length value leads to heap-based buffer overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0231"
+      },
+      {
+        "reference": "CVE-2008-3282",
+        "description": "Size of a particular type changes for 64-bit platforms, leading to an integer truncation in document processor causes incorrect index to be generated.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-3282"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

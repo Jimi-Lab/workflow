@@ -1,0 +1,354 @@
+III. A
+PPROACH
+Building on the motivation example, our proposed method
+aims to effectively identify all statements contributing to the
+appearance of the bug. The architecture of S
+EM-SZZ is shown
+in Fig. 2.
+Observation 1 leads our approach to focusing on program
+segments near the added lines. Thus, we begin by performing
+program slicing [23], [24] to extract relevant program parts
+close to the additions. Based on Observation 2, after slicing the
+program, we delve into a more detailed analysis. This involves
+comparing the states of both versions of the program, one with
+the added lines and one without. Through thorough comparison
+and analysis, we identify specific statements associated with
+the added lines, pinpointing them as the triggers for the bug.
+Drawing on Observation 3, we proceed to locate bug-inducing
+commits by finding the earliest commit that contains all buggy
+statements.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 004 =====
+
+3040 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 2. Overview of S EM-SZZ.
+Fig. 3. An example of program slice.
+A. Program Slicing
+In this section, we present the program slicing process. The
+goal of this process is to pick out specific parts of the program
+that are relevant to the bug.
+Firstly, we extract the function from the fixed version con-
+taining the added lines. Then, we adapt the approach similar
+to the previous research [25] for an intraprocedural program
+slicing. During the program slicing process, we initially identify
+the point of interest, which in this case is the basic block
+containing added lines. Subsequently, we conduct both forward
+and backward program slicing centered around this point. In this
+way, we can avoid the noise introduced by the irrelevant lines.
+In detail, we initially construct the control flow graph [26]
+for the function, splitting the function into a set of basic blocks.
+Then we pick out the basic block containing the added line as
+the point of interest. Finally, we use the depth-first-search algo-
+rithm to search itsN nearest predecessors and successors. Here,
+the parameter N is the maximum search step, indicating the
+search scope of our program. When the search step reaches N,
+we save all the basic blocks encountered during the searching
+process and exclude all other parts of the program.
+Here, our slice criterion is based on basic blocks with added
+code statements instead of variables. We do this for two reasons.
+Firstly, there may be many changed statements in a function,
+resulting in many changed variables. Handling them one by one
+is time-consuming. By dealing with changed basic blocks, we
+can address many code statements and variables once at a time.
+Secondly, slicing based on variables may introduce lines far
+from the added lines, which can introduce noise. Instead, by
+slicing only the basic blocks near the changed basic blocks, we
+can avoid this issue.
+Fig. 3 illustrates an example of program slicing, based on the
+function depicted in the motivation example. As depicted in the
+figure, the original function is divided into six basic blocks, with
+line ranges also indicated. The added line number is 15. Thus,
+the basic block d contains the added line and we designate it
+as the interesting point. Here we set N to 3. We begin to search
+its three nearest predecessors (in this case, blocks c, a and
+begin). Subsequently, we explore its three nearest successors.
+Note that each block is visited only once throughout the process.
+Thus, we identify the end block as the only successor. As a
+result, our slicing result contains basic blocks begin, a, c, d,
+and end.
+B. State Collection
+Having isolated the part of the program relevant to the bug,
+our next step is to collect the states of the program within
+this portion. We borrow the concept program’s state from sym-
+bolic execution [27], [28]. In symbolic execution, the execution
+engine maintains the program’s states (σ,π) for each execu-
+tion path, where σ represents a table that maps each variable
+to its corresponding symbolic value α
+i, and pi denotes the
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 005 =====
+
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3041
+Fig. 4. Candidate selection.
+Algorithm 1: obtaining the program’s state after exe-
+cuting the path.
+Input : path, the input path
+Output: state, the program’s state for the execution
+path.
+1 for statement in path do
+2 if statement.type in {while, if, switch, for} then
+3 state.constraints.add(statement)
+4 if statement.type in {expression} then
+5 variables ←−extractVars(statement)
+6 for variable in variables do
+7 state.variable.dataflow.append(statement)
+8 return state
+path constraints, signifying all branch conditions taken to reach
+each statement in the path. Given that our goal is to discern
+the differences between the states of the two versions of the
+program—the bug-fixed version and the buggy version, there
+is no imperative need for the symbolic value of each variable.
+Instead, we collect each variable’s data flow for simplicity.
+As shown above, in order to collect the program’s state,
+we first construct its execution paths. We start from the ba-
+sic blocks without predecessors and then traverse recursively
+through all their successors. When we reach basic blocks with
+no successors, we mark all statements encountered in sequential
+order as an execution path. For example, in the sliced program
+illustrated in Fig.3, we start from thebeginblock and traverse
+its successors, including blocks a, c, d, until we arrive at the
+endblock, which has no further successors. During the process,
+we add each statement encountered to the execution path.
+Following path extraction, we proceed to generate the pro-
+gram’s state for the execution path. Algorithm 1 outlines the
+process. We iterate through the statements in the execution path.
+If the statement type belongs to path constraints (line 2), we
+include the statement in the path constraints. Otherwise, we
+extract the variables from the statement and incorporate them
+into the data flow of these variables (lines 4-7).
+Fig. 5. A program state example.
+Fig. 5 illustrates the program’s state for the previously col-
+lected execution path in the motivation example. Upon encoun-
+tering the statement at line 3, we extract the variablesworkand
+tmp from the statement. Consequently, we add line number 3
+to their data flow, as depicted in the figure. Additionally, upon
+reaching line 6, we easily identify it as an if statement related
+to path constraint. Since our path executes from block c to d,
+and it does not satisfy the condition, we negate the condition
+and store it in the path constraint, as shown in Fig. 5.
+C. State Comparison
+After collecting the states, our subsequent step involves com-
+paring the states of the execution paths from the current version
+with those from the previous version. This comparison enables
+us to identify discrepancies in their states, ultimately helping us
+determine the unmodified statements contributing to the bug.
+For each execution path in the current version, our objective
+is to discover how the added lines affect the path, making its
+state different from the previous version. To enable the com-
+parison, the first step involves identifying the corresponding
+execution path in the previous version and obtaining its state.
+Our goal is to find an execution path in the previous version
+that most closely resembles the one in the current version. Thus,
+we can capture the differences in their states more precisely.
+To get such a corresponding path, we begin by mapping the
+first and last basic blocks in the current execution path to their
+counterparts in the previous version of the program. Subse-
+quently, we traverse from the first block in the previous version,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 006 =====
+
+3042 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 6. Constraint comparison example.
+endeavoring to find a path to the last block. It is important
+to note that we may encounter mu ltiple candidates during this
+step. For each candidate in the pr evious version, we initially
+prioritize the one that shares th e highest number of constraints
+with the current execution path.If there are multiple candidates,
+preference is given to the one with the most common lines.
+To illustrate this, we use the extracted execution path p from
+the motivation example. To derive its corresponding path in the
+previous version, we initially map its first and last basic blocks
+to their counterparts in the previous version. These correspond
+to the begin’ block and the end’ block, respectively, as
+illustrated in orange in Fig. 4.
+Next, we attempt to find out paths from the first mapped
+block to the last mapped block in the previous version. In
+this case, we aim to find paths from the begin’ block to
+the end’ block in the previous version of the program. We
+use the depth-first-search algorithm to find out candidates. As
+depicted in the figure, we encounter two candidates: p
+′
+1 and p′
+2.
+After comparing their constraints, we observe that candidatep′
+1
+shares more constraints with p, leading us to designate it as the
+corresponding path.
+After path matching, each pathpwith the statesin the current
+version has been paired with a corresponding path p′ with the
+state s′from the previous version. Now, we initially compare the
+two states and proceed to find out which unmodified statements
+in the previous version contribute to the occurrence of the bug.
+The detailed algorithm is outlined in Algorithm 2. Initially,
+we compare the constraints in two program states. If the con-
+straints in the previous path are not identical to those in the
+current path, we first identify the index i where the con-
+straint preCons[i] in the previous version is different from
+the constraint curCons[i] in the current version(lines 1-3).
+In case of a conflict condition, we assume that the previous
+version of the program may neglect the condition curCons[i]
+from the statement S
+i to the statement Si+1, where Si is the
+last statement before curCons[i] and Si+1 is the first state-
+ment after curCons[i]. Consequently, we utilize the function
+extractStmts to extract Si and Si+1, subsequently mapping
+them to the previous version and adding them to the buggy
+statements (lines 4-5).
+We provide a constraint comparison example in Fig.6.I nt h e
+previous version, the path executes from S
+i to Si+1 without a
+condition check while in the current version, it needs to sat-
+isfy Cnew. The newly added constraint is highlighted in green
+while the original constraints are highlighted in red. Here the
+constraints in the previous version are C
+1, C2, and C3.T h e
+Algorithm 2: obtain the buggy statements.
+Input : s, state of the current path.
+s′, state of the previous path.
+Output: bStmts, the obtained buggy statements.
+i←−0
+preCons ←−s′.constraints
+curCons ←−s.constraints
+1 for i<curCons.size () and i<preCons.size () do
+2 if curCons[i]̸=preCons[i] then
+3 break
+i←−i+1
+4 if i̸=curCons.size() then
+5 bStmts.add(extractStmts(curCons [i],s))
+6 for var in s′.vars do
+i←−0
+7 preData ←−s′.var.data
+8 curData ←−s.var.data
+9 for i<curData.size () and i<preData.size ()
+do
+10 if curData[i]̸=preData[i] then
+11 break
+i←−i+1
+12 if i̸=curData.size() then
+13 bStmts.add(preData [i-1],preData [i])
+current version of the program has constraints C1, C2, Cnew
+and C3. We compare all constraints in sequential order and find
+that C3 is conflicted with Cnew at index 2. Thus, we extract the
+last statement Si before Cnew and the first statement Si+1 after
+Cnew. We map these two statements to the previous version and
+add them to buggy statements.
+For each variable in the previous path, we compare its data
+flow with that in the current path (lines 10-11). Again, we first
+locate the conflict index. Then, we add the conflicting index
+and its preceding index’s corresponding statements to the buggy
+statements (lines 12-13). Note that a variable’s data flow is the
+sequence of code statements that define, assign, modify, or use
+the variable in the path. Additionally, when we compare the data
+flow of a variable, we do not consider the control flow.
+In the case of the motivation example, we first examine
+the constraints and identify no differences. Subsequently, we
+analyze the data flow of each variable. Upon inspection, we
+observe that the data flow of the variable flagsin the previous
+version encompasses two statements 11-12, 16-17, while in the
+current version, it comprises three statements 11-12, 15, 16-17.
+Consequently, a conflict ar ises at index 1, as we illustrate in
+green in Fig. 5. As a result, we include the statements 11-12,
+16-17 as the statements contributing to the bug.
+D. Locating Bug-Inducing Commits
+After identifying all buggy statements, the subsequent step
+involves tracing back the commit history to pinpoint the bug-
+inducing commit. We adopt an approach similar to the “per-
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 007 =====
+
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3043
+Fig. 7. Locating bug-inducing commits.
+fect test” model proposed by Rodríguez-Pérez et al. [29].T h e
+model consists of two parts. The first part involves determining
+whether a commit is buggy. They assume there exists a “per-
+fect test” to accomplish this. If a commit can pass the test,
+it is considered correct; otherwise, it is deemed buggy. The
+second part involves locating the bug-inducing commit. They
+trace back from the bug-fixing commit until encountering the
+earliest commit that fails the “perfect test,” marking it as the
+bug-inducing commit. However, in practice, there is always no
+applicable “perfect test” available. Therefore, they replace it
+with manually designed tests based on bug reports.
+Based on the model mentioned above, our method to locate
+the bug-inducing commits also consists of two parts. To deter-
+mine whether a commit is buggy, we replace the “perfect test”
+with the buggy statements collected above. As we mentioned
+above, each buggy statement is indispensable to the occurrence
+of the bug. Thus, we consider the commit as buggy only when it
+contains all buggy statements or it contains statements with the
+same semantic meaning as all buggy statements. To determine
+whether two statements have the same semantic meaning, we
+leverage the methodology proposed by V-SZZ [17].I ft w o
+statements have a line similarity beyond a threshold, we believe
+that they have the same semantic meaning. Here, we also use the
+same method to compute line similarity and set the similarity
+t h r e s h o l dt o0 . 7 5a sV - S Z Z .
+Suppose that we have two strings S
+1 and S2. We first cal-
+culate the sum of the length of S1 and S2 as in formula 1.
+Then we calculate the line similarity shown in formula2, where
+the levenshteinDistance function is used to calculate the
+Levenshtein edit distance[30] of the two strings. Line similarity
+ranges from 0 to 1. Higher values indicate a greater likelihood
+that two code statements share the same semantic meaning.
+L=len(S
+1)+ len(S2) (1)
+S =(L−levenshteinDistance(S1,S2))/L (2)
+To locate the bug-inducing commits, we trace back all buggy
+statements, generating a set of candidate commits. Subse-
+quently, we scrutinize these candidates to identify the earliest
+buggy commit and designate it as the bug-inducing commit,
+which is the same as the model above.
+Fig. 7 illustrates the process o f locating bug-inducing
+commits. After obtaining statements contributing to the bug,
+we first use the git blame tool on the statements and
+obtain two candidates: commit 153bedbac2e and commit
+feb4a51323b. Then we begin to check which commit
+first introduces all buggy statements. We first check the
+earliest commit 153bedbac2e and find that no statement
+has a line similarity over 0.75 with the statement flags
+= atomic_fetch_andnot(IRQ_WORK_PENDING, &
+work-> flags). The most closely related statement is line
+3, but its similarity is still under 0.75. Thus, 153bedbac2e
+is not the bug-inducing commit. Then, we check commit
+feb4a51323b and find that it contains all statements in
+the buggy statements. Thus, we designate it as the final
+bug-inducing commit, which is the same as the developers’
+message in Fig. 1.
+E. Extending S
+EM-SZZ to Bug-Fixing Commits With
+Deleted Lines
+While our method is primarily designed for bug-fixing com-
+mits with only added lines, the approach of comparing program
+states and identifying buggy statements can also be applied to
+commits with deleted lines. However, some adjustments are
+necessary for this scenario, particularly with respect to deleted
+lines.
+First, during program slicing, we mark the basic block con-
+taining deleted lines as the point of interest and search its nearest
+N predecessors and successors. Second, when comparing pro-
+gram states, we focus more on deleted lines. Specifically, if we
+find differences in path constraints between the previous and
+current versions, we identify the deleted lines related to those
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 008 =====
+
+3044 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 8. An example of handling bug- fixing commits w ith deleted lines.
+constraints and mark them as buggy statements. Similarly, when
+comparing the data flow of each variable, if there’s a difference
+between versions, we identify and mark the related deleted lines
+as buggy statements.
+Fig. 8 illustrates why comparing paths is necessary. If we
+blamed all deleted lines, lines 3 and 17 would be included.
+However, line 3 is simply replaced by line 4 and does not affect
+the program’s state. By comparing paths, we can see that the
+data flow of variables buffer and count is not affected,
+allowing us to exclude line 3 and reduce noise.
+IV . E
+XPERIMENT SETUP

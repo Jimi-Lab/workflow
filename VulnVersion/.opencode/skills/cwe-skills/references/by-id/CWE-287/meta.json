@@ -1,0 +1,248 @@
+{
+  "cwe_id": "CWE-287",
+  "name": "Improper Authentication",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-284",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Access Control"
+      },
+      {
+        "cwe_id": "CWE-284",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Access Control"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "Web Based",
+      "ICS/OT"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "This CWE entry might be misused when lower-level CWE entries are likely to be applicable. It is a level-1 Class (i.e., a child of a Pillar)."
+  },
+  "mechanism": {
+    "root_cause_summary": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "authentication",
+      "insufficiently",
+      "identity",
+      "correct"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "authentication",
+      "insufficiently",
+      "identity",
+      "correct",
+      "claims",
+      "proves",
+      "actor",
+      "claim"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "The following code intends to ensure that the user is already logged in. If not, the code performs authentication with the user-provided username and password....",
+        "snippet": "my $q = new CGI; if ($q->cookie('loggedin') ne \"true\") { if (! AuthenticateUser($q->param('username'), $q->param('password'))) { ExitError(\"Error: you need to log in first\"); } else { # Set loggedin and user cookies...."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-11680",
+        "description": "File-sharing PHP product does not check if user is logged in during requests for PHP library files under an includes/ directory, allowing configuration changes, code execution, and other impacts.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-11680"
+      },
+      {
+        "reference": "CVE-2022-35248",
+        "description": "Chat application skips validation when Central Authentication Service (CAS) is enabled, effectively removing the second factor from two-factor authentication",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-35248"
+      },
+      {
+        "reference": "CVE-2022-36436",
+        "description": "Python-based authentication proxy does not enforce password authentication during the initial handshake, allowing the client to bypass authentication by specifying a 'None' authentication type.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-36436"
+      },
+      {
+        "reference": "CVE-2022-30034",
+        "description": "Chain: Web UI for a Python RPC framework does not use regex anchors to validate user login emails (CWE-777), potentially allowing bypass of OAuth (CWE-1390).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30034"
+      },
+      {
+        "reference": "CVE-2022-29951",
+        "description": "TCP-based protocol in Programmable Logic Controller (PLC) has no authentication.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29951"
+      },
+      {
+        "reference": "CVE-2022-29952",
+        "description": "Condition Monitor uses a protocol that does not require authentication.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29952"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

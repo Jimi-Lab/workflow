@@ -1,0 +1,105 @@
+VCCFinder: Finding Potential Vulnerabilities in
+Open-Source Projects to Assist Code Audits
+Henning Perl*,
+Sergej Dechand†,
+Matthew Smith*†
+* Fraunhofer FKIE, Germany
+†University of Bonn, Germany
+Daniel Arp,
+Fabian Y amaguchi,
+Konrad Rieck
+University of Göttingen,
+Germany
+Sascha Fahl,
+Y asemin Acar
+Saarland University, Germany
+ABSTRACT
+Despite the security community’s best eﬀort, the number
+of serious vulnerabilities discovered in software is increasing
+rapidly. In theory, security audits should find and remove
+the vulnerabilities before the code ever gets deployed. How-
+ever, due to the enormous amount of code being produced,
+as well as a the lack of manpower and expertise, not all code
+is suﬃciently audited. Thus, many vulnerabilities slip into
+production systems. A best-practice approach is to use a
+code metric analysis tool, such as Flawfinder, to flag poten-
+tially dangerous code so that it can receive special attention.
+However, because these tools have a very high false-positive
+rate, the manual eﬀort needed to find vulnerabilities remains
+overwhelming.
+In this paper, we present a new method of finding poten-
+tially dangerous code in code repositories with a significantly
+lower false-positive rate than comparable systems. We com-
+bine code-metric analysis with metadata gathered from code
+repositories to help code review teams prioritize their work.
+The paper makes three contributions. First, we conducted
+the first large-scale mapping of CVEs to GitHub commits
+in order to create a vulnerable commit database. Second,
+based on this database, we trained a SVM classifier to flag
+suspicious commits. Compared to Flawfinder, our approach
+reduces the amount of false alarms by over 99 % at the same
+level of recall. Finally, we present a thorough quantitative
+and qualitative analysis of our approach and discuss lessons
+learned from the results. We will share the database as
+a benchmark for future research and will also provide our
+analysis tool as a web service.
+Categories and Subject Descriptors
+D.2.4 [Software Engineering]: Software/Program Verifi-
+cation; K.6.5 [ Management of Computing and Infor-
+mation Systems]: Security and Protection
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full cita-
+tion on the first page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from Permissions@acm.org.
+CCS’15,October 12-16, 2015, Denver, Colorado, USA.
+c⃝2015 ACM. ISBN 978-1-4503-3832-5/15/10 ...$15.00.
+DOI: http://dx.doi.org/10.1145/2810103.2813604.
+Keywords
+Vulnerabilities; Static Analysis; Machine Learning
+1. INTRODUCTION
+Despite the best eﬀort of the security community, the
+number of serious vulnerabilities discovered in deployed soft-
+ware is on the rise. The Common Vulnerabilities and Expo-
+sures (CVE) database operated by MITRE tracks the most
+serious vulnerabilities. In 2000, around 1,000 CVEs were
+registered. By 2010, there were about 4,500. In 2014, al-
+most 8,000 CVEs were registered. The trend seems to be
+increasing in speed.
+While it is considered a best practice to perform code
+reviews before code is released, as well as to retroactively
+checking old code, there is often not enough manpower to
+rigorously review all the code that should be reviewed. Al-
+though open-source projects have the advantage that any-
+body can, in theory, look at all the source code, and although
+bug-bounty programs create incentives to do so, usually only
+a small team of core developers reviews the code.
+In order to support code reviewers in finding vulnerabili-
+ties, tools and methodologies that flag potentially dangerous
+code are used to narrow down the search. For C-like lan-
+guages, a wide variety of code metrics can raise warning
+flags, such as a variable assigned inside an if-statement or
+unreachable cases in a switch-statement. The Clang static
+analyzer [1] as well as the dynamic analyzer Valgrind [3] and
+others, can pinpoint further pitfalls such as invalid mem-
+ory access. For the Linux kernel, the Trinity system call-
+fuzzer [2] has found and continues to find many bugs. Fi-
+nally, static analysis tools like Flawfinder [34] help find pos-
+sible security vulnerabilities.
+Most of these approaches operate on an entire software
+project and deliver a (frequently very large) list of poten-
+tially unsafe code. However, software grows incrementally
+and it is desirable to have tools to assist in reviewing these
+increments as well as tools to check entire projects. Most
+open-source projects manage their source code with version
+control systems (VCS) such as Git, Mercurial, CVS or Sub-
+version. In such systems, code - including vulnerable code
+- is inserted into the software in the form of commits to the
+repository. Therefore, the natural unit upon which to check
+whether new code is dangerous is the commit. However,
+most existing tools cannot simply be executed on code snip-
+pets contained within a commit. Thus, if a code reviewer
+wants to check the security of a commit, the reviewer must
+426

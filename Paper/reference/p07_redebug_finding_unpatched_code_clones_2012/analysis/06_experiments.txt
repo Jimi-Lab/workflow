@@ -1,0 +1,49 @@
+Research Questions:
+The paper is not organized as explicit RQs, but the introduction frames three empirical questions: attacker discovery from patches, OS responsiveness to known vulnerabilities, and persistence of unpatched clones across OS versions.
+
+Datasets:
+The paper uses early/late 2011 source datasets including Debian Lenny, Ubuntu Maverick, Linux kernel, SourceForge C/C++ projects, Debian Squeeze, and Ubuntu Oneiric. Table I contains exact dataset sizes [NEEDS TABLE REPAIR].
+
+Baselines:
+Deckard is used for direct comparison in discussion/evaluation. Related work also discusses CCFinder, CP-Miner, Deja Vu, MOSS, SYDIT, and Pattern Insight Code Assurance.
+
+Metrics:
+- Build time.
+- Query time.
+- Database size.
+- Number of unpatched code clones.
+- Confirmed real bugs.
+- False detection / missed clones in comparison with Deckard.
+- Similarity distribution for copied code measurement.
+
+Experimental Protocol:
+The paper describes collecting source datasets twice in 2011, collecting Debian/Ubuntu security-related patches, applying existing package patches, then querying patch sets against source datasets under default n=4, c=3, theta=1 settings.
+
+Implementation Details:
+The paper states the evaluated system was about 1000 lines of C and 250 lines of Python and used QuickLZ compression. Local source is a separate Python reimplementation, not the original C implementation [NEEDS ARTIFACT].
+
+Hyperparameters / Settings:
+Default context c=3, n=4, theta=1, 256KB Bloom filters, m/N ratio greater than 32, and three fast hash functions are stated in the paper. Exact reproduction is [EXECUTION NOT REQUESTED].
+
+Hardware / Environment:
+The paper reports a desktop with Linux 2.6.38, 3.4GHz Intel Core i7, 8GB memory, and 256GB SSD for unpatched clone experiments.
+
+Static Reproducibility Materials:
+Local Python source has README usage and dependencies, but lacks the original C evaluation implementation, source corpora, patch datasets, and generated databases.
+
+Execution Status:
+[EXECUTION NOT REQUESTED]
+
+What Is Measured:
+System scalability, query performance, detection counts, persistence across distribution versions, confirmed bugs, and clone prevalence.
+
+What Is Not Measured:
+Local reproduction, exact table values after manual repair, and performance of the Python reimplementation on the original corpora.
+
+Agent Evidence Anchors:
+- raw_extraction/section_text/04_implementation_evaluation.txt
+- raw_extraction/tables/table_index.txt
+- raw_extraction/figures/figure_index.txt
+
+Writing Pattern:
+Use dataset tables for scale, figures for performance curves, then concrete bug-confirmation counts for security impact.

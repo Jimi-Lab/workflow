@@ -1,0 +1,247 @@
+{
+  "cwe_id": "CWE-311",
+  "name": "Missing Encryption of Sensitive Data",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product does not encrypt sensitive or critical information before storage or transmission.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-693",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Protection Mechanism Failure"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "CWE-311 is high-level with more precise children available. It is a level-1 Class (i.e., a child of a Pillar)."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not encrypt sensitive or critical information before storage or transmission.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "transmission",
+      "information",
+      "encryption",
+      "critical"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "transmission",
+      "information",
+      "encryption",
+      "critical",
+      "encrypt",
+      "storage"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code writes a user's login information to a cookie so the user does not have to login again later.",
+        "snippet": "function persistLogin($username, $password){ $data = array(\"username\" => $username, \"password\"=> $password); setcookie (\"userdata\", $data); }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code attempts to establish a connection, read in a password, then store it to a buffer.",
+        "snippet": "server.sin_family = AF_INET; hp = gethostbyname(argv[1]); if (hp==NULL) error(\"Unknown host\"); memcpy( (char *)&server.sin_addr,(char *)hp->h_addr,hp->h_length); if (argc < 3) port = 80; else port = (unsigned..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code attempts to establish a connection to a site to communicate sensitive information.",
+        "snippet": "try { URL u = new URL(\"http://www.secret.example.org/\"); HttpURLConnection hu = (HttpURLConnection) u.openConnection(); hu.setRequestMethod(\"PUT\"); hu.connect(); OutputStream os = hu.getOutputStream(); hu.disconnect();..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-26390",
+        "description": "wireless battery product stores credentials and Personal Health Information (PHI) without encryption",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-26390"
+      },
+      {
+        "reference": "CVE-2009-2272",
+        "description": "password and username stored in cleartext in a cookie",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2272"
+      },
+      {
+        "reference": "CVE-2009-1466",
+        "description": "password stored in cleartext in a file with insecure permissions",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1466"
+      },
+      {
+        "reference": "CVE-2009-0152",
+        "description": "chat program disables SSL in some circumstances even when the user says to use SSL.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0152"
+      },
+      {
+        "reference": "CVE-2009-1603",
+        "description": "Chain: product uses an incorrect public exponent when generating an RSA key, which effectively disables the encryption",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1603"
+      },
+      {
+        "reference": "CVE-2009-0964",
+        "description": "storage of unencrypted passwords in a database",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0964"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

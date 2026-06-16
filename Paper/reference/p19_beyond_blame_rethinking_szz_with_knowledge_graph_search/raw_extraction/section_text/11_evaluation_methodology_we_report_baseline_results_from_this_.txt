@@ -1,0 +1,29 @@
+evaluation methodology, we report baseline results from this prior work where available.1
+All SZZ baseline variants are solely based on git blameover deleted or modified lines in the
+BFC. They differ primarily in their filtering and ranking strategies:B-SZZ[ 32] is the original SZZ
+algorithm that traces deleted lines via git blame and returns all blame commits as candidates.
+AG-SZZ[ 19] extends B-SZZ by filtering cosmetic changes (blank lines, comments) and using
+annotation graphs (which map line origins across revisions, even when lines move due to insertions
+or deletions) for more precise line tracking.MA-SZZ[ 7] further excludes meta-changes (branch
+merges, property changes) that do not affect program behavior.R-SZZandL-SZZ[ 8] select a single
+BIC from AG-SZZ candidates: R-SZZ chooses the most recent commit, while L-SZZ chooses the
+commit with the most changed lines.RA-SZZ[ 24] filters refactoring operations using RefDiff [31]
+and Refactoring Miner [39], but is limited to Java projects.Neural-SZZ[ 35] applies deep learning
+by embedding code changes with CodeBERT [12] and ranking them using a heterogeneous graph
+attention network. It is also limited to Java.
+1Baseline results for B-SZZ, AG-SZZ, MA-SZZ, R-SZZ, L-SZZ, RA-SZZ, and Neural-SZZ are from the LLM4SZZ paper [36].
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 011 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 11
+LLM4SZZ[ 36] is the current state-of-the-art approach that leverages LLMs to identify BICs from
+blame candidates. It employs two strategies: rank-based identification that asks the LLM to rank
+buggy statements by their relevance to the root cause, and context-enhanced identification that
+provides additional context for direct BIC selection. LLM4SZZ expands context around modified
+lines (full function bodies or ±2 surrounding lines) and blames these expanded lines as well for
+candidate collection. This enables LLM4SZZ to handle blameless cases and reach some BICs beyond
+the immediate deleted-line blame set. However, LLM4SZZ does not traverse commit history, which
+is the gap that AgenticSZZ addresses through TKG-based exploration.
+In summary, LLM4SZZ’s context expansion extends blame beyond deleted lines but does not
+traverse commit history. Furthermore, only LLM4SZZ handles blameless cases; none of the other
+baselines can provide any candidates when the bug fix contains only additions.

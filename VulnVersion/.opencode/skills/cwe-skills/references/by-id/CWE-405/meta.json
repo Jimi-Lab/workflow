@@ -1,0 +1,263 @@
+{
+  "cwe_id": "CWE-405",
+  "name": "Asymmetric Resource Consumption (Amplification)",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "The product does not properly control situations in which an adversary can cause the product to consume or produce excessive resources without requiring the adversary to invest equivalent work or otherwise prove authorization, i.e., the adversary's influence is \"asymmetric.\"",
+  "extended_description": "This can lead to poor performance due to \"amplification\" of resource consumption, typically in a non-linear fashion. This situation is worsened if the product allows malicious users or attackers to consume more resources than their access level permits.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-400",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Uncontrolled Resource Consumption"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "Client Server"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not properly control situations in which an adversary can cause the product to consume or produce excessive resources without requiring the adversary to invest equivalent work or otherwise prove...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "adversary",
+      "amplification",
+      "consumption",
+      "asymmetric"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "adversary",
+      "amplification",
+      "consumption",
+      "asymmetric",
+      "consume",
+      "authorization",
+      "performance",
+      "equivalent"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "This code listens on a port for DNS requests and sends the result to the requesting address.",
+        "snippet": "sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) sock.bind( (UDP_IP,UDP_PORT) ) while true: data = sock.recvfrom(1024) if not data: break (requestIP, nameToResolve) = parseUDPpacket(data) record =..."
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This function prints the contents of a specified file requested by a user.",
+        "snippet": "function printFile($username,$filename){ //read file into string $file = file_get_contents($filename); if ($file && isOwnerOf($username,$filename)){ echo $file; return true; } else{ echo 'You are not authorized to view..."
+      },
+      {
+        "language": "JavaScript",
+        "nature": "Bad",
+        "summary": "This example attempts to check if an input string is a \"sentence\" [REF-1164].",
+        "snippet": "var test_string = \"Bad characters: $@#\"; var bad_pattern = /^(\\w+\\s?)*$/i; var result = test_string.search(bad_pattern);"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "JavaScript",
+        "nature": "Good",
+        "summary": "This example attempts to check if an input string is a \"sentence\" [REF-1164].",
+        "snippet": "var test_string = \"Bad characters: $@#\"; var good_pattern = /^((?=(\\w+))\\2\\s?)*$/i; var result = test_string.search(good_pattern);"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-1999-0513",
+        "description": "Classic \"Smurf\" attack, using spoofed ICMP packets to broadcast addresses.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-0513"
+      },
+      {
+        "reference": "CVE-2003-1564",
+        "description": "Parsing library allows XML bomb",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-1564"
+      },
+      {
+        "reference": "CVE-2004-2458",
+        "description": "Tool creates directories before authenticating user.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-2458"
+      },
+      {
+        "reference": "CVE-2020-10735",
+        "description": "Python has \"quadratic complexity\" issue when converting string to int with many digits in unexpected bases",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-10735"
+      },
+      {
+        "reference": "CVE-2020-5243",
+        "description": "server allows ReDOS with crafted User-Agent strings, due to overlapping capture groups that cause excessive backtracking.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-5243"
+      },
+      {
+        "reference": "CVE-2013-5211",
+        "description": "composite: NTP feature generates large responses (high amplification factor) with spoofed UDP source addresses.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2013-5211"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

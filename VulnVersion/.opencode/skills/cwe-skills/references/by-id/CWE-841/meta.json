@@ -1,0 +1,242 @@
+{
+  "cwe_id": "CWE-841",
+  "name": "Improper Enforcement of Behavioral Workflow",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "The product supports a session in which more than one behavior must be performed by an actor, but it does not properly ensure that the actor performs the behaviors in the required sequence.",
+  "extended_description": "By performing actions in an unexpected order, or by omitting steps, an attacker could manipulate the business logic of the product or cause it to enter an invalid state. In some cases, this can also expose resultant weaknesses. For example, a file-sharing protocol might require that an actor perform separate steps to provide a username, then a password, before being able to transfer files. If the file-sharing server accepts a password command followed by a transfer command, without any username being provided, the product might still perform the transfer. Note that this is different than CWE-696, which focuses on when the product performs actions in the wrong sequence; this entry is closely related, but it is focused on ensuring that the actor performs actions in the correct sequence. Workflow-related behaviors include: Steps are performed in the expected order. Required steps are not omitted. Steps are not interrupted. Steps are performed in a timely fashion.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-691",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Insufficient Control Flow Management"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product supports a session in which more than one behavior must be performed by an actor, but it does not properly ensure that the actor performs the behaviors in the required sequence.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "steps",
+      "actor",
+      "are",
+      "performed"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "steps",
+      "actor",
+      "are",
+      "performed",
+      "sequence",
+      "transfer",
+      "actions",
+      "file-sharing"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "This code is part of an FTP server and deals with various commands that could be sent by a user. It is intended that a user must successfully login before...",
+        "snippet": "def dispatchCommand(command, user, args): if command == 'Login': loginUser(args) return # user has requested a file if command == 'Retrieve_file': if authenticated(user) and ownsFile(user,args): sendFile(args) return if..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "This code is part of an FTP server and deals with various commands that could be sent by a user. It is intended that a user must successfully login before...",
+        "snippet": "def dispatchCommand(command, user, args): ... if command == 'List_files': if authenticated(user) and ownsDirectory(user,args): listFiles(args) return ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2011-0348",
+        "description": "Bypass of access/billing restrictions by sending traffic to an unrestricted destination before sending to a restricted destination.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-0348"
+      },
+      {
+        "reference": "CVE-2007-3012",
+        "description": "Attacker can access portions of a restricted page by canceling out of a dialog.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-3012"
+      },
+      {
+        "reference": "CVE-2009-5056",
+        "description": "Ticket-tracking system does not enforce a permission setting.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-5056"
+      },
+      {
+        "reference": "CVE-2004-2164",
+        "description": "Shopping cart does not close a database connection when user restores a previous order, leading to connection exhaustion.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-2164"
+      },
+      {
+        "reference": "CVE-2003-0777",
+        "description": "Chain: product does not properly handle dropped connections, leading to missing NULL terminator (CWE-170) and segmentation fault.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0777"
+      },
+      {
+        "reference": "CVE-2005-3327",
+        "description": "Chain: Authentication bypass by skipping the first startup step as required by the protocol.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-3327"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

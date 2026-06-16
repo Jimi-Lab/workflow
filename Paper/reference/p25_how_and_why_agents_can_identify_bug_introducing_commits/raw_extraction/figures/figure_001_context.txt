@@ -1,0 +1,122 @@
+Page: 2
+Caption: Figure 1: SZZ-Agent: Stage 1 applies standard SZZ to the deleted lines and uses an agent to select BICs from the candidates.
+
+Page text context:
+Preprint, Under Submission, arXiv
+Risse et al.
+Fix Commit
+Lines
+deleted?
+Standard
+SZZ
+Candidate
+Commits
+Commit
+Identifier
+BICs
+selected?
+BICs
+Get Files
+Modified by
+Fix Commit
+Collect File
+Commit
+Histories
+Sort by
+Timestamp
+Select Middle
+Commit
+File Analysis
+≤33 commits
+left?
+Commit
+Identifier
+BICs
+Stage 1: SZZ-based Identification
+Stage 2: Binary Search
+Yes
+Yes
+No
+Yes
+No
+Binary Search
+Input
+Process
+Agent Call
+Decision
+Output
+Figure 1: SZZ-Agent: Stage 1 applies standard SZZ to the deleted lines and uses an agent to select BICs from the candidates.
+Stage 2 activates when Stage 1 fails: it collects file histories, binary searches over commits by having an agent analyze the
+source code at each midpoint, and narrows the search space until the remaining candidates are few enough for direct selection.
+2
+Background
+Problem Definition. Given a fix commit 𝑐fix that repairs a bug in a
+software repository, the goal is to identify the set of bug-introducing
+commits 𝐵⊆𝐻, where 𝐻is the repository history prior to 𝑐fix. Each
+commit 𝑏∈𝐵introduced a change that caused or contributed to the
+bug that 𝑐fix resolves. In practice, |𝐵| is often one but can be larger
+when a bug arises from changes spread across multiple commits.
+2.1
+Related Work
+The SZZ Algorithm. The original SZZ algorithm [31] identifies
+bug-introducing commits by tracing the lines deleted in a fix commit
+back to the commits that last modified them using version control
+annotations. These earlier commits form the set of bug-introducing
+candidates. While simple, this approach rests on the assumption that
+the lines removed by the fix are the same lines that introduced the
+bug. This assumption does not always hold: for instance, a commit
+may introduce a function that fails to validate its inputs, yet the fix
+adds a validation check rather than modifying the original function
+code. In such cases, the deleted lines in the fix are unrelated to
+the actual bug-introducing change. More generally, the approach
+suffers from false positives because not every deleted line is related
+to the bug fix, and it cannot identify bug-introducing commits for
+fixes that only add lines without deleting any, since there are no
+lines to trace back.
+Filtering-based Refinements. Subsequent work tries to overcome
+the limitations of SZZ by refining how candidates are generated,
+filtered, or selected. AG-SZZ [11] uses annotation graphs and ex-
+cludes non-semantic changes such as comments and formatting.
+MA-SZZ [6] further excludes meta-changes such as modifications
+to module declarations and import statements. RA-SZZ [19] inte-
+grates refactoring detection tools to remove behavior-preserving
+changes, which account for 6.5% of changes incorrectly flagged as
+bug-introducing. L-SZZ and R-SZZ [7] reduce the candidate set to a
+single commit: L-SZZ selects the candidate that changes the largest
+number of lines, while R-SZZ selects the most recent candidate.
+V-SZZ [4] targets security vulnerabilities specifically by recursively
+tracing lines back to the earliest commit that modified them, based
+on the observation that vulnerabilities are often introduced in early
+versions of the code.
+Learning-based Approaches. More recent methods apply ma-
+chine learning to refine which lines are traced or to assess candi-
+dates directly. Neural-SZZ [24] uses a graph neural network to rank
+the deleted lines in the fix commit by bug-relevance, then applies
+SZZ only to the top-ranked lines. LLM4SZZ [25], published at ACM
+ISSTA 2025 and to our knowledge the current state-of-the-art tech-
+nique, uses two LLM-based strategies: rank-based identification,
+which selects and ranks buggy statements in the fix commit, and
+context-enhanced identification, which prompts the LLM with con-
+textual information about the fix commit and each SZZ candidate
+to assess whether a candidate truly introduced the bug.
+All of these previous approaches remain critically limited by their
+performance. Despite two decades of refinements, the cumulative
+improvement over the original SZZ remains limited to 5–10 per-
+centage points in F1-score using the four datasets in our evaluation
+setup (see §3 and §4).
+Software Engineering Agents. Agents are software systems that
+use large language models (LLMs) trained to invoke external tools
+such as command-line interfaces, file readers, and web search [23,
+29] to achieve goals specified by a user or other agents. Agents
+have proven effective across a range of software engineering tasks,
+including automated program repair and autonomous issue resolu-
+tion [9, 28, 30]. Several mature agent platforms exist today: Claude
+Code [2] is a widely adopted proprietary coding agent, while Open-
+Hands [26] is a popular open-source platform that supports multiple
+LLM backends. LLM-based agents promise to be more effective than
+previous approaches at determining when a bug was first intro-
+duced, as they can reason about the semantics of code changes [8],
+navigate repository histories with tools, and examine source code
+a
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

@@ -1,0 +1,116 @@
+===== PAGE 001 =====
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+2219
+Evaluating SZZ Implementations: An Empirical
+Study on the Linux Kernel
+Yunbo Lyu
+, Hong Jin Kang
+, Ratnadira Widyasari
+, Graduate Student Member, IEEE, Julia Lawall
+, and
+David Lo
+, Fellow, IEEE
+Abstract—The SZZ algorithm is used to connect bug-ﬁxing
+commits to the earlier commits that introduced bugs. This
+algorithm has many applications and many variants have been
+devised. However, there are some types of commits that cannot
+be traced by the SZZ algorithm, referred to as “ghost commits”.
+The evaluation of how these ghost commits impact the SZZ
+implementations remains limited. Moreover, these implemen-
+tations have been evaluated on datasets created by software
+engineering researchers from information in bug trackers and
+version controlled histories. Since Oct 2013, the Linux kernel
+developers have started labelling bug-ﬁxing patches with the
+commit identiﬁers of the corresponding bug-inducing commit(s)
+as a standard practice. As of v6.1-rc5, 76,046 pairs of bug-ﬁxing
+patches and bug-inducing commits are available. This provides
+a unique opportunity to evaluate the SZZ algorithm on a large
+dataset that has been created and reviewed by project developers,
+entirely independently of the biases of software engineering
+researchers. In this paper, we apply six SZZ implementations to
+76,046 pairs of bug-ﬁxing patches and bug-introducing commits
+from the Linux kernel. Our ﬁndings reveal that SZZ algorithms
+experience a more signiﬁcant decline in recall on our dataset
+(↓13.8%) as compared to prior ﬁndings reported by Rosa
+et al., and the disparities between the individual SZZ algorithms
+diminish. Moreover, we ﬁnd that 17.47% of bug-ﬁxing commits
+are ghost commits. Finally, we propose Tracing-Commit SZZ
+(TC-SZZ), that traces all commits in the change history of lines
+modiﬁed or deleted in bug-ﬁxing commits. Applying TC-SZZ to
+all failure cases, excluding ghost commits, we found that TC-
+SZZ could identify 17.7% of them. Our further analysis based
+on git log found that 34.6% of bug-inducing commits were in the
+function history, 27.5% in the ﬁle history (but not in the function
+history), and 37.9% not in the ﬁle history. We further evaluated
+the effectiveness of ChatGPT in boosting the SZZ algorithm’s
+ability to identify bug-inducing commits in the function history,
+in the ﬁle history and not in the ﬁle history.
+Index
+Terms—SZZ,
+defect
+prediction,
+empirical
+study,
+ChatGPT.
+Manuscript received 5 August 2023; revised 6 May 2024; accepted
+9 May 2024. Date of publication 29 May 2024; date of current version
+19 September 2024. This work was supported by the National Research
+Foundation, under its Investigatorship Grant NRF-NRFI08-2022-0002. Rec-
+ommended for acceptance by J. Wang. (Corresponding author: Yunbo Lyu.)
+Yunbo Lyu, Ratnadira Widyasari, and David Lo are with the School
+of Computing and Information Systems, Singapore Management Univer-
+sity, Singapore 178902 (e-mail: yunbolyu@smu.edu.sg; ratnadiraw.2020@
+phdcs.smu.edu.sg; davidlo@smu.edu.sg).
+Hong Jin Kang is with the University of California, Los Angeles, CA 90095
+USA (e-mail: hjkang@g.ucla.edu)
+Julia Lawall is with Inria-Paris, 75013 Paris, France (e-mail: julia.lawall@
+inria.fr).
+Digital Object Identiﬁer 10.1109/TSE.2024.3406718
+I. INTRODUCTION
+I
+N MSR 2005, ´Sliwerski, Zimmermann, and Zeller intro-
+duced an approach to identifying bug-inducing commits in
+a software code base [1]. Their approach, subsequently referred
+to as the SZZ algorithm [2], ﬁrst identiﬁes bug-ﬁxing commits
+by correlating commits to reports in a bug tracker. It then uses
+the history mechanism of the version control-system to map
+each line of code removed by the bug ﬁx to the commit that
+most recently added or modiﬁed that line. Finally, the resulting
+set of commits is ﬁltered to remove those that postdate the bug
+report, unless there is evidence that the commit represents a
+partial ﬁx or the commit is a bug-introducing commit for some
+other bug-ﬁxing commit. The SZZ algorithm has been used in
+defect prediction techniques [3], [4], [5], [6], [7], and to analyze
+how bugs are born [8], [9], [10], [11].
+Despite the success and inﬂuence of the SZZ algorithm, over
+the years, researchers have identiﬁed a number of weaknesses
+in its strategy for identifying bug-inducing commits. For ex-
+ample, the SZZ algorithm may incorrectly ﬂag non-semantic
+source code (e.g., formatting changes) [2], meta-changes (e.g.,
+branch changes) [12], and refactoring changes [13], [14] as bug-
+inducing. Several algorithm reﬁnements have been proposed,
+such as excluding formatting and cosmetic changes [2], ex-
+cluding changes that represent version-control system metadata
+(e.g., merge commits) [12], excluding changes that perform
+refactorings [13], [14], excluding non-executable changes [15],
+and combining the syntactic approach proposed by SZZ with
+analysis of changes in dependencies, including potentially in-
+terprocedural analysis [16].
+Recently, attention has turned to the notion of a ghost commit
+[17]. As the SZZ algorithm relies on connecting the removed
+lines in the bug-ﬁxing commit to the added lines in the bug-
+inducing commit, it is intrinsically unable to provide results for
+bug-ﬁxing commits that have no removed lines (referred to as
+Remove Mapping Ghost), and to detect bug-inducing commits
+that have no added lines (referred to as Add Mapping Ghost).
+The SZZ algorithm furthermore cannot detect bug-inducing
+commits that are discarded due to the various ﬁltering strategies
+(referred to as Filtering Ghost), such as commits dated after the
+bug report, commits that perform refactoring, or commits that
+address multiple purposes (i.e., tangled commits [18]). Some
+further variants have been proposed to mitigate these issues.
+Speciﬁcally, to address failures from Remove Mapping Ghost,
+A-SZZ [19] and Rezk et al.’s [12] method were proposed. To
+0098-5589 © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

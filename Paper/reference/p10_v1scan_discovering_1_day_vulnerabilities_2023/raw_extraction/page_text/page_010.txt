@@ -1,0 +1,301 @@
+Table 5: Accuracy of V1SCAN, MOVERY, and V0Finder in vulnerability detection. Results with the highest precision and TP detection
+rate for each target program are highlighted in bold text.
+Target
+program
+CVEs∗
+V1SCAN
+MOVERY
+V0Finder
+#TP
+#FP
+#FN
+P†
+R‡
+#TP
+#FP
+#FN
+P
+R
+#TP
+#FP
+#FN
+P
+R
+Turicreate
+36
+32
+1
+4
+0.97
+0.89
+22
+5
+14
+0.81
+0.61
+22
+2
+14
+0.92
+0.61
+ReactOS
+29
+26
+1
+3
+0.96
+0.90
+24
+3
+5
+0.89
+0.83
+18
+4
+11
+0.82
+0.62
+FreeBSD
+23
+19
+2
+4
+0.90
+0.83
+13
+4
+10
+0.76
+0.57
+12
+7
+11
+0.63
+0.52
+MongoDB
+14
+14
+0
+0
+1.00
+1.00
+4
+0
+10
+1.00
+0.29
+4
+0
+10
+1.00
+0.29
+Filament
+14
+14
+0
+0
+1.00
+1.00
+10
+0
+4
+1.00
+0.71
+4
+0
+10
+1.00
+0.29
+TizenRT
+10
+9
+0
+1
+1.00
+0.90
+4
+1
+6
+0.80
+0.40
+3
+1
+7
+0.75
+0.30
+Aseprite
+8
+8
+0
+0
+1.00
+1.00
+6
+0
+2
+1.00
+0.75
+1
+1
+7
+0.50
+0.13
+MAME
+8
+7
+2
+1
+0.78
+0.88
+6
+1
+2
+0.86
+0.75
+2
+1
+6
+0.67
+0.25
+Godot
+4
+4
+0
+0
+1.00
+1.00
+1
+3
+3
+0.25
+0.25
+1
+2
+3
+0.33
+0.25
+ArangoDB
+4
+4
+0
+0
+1.00
+1.00
+0
+0
+4
+N/A
+0.00
+0
+1
+4
+0.00
+0.00
+Total
+150
+137
+6
+13
+0.96
+0.91
+90
+17
+60
+0.84
+0.60
+67
+19
+83
+0.78
+0.45
+CVEs∗: Total number of TPs detected by V1SCAN, MOVERY, and V0Finder,
+P†: Precision,
+R‡: TP detection rate.
+Unlike V0Finder, which is compatible with our dataset,
+MOVERY offers datasets with their own preprocessing ap-
+plied. Therefore, we additionally applied preprocessing to
+the vulnerability and patched functions we gathered (see Sec-
+tion 4.3), by referring to the MOVERY paper, e.g., extracting
+control dependency graphs of the vulnerable and patched
+functions by using the Joern [39] parser.
+Overall results. Table 5 summarizes the vulnerability detec-
+tion results. We confirmed that 150 CVE vulnerabilities were
+discovered in ten target programs. Among them, 93 (62%)
+vulnerabilities were reused in the target program with code
+changes. Nevertheless, V1SCAN showed substantially bet-
+ter accuracy than the other approaches. It is noteworthy that
+V1SCAN could reduce the false negative rate of MOVERY and
+V0Finder from 40% and 55% to 9%; V1SCAN discovered
+137 vulnerabilities from ten target programs, while existing
+approaches detected at most 90 vulnerabilities (see Figure 4).
+FNs of existing approaches. In our experiments, MOVERY
+and V0Finder failed to detect many vulnerabilities, i.e., they
+missed 60 and 83 vulnerabilities, respectively. We observed
+that there are two main reasons for this: when the propagated
+vulnerable code (1) underwent significant syntax change or
+(2) existed outside of functions.
+MOVERY and V0Finder detect vulnerabilities by assum-
+ing that propagated vulnerable codes have similar syntax (e.g.,
+over 50% similarity) to the disclosed vulnerable codes, caus-
+ing failure in discovering vulnerable codes with significant
+syntax changes. Specifically, V0Finder reported more false
+negatives compared to MOVERY as it was more limited in
+detecting heavily modified vulnerable codes. Additionally,
+they failed to detect seven vulnerabilities that exist outside of
+functions as they only consider function units.
+FPs of existing approaches. MOVERY and V0Finder pro-
+duced 17 and 19 false positives in vulnerability discovery.
+MOVERY can detect vulnerabilities in which the code lines
+deleted from the patch do not exist, but this approach rather
+generated FPs; a function unrelated to the vulnerability, in
+137
+6
+13
+90
+17
+60
+67
+19
+83
+0
+60
+120
+180
+Count (#)
+V1SCAN
+TP
+FP
+FN
+MOVERY
+V0Finder
+Figure 4: Vulnerability detection results of V1SCAN, MOVERY,
+and V0Finder.
+which neither the codes added nor deleted from the patch
+were present, was falsely detected as vulnerable.
+In addition, when the code lines deleted in the patch exists
+in multiple locations in the vulnerable code, V0Finder mis-
+interpreted that the vulnerability still remains even after the
+patch is applied, thereby generating false alarms.
+Accuracy of V1SCAN. V1SCAN significantly outperformed
+the other approaches: V1SCAN could considerably reduce
+FPs of MOVERY and V0Finder, while discovering more TPs.
+It is noteworthy that V1SCAN showed high detection accu-
+racy regardless of the number of vulnerabilities discovered in
+software; V1SCAN succeeded in detecting propagated vulner-
+abilities without false alarms even in Godot and ArangoDB, in
+which only a small number of vulnerabilities were discovered.
+Although V1SCAN detected vulnerabilities precisely in
+most cases, it reported several false results (6 FPs and 13
+FNs). The six FPs were caused by similar code logic in the
+OSS components [1,37]. If a function similar to one that was
+repaired in the security patch existed in the target program,
+V1SCAN misinterpreted the reused function as being vulnera-
+ble even though it was safe. Because the possibility of actual
+abuse was negligible, we determined these to be FPs.
+FNs in V1SCAN were reported when the syntax of the
+reused vulnerable function differed vastly from that disclosed
+by the NVD (e.g., syntax similarity of less than 15%). Addi-
+tionally, unlike MOVERY, V1SCAN only targets vulnerabili-
+ties with code lines deleted from the patch. This is to prevent
+false positives that may occur when considering only the code
+lines added in the patch, but this leads to two FNs. Further-

@@ -1,0 +1,40 @@
+gnatures in VCC discovery
+(i.e., considering Conds 2and 3).
+(3) If fo does not exist ( e.g., the vulnerability only exists
+in a single OSS version), we determine that internal
+modification cannot occur, and MOVERY uses only fd
+in the signature generation and in Cond 3.
+(4) If the code line sets of vulnerable and patched functions
+are the same (e.g., when a security patch only changes
+the order of code lines), MOVERY records the order of
+the code lines of the vulnerable function. When a func-
+tion f satisfying Conds 1and 3 appears, MOVERY deter-
+mines that f is vulnerable only when the code line order
+of the vulnerable function is maintained in f .
+Our experimental results demonstrate that MOVERY can
+also discover such VCCs with high accuracy; note that these
+four cases are not dominant (i.e., less than 30%).
+USENIX Association 31st USENIX Security Symposium    3043
+
+===== PAGE 009 =====
+Table 2: Vulnerability dataset overview.
+Category Count (#)
+Security patches 4,219
+Disclosed vulnerable and patched function pairs 7,762
+Oldest vulnerable functions 5,936
+4 Implementation of M OVERY
+In this section, we introduce the implementation of MOVERY ,
+including the vulnerability dataset and the architecture.
+4.1 Vulnerability dataset
+Collecting security patches. We collected security patches
+by leveraging the method used in the previous approaches [19,
+32]; we examined CVEs in the National Vulnerability
+Database (NVD) and checked ifgit commitURLs (i.e., secu-
+rity patch commits) were included in the references. We then
+gathered security patches by crawling such patch commits
+from the corresponding Git repositories. We chose the C/C++
+vulnerabilities as our initial targets, because code fragments
+reuse and modified OSS reuse are prominent in C/C++ soft-
+ware [17, 47–49]. Consequently, we collected 4,219 C/C++
+security patches from the NVD (as of March 2021).
+Re

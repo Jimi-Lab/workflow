@@ -1,0 +1,25 @@
+Artifact Consistency Analysis
+
+Artifact Classification:
+- Type A: paper plus local source/artifact tree.
+
+Paper-to-Artifact Mapping:
+- Paper claims a D3FEND knowledge graph of countermeasures; source contains src/ontology/d3fend-protege.ttl and related ontology/mapping files.
+- Paper emphasizes OWL DL and semantic modeling; source uses OWL/RDF Turtle, ROBOT build targets, SPARQL queries, and ontology validation/report targets.
+- Paper describes ATT&CK relation and future maintenance; source contains update_attack.py, update_capec.py, update_sparta.py, update_atlas.py, and Makefile update targets.
+- Paper discusses digital artifacts; source ontology contains object properties and thousands of OWL classes/subclass assertions.
+
+Static Source Confidence:
+- High confidence for existence of ontology source and build/query infrastructure.
+- Medium confidence for paper-code consistency at architecture level.
+- Low confidence for exact release output, inferred mappings, query results, and validation results because nothing was executed. [EXECUTION NOT REQUESTED]
+
+Notable Repository Risks:
+- README states latest release should be obtained from the D3FEND website, so this checkout may not equal the newest public release. [NEEDS CITATION VERIFICATION]
+- Some Makefile targets interact with external services/databases and production/local endpoints; not used in this analysis.
+- Build artifacts such as dist/ and build/ were not generated or verified. [EXECUTION NOT REQUESTED]
+
+Consistency Verdict:
+- Architecture and ontology evidence: strong.
+- Table/figure evidence: weak until repair.
+- Empirical validation evidence: weak/preliminary.

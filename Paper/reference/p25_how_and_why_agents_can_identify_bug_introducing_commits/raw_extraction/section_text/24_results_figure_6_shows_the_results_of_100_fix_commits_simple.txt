@@ -1,0 +1,60 @@
+Results.Figure 6 shows the results. Of 100 fix commits, Simple-
+SZZ-Agent correctly identifies the bug-introducing commit in 87
+cases. Of the 13 incorrect predictions, 4 fail because the true bug-
+introducing commit is not in the candidate set (i.e., the bug was
+introduced in a file not modified by the fix). The remaining 9 failures
+occur when the bug-introducing commit is in the candidate set but
+the agent does not select the correct one.
+We further categorize these 9 cases through manual analysis: in
+3 cases, the agent performs an incorrect analysis—it identifies the
+correct code area but confuses commits that modified the relevant
+code with the commit that originally introduced the flaw; in 2 cases,
+the agent selects a commit within 3 positions of the correct one
+(near miss), including one case where the predicted and ground
+truth commits are consecutive commits from the same patch series;
+in 3 cases, the ground truth label itself is questionable; and in 1 case,
+we could not determine the reason for the failure because the fix
+0 10 20 30 40 50 60
+Commit Hash Pattern
+FC Diff Raw Match
+FC Diff Path Components
+Undetermined
+FC Diff File Paths
+FC Diff Hunk Headers
+FC Diff Function Names
+FC Diff Context Lines
+FC Diff Added Lines
+FC Message
+FC Diff Removed Lines
+0.4%
+1.6%
+7.4%
+8.6%
+9.1%
+11.9%
+11.9%
+25.9%
+30.9%
+43.6%
+48.1%
+Percentage of grep calls (%)
+Figure 5: Distribution of grep search sources used by the
+agent. "FC" stands for "Fix Commit".
+and ground truth bug-introducing commits were too complex for
+us to analyze as non-Linux-kernel experts. Since we are not Linux
+kernel experts, we also cannot determine with certainty whether
+the 3 questionable labels are incorrect; we include a detailed report
+for each case in our artifact.
+Finding 7:Of the 13 failures, 4 occur because the bug-introducing
+commit is not in the candidate set. Of the remaining 9, 3 are due to
+incorrect agent analysis, 2 are near misses, 3 involve questionable
+ground truth labels, and 1 we could not categorize.
+4.3.4 RQ4c: Better Models and Agents.We investigate whether
+Simple-SZZ-Agent’s performance generalizes across different LLM
+backbones and agent frameworks, and whether cheaper or more
+capable configurations can improve results.
+Setup.We evaluate Simple-SZZ-Agent with two agent frameworks—
+Claude Code and OpenHands—across multiple LLM backbones:
+Claude Haiku 4.5, Claude Sonnet 4.5, Claude Opus 4.5, as well
+as minimax-m2.5 and glm-5 for OpenHands. All experiments use
+DS_LINUX-26 (100 samples).

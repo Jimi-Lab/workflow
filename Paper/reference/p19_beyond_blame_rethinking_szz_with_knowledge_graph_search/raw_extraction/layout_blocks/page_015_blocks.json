@@ -1,0 +1,152 @@
+[
+  {
+    "page": 15,
+    "block_id": "page_015:block_001",
+    "block_type": "text",
+    "text": "Beyond Blame: Rethinking SZZ with Knowledge Graph Search 15",
+    "bbox": [
+      45.827999114990234,
+      60.6286735534668,
+      440.172607421875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_002",
+    "block_type": "text",
+    "text": "blameless cases contribute meaningfully? Does combining TKG and agent produce synergistic benefits beyond their individual contributions?",
+    "bbox": [
+      45.827999114990234,
+      83.43709564208984,
+      440.1689758300781,
+      109.16036224365234
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_003",
+    "block_type": "text",
+    "text": "6.2.2 Approach. We evaluate five configurations that systematically enable or disable components:",
+    "bbox": [
+      45.827999114990234,
+      113.3250961303711,
+      441.3509521484375,
+      127.0934066772461
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_004",
+    "block_type": "text",
+    "text": "(1) Blame-only : Returns the most recent blame commit as the predicted BIC, following traditional SZZ heuristics. No LLM reasoning, no TKG traversal, and no fallback for blameless cases (returns empty prediction). This represents the simplest heuristic baseline.",
+    "bbox": [
+      45.827999114990234,
+      125.2800521850586,
+      440.1684265136719,
+      162.95938110351562
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_005",
+    "block_type": "text",
+    "text": "(2) Blame-fallback : Extends Blame-only by applying the fallback strategy for blameless cases, blaming ± 2 lines around additions to obtain candidates. This isolates the contribution of handling BIC identification of blameless bug fixes.",
+    "bbox": [
+      45.827999114990234,
+      161.1460723876953,
+      441.2706298828125,
+      198.82437133789062
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_006",
+    "block_type": "text",
+    "text": "(3) TKG-only : Constructs the full TKG with commit history traversal from two starting points but replaces the LLM agent with deterministic selection. Unlike the full pipeline shown in Algorithm 1 where the agent iteratively investigates candidates (reading diffs, traversing rela- tionships, reasoning about causality), TKG-only simply returns the highest-scoring candidate based on tiered fitness scoring (blame > blame_ancestor > bfc_ancestor) without any LLM interaction. This isolates the TKG’s candidate expansion from intelligent agent reasoning.",
+    "bbox": [
+      45.827999114990234,
+      197.0110321044922,
+      441.8565673828125,
+      270.5553894042969
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_007",
+    "block_type": "text",
+    "text": "(4) Agent-only : Uses an LLM agent to reason over blame candidates (with fallback) but without constructing a TKG. The agent receives blame candidate commit SHAs and their commit messages as text input and uses a simplified prompt without tool-calling capabilities, directly outputting its prediction. This isolates the agent’s reasoning capability without the expanded search space provided by the TKG.",
+    "bbox": [
+      45.827999114990234,
+      268.7420654296875,
+      440.4353332519531,
+      330.3313903808594
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_008",
+    "block_type": "text",
+    "text": "(5) Full Pipeline (AgenticSZZ) : Combines TKG construction with agent-guided search. The agent navigates the TKG using the four specialized tools (Section 4.2 ) for candidate enumeration, graph traversal, property queries, and causal analysis between BFC and BIC candidates. By comparing these configurations, we quantify each component’s marginal contribution and assess whether their combination produces synergistic benefits. Since in RQ1, we observed at most a variation of 3% for any metric across the three runs of either AgenticSZZ or LLM4SZZ, for RQ2’s analysis, we decided to only perform one run of each variant.",
+    "bbox": [
+      45.827999114990234,
+      328.51806640625,
+      441.2706604003906,
+      414.01739501953125
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_009",
+    "block_type": "text",
+    "text": "6.2.3 Results. The full pipeline consistently outperforms all ablation configurations, demonstrating that both TKG and agent components are necessary for optimal per- formance. Table 5 presents results across five configurations. AgenticSZZ achieves the highest F1-score on all datasets, with the largest margin on DS_GITHUB where diverse project structures benefit most from TKG-based exploration. The consistent improvements indicate that neither component alone is sufficient: the TKG provides structured search space expansion while the agent provides intelligent navigation. McNemar’s tests confirm all differences are statistically significant ( 𝑝 < 0 . 05) with large effect sizes (Cohen’s 𝑔 from 0.40 to 0.44) [ 6 ]. Among configurations without LLM reasoning, Blame-fallback provides the best base- line, while TKG-only suffers from noise introduced by search space expansion. Blame-only serves as the simplest baseline: it returns the most recent blame commit without handling blame- less cases. Blame-fallback improves over Blame-only on all datasets by providing candidates for blameless cases, where Blame-only returns no prediction. However, TKG-only performs worse than Blame-fallback despite expanding the search space, particularly on DS_GITHUB and DS_APACHE. This reveals that deterministic ranking cannot effectively filter the expanded candidate set of a TKG: commits that coincidentally modified the same files are scored similarly to those that actually introduced the bug, reducing precision. Agent-only outperforms TKG-only, but the full pipeline shows the TKG’s value when combined with intelligent navigation. Agent-only applies LLM reasoning to the same candidate set as Blame-fallback (blame commits with the fallback strategy for blameless cases). It outperforms",
+    "bbox": [
+      45.52899932861328,
+      419.2879333496094,
+      441.9573669433594,
+      659.098388671875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 15,
+    "block_id": "page_015:block_010",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      260.1289978027344,
+      671.4816284179688,
+      440.1734313964844,
+      682.496337890625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

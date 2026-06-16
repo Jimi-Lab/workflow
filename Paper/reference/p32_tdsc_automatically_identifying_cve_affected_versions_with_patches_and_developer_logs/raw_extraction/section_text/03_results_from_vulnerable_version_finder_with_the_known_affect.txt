@@ -1,0 +1,121 @@
+results from Vulnerable Version Finder with the Known Affected
+Software Conﬁgurations of the NVD, and outputs the justiﬁed
+affected versions and the accuracy of the NVD.
+B. Experimental Setup and Dataset
+Dataset. This article mainly selects the following products,
+including Linux kernel, Openssl, BusyBox, Wget and QEMU.
+The source websites of their patches are shown in TableII.
+Taking Linux kernel as an example, after the ﬁnal screening,
+there are 1,367 CVE ﬁles in our database, including many vul-
+nerability types such as buffer overﬂow, integer overﬂow, SQL
+injection, use-after-free and many others. We collected Linux
+kernel vulnerabilities released from January 2003 to September
+2020 from the NVD, which resulted in 2,576 CVE -IDs in total.
+Among them, 1,367 were published in https://git.kernel.org,
+including 2,664 patches. The rest correspond to the secondary
+development versions based on the Linux kernel, and their
+patches might not exist or were scattered on various third-party
+websites, so these CVE-IDs are not within our consideration. In
+addition, we collected a total of 3,086 Linux kernel versions that
+make up its version tree, taking 585 G of data space.
+C. Accuracy Evaluation
+We scan 1,367 CVE-IDs of Linux kernel against its 3,086
+open-source versions to detect all vulnerable versions in the three
+directions (R1, R2 and R3). For our dataset, we manually verify
+the reported boundary of vulnerable versions in the version tree
+for each CVE-ID. Note that for the TPs of the reported vulnerable
+version set, we can verify them by manual inspection. However,
+for FNs, since there are a great number of software versions(we
+do not regard the versions reported by NVD as the ground truth
+because it has many errors, as presented in the next subsection),
+we cannot directly report the FN rate or recall. Therefore, for
+R1 and R2, we sample 100 CVE-IDs for manual inspection to
+calculate the recall of our tool. As for R3, we determine the
+lower bound of the recall. The evaluation results of our tool are
+as follows:
+R1. It represents the method of obtaining the last vulnerable
+version of Linux kernel for a given CVE-ID. Manual veriﬁcation
+shows that the reported vulnerable versions has no false positive,
+and the precision reaches 100%. Among the 100 sampled CVE-
+IDs, there are unpatched codes in the next major versions with
+respect to 4 CVE-ids, and there is no repatch found. So the lower
+bound of the recall rate is 96%. The incomplete patches and
+errors in git logs are possible causes behind these false negative
+cases.
+R2. It represents the method of determining the last vulnerable
+version in each version branch. Our manual inspection shows
+that the precision of the reported versions also reaches 100%.
+We again sample 100 different CVE-IDs for manual inspection,
+which shows that there are unpatched codes in the next minor
+versions with respect to 2 CVE-IDs, so the recall rate is at least
+98% for the samples. The reasons for the false negatives are as
+above.
+R3. It represents the method of determining the ﬁrst vulnerable
+version V from by backward traversing the major versions before
+the minimum committed version (reported by changelog) in the
+version tree. As shown in TableII, among the 1,367 CVE-IDs,
+337 of them have some partial matching versions and the re-
+maining 1,030 only have exact matching versions. Among the
+matching results, we add up the number of vulnerable versions
+detected by each CVE-ID, and the total number is 37,685,
+including 32,903 exact matching versions and 4,782 partial
+matching versions. Because different CVE-IDs may correspond
+to different source code fragmentsSFs in the same version, a
+vulnerable version may be counted more than one time. For
+the 1,030 exact matching only CVE-IDs, since the ﬁrst exact
+matching version will be regarded asVfr o m, we ﬁrst check
+the versions right before our reported versionVfr o m. Among
+them, it is found that either the CVE-speciﬁed ﬁle does not
+exist, or there is no vulnerable function (Fun) in the source code.
+Therefore, theV from under our exact matching method has no
+false negative. Our tool spent 10.2 hours for this process in total.
+For the remaining 337 CVE-IDs with partial matches, we
+only check the major versions with different partial matching
+code, not the minor versions. Our statistics shows that on average
+one CVE-ID corresponds to 2 different sf-diffs. To evaluate our
+partial matching algorithm and obtain the accurateV from for
+each CVE-ID, we need to check at least 532 times, and we
+spent about 3.3 hours to verity the partial matching code. Since
+the partial matching code is similar to the CVE patch, we can
+determine that the code has a potential vulnerability, but whether
+it has a real vulnerability or not needs to be conﬁrmed through
+context-based dynamic analysis and POC construction, which
+requires huge investment and cost. Fortunately, git logs record
+the ﬁx process of a vulnerability, including the release of CVE,
+which is the ground truth for our justiﬁcation of the vulnerability.
+However, if the git log information did not record whether the
+code is related to a vulnerability, it is probable that the code has
+a vulnerability, or it may be just a bug that was ﬁxed. Speciﬁ-
+cally, if a git log is in the following two situations, we cannot
+directly determine whether it has the vulnerability: (1) The log
+information is incomplete. (2) the log information is complete,
+but it does not record the relationship with the vulnerability. In
+this case, theVfr o mfor this CVE-ID is the earliest vulnerable
+version in the version tree that we can manually determine.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 011 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 915
+Fig. 10. Comparison of last vulnerable versions.
+Fig. 11. Comparison of ﬁrst vulnerable versions.
+In the end, there are 12 partial matching versions of CVE,
+which makes it impossible to determine whether there are
+any vulnerabilities in this study. There are 74 corresponding
+versions, accounting for nearly 3.6% of 337 CVEs. Among
+the remaining 325 CVEs, if some matching codes are directly
+identiﬁed as vulnerabilities by our tool, through log veriﬁcation,
+it is found that there are 19 CVEs with false positives and
+4 CVEs with false negatives, corresponding to 172 versions
+and 39 versions respectively. Therefore, assuming that all 74
+unconﬁrmed versions have corresponding CVE vulnerabilities,
+the total number of false negatives is 113 (74 plus 39) versions,
+and the total number of true positives is 4669 versions, so the
+lower limit of recall rate of this tool is 97.6%. At the same
+time, the number of false positives is 172 versions, and the
+corresponding number of true positives is 4610 versions, so
+the correct rate of this tool is 96.4%. In the end, this scheme
+corrected 19+4=23 CVE vulnerabilities that were incorrectly
+identiﬁed by the tool through log veriﬁcation.
+D. Incorrect Results of Known Affected Software V ersions of
+NVD
+In this section, we will introduce the difference between the

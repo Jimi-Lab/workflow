@@ -1,0 +1,162 @@
+TTP Classifier Model Building
+Attack Pattern 3
+Input
+Tokenization
+Token
+Embedding
+Segment
+Embedding
+Position
+Embedding
+CVE-2024-4985 (Context)
++
+Weight Update (Encoder Frozen)
++
+BERT
+Encoder
+Classification
+Head
+T1606: 0.23
+T1566: 0.95
+T1548: 0.87
+...
+True
+Labels
+Com-
+pare
+Predicted TTP Probabilities
+Binary Cross-Entropy
+Loss Calculation
+Backpropagation
+Fine-tuning
+(Head Only)
+[CLS] [SEP] An authentication ... program .an attacker gain ... privileges
+E(an) E(attacker) E(gain) ... E(privileges)E([CLS]) E([SEP]) E(An) E(authentication) ... E(program) E(.)
+E[A] E[A] E[A] E[A] ... E[A] E[A] E[B] E[B] ... E[B] E[B]
+E[0] E[1] E[2] E[3] ... E[11] E[12] E[13] E[14] ... E[n-1] E[n]
+Fig. 10: An example of ﬁne-tuning the TTP Classiﬁer Model.
+Fig. 11: An example of TTP clustering via Prediction step.
+validation and test sets. Moreover, it uses a frozen encoder
+and a sigmoid-activated classiﬁcation head trained via binary
+cross-entropy. We evaluate six BERT variants (e.g., BERT-
+Base, SecureBERT [19], [20]) and select the best-performing
+model as the ﬁnal classiﬁer forNEXUS.
+Example 6. Figure 10 shows an example of the TTP Classiﬁer
+Model Building step during ﬁne-tuning. Here,Attack Pattern 3
+from CVE-2024-4985 is paired with its CVE description
+using the[SEP] token. The sequence is tokenized, embedded
+(token, segment, position), and passed through a frozen BERT
+encoder. The[CLS] output feeds into the classiﬁcation head,
+producing multi-label probability scores (e.g., 0.23 forT1606,
+0.95 for T1566, 0.87 for T1548). Predictions are compared
+to ground truth using binary cross-entropy loss. Only the
+classiﬁcation head is updated during backpropagation.
+F . Prediction and Adaptation
+This step builds upon the ﬁne-tuned TTP classiﬁer model
+described in Section III-E to predict TTPs for previously un-
+seen CVEs and to improve prediction accuracy through analyst
+feedback. It consists of two main sub-steps: TTP Prediction
+(Section III-F1) and Model Adaptation (Section III-F2).
+1) TTP Prediction: This sub-step ﬁrst predicts TTPs for
+unseen CVEs, reﬁnes them through Model Adaptation, and
+then receives analyst feedback. First, the TTP Prediction sub-
+step processes attack patterns extracted from a CVE, each with
+its context, and applies the ﬁne-tuned TTP classiﬁer. Initial
+predictions are reﬁned by the Model Adaptation sub-step (Sec-
+tion III-F2) using prior feedback, and the ﬁnal adapted TTPs
+are returned. Second, analysts review predictions and provide
+structured feedback by marking each TTP as true positive,
+false positive, or false negative. For each TTPT
+i, feedback
+can target speciﬁc attack patterns {AP1, AP2, . . . , APk} or
+apply using a wildcard (*), as follows:
+TTP Prediction and Feedback Collection
+AP Extraction TTP Prediction Revision
+ Feedback
+False Negative: 
+T1606.002
+for AP1-3 from
+Sentence 2
+Model Adaptation DB Update
+CVE-2024-4985 Feedback
+Database
+Analyst 47c1e5c...
+Exact-Match
+Signatures
+Behavioral
+Signatures
+C1, C5, ...
+Hash Values
+(SHA-256)
+Cluster Distance
+(0.1)
+e.g., e.g.,
+<CONTEXT>
+Sent. APs
+1 AP1
+2 AP1, AP2, AP3
+3 AP1, AP2
+T1548: Abuse Elevation Control Mechanism T1606: Forge Web Credentials T1606.002: Forge Web Credentials: SAML Tokens
+Sent.
+3
+AP TTPs
+T1606, ...1
+.........
+......... 2
+.........
+2 T1548, ...
+Refined by Model
+Adaptation
+Fig. 12: An example of predicting TTPs.
+Feedback(Ti)=
+k⋃
+j=1
+Map(APj), where Map(APj) ↔{ APj, *} (3)
+Third, the TTP Prediction sub-step stores feedback using
+two mechanisms: Exact-Match and Behavioral signatures. For
+Exact-Match, it concatenates the attack pattern and CVE
+description with a <CONTEXT> delimiter and applies SHA-
+256 to create a stable identiﬁer for deterministic lookup. For
+Behavioral Signatures, it records the predicted TTP set as a
+behavioral ﬁngerprint to generalize feedback across similar
+patterns. However, small contextual differences (e.g.,[T1,T 2]
+versus [T1,T 2,T 7] hinder exact matching and inﬂate the
+database. To mitigate this, the sub-step abstracts these sets by
+clustering correlated TTPs, computing a Pearson correlation
+matrix C
+ij over the multi-label CVE–TTP dataset (Equa-
+tion 4).
+Cij = Cov(Li,L j)
+ωLiωLj
+(4)
+and deﬁnes a pairwise distance as presented in Equation 5:
+d(Li,L j)=1 ↘ Cij (5)
+Using these distances, hierarchical agglomerative clustering
+with average linkage is performed, and the dendrogram is cut
+at a thresholdX to formN clusters as denoted in Equation 6:
+D = {Li ≃ ClusterID(Li) | i =1 , 2,...,M } (6)
+By clustering correlated TTPs, the system reuses behavioral
+feedback across semantically similar patterns despite minor
+prediction differences. Figure 11 illustrates how varying dis-
+tance thresholds merge TTPs into broader clusters, trading
+speciﬁcity for generalization. For each pattern with feedback,
+the TTP Prediction sub-step then maps its predicted TTPs to
+cluster IDs to form the Behavioral Signature:
+APclusters =
+APTTPs⋃
+t=1
+{ClusterID(CPt)} (7)
+This cluster-level signature enablesNEXUS to reuse analyst
+feedback during future prediction processes, applying it to both
+identical and behaviorally similar attack patterns.
+Example 7. Figure 12 illustrates TTP prediction and ana-
+lyst feedback. ForCVE-2024-4985, NEXUS extracts multiple
+attack patterns (e.g., AP1–AP3 from the second sentence).
+The TTP Prediction sub-step generates initial TTPs, which
+are reﬁned via Model Adaptation (Section III-F2). During
+revision, an analyst identiﬁes a false negative—T1606.002
+(“Forge Web Credentials: SAML Tokens”)—missing from
+AP1–AP3 and adds it to all three. The system encodes this
+feedback using two signatures per pattern: an Exact-Match
+Signature (SHA-256 hash of the pattern and CVE context) and
+6

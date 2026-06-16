@@ -1,0 +1,77 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+techniques and contextualize provenance data over both internal 
+system knowledge and external cyber-security knowledge. Based 
+on the KRYSTAL ontology, we provide a foundation for provenance 
+and attack graph modeling in a uniﬁed framework. The ontology 
+provides semantic interoperability and allows users to leverage 
+community knowledge for tactical attack analysis. Furthermore, 
+our framework introduces a declarative and modular architecture 
+to overcome the inﬂexibility of monolithic prototypes; hence, it 
+supports rapid development and integration of new approaches, 
+lowering the barriers for rule development, reproducibility, and 
+further research. 
+To evaluate the ability of SPARQL to effectively express threat 
+detection rules, we implemented several state of the art techniques 
+including tag propagation, list:attenuation and decay, signature/rule- 
+based detection and graph queries . We evaluated the feasibil- 
+ity of our approach for threat detection and attack construc- 
+tion through multiple attack scenarios from the well-established 
+DARPA-TC dataset. The evaluation shows that our ontology-based 
+RDF provenance graphs are scalable with respect to graph size and 
+query complexity without sacriﬁcing graph reduction, compres- 
+sion, and attack reconstruction performance. This makes it possi- 
+ble to combine a variety of threat detection techniques, which im- 
+proved the detection capabilities in our evaluation. For instance, 
+we found that complementary rule-based threat detection identi- 
+ﬁed threats which were missed by tag-propagation techniques. 
+Finally, our framework facilitates linking to high-level attack 
+patterns to establish a “kill-chain” of high-level attacker tactics, 
+which results in a navigable and queryable provenance graph en- 
+riched with security knowledge. This can help improve attack un- 
+derstanding and situational awareness. 
+As next steps in our research, we plan to integrate with mul- 
+tiple large-scale heterogeneous log sources beyond audit log data 
+and aim for performance optimization (e.g., for better exploration 
+and visualization). Based on the possibility to combine detection 
+techniques, we want to explore how alerts raised by one technique 
+could automatically trigger analysis by other techniques for conﬁr- 
+mation and additional information. Further research will also focus 
+on exploring other threat detection approaches, including anomaly 
+detection techniques, and integrating them into our framework. Fi- 
+nally, we plan to adapt and evaluate the attack graph construction 
+approach in different implementation settings such as in decentral- 
+ized and distributed scenarios. 
+Declaration of Competing Interest 
+The authors declare that they have no known competing ﬁnan- 
+cial interests or personal relationships that could have appeared to 
+inﬂuence the work reported in this paper. 
+CRediT authorship contribution statement 
+Kabul Kurniawan: Conceptualization, Methodology, Software, 
+Investigation, Validation, Visualization, Writing – original draft. 
+Andreas Ekelhart: Conceptualization, Writing –r e v i e w & editing. 
+Elmar Kiesling: Conceptualization, Writing –r e v i e w & editing. 
+Gerald Quirchmayr: Supervision. A Min Tjoa: Supervision. 
+Acknowledgments 
+This work has been supported by netidee SCIENCE and the Aus- 
+trian Science Fund (FWF) under grant P30437-N31. The compe- 
+tence center SBA Research (SBA-K1) is funded within the frame- 
+work of COMET — Competence Centers for Excellent Technologies 
+by BMVIT, BMDW, and the federal state of Vienna, managed by 
+the FFG. Moreover, the ﬁnancial support by the Christian Doppler 
+Research Association, the Austrian Federal Ministry for Digital and 
+Economic Affairs and the National Foundation for Research, Tech- 
+nology and Development is gratefully acknowledged (Christian- 
+Doppler-Laboratory for Security and Quality Improvement in the 
+Production System Lifecycle). 
+Appendix 
+Scenario 2 - Nginx backdoor w/ Drakon in-memory In this sce- 
+nario our system detects several alarms on the provenance graph 
+as shown on Fig. 12 . We performed backward-forward chaining 
+with query federation to construct the attack graph together with 
+its kill-chain phases. We successfully linked the generated attack 
+graph to MITRE ATT&CK techniques such as Gather Victim Iden- 
+tity Information (T1589), File and Directory Permissions Modiﬁcation 
+Fig. 12. Scenario 2 ( Nginx backdoor w/ Drakon in-memory ). The attack begins with a vulnerable Nginx installed on a FreeBSD host that gets exploited by an attacker. The 
+attacker sends a malformed HTTP request that results in downloading several malicious ﬁles on the local system. One of the ﬁles i.e. /tmp/pEja72mA then gets executed, 
+which spawns a process pEja72mA . This process reads sensitive information /etc/passwd) and connects remotely via C&C to the attacker console. 
+16

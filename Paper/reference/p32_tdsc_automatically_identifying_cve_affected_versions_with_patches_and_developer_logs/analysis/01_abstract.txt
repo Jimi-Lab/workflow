@@ -1,0 +1,51 @@
+Problem:
+- Abstract—While vulnerability databases are important sources of information for software security, it is known that information in these databases is inconsistent.
+- In this article, we employ developer logs and patches to automatically identify vulnerable source code versions that each CVE really affects.
+- Our tool organizes all versions of a piece of software into a version tree, and identiﬁes the ﬁrst vulner- able version, and the last vulnerable versions in the version tree trunk and branches.
+- For evaluation, we took Linux Kernel as the case study and quantiﬁed the error rate of the vulnerable versions reported by the NVD.
+- The total number of vulnerable Linux Kernel versions reported by the NVD was 43,727 (as of September 2020), of which the total number of false positives reached 2,497 and the total number of false negatives reached 9,330, accounting for 5.7% and 21.34%, respectively.
+Gap:
+- However, is the information from the NVD database accurate?
+- However, the previous work mostly pointed out the inaccuracy of the NVD, with the following question largely remaining unanswered:which vulnerable versions are exactly affected by a CVE-ID?
+- To ﬁll this gap, we aim to propose a practical solution to justify the incorrect versions reported by the NVD.
+- For a given CVE, none of the existing vulnerability detection methods can guarantee that the vulnerability can be accurately identiﬁed in all released versions, so just relying on these methods is not enough.
+Core Idea:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+- The ﬁrst step is to build the version tree and obtain a version number set over which the vulnerability has been patched according to the commit-ids recorded in the changelogs.
+- Based on this version set, the second step involves three different processing directions: (R1) to determine the last vulnerable version number in the trunk of the version tree, (R2) to determine the vulnerable Authorized licensed use limited to: Huazhong University of Science and Technology.
+- ===== Page 005 ===== HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909 Fig.
+- Overview of our approach with three major steps numbered from 1 to 3.
+- version of each version branch and (R3) to determine the ﬁrst vulnerable version.
+Method:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+- The ﬁrst step is to build the version tree and obtain a version number set over which the vulnerability has been patched according to the commit-ids recorded in the changelogs.
+- Based on this version set, the second step involves three different processing directions: (R1) to determine the last vulnerable version number in the trunk of the version tree, (R2) to determine the vulnerable Authorized licensed use limited to: Huazhong University of Science and Technology.
+- ===== Page 005 ===== HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909 Fig.
+- Overview of our approach with three major steps numbered from 1 to 3.
+- version of each version branch and (R3) to determine the ﬁrst vulnerable version.
+Evaluation Setup:
+- results from Vulnerable Version Finder with the Known Affected Software Conﬁgurations of the NVD, and outputs the justiﬁed affected versions and the accuracy of the NVD.
+- We collected Linux kernel vulnerabilities released from January 2003 to September 2020 from the NVD, which resulted in 2,576 CVE -IDs in total.
+- Accuracy Evaluation We scan 1,367 CVE-IDs of Linux kernel against its 3,086 open-source versions to detect all vulnerable versions in the three directions (R1, R2 and R3).
+- For our dataset, we manually verify the reported boundary of vulnerable versions in the version tree for each CVE-ID.
+- However, for FNs, since there are a great number of software versions(we do not regard the versions reported by NVD as the ground truth because it has many errors, as presented in the next subsection), we cannot directly report the FN rate or recall.
+- Therefore, for R1 and R2, we sample 100 CVE-IDs for manual inspection to calculate the recall of our tool.
+- As for R3, we determine the lower bound of the recall.
+Main Results:
+- In addition, we compare our tool with two vulnerability detection tools and show that our tool could achieve high detection accuracy.
+- Indeed, previous work has pointed out the inaccuracy of NVD information.
+- However, the previous work mostly pointed out the inaccuracy of the NVD, with the following question largely remaining unanswered:which vulnerable versions are exactly affected by a CVE-ID?
+- The methods based on code similarity[20], [25] are difﬁcult to detect vulnerabilities that are not caused by code duplication, and the programs with similar vulnerable code are not necessarily vulnerable, which leads to inaccurate results.
+- Accordingly, we design methods to identify the partial matching source code and provide more reliable results for the vulnerabilities.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- Sometimes patches may not be implemented correctly, which means that the software versions are vulnerable even if they are patched.
+- We plan to study how to identify incorrect(incomplete or wrong) patches in the future work.
+- For future research, it will be interesting to solve the above limitations, and explore whether partial matching and repatching can be extended for binary code vulnerability detection.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

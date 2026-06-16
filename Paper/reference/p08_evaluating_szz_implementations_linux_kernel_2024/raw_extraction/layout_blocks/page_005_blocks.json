@@ -1,0 +1,152 @@
+[
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2223",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:002",
+    "block_type": "text",
+    "text": "during the ﬁltering phase are reported as bug-inducing commits\nby B-SZZ.\nSubsequent studies have proposed various ﬁltering methods,\nincluding Content Filters [2], [41] and Suspiciousness Filters\n[12]. If all the potential bug-inducing commits are ﬁltered out\nfor a given bug-ﬁxing commit, Rezk et al. refer to the bug-ﬁxing\ncommit as a Filtering Ghost (FG).\nWe do not further examine the limitations of the ﬁltering step\nin the SZZ algorithms for two reasons: (1) The ﬁltering step\nheavily depends on data from the ITS, but we bypass any ITS\nby using the tags found directly in the Linux kernel commits;\n(2) The ﬁltering process aims to improve precision by eliminat-\ning commits from the potential bug-ﬁxing commits, while our\nfocus is on enhancing the recall of the existing SZZ algorithm,\ni.e., adding potentially correct bug-inducing commits that were\nmissing.",
+    "bbox": [
+      37.58,
+      63.79,
+      288.65,
+      254.24
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:003",
+    "block_type": "text",
+    "text": "B. Improvements for B-SZZ",
+    "bbox": [
+      37.58,
+      286.11,
+      151.09,
+      297.06
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:004",
+    "block_type": "text",
+    "text": "Despite the numerous proposals aimed at enhancing the ac-\ncuracy of the SZZ algorithm [2], [12], [13], [14], [15], [16], the\nexamination of bug-inducing commits not detected by SZZ is\nstill in its infancy, and only limited efforts have been made to\nimprove the recall [2], [17], [19].\nKim et al. [2] found that B-SZZ may incorrectly label bug-\ninducing commits due to considering formatting or cosmetic\nchanges. To address this, they proposed AG-SZZ, which ig-\nnores such changes during the mapping process, improving the\naccuracy of locating bug-introducing commits. Moreover, as\nB-SZZ employs the CVS annotate command for mapping lines\nremoved in bug-ﬁxing commits to recent revisions, it cannot\npinpoint the corresponding lines in earlier revisions. Kim et al.\nobserved that such mappings might lead to inaccurately linked\ncode segments. AG-SZZ, therefore, utilizes annotation graphs\n[42] to map line numbers across revisions, ensuring that both\nthe starting and mapped lines belong to functions with the same\nname, improving the accuracy of the mapping process.\nWilliams et al. [15] propose DJ-SZZ to address the lim-\nitations of annotation graphs which cannot track individual\nlines through extensive modiﬁcations by using a line-number\nmapping approach [43]. Furthermore, they used DiffJ [44] to\nexclude non-executable changes.\nDavies et al. [16] propose L-SZZ and R-SZZ, which improve\non the AG-SZZ algorithm by selecting only one bug-inducing\ncommit from all the candidate commits. L-SZZ selects the\ncommit that changes the most lines. R-SZZ selects the most\nrecent one.\nDa Costa et al. [12] found that AG-SZZ identiﬁes meta-\nchanges (i.e., branch changes, merge changes, and property\nchanges) as bug-inducing commits. AG-SZZ includes these\ncommits as the annotation graph is unable to map the code\nbetween meta-changes and their preceding changes. To address\nthis issue, Da Costa et al. propose MA-SZZ that connects\nall nodes in the annotation graph to their prior changes. This\nenhancement ensures that MA-SZZ does not identify meta-\nchanges as bug-inducing commits.",
+    "bbox": [
+      37.58,
+      302.89,
+      288.65,
+      744.41
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:005",
+    "block_type": "text",
+    "text": "Neto et al. [13] found that refactoring operations, which do\nnot modify a program’s behavior, impact the SZZ results. They\nextended MA-SZZ as two variants, RA-SZZ [13] and RA-SZZ*",
+    "bbox": [
+      300.6,
+      63.8,
+      551.65,
+      98.83
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:006",
+    "block_type": "text",
+    "text": "[14], to reduce the set of false positives reported by MA-SZZ.\nRA-SZZ and RA-SZZ* use RefDiff [29] and Refactoring Miner\n[30], respectively, to exclude refactoring operations from bug-\ninducing commit candidates, but both algorithms only work on\nJava ﬁles.\nPyDriller (SZZ@PYD) [33], SZZ Unleashed [34], and Open-\nSZZ [35] are three open-source implementations of SZZ al-\ngorithms. PyDriller is a Python framework that analyzes Git\nrepositories by extracting information about commits, diffs,\nand other information. It also implements B-SZZ and ignores\nC-style and Python-style comment lines. SZZ Unleashed uses\nline-number mapping without DiffJ, which allows it to work\non non-Java ﬁles. OpenSZZ implements B-SZZ by using the\ngit blame command.\nTo improve the recall of the SZZ algorithm, Sahal et al. [19]",
+    "bbox": [
+      300.6,
+      99.65,
+      551.71,
+      278.15
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:007",
+    "block_type": "text",
+    "text": "propose a syntax-based variation, A-SZZ, to address the case\nof bug-ﬁxing commits that do not have removed lines (Remove\nMapping Ghost). This algorithm traces changes for all lines\nwithin the code blocks that contain the additions. Rezk et al.\n[17] enhance the A-SZZ approach by incorporating context-\naware data ﬂow analysis, which includes mitigation strategies\nfor speciﬁc programming scenarios such as null checks, cre-\nation of new entities, method overrides, logging operations, and\nclass expansions. These strategies use data ﬂow analysis on\nidentiﬁers in added code lines, and then use B-SZZ to map the\nlines within these identiﬁers’ data ﬂow paths.\nTable I presents the datasets that have been used for evalu-\nating these algorithms, detailing the dataset type, the number\nof projects, and the bug-ﬁxing commit count. In most cases,\nthe ground truth is labeled by researchers without specialized\ndomain knowledge. MA-SZZ uses an evaluation framework\nwhen there is no ground-truth label available between the bug-\nﬁxing commit and the bug-inducing commit. Speciﬁcally, it\nuses an automatic metric with three criteria to evaluate SZZ:\nearliest bug appearance, future impact of a change, and realism\nof bug introduction [12]. The only dataset labeled by develop-\ners contains, on average, only 1.2 commits per project, which\nmay not sufﬁciently represent the entirety of issues arising in\nthe development process of each project. This underlines the\nsigniﬁcance of collecting a dataset annotated by developers,\nencapsulating a range of problems that could emerge during a\nproject’s lifespan.",
+    "bbox": [
+      300.6,
+      278.99,
+      551.7,
+      600.94
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:008",
+    "block_type": "text",
+    "text": "C. SZZ in SE Research",
+    "bbox": [
+      300.6,
+      620.85,
+      396.59,
+      631.81
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:009",
+    "block_type": "text",
+    "text": "Many prior studies have discussed the signiﬁcant role that\nSZZ plays in software engineering research [28], [45], [46].\nSZZ is used as the ﬁrst step in many studies, especially in\nthe area of defect prediction. Many defect prediction studies\nuse the SZZ algorithm to build datasets to train and evaluate\ntheir models [5], [6], [11], [20], [21], [22], [23], [24]. Herbold\net al. [36] found that as of August 2019, 8 out of 15 of the public\ndatasets used for defect prediction used B-SZZ to construct their\nground truth. However, this approach suggests that the precision",
+    "bbox": [
+      300.6,
+      637.64,
+      551.66,
+      744.41
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:005:010",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

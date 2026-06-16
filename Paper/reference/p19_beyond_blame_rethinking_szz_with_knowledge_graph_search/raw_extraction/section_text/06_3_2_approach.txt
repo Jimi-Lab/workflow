@@ -1,0 +1,49 @@
+3.2 Approach
+3.2.1 Datasets.We use the same three developer-annotated datasets as LLM4SZZ [ 36], where
+BFC-BIC pairs are extracted from bug reports or commit messages authored by developers. These
+datasets provide higher ground truth quality than SZZ-generated datasets [8, 25].DS_LINUX[ 23]
+is derived from the Linux kernel (written in C), where developers explicitly label bug-inducing
+commits in their fix messages. We use the exact same 1,500 pairs provided by LLM4SZZ [ 36].
+DS_APACHE[ 42] is constructed from five Apache Software Foundation Java projects, with BIC
+annotations extracted from issue tracking systems and commit messages. This dataset contains 241
+validated pairs.DS_GITHUB[ 29] spans 295 open-source repositories with developer-annotated
+BIC information mined from commit messages. This dataset contains 361 pairs, which we further
+split into DS_GITHUB-c (C language, 286 pairs) and DS_GITHUB-j (Java, 75 pairs) for language-
+specific analysis. In total, our evaluation covers 2,102 BFC-BIC pairs with 2,272 ground truth BICs,
+as some fixes address bugs introduced by multiple commits.
+3.2.2 BIC Categorization.To characterize the search space, we execute git blameon the modified
+lines of each BFC and automatically classify the ground truth BIC based on its reachability from
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 005 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 5
+Table 1. Distribution of ground truth BIC categories across datasets.
+Dataset Cases BICs Blame Blame Anc. BFC Anc. Blameless Unreachable
+DS_LINUX 1,500 1,562 901 (57.7%) 170 (10.9%) 219 (14.0%) 268 (17.2%) 4 (0.3%)
+DS_APACHE 241 353 164 (46.5%) 48 (13.6%) 116 (32.9%) 15 (4.2%) 10 (2.8%)
+DS_GITHUB 361 357 234 (65.5%) 17 (4.8%) 67 (18.8%) 37 (10.4%) 2 (0.6%)
+Total 2,102 2,272 1,299 (57.2%) 235 (10.3%) 402 (17.7%) 320 (14.1%) 16 (0.7%)
+these blame results. We define five mutually exclusive categories (see Figure 1).Blameincludes
+BICs that appear directly in the blame set.Blame Ancestorincludes BICs that are ancestors of
+blame commits and require backward traversal.BFC Ancestorincludes BICs that are descendants
+of blame commits but precede the BFC, requiring traversal backward from the BFC.
+We also account for cases where standard traversal fails.Blamelesscaptures cases where the
+BFC contains no deleted or modified lines (i.e., only new code was added and nothing togit blame),
+rendering standard SZZ approaches inapplicable. Finally,Unreachablerefers to BICs on parallel
+branches not reachable via backward traversal from blame commits. For example, suppose the BIC
+is on branch A while the blame commit is on branch B; after both branches merge, the buggy code
+is present, but git blame points to the branch B commit that last modified the same lines, making
+the true BIC on branch A unreachable through backward traversal. This classification determines
+the specific graph traversal capabilities required to identify the root cause.
+To determine whether broader history traversal is necessary and to quantify the search space, we
+analyze each BIC category with a tailored measurement strategy. For the Blame category, we study
+the number of blame commits per case to understand candidate complexity. For the Blame Ancestor
+and BFC Ancestor categories, we measure the file-history depth required to reach the BIC. Given
+the scale of commit graphs (e.g., Linux has over 1 million commits), we filter candidates to those
+that modified exactly the same files as the BFC, as file co-modification is a necessary condition for
+code-level bug introduction. This file-scoped traversal is far more tractable than full DAG distance
+(median 13,786 commits across our raw datasets vs. median 2 commits for file-history) and focuses
+on commits most likely to be relevant. For Blameless cases where no deleted lines exist, we analyze
+a fallback strategy that applies git blameto the context lines surrounding each addition (2 lines
+before and after each added hunk [36], i.e., contiguous block of added lines), under the assumption
+that the BIC likely modified code adjacent to where the fix adds new logic.

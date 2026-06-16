@@ -1,0 +1,48 @@
+Beyond Blame: Rethinking SZZ with Knowledge Graph
+Search
+YU SHI,Queen’s University, Canada
+HAO LI,Queen’s University, Canada
+BRAM ADAMS,Queen’s University, Canada
+AHMED E. HASSAN,Queen’s University, Canada
+Identifying Bug-Inducing Commits (BICs) is fundamental for understanding software defects and enabling
+downstream tasks such as defect prediction and automated program repair. Yet existing SZZ-based approaches
+are limited by their reliance on git blame, which restricts the search space to commits that directly modified
+the fixed lines. Our preliminary study on 2,102 validated bug-fixing commits reveals that this limitation is
+significant: over 40% of cases cannot be solved by blame alone, as 28% of BICs require traversing commit
+history beyond blame results and 14% are blameless.
+We present AgenticSZZ, the first approach to apply Temporal Knowledge Graphs (TKGs) to software
+evolution analysis. AgenticSZZ reframes BIC identification from a ranking problem over blame commits into
+a graph search problem, where temporal ordering is fundamental to causal reasoning about bug introduction.
+The approach operates in two phases: (1) constructing a TKG that encodes commits with temporal and
+structural relationships, expanding the search space by traversing file history backward from two reference
+points (blame commits and the BFC); and (2) leveraging an LLM agent to navigate the graph using specialized
+tools for candidate exploration and causal analysis.
+Evaluation on three datasets shows that AgenticSZZ achieves F1-scores of 0.48 to 0.74, with statistically
+significant improvements over state-of-the-art by up to 27%. Our ablation study confirms that both components
+are essential, reflecting a classic exploration-exploitation trade-off: the TKG expands the search space while
+the agent provides intelligent selection. By transforming BIC identification into a graph search problem, we
+open a new research direction for temporal and causal reasoning in software evolution analysis.
+CCS Concepts:•Software and its engineering→Software maintenance tools.
+Additional Key Words and Phrases: Bug-inducing commit, SZZ, Temporal knowledge graph, large language
+model, LLM agent
+ACM Reference Format:
+Yu Shi, Hao Li, Bram Adams, and Ahmed E. Hassan. 2026. Beyond Blame: Rethinking SZZ with Knowledge
+Graph Search. 1, 1 (February 2026), 21 pages. https://doi.org/10.1145/nnnnnnn.nnnnnnn
+1 Introduction
+Identifying the commit that introduced a bug, known as the Bug-Inducing Commit (BIC), is a
+foundational task in software maintenance. Accurate BIC identification enables understanding when
+and how bugs are introduced [2, 3, 17, 18], supports defect prediction models [11, 15, 27, 34, 44], and
+guides history-aware automated program repair systems [30] toward effective patches by providing
+Authors’ Contact Information: Yu Shi, Queen’s University, Kingston, Canada, y.shi@queensu.ca; Hao Li, Queen’s University,
+Kingston, Canada, hao.li@queensu.ca; Bram Adams, Queen’s University, Kingston, Canada, bram.adams@queensu.ca;
+Ahmed E. Hassan, Queen’s University, Kingston, Canada, hassan@queensu.ca.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee
+provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the
+full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored.
+Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires
+prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM XXXX-XXXX/2026/2-ART
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+arXiv:2602.02934v1  [cs.SE]  3 Feb 2026

@@ -1,0 +1,282 @@
+{
+  "cwe_id": "CWE-94",
+  "name": "Improper Control of Generation of Code ('Code Injection')",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or behavior of the intended code segment.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-74",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      },
+      {
+        "cwe_id": "CWE-74",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      },
+      {
+        "cwe_id": "CWE-913",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Control of Dynamically-Managed Code Resources"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Interpreted"
+    ],
+    "technologies": [
+      "AI/ML"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This entry is frequently misused for vulnerabilities with a technical impact of \"code execution,\" which does not by itself indicate a root cause weakness, since dozens of weaknesses can enable code execution."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product constructs all or part of a code segment using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the syntax or...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "segment",
+      "externally-influenced",
+      "incorrectly",
+      "neutralizes"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "segment",
+      "externally-influenced",
+      "incorrectly",
+      "neutralizes",
+      "neutralize",
+      "component",
+      "injection",
+      "behavior"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This example attempts to write user messages to a message file and allow users to view them.",
+        "snippet": "$MessageFile = \"messages.out\"; if ($_GET[\"action\"] == \"NewMessage\") { $name = $_GET[\"name\"]; $message = $_GET[\"message\"]; $handle = fopen($MessageFile, \"a+\"); fwrite($handle, \"<b>$name</b> says '$message'<hr>\\n\");..."
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "edit-config.pl: This CGI script is used to modify settings in a configuration file.",
+        "snippet": "use CGI qw(:standard); sub config_file_add_key { my ($fname, $key, $arg) = @_; # code to add a field/key to a file goes here } sub config_file_set_key { my ($fname, $key, $arg) = @_; # code to set key to a particular..."
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "This simple python3 script asks a user to supply a comma-separated list of numbers as input and adds them together.",
+        "snippet": "def main(): sum = 0 try: numbers = eval(input(\"Enter a comma-separated list of numbers: \")) except SyntaxError: print(\"Error: invalid input\") return for num in numbers: sum = sum + num print(f\"Sum of {numbers} = {sum}\")..."
+      },
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "The following code is a workflow job written using YAML. The code attempts to download pull request artifacts, unzip from the artifact called pr.zip and...",
+        "snippet": "name: Deploy Preview jobs: deploy: runs-on: ubuntu-latest steps: - name: 'Download artifact' uses: actions/github-script with: script: | var artifacts = await github.actions.listWorkflowRunArtifacts({ owner:..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "This simple python3 script asks a user to supply a comma-separated list of numbers as input and adds them together.",
+        "snippet": "def main(): sum = 0 numbers = input(\"Enter a comma-separated list of numbers: \").split(\",\") try: for num in numbers: sum = sum + int(num) print(f\"Sum of {numbers} = {sum}\") except ValueError: print(\"Error: invalid..."
+      },
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "The following code is a workflow job written using YAML. The code attempts to download pull request artifacts, unzip from the artifact called pr.zip and...",
+        "snippet": "The code could be modified to validate that the NR file only contains a numeric value, or the code could retrieve the PR number from a more trusted source."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2023-29374",
+        "description": "Math component in an LLM framework translates user input into a Python expression that is input into the Python exec() method, allowing code execution - one variant of a \"prompt injection\" attack.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2023-29374"
+      },
+      {
+        "reference": "CVE-2024-5565",
+        "description": "Python-based library uses an LLM prompt containing user input to dynamically generate code that is then fed as input into the Python exec() method, allowing code execution - one variant of a \"prompt injection\" attack.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-5565"
+      },
+      {
+        "reference": "CVE-2024-4181",
+        "description": "Framework for LLM applications allows eval injection via a crafted response from a hosting provider.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-4181"
+      },
+      {
+        "reference": "CVE-2022-2054",
+        "description": "Python compiler uses eval() to execute malicious strings as Python code.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-2054"
+      },
+      {
+        "reference": "CVE-2021-22204",
+        "description": "Chain: regex in EXIF processor code does not correctly determine where a string ends (CWE-625), enabling eval injection (CWE-95), as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-22204"
+      },
+      {
+        "reference": "CVE-2020-8218",
+        "description": "\"Code injection\" in VPN product, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-8218"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

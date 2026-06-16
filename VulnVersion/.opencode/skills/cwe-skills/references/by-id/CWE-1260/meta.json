@@ -1,0 +1,249 @@
+{
+  "cwe_id": "CWE-1260",
+  "name": "Improper Handling of Overlap Between Protected Memory Ranges",
+  "abstraction": "Base",
+  "status": "Stable",
+  "description": "The product allows address regions to overlap, which can result in the bypassing of intended memory protection.",
+  "extended_description": "Isolated memory regions and access control (read/write) policies are used by hardware to protect privileged software. Software components are often allowed to change or remap memory region definitions in order to enable flexible and dynamically changeable memory management by system software. If a software component running at lower privilege can program a memory address region to overlap with other memory regions used by software running at higher privilege, privilege escalation may be available to attackers. The memory protection unit (MPU) logic can incorrectly handle such an address overlap and allow the lower-privilege software to read or write into the protected memory region, resulting in privilege escalation attack. An address overlap weakness can also be used to launch a denial of service attack on the higher-privilege software memory regions.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-284",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Access Control"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Memory Hardware",
+      "Processor Hardware"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product allows address regions to overlap, which can result in the bypassing of intended memory protection.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "overlap",
+      "privilege",
+      "address",
+      "regions"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "overlap",
+      "privilege",
+      "address",
+      "regions",
+      "region",
+      "escalation",
+      "protection",
+      "protected"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": null,
+        "nature": "Bad",
+        "summary": "For example, consider a design with a 16-bit address that has two software privilege levels: Privileged_SW and Non_privileged_SW. To isolate the system memory...",
+        "snippet": "Non_privileged_SW can program the Address_range register for Region_2 so that its address overlaps with the ranges defined by Region_0 or Region_1. Using this capability, it is possible for Non_privileged_SW to block..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The example code below is taken from the IOMMU controller module of the HACK@DAC'19 buggy CVA6 SoC [REF-1338]. The static memory map is composed of a set of...",
+        "snippet": "... localparam logic[63:0] PLICLength = 64'h03FF_FFFF; localparam logic[63:0] UARTLength = 64'h0011_1000; localparam logic[63:0] AESLength = 64'h0000_1000; localparam logic[63:0] SPILength = 64'h0080_0000; ... typedef..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": null,
+        "nature": "Good",
+        "summary": "For example, consider a design with a 16-bit address that has two software privilege levels: Privileged_SW and Non_privileged_SW. To isolate the system memory...",
+        "snippet": "Ensure that software accesses to memory regions are only permitted if all three filters permit access. Additionally, the scheme could define a memory region priority to ensure that Region_2 (the memory region defined by..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The example code below is taken from the IOMMU controller module of the HACK@DAC'19 buggy CVA6 SoC [REF-1338]. The static memory map is composed of a set of...",
+        "snippet": "... localparam logic[63:0] PLICLength = 64'h03FF_FFFF; localparam logic[63:0] UARTLength = 64'h0000_1000; localparam logic[63:0] AESLength = 64'h0000_1000; localparam logic[63:0] SPILength = 64'h0080_0000; ... typedef..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2008-7096",
+        "description": "virtualization product allows compromise of hardware product by accessing certain remapping registers.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-7096"
+      },
+      {
+        "reference": "[REF-1100]",
+        "description": "processor design flaw allows ring 0 code to access more privileged rings by causing a register window to overlap a range of protected system RAM [REF-1100]",
+        "link": "https://github.com/xoreaxeaxeax/sinkhole/blob/master/us-15-Domas-TheMemorySinkhole-wp.pdf"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

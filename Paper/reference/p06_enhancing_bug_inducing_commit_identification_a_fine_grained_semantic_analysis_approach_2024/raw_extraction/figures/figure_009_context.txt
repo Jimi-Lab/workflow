@@ -1,0 +1,22 @@
+ssors, including blocks a, c, d, until we arrive at the
+endblock, which has no further successors. During the process,
+we add each statement encountered to the execution path.
+Following path extraction, we proceed to generate the pro-
+gram’s state for the execution path. Algorithm 1 outlines the
+process. We iterate through the statements in the execution path.
+If the statement type belongs to path constraints (line 2), we
+include the statement in the path constraints. Otherwise, we
+extract the variables from the statement and incorporate them
+into the data flow of these variables (lines 4-7).
+Fig. 5. A program state example.
+Fig. 5 illustrates the program’s state for the previously col-
+lected execution path in the motivation example. Upon encoun-
+tering the statement at line 3, we extract the variablesworkand
+tmp from the statement. Consequently, we add line number 3
+to their data flow, as depicted in the figure. Additionally, upon
+reaching line 6, we easily identify it as an if statement related
+to path constraint. Since our path executes from block c to d,
+and it does not satisfy the condition, we negate the condition
+and store it in the path constraint, as shown in Fig. 5.
+C. State Comparison
+After collecting 

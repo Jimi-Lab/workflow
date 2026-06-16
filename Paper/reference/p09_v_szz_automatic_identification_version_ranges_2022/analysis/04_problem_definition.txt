@@ -1,0 +1,28 @@
+# 04 Problem Definition
+
+Inputs:
+- A vulnerability/CVE record with textual affected-version information.
+- One or more vulnerability-fixing commits in a project repository.
+- Project history and version tags.
+- Optional source/artifact inputs for SZZ variants, line mapping, Git logs, duplicate patch maps, and manually verified labels.
+
+Outputs:
+- Vulnerability-inducing commits (VICs) for the CVE.
+- A set of affected version tags inferred from inducing/fixing commit relations.
+- A comparison between inferred affected versions and the CVE/NVD affected-version claim.
+
+Core Assumptions:
+- A version is affected if it contains vulnerable code.
+- Vulnerable versions lie after/reachable from inducing commits and before/not after fixing commits.
+- For many vulnerabilities, the earliest commit that modified vulnerable lines is more likely to be the inducing commit than the previous commit selected by classic SZZ.
+- Fixing and inducing changes may be duplicated across branches and should be considered when deriving version ranges.
+
+Operational Constraints:
+- Manual ground truth is difficult because no public ground truth linking CVEs to true inducing commits existed according to the paper.
+- Large fixing commits are excluded from the manual annotation study because fixed lines may include noisy or non-vulnerable changes.
+- CVE affected-version text may not map cleanly to repository tags.
+
+Threats to Direct Use:
+- The paper's problem formulation is line-centric and fixing-commit-centric; vulnerabilities without deleted lines or without usable fixing commits are out of scope.
+- The local artifact has configuration placeholders and was not executed. [EXECUTION NOT REQUESTED]
+- Exact table-level numeric evidence is not citation-ready until table repair. [NEEDS TABLE REPAIR]

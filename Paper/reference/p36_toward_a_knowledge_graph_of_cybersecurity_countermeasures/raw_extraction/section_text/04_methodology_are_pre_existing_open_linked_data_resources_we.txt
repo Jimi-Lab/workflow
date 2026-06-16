@@ -1,0 +1,157 @@
+methodology are pre-existing open linked data resources. We
+see opportunities to rapidly integrate pertinent open linked data
+readily available, including patent data (and patent coding sys-
+tems), authors, researchers, inventors, and organizations. We
+believe D3FEND may be enhanced by using and referencing
+these open linked datasets with standards-based linked data
+technologies.
+III. M ETHODOLOGY
+A. Frameworks, Models, and Knowledge Graphs
+There are three key information organization approaches we
+use to create D3FEND. A conceptual framework which “ex-
+plains, either graphically or in narrative form, the main things
+to be studied—the key factors, constructs, or variables—and
+the presumed relationships among them” [32]. A domain
+knowledge model which “is used to reduce conceptual and
+terminological confusion” and foster communication, reusabil-
+ity, and cooperation [33]. Finally, a knowledge graph which
+provides a ﬂexible representation of knowledge and enables
+complex machine reasoning about the domain.
+To support the recurring need for effective and clear coun-
+termeasure capability speciﬁcations, we aspire to (1) provide a
+conceptual framework that incorporates a domain knowledge
+model of the cyber countermeasure domain, (2) populate the
+framework and model to complete a knowledge graph, and (3)
+relate countermeasures to the ATT&CK framework’s offensive
+counterparts and to the larger domain space of structured cyber
+knowledge.
+D3FEND models core countermeasure functionality and the
+knowledge relationships necessary to effectively understand
+and contextualize that functionality. Countermeasure technolo-
+gies perform many functions with their software or hardware
+components. Some functions directly counter adversary behav-
+ior. Others are more administrative in nature and supportive
+
+===== Page 004 =====
+Fig. 1. Cybersecurity Patent Applications 2001-2018
+of the core countermeasure functionality and are not the focus
+of D3FEND.
+D3FEND is primarily concerned with abstract and generic
+semantics versus vendor speciﬁc terminology or technical jar-
+gon. However, analysis of technical jargon is usually required
+to select effective semantics—and in some cases create or
+deﬁne useful new semantics. For example, for D3FEND we
+ﬁrst included an abstract deﬁnition of a Kernel instead of
+the Microsoft terminology: “Windows Kernel” or “Windows
+NT Kernel”, thereby enabling our Kernel concept to apply to
+the “Linux Kernel” as well. When needed, D3FEND users
+will be able to extend this with more speciﬁc deﬁnitions of
+kernel types by subclassing speciﬁc OS kernels and also by
+compositions of their parts (e.g, ”Kernel Module” elements).
+B. Data Sources
+The data used to build D3FEND underpins our new ap-
+proach to systematically understanding cybersecurity counter-
+measures. The research team developed the model directly
+from the research claims in the literature in a bottom-up
+fashion, linking each countermeasure through speciﬁc citations
+to the literature and integrating those into higher-level abstrac-
+tions. We discuss patents, existing knowledge bases, and other
+data sources.
+1) Patents: Inventors ﬁle thousands of patent applications
+each year for technologies and methods for defensive cyber-
+security techniques. We downloaded all U.S. Patent Ofﬁce
+ﬁlings from 2001 to January 2019. A key phrase search
+against this corpus 1 shows an ever-increasing publishing rate
+on cybersecurity patents in Figure 1.
+The patent corpus was our initial focus for multiple rea-
+sons. There is strong motivation for inventors, investors, and
+organizations to describe and distinguish how their cyberse-
+curity technologies work in patents. This due to the various
+protections patents provide for intellectual property owners. It
+is also a highly curated corpus with category codes, citations,
+and an ofﬁcial legally-authoritative assessment of the novelty
+of their claims. In our experience, vendor white papers and
+1Apache Solr search terms: ”information assurance” ”cyber security” ”cy-
+bersecurity” ”infosec” ”information security” ”network security” ”computer
+security” ”computer network defense” ”network defense” ”malware” ”com-
+puter hacking” ”computer virus” ”data exﬁltration” ”cyber warfare” ”infor-
+mation warfare” ”intrusion detection” ”intrusion prevention” ”indicators of
+compromise” ”security information events” ”cryptographic” ”cryptography”
+Fig. 2. Example Intellectual Property Development Network
+marketing material do not sufﬁciently explain how the tech-
+nologies work at an engineering level, nor do they do so in
+as uniform a manner as patents. To date, there appears to be
+no comprehensive public analysis of the cybersecurity patent
+corpus for the purpose of developing a knowledge graph of
+cyber countermeasures.
+This corpus, while useful, has numerous issues that need to
+be understood when using it for our purpose. In some cases,
+the corpus is adversarial. For example, in academic papers,
+the citations tend to have high ﬁdelity because researchers
+are incentivized to accurately represent prior scientiﬁc knowl-
+edge. Patents also have citations and prior art enumerations.
+However, these are often selected to bolster the case that the
+new patent is truly novel, useful, and non-obvious for business
+purposes. This is done without the peer review process used
+in academia.
+Forty percent of U.S. patented inventions are not used.
+About half of these are patents meant to block competitors or
+to be used as bargaining chips in inter-ﬁrm negotiations [36].
+Our study catalogs all cyber-defense approaches, whether yet
+practiced or not; use of the D3FEND knowledge graph may
+identify an unpracticed approach and encourage innovation
+and productization in that category. Furthermore, because our
+survey focuses on recent inventions in an emergent ﬁeld, the
+“not used” distinction is ephemeral in many instances.
+2) Existing Knowledge Bases: We analyzed the MITRE
+Cyber Analytic Repository [34] and mapped its analytics to the
+alpha version of D3FEND. The repository primarily contains
+detection analytics that consume endpoint telemetry. We also
+analyzed the ATT&CK knowledge base and developed a way
+to relate it to D3FEND, as discussed in Section IV-E.
+3) Other Data Sources: We have also analyzed other data
+sources. Some of these sources include academic papers, tech-
+nical speciﬁcations, and publicly available product technical
+documentation.
+4) Key Findings: After reviewing these data sources, we
+determined that these available intellectual property documents
+could serve as the foundation for a cybersecurity countermea-
+sure knowledge graph. We also were hopeful the resulting
+knowledge graph would be coherent and useful to cybersecu-
+rity architects. The D3FEND knowledge graph was built from
+the patent corpus primarily due to its scope, speciﬁcity, and
+
+===== Page 005 =====
+availability. These data sources are published or made public
+in various formats and venues. The cybersecurity community
+has a diverse group of participants ranging from technicians
+to academics. Intellectual property is developed by the whole
+spectrum of participants. Example data sources are depicted
+in Figure 2. The ﬁgure also illustrates the intellectual property
+development network which produces cybersecurity counter-
+measure technology. We also determined these datasets are
+too large to analyze entirely manually. However, we started
+with a manual analysis process so that we can better develop
+automated means.
+C. Countermeasure Analysis Process
+Our initial approach included some preliminary efforts
+to use natural language processing techniques to organize,
+summarize, and classify the technologies claimed in the docu-
+ments, primarily U.S. patent applications. We experimented
+with unsupervised topic modeling and text summarization
+algorithms. We determined these preliminary methods were
+not sufﬁcient to create a semantic representation that would be
+useful to cybersecurity practitioners at the outset. Supervised
+and semi-supervised machine-learning approaches were not
+tried, as we did not yet have a countermeasure or artifact
+classiﬁcation system or a set of ﬁxed terms and thus were
+unable to provide labeled training data.
+Our early efforts to use existing high-level models and work
+top down to speciﬁc countermeasures, or to propose our own
+high-level models absent the enumeration of countermeasure
+instances, did not prove to be an effective approach to create
+the desired framework of concepts and vocabulary. Our ex-
+perience is that without anchoring the framework to speciﬁc
+instances from the outset, establishing team consensus for the
+vocabulary was difﬁcult and was considered too subjective
+and too biased toward individual contributor’s experience and

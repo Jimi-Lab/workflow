@@ -1,0 +1,29 @@
+3.1 Motivation
+Existing SZZ techniques [7, 19, 24, 32] predominantly assume that bug-inducing commits (BICs) can
+be identified by applying git blame on the deleted or modified lines in the BFC. This is based on
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 004 =====
+4 Yu Shi et al.
+Fig. 1. Categorization of bug-inducing commits (BICs) relative to blame commits. The Blame category (green)
+contains BICs that appear in blame commits; the Blame Ancestor category (blue) requires backward search
+from blame; the BFC Ancestor category (orange) requires backward search from the BFC toward blame.
+the common assumption that the bug fix location has to be one or more lines previously modified by
+the BIC [32]. This assumption of course can be incorrect, for instance when the commit identified
+by blame only modified whitespace characters and the real BIC is older than the former commit. In
+such cases, one could recursively apply blame to trace further back (illustrated as “Blame Ancestor”
+in Figure 1); other times, the BIC actually could be more recent than the blame commit (“BFC
+Ancestor” in Figure 1), for instance when the BIC changes the value of a configuration option,
+which reveals a bug in a different part of the system. In such a situation, some other kind of code
+or commit relation should be used to navigate from the BFC to the BIC.
+However, without knowing how often each scenario occurs and how deep the search must go,
+such extensions to the base SZZ techniques remain impractical. While prior work has examined
+file and statement overlap between BICs and bug-fixing commits (BFCs) [42], the distribution of
+ground truth BICs across different positions in the commit history relative to blame results has not
+been systematically characterized. Understanding this distribution is essential for better guiding
+the search strategy across the commit history of a project. For instance, if one would find that BICs
+requiring backward traversal are common, how far back in history should one go to search the
+BIC? If BICs instead lie in between the blame commit and the BFC, how much closer to the BFC
+are they typically located? This preliminary study addresses this gap by categorizing where BICs
+appear with respect to blame commits, in order to assess the completeness of blame-based search
+and to determine whether broader history traversal is necessary.

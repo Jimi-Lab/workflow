@@ -1,0 +1,23 @@
+on the
+original dataset into multiple datasets, as illustrated in Fig. 9.
+We initially pick out bug-fixing commits containing c files
+with only added lines from the original dataset, yielding
+11,426 commits, which we call DATASET
+-A. Here, the suffix
+“A” means added lines. To better demonstrate the effective-
+ness of S EM-SZZ, we filter out two types of commits from
+DATASET-A. The first type of commits does not involve
+changes within functions. These commits often only involve
+changes to header file includes, str uct definitions, or global
+variable declarations. We have provided an example in Fig.10.
+The commit fixes the bug only by adding a new header file.
+The second type involves changes within functions, but even
+by tracing all lines in th e changed functions, we still cannot
+identify the bug-inducing commits. Our approach is not de-
+signed for the first type, and no approaches, including base-
+lines, can handle the second type. Thus, we filter out these two
+types of commits from DATASET
+-A and get DATASET -FA,
+which contains 6,233 bug-fixing commits. Here, the suffix “FA”
+stands for the filtered bug-fixing commits with only added lines.
+Finally, to evaluate our method’s effectiveness

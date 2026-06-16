@@ -1,0 +1,128 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 8 
+Detection techniques supported by state of the art approaches. 
+Detection 
+Technique 
+Holmes 
+( Milajerdi et al., 2019b ) 
+Morse ( Hossain et al., 
+2020 ) 
+Poirot ( Milajerdi et al., 
+2019a ) 
+Rapsheet ( Hassan et al., 
+2020 ) Krystal 
+Tag-Propagation - ✓ - - ✓ 
+Rule/Policy-Based ✓ ✓ - - ✓ 
+Signature-Based - - - ✓ ✓ 
+Graph Query - - ✓ - ✓ 
+Tactical Analysis 
+(TTP Mapping) 
+✓ - - ✓ ✓ 
+virtualized graphs ( Kurniawan et al., 2022; Xiao et al., 2019 ), and 
+(v) stream reasoning techniques Dell’Aglio et al. (2017) . 56 
+Standard Query Language KRYSTAL leverages SPARQL 
+Consortium et al. (2013) , a graph-based query language for 
+RDF that offers high expressivity and supports complex querying 
+(e.g., aggregation, subqueries, negation) in a declarative man- 
+ner Kaminski et al. (2016) . We ﬁnd that this standardized query 
+language provides powerful means to deﬁne reusable rules, 
+policies and graph patterns (cf. R2). 
+In particular, we observe that SPARQL property path queries 
+can perform analyses that are critical to provenance-based anal- 
+yses –s u c h as backward-forward chaining for attack graph re- 
+construction – eﬃciently. This is despite the fact that theoretical 
+studies Arenas et al. (2012) on the computational complexity of 
+property paths found that the implementation of a naïve (unﬁl- 
+tered) query can result in double exponential runtime complex- 
+ity, which becomes critical, e.g., for nodes with more than 15k se- 
+quence paths. The typical property path lengths in our scenario at- 
+tack graphs, however, tend to be rather short, with a maximum 
+path length of 37. This is attributable to the absence of long chains 
+in the provenance data to begin with on the one hand, but also 
+due to tagging and ﬁltering mechanisms such as attenuation and 
+decay, which effectively limit path lengths by focusing only on rel- 
+evant suspicious events and nodes with low integrity. As a conse- 
+quence, we observe that the attack graph reconstruction through 
+property paths performs eﬃciently. 
+Although SPARQL is part of computer science curricula and 
+is increasingly being adopted in many industries 57 , it is typ- 
+ically new to security analysts and thus requires some train- 
+ing. This could partly be addressed with general-purpose visual 
+query building and exploration tools such as Haag et al. (2014) , 
+Vargas et al. (2019) , but we also see a potential for future work in 
+the development of intuitive specialized interfaces for threat de- 
+tection and attack reconstruction. 
+Integrated & Modular Framework Current research has re- 
+sulted in numerous prototypes that each provide solutions for spe- 
+ciﬁc detection techniques. KRYSTAL , by contrast, enables the com- 
+bination of multiple different threat detection techniques and at- 
+tack reconstruction approaches in a single integrated framework 
+(cf. R2). Instead of applying different techniques –e a c h with their 
+own preprocessing pipelines –i n isolation, the framework allows 
+us to compare and combine different techniques in a single model. 
+In Sections 6 and 7 , we speciﬁcally showed how a variety of de- 
+tection and attack reconstruction techniques can be formulated in 
+SPARQL and executed within the KRYSTAL framework. The modular- 
+ity of the framework also makes it extensible for future techniques. 
+Distributed Log Analysis In production settings, security anal- 
+ysis will often require and involve data from disparate sources. 
+KRYSTAL is built upon Semantic Web technologies which are ex- 
+plicitly designed for decentralization. Consequently, KRYSTAL inher- 
+56 For a survey of RDF data storage and query processing schemes, cf. 
+Wylot et al. (2018) . For a survey of approaches to scale to massive data, cf. 
+Ma et al. (2016) . 
+57 cf. http://sparql.club 
+ently supports distributed analysis (i.e., querying data across differ- 
+ent machines). In Sections 6 and 7 , we demonstrated how KRYSTAL 
+can integrate external information sources and facilitate distributed 
+analysis through SPARQL query federation, a technique that enables 
+multiple data sources to be queried in an integrated manner. 
+To support large-scale provenance graph based attack discovery 
+in production environments, it is necessary to distribute and paral- 
+lelize computational loads to multiple (local) log processing nodes. 
+This will be part of our future research, where we plan to allow for 
+independent local analysis modules for threat detection and alert- 
+ing and to integrate the local results into a (global) module, e.g., 
+via SPARQL query federation in order to construct complete attack 
+graphs to address cross-machine attack scenarios. If necessary, sev- 
+eral layers of hierarchies can be introduced to better scale the co- 
+ordination effort. 
+Online Attack Graph Reconstruction KRYSTAL has been evalu- 
+ated in an oﬄine setting, which can facilitate, e.g., forensic anal- 
+yses. A (near real-time) online deployment mode would require 
+consideration of issues for attack reconstruction over streaming 
+data. In particular, it would require (i) strategies to dynamically 
+construct attack graphs, (ii) mechanisms to manage continuous up- 
+dates on a multitude of parallel attack graph reconstruction pro- 
+cesses, (iii) policies for prioritizing and discarding attack graph 
+reconstruction processes. Furthermore, the complexity of the ap- 
+proach grows if analyses should be performed in large distributed 
+scenarios and over multiple data streams, which raises issues 
+around time synchronization, latency, throughput, etc. We plan to 
+investigate online scenarios with (semantic) streaming technolo- 
+gies and extend the framework accordingly in future work. 
+Unknown Attack Behavior To increase robustness against new 
+ways to evade detection, KRYSTAL provides a more general frame- 
+work that makes it possible to combine a variety of attack recon- 
+struction techniques on top of a common knowledge graph founda- 
+tion. For instance, we demonstrated how KRYSTAL can incorporate 
+existing community-based threat detection rules such as Sigma 
+and integrate them with state of the art detection techniques that 
+have been demonstrated to be effective in the context of Advanced 
+Persistent Threat. 
+We argue that although evasion techniques to circumvent de- 
+tection will always be a concern, the possibility to apply multi- 
+ple techniques (combining, e.g., rule-based, graph queries, and tag 
+propagation) in the KRYSTAL framework can provide more robust 
+detection of unknown attack behavior compared to the isolated ap- 
+plication of individual approaches. Furthermore the ﬂexible frame- 
+work allows for faster adaptation, experimentation, and parameter 
+tuning. For instance, the rules and policies in the Listings in this 
+paper can be adapted quickly to address new evasion techniques. 
+10. Conclusions 
+In this paper, we proposed KRYSTAL , a modular knowledge 
+graph-based framework for threat detection, scenario reconstruc- 
+tion, and tactical attack analysis. We provide an open, standards- 
+based provenance graph representation based on Semantic Web 
+technologies that can ﬂexibly combine multiple threat detection 
+15

@@ -1,0 +1,16 @@
+# CWE-75 Family View
+Name: Failure to Sanitize Special Elements into a Different Plane (Special Element Injection)
+
+## Family Summary
+
+The product does not adequately filter user-controlled input for special elements with control implications.
+
+## Use This Family View When
+
+- only a broad CWE family is known
+- you need to choose a more specific child CWE before loading a stage file
+- the available CVE metadata is vague or only maps to a parent class
+
+## Children
+
+- `CWE-76`: Improper Neutralization of Equivalent Special Elements (Base)

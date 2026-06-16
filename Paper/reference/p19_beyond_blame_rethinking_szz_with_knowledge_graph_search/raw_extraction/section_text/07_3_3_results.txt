@@ -1,0 +1,235 @@
+3.3 Results
+57.2% of BICs are directly identifiable via git blame, while 28.0% require extended commit
+history traversal (Blame Ancestor or BFC Ancestor).Table 1 presents the category distribution
+across three datasets. The Blame category dominates with 57.2% of all BICs, confirming that git
+blame provides a strong baseline for BIC identification. However, a substantial portion of BICs
+require traversing the commit graph beyond blame commits: 10.3% are Blame Ancestors (requiring
+backward traversal from blame commits) and 17.7% are BFC Ancestors (requiring backward traversal
+from the BFC). Notably, 14.1% of cases are Blameless where traditional blame-based approaches
+cannot provide any candidates. These findings reveal that any approach relying solely on direct
+blame commits will miss nearly half of all BICs. Even for the majority Blame category, correctly
+identifying the true BIC among multiple blame candidates remains challenging.
+Even within the Blame category, identifying the correct BIC among multiple candi-
+dates is non-trivial.Figure 2 shows the joint distribution of deleted lines and blame commits
+across datasets. The heatmap reveals distinct complexity patterns across datasets. DS_LINUX and
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 006 =====
+6 Yu Shi et al.
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+307 115
+37
+89
+47
+10
+4
+74
+44
+19
+1
+1
+3
+25
+17
+22
+13
+3
+4
+6
+7
+10
+6
+7
+17
+3
+1
+2
+3
+2
+1
+1
+0
+50
+100
+150
+200
+250
+300
+Cases
+(a) DS_LINUX (n=901)
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+20 13
+4
+8
+11
+1
+12
+11
+6
+1
+4
+7
+9
+5
+1
+2
+3
+2
+4
+4
+4
+4
+4
+1
+1
+3
+1
+8
+1
+2
+1
+4
+1
+1
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+Cases (b) DS_APACHE (n=164)
+1 2 3-4 5-9
+10-1920-4950-99
+100-499
+500+
+Deleted Lines
+1
+2
+3
+4
+5
+6+Blame Commits
+73 28
+2
+20
+17
+4
+10
+12
+7
+3
+1
+1
+6
+7
+2
+4
+3
+3
+2
+3
+3
+4
+4
+5 2
+2
+6
+0
+10
+20
+30
+40
+50
+60
+70
+Cases (c) DS_GITHUB (n=234)
+Fig. 2. Distribution of blame complexity for Blame category cases. Each cell shows the number of cases with
+a given combination of deleted lines and blame commits.
+0 25 50 75 100 125 150 175 200
+File-History Depth Limit
+0
+20
+40
+60
+80
+100Coverage (%)
+80%
+24
+14
+90%
+56
+44
+Blame Ancestor
+BFC Ancestor
+(a) Blame Ancestor and BFC Ancestor.
+0 20 40 60 80 100
+File-History Depth Limit
+0
+20
+40
+60
+80
+100Coverage (%)
+50%
+19
+37
++ Fallback Direct: 172 cases (54% of blameless)
+Blame Ancestor
+BFC Ancestor (b) Blameless with fallback strategy.
+Fig. 3. File-history traversal depth required to reach BICs. (a) 28% of cases require traversal beyond blame
+(Blame Ancestor and BFC Ancestor categories). (b) The 14.1% Blameless cases have no deleted lines.
+DS_GITHUB concentrate in the low-complexity region (1 to 2 deleted lines with 1 blame commit):
+422 cases (47%) and 101 cases (43%) respectively. In contrast, DS_APACHE is more scattered, with
+only 33 cases (20%) in this region but 49 cases (30%) with ≥10 deleted lines and ≥3 blame commits.
+Overall, 476 of 1,299 Blame category cases (36.6%) involve multiple blame commits, requiring
+intelligent selection rather than simply returning all blame candidates.
+For the remaining 28% of BICs that fall into the Blame Ancestor and BFC Ancestor categories,
+the challenge shifts from ranking candidates to determining how far to traverse the commit history.
+File-history depth provides a tractable search space for BIC identification.Figure 3 shows the
+percentage of BICs found as file-history traversal depth increases. For blameable cases (Figure 3a),
+traversing 24 ancestor commits covers 80% of Blame Ancestor BICs (backward from blame), while
+14 descendant commits cover 80% of BFC Ancestor BICs (backward from BFC).
+Fallback strategy provides useful candidates for 54% of Blameless cases.For the 14.1% of
+Blameless cases where git blame cannot be applied, we investigate whether blaming lines adjacent
+to additions could provide useful candidates. Figure 3b shows that 54% of Blameless BICs appear
+directly in these fallback blame commits. For the remaining cases, traversal depths of 19 (Blame
+Ancestor) to 37 (BFC Ancestor) commits achieve 50% coverage.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 007 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 7
+Fig. 4. AgenticSZZ architecture. Given a Bug-Fixing Commit (BFC) and its repository, TKG Construction
+identifies blame commits and expands the search space by traversing file history backward from two starting
+points (Blame Ancestor and BFC Ancestor). Agentic BIC Search then navigates the resulting graph using four
+specialized tools to identify the Bug-Inducing Commit (BIC).
+Summary of RQ0
+•While 57.2% of BICs do appear directly in blame commits, 36.6% of these Blame category cases involve
+multiple candidates requiring intelligent selection.
+•28.0% of BICs require commit history traversal beyond blame results (Blame Ancestor or BFC Ancestor),
+and 14.1% of cases are blameless (traditional blame-based approaches cannot apply).
+Implication:Differentiating between these three categories is a promising direction for improving BIC
+identification. However, it requires intelligent reasoning to predict which category applies to a given case,
+as exhaustive graph traversal for all potential BIC candidates would be prohibitively expensive.

@@ -1,0 +1,548 @@
+Appendix A.
+Example 2. Figure 5 shows NEXUS ’s preprocessing for
+CVE-2024-4985. After cleaning and tokenizing the text,
+NEXUS extracts ﬁve sentences and focuses on Sentence 2 for
+its sequential actions. SRL identiﬁes three main verbs (“al-
+lowed,” “forge,” “gain”) and theirARG0/ARG1 roles; although
+“provision” is missed, the key action remains captured through
+“gain.” From these verbs,NEXUS forms three sub-sentences
+by linking each verb to its object (and subject when present),
+since verb–object pairs best capture malicious behavior. As
+shown in Figure 6, dependency analysis assigns Sub-sentence
+1 (“allowed/forge”) as the parent and Sub-sentences 2–3
+(“forge,” “gain”) as children, clarifying the attack sequence
+and enabling multi-pattern analysis in later steps.
+Semantic Role Labeling
+E.g., Sentence 2
+This vulnerability allowed an attacker to forge a SAML response to
+provision and/or gain access to a user with site administrator privileges.
+VARG0 ARG1
+This vulnerability allowed an attacker to forge a SAML response to
+provision and/or gain access to a user with site administrator privileges.
+V
+ARG0
+ARG1
+V: Action (Verb) ARG1: Patient (Theme)ARG0: Agent (Doer)
+This vulnerability allowed an attacker to forge a SAML response to
+provision and/or gain access to a user with site administrator privileges.
+VARG0 ARG1
+CVE-
+2024-
+4985
+Sentence
+Tokenization
+Sentence 1
+...
+Sentence 5
+Sub-sentence Extraction
+Subject (e.g., ARG0) Verb Object (e.g., ARG1)
+an attacker forge a SAML response to...
+allowed
+gain
+This vulnerability an attacker to forge...
+an attacker access to a user with...
+RequiredOptional
+ID
+1
+2
+3
+Extracted
+Sub-
+sentences
+Connect each
+verb to its subject
+and object
+Text
+Cleaning
+Fig. 5: An example of data processing.
+Dependency Extraction
+Is the child ofIs the child of
+Is the child of
+(Inherits "gain")
+(Inherits "gain")
+(Inherits "gain" and "forge")1 2 3
+Fig. 6: An example of extracting hierarchical dependencies.
+2) Attack Pattern Classiﬁcation: This step identiﬁes sub-
+sentences containing attack patterns using the Attack Pattern
+Detector (APD), a binary classiﬁer built by ﬁne-tuning Secure-
+BERT [19]. The APD is trained on 3,000 manually labeled
+sub-sentences, distinguishing positives (containing attack pat-
+terns) from negatives. Following prior work [3], [9], [10], [32],
+attack patterns are deﬁned as action sequences reﬂecting an
+attacker’s methods and intentions. To improve accuracy, each
+sub-sentence is paired with its original sentence as context
+using the[SEP] token (a separator between segments in input
+sequences used in BERT) during training and prediction. This
+context helps the APD model capture semantic nuances and
+improve precision [10]. Identiﬁed attack patterns are either
+added to the training dataset or proceed through prediction.
+Example 3. Figure 7 illustrates the Attack Pattern Clas-
+siﬁcation sub-step, with two ﬂows: training and prediction.
+During training (left), an annotated dataset of 3,000 manually
+labeled sub-sentences is used to ﬁne-tune the APD model,
+achieving about 95% accuracy. In the prediction ﬂow (right),
+extracted sub-sentences from CVE-2024-4985 are classiﬁed.
+“An attacker gain access to a user with site administrator
+privileges” (Sub-sentence 3) is identiﬁed as an attack pattern,
+while “this vulnerability reported via the GitHub Bug Bounty
+program” is classiﬁed as a non-attack pattern.
+D. Dataset Enhancement
+We augment the training set to reduce TTP imbalance and
+improve coverage of underrepresented techniques. GPT-4o-
+mini is used for large-scale veriﬁcation and correction of TTP
+labels while Llama-3.1-8B supports efﬁcient paraphrasing for
+4
+
+===== Page 005 =====
+Training
+ID >3K Sub-sentences
+1 A crafted payload inserted into the Search box
+2 Users advised to upgrade
+n ...
+Analyze
+Analyst
+Annotate
+AP
+...
+Fine-tune
+I
+II
+APD Model
+~95%
+accuracy
+Attack Pattens 
+(APs)
+Prediction
+CVE-2024-4985
+APD Model
+This vulnerability reported
+via the GitHub Bug Bounty
+program
+Two of Sub-sentences
++ Main Sentence 
+as Context
+An attacker gain access to
+a user with site
+administrator privileges
++ Main Sentence 
+as Context
+Attack Pattern Classification
+Fig. 7: An example of attack pattern classiﬁcation.
+augmentation. As shown in Section IV-C and Appendix C,
+fully generative LLMs perform well on clean samples but
+degrade on large or noisy data, motivating our hybrid design.
+This step is performed as follows.
+1) Label Adjustment: The goal of this sub-step is to
+enhance the dataset by automatically adding relevant TTPs
+missing from the original ground truth. First, we identify
+67 crucial TTPs (27 main techniques and 40 associated
+sub-techniques) that are frequently referenced by adversaries
+across documented cybersecurity campaigns (e.g., [23]–[26])
+but were not included in the initial dataset described in
+Section III-B. Second, we construct an extended candidate set
+for each CVE by merging its previously assigned TTPs with
+these newly identiﬁed ones as follows:
+ZCV Ei = Tassigned(CV Ei) → Tmissed (1)
+where Tassigned is the set of TTPs already linked toCVE i,
+and Tmissed is the group of 67 newly discovered critical TTPs
+missing from the original dataset. ZCV Ei denotes the full
+candidate TTP set associated with that CVE.
+Third, we use GPT-4o-mini to automatically check whether
+each missing TTP in ZCV Ei is consistent with the CVE
+description or the extracted attack pattern. As in Appendix
+C and prior work [28], [37], GPT-4o-mini achieves strong
+precision and recall, especially with constrained candidate sets.
+Each candidate TTP description is paired with the CVE or
+pattern text, and the model is prompted to judge its exploit
+relevance. To ensure consistency, responses are restricted to
+deterministic “Yes”/“No” outputs using temperature 0.2 and
+top-p 0.9. To ensure label quality and fairness, we verify
+both new and existing TTPs per CVE. This avoids preserving
+prior errors, leverages GPT-4o-mini’s high recall (Appendix C)
+and supportsNEXUS’sfeedback loop (Section III-F), enabling
+consistent TTP assignment and improved label recovery.
+Finally, we reﬁne assigned labels by enforcing consistency
+within the attack pattern dependency graph, ensuring child
+nodes inherit a subset or equivalent set of TTPs from their par-
+ents. This prevents more speciﬁc patterns from being assigned
+broader or unrelated TTPs, preserving contextual coherence.
+This step is further outlined in Algo. 2 in Appendix A.
+Example 4. Figure 8 shows the label adjustment process for
+Attack Pattern 3, extracted from CVE-2024-4985.
+GPT-4o-mini evaluatesT1548, T1606, and T1566 as can-
+didate TTPs based on the description. Although T1566
+(Phishing) is initially considered relevant due to the
+Label Adjustment
+T1548 (Abuse Elevation Control Mechanism) T1606 (Forge Web Credentials) T1566 (Phishing)
+GPT-4o-mini
+Candidates
+T1548
+T1606
+T1566...
+Response
+ Label Verification Adjusted
+T1548
+T1606
+...
+Attack Pattern
+T1548
+T1606
+T1566... 3
+1 2 T1548
+T1606
+T1566...
+Direct Parents
+an attacker gain access to a user
+with site administrator privileges
+3
+Fig. 8: An example of the Label Adjustment process.
+CVE Sample Augmentation
+An authentication bypass vulnerability was present in
+the GitHub Enterprise Server (GHES) when utilizing
+SAML single sign-on authentication with the optional
+encrypted assertions feature. This vulnerability allowed an
+attacker to forge a SAML response to provision and/or
+gain access to a user with site administrator privileges.
+Exploitation of this vulnerability ...
+A vulnerability in GitHub Enterprise Server (GHES)
+was found when using SAML single sign-on (SSO)
+with the optional encrypted assertions feature. This
+flaw allowed attackers to craft a fake SAML
+response, which could grant them access to a user
+account with site administrator privileges. By
+exploiting this vulnerability ...
+Llama-3.1-8B
+1 2 3Attack
+Patterns
+...
+T1548 T1606 ...TTPs
+Paired/Assigned
+Support
+≤ T?
+Yes
+Original Description
+CVE-2024-4985
+Augmented Description
+Unique?
+Paraph-
+raseCheck Check
+Pair Attack Patterns
+Yes Assign TTPs
+Update Supports
+Add to Dataset
+Fig. 9: An example of the CVE Sample Augmentation process.
+limited context ofAttack Pattern 3, which loosely sug-
+gests user interaction, the label veriﬁcation step cross-checks it
+against the direct ParentAttack Patterns 1 and 2. Since
+both parents strictly describe privilege escalation through
+forged SAML responses—without any phishing or social
+engineering context—T1566 is removed as unsupported. As
+a result, only the contextually consistent labelsT1548 and
+T1606 are retained forAttack Pattern 3.
+2) CVE Sample Augmentation:To address TTP imbalance,
+we augment CVE samples through paraphrasing with Llama-
+3.1-8B, selected for quality, open-source availability, and efﬁ-
+cient local use. Augmentation increases data diversity without
+collecting new samples [51]–[55]. Step 1: For each sampleS
+i
+in Z (CVE text + attack pattern), if any TTP in its label setL
+has support ! <T , the sample is marked for augmentation.
+Step 2: Llama-3.1-8B generates one paraphrase ” using
+temperature 0.6 and top-p 0.9 to balance ﬁdelity and variation.
+Step 3: If”
+j(Si) is unique inZ, it is added as a new sample
+with the same attack pattern and labels, and support counts
+are updated. The process repeatsN times per eligible sample.
+Augmentation parameters (T , N) are selected empirically
+based on TTP classiﬁer performance (Section IV-D3). The
+formulation is:
+Z ↑ Z →
+∑
+Si→Z
+N∑
+j=1
+{
+!j(Si)
+⏐⏐⏐↓TTP ↔ L(Si), ”(TTP) ↗ T,
+!j(Si) /↔ Z, Update(”,L (Si))
+}
+(2)
+Example 5.Figure 9 shows if CVE-2024-4985 maps to under-
+supported TTPs, its description is paraphrased using Llama-
+3.1-8B. Semantically consistent, novel samples are added to
+the dataset with preserved TTPs and updated support counts.
+E. TTP Classiﬁer Model Building
+We ﬁne-tune a BERT-based model [18] for multi-label
+CVE-to-TTP classiﬁcation after addressing Challenges [19],
+[22] and tokenized. The model was trained on 75% of the
+data, while the remaining 25% was evenly divided between
+5
+
+===== Page 006 =====
+TTP Classifier Model Building
+Attack Pattern 3
+Input
+Tokenization
+Token
+Embedding
+Segment
+Embedding
+Position
+Embedding
+CVE-2024-4985 (Context)
++
+Weight Update (Encoder Frozen)
++
+BERT
+Encoder
+Classification
+Head
+T1606: 0.23
+T1566: 0.95
+T1548: 0.87
+...
+True
+Labels
+Com-
+pare
+Predicted TTP Probabilities
+Binary Cross-Entropy
+Loss Calculation
+Backpropagation
+Fine-tuning
+(Head Only)
+[CLS] [SEP] An authentication ... program .an attacker gain ... privileges
+E(an) E(attacker) E(gain) ... E(privileges)E([CLS]) E([SEP]) E(An) E(authentication) ... E(program) E(.)
+E[A] E[A] E[A] E[A] ... E[A] E[A] E[B] E[B] ... E[B] E[B]
+E[0] E[1] E[2] E[3] ... E[11] E[12] E[13] E[14] ... E[n-1] E[n]
+Fig. 10: An example of ﬁne-tuning the TTP Classiﬁer Model.
+Fig. 11: An example of TTP clustering via Prediction step.
+validation and test sets. Moreover, it uses a frozen encoder
+and a sigmoid-activated classiﬁcation head trained via binary
+cross-entropy. We evaluate six BERT variants (e.g., BERT-
+Base, SecureBERT [19], [20]) and select the best-performing
+model as the ﬁnal classiﬁer forNEXUS.
+Example 6. Figure 10 shows an example of the TTP Classiﬁer
+Model Building step during ﬁne-tuning. Here,Attack Pattern 3
+from CVE-2024-4985 is paired with its CVE description
+using the[SEP] token. The sequence is tokenized, embedded
+(token, segment, position), and passed through a frozen BERT
+encoder. The[CLS] output feeds into the classiﬁcation head,
+producing multi-label probability scores (e.g., 0.23 forT1606,
+0.95 for T1566, 0.87 for T1548). Predictions are compared
+to ground truth using binary cross-entropy loss. Only the
+classiﬁcation head is updated during backpropagation.
+F . Prediction and Adaptation
+This step builds upon the ﬁne-tuned TTP classiﬁer model
+described in Section III-E to predict TTPs for previously un-
+seen CVEs and to improve prediction accuracy through analyst
+feedback. It consists of two main sub-steps: TTP Prediction
+(Section III-F1) and Model Adaptation (Section III-F2).
+1) TTP Prediction: This sub-step ﬁrst predicts TTPs for
+unseen CVEs, reﬁnes them through Model Adaptation, and
+then receives analyst feedback. First, the TTP Prediction sub-
+step processes attack patterns extracted from a CVE, each with
+its context, and applies the ﬁne-tuned TTP classiﬁer. Initial
+predictions are reﬁned by the Model Adaptation sub-step (Sec-
+tion III-F2) using prior feedback, and the ﬁnal adapted TTPs
+are returned. Second, analysts review predictions and provide
+structured feedback by marking each TTP as true positive,
+false positive, or false negative. For each TTPT
+i, feedback
+can target speciﬁc attack patterns {AP1, AP2, . . . , APk} or
+apply using a wildcard (*), as follows:
+TTP Prediction and Feedback Collection
+AP Extraction TTP Prediction Revision
+ Feedback
+False Negative: 
+T1606.002
+for AP1-3 from
+Sentence 2
+Model Adaptation DB Update
+CVE-2024-4985 Feedback
+Database
+Analyst 47c1e5c...
+Exact-Match
+Signatures
+Behavioral
+Signatures
+C1, C5, ...
+Hash Values
+(SHA-256)
+Cluster Distance
+(0.1)
+e.g., e.g.,
+<CONTEXT>
+Sent. APs
+1 AP1
+2 AP1, AP2, AP3
+3 AP1, AP2
+T1548: Abuse Elevation Control Mechanism T1606: Forge Web Credentials T1606.002: Forge Web Credentials: SAML Tokens
+Sent.
+3
+AP TTPs
+T1606, ...1
+.........
+......... 2
+.........
+2 T1548, ...
+Refined by Model
+Adaptation
+Fig. 12: An example of predicting TTPs.
+Feedback(Ti)=
+k⋃
+j=1
+Map(APj), where Map(APj) ↔{ APj, *} (3)
+Third, the TTP Prediction sub-step stores feedback using
+two mechanisms: Exact-Match and Behavioral signatures. For
+Exact-Match, it concatenates the attack pattern and CVE
+description with a <CONTEXT> delimiter and applies SHA-
+256 to create a stable identiﬁer for deterministic lookup. For
+Behavioral Signatures, it records the predicted TTP set as a
+behavioral ﬁngerprint to generalize feedback across similar
+patterns. However, small contextual differences (e.g.,[T1,T 2]
+versus [T1,T 2,T 7] hinder exact matching and inﬂate the
+database. To mitigate this, the sub-step abstracts these sets by
+clustering correlated TTPs, computing a Pearson correlation
+matrix C
+ij over the multi-label CVE–TTP dataset (Equa-
+tion 4).
+Cij = Cov(Li,L j)
+ωLiωLj
+(4)
+and deﬁnes a pairwise distance as presented in Equation 5:
+d(Li,L j)=1 ↘ Cij (5)
+Using these distances, hierarchical agglomerative clustering
+with average linkage is performed, and the dendrogram is cut
+at a thresholdX to formN clusters as denoted in Equation 6:
+D = {Li ≃ ClusterID(Li) | i =1 , 2,...,M } (6)
+By clustering correlated TTPs, the system reuses behavioral
+feedback across semantically similar patterns despite minor
+prediction differences. Figure 11 illustrates how varying dis-
+tance thresholds merge TTPs into broader clusters, trading
+speciﬁcity for generalization. For each pattern with feedback,
+the TTP Prediction sub-step then maps its predicted TTPs to
+cluster IDs to form the Behavioral Signature:
+APclusters =
+APTTPs⋃
+t=1
+{ClusterID(CPt)} (7)
+This cluster-level signature enablesNEXUS to reuse analyst
+feedback during future prediction processes, applying it to both
+identical and behaviorally similar attack patterns.
+Example 7. Figure 12 illustrates TTP prediction and ana-
+lyst feedback. ForCVE-2024-4985, NEXUS extracts multiple
+attack patterns (e.g., AP1–AP3 from the second sentence).
+The TTP Prediction sub-step generates initial TTPs, which
+are reﬁned via Model Adaptation (Section III-F2). During
+revision, an analyst identiﬁes a false negative—T1606.002
+(“Forge Web Credentials: SAML Tokens”)—missing from
+AP1–AP3 and adds it to all three. The system encodes this
+feedback using two signatures per pattern: an Exact-Match
+Signature (SHA-256 hash of the pattern and CVE context) and
+6
+
+===== Page 007 =====
+Adaptation
+CVE-2024-4985Signatures
+Feedback
+Database
+Relevant Feedback
+47c1...
+C1,C5,...
+X: 0.1
+𝜏: 0.4
+T1606.002
+FN47c1...
+C1,C5,C7... FN
+Add This
+TTP
+directly CVE-2024-45409
+LlamaAP6
+Relev-
+ant?
+Verify
+Yes
+CVE-2024-45409
+Similar CVEs
+CVE-2024-4985 47c1... ... C1,C5,...
+25o9... ...
+Predictions
+T1606.002
+not predicted
+Reviewed
+Yes
+No C1,C5,...
+Exact-Match Behavioral
+Add this
+TTP
+X: Cluster Distance Threshold 𝜏: Coverage Threshold AP: Attack Pattern
+Model Adaptation and Prediction Refinement
+Fig. 13: An example of reﬁning initial predicted TTPs.
+a Behavioral Signature (clustered TTP IDs at a 0.1 threshold).
+Signatures, feedback type, and TTP, are stored for future
+reﬁnement.
+2) Model Adaptation: The Model Adaptation sub-step
+(evaluated in Section IV-F) aligns the output of the TTP Pre-
+diction sub-step with historical analyst feedback by reusing the
+Exact-Match Signatures and Behavioral Signatures introduced
+earlier. These signatures serve as retrieval keys for matching
+current attack patterns with previously recorded feedback,
+either through exact context matching or behavioral similarity.
+First, for each attack pattern, the Model Adaptation sub-step
+checks the feedback database for an Exact-Match Signature
+and, if found, directly inherits all linked feedback (TPs, FPs,
+FNs). Second, to compare against stored Behavioral Signa-
+tures, it computes a cluster-coverage scoreS: letting T
+clusters
+be the current pattern’s Behavioral Signature andB the set of
+stored Behavioral Signatures (Equation 8).
+B = DB(1)
+clusters, DB(2)
+clusters
+,..., DB(n)
+clusters (8)
+For each DB(i)
+clusters →B , the coverage score is calculated via
+Equation 9:
+S(DB(i)
+clusters, Tclusters)= |DB(i)
+clusters ⇐ Tclusters|
+|DB(i)
+clusters|
+⇒ 100 (9)
+If the score exceeds threshold ω , the feedback linked to
+DB(i)
+clusters
+is selected. The sub-step then integrates this feedback
+in two stages: (i) all candidate entries are tentatively applied
+to the current attack pattern, and (ii) each feedback TTP is
+veriﬁed with Llama-3.1-8B using the same Yes/No prompting
+strategy as in Label Adjustment. A “Yes” keeps true positives
+or false negatives, while a “No” removes false positives.
+This veriﬁcation step ensures accurate behaviorally adapted
+feedback. Fourth, the ﬁnal adapted prediction is constructed
+by combining the initial TTP predictions with the corrections
+derived from both signature types. Feedback obtained from
+Exact-Match Signatures is applied directly, while feedback
+from Behavioral Signatures is incorporated following model-
+based veriﬁcation. False positive TTPs are removed, false
+negative TTPs are added, and true positive TTPs are reinforced
+according to the veriﬁed feedback outcomes. The step is
+further summarized in Algo. 3 in Appendix A.
+Example 8. Figure 13 illustrates the Model Adaptation
+process. NEXUS analyzes two similar CVEs, CVE-2024-
+4985 and CVE-2024-45409, both missing TTP T1606.002.
+For CVE-2024-4985, feedback with an Exact-Match Signature
+(47c1...) and a Behavioral Signature (C1,C5,C7...)
+exists in the database. ForCVE-2024-45409, no exact match
+is found, so the system retrieves feedback using Behavioral
+Signature matching (X =0 .1, ω =0 .4). Exact-Match
+feedback is directly applied, while Behavioral feedback is
+veriﬁed via Llama-3.1-8B. If conﬁrmed, TTP T1606.002 is
+added to the prediction.
+IV . E
+VA L UAT I O N
+This section ﬁrst describes the experiment setup, and then
+evaluate NEXUS across several aspects.
+A. Experiment Setup

@@ -1,0 +1,93 @@
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+14 Anon.
+Table 4. The results of different variants
+CVE Level Version Level
+Accuracy Precision Recall F1-score
+CaVulner_diff 49.43% 94.11% 58.12% 71.86%
+CaVulner_ast 65.91% 99.22% 80.23% 88.72%
+CaVulner 73.30% 98.14% 83.15% 90.02%
+RQ1: CaVulner consistently outperforms state-of-the-art baselines at both the CVE and
+version levels. The improvements in accuracy, precision, recall, and F1-score demonstrate
+the effectiveness of CaVulner in identifying vulnerable versions.
+4.4 RQ2. Ablation Study
+In this section, we evaluate the effectiveness of the key components of CaVulner. During the
+vulnerable code identification stage of CaVulner_diff, we remove the coarse-grained vulnerable
+methods localization and fine-grained vulnerable code blocks identification based on multi-source
+information fusion. Instead, we let the LLM identify the vulnerable code based on the fix commit
+diff files and CVE information. In the VIC tracing phase, we use the same approach as CaVulner. In
+CaVulner_ast, after identifying the vulnerable code blocks, we replace the use of LLM for tracing
+the VICs with an AST-based line mapping approach.
+As shown in Table 4, at the CVE level,CaVulner_diff achieves only 49.43% accuracy, indicating that
+without Coarse-grained Vulnerable Method Localization and Fine-grained Vulnerable Code Block
+Identification the LLM often misidentifies vulnerable versions. Introducing AST-based tracing raises
+CVE accuracy to 65.91%. Finally, the full CaVulner reaches 73.30%, outperforming CaVulner_diff
+and CaVulner_ast.
+To validate the effectiveness of our LLM-based VIC tracing module, we further compare its
+performance against the AST-based baseline (CaVulner_ast) using the strict CVE-level accuracy
+metric. As shown in Table 4, the AST-based approach achieves a CVE accuracy of 65.91%. Since
+CVE-level accuracy requires an exact match of the entire vulnerable version range, any deviation
+in identifying the VIC results in a failure for that CVE. By replacing the AST algorithm with our
+LLM-based semantic tracing, CaVulner significantly improves the accuracy to 73.30%. This absolute
+gain of 7.39% demonstrates that the LLM-based approach is superior in correctly pinpointing the
+exact VIC. Unlike the AST method, which may be disrupted by complex code refactorings and
+fail to identify the true origin, the LLM’s semantic understanding enables CaVulner to correctly
+determine the start of the vulnerability lifecycle in substantially more cases, thereby securing the
+correctness of the final version sets.
+At the version level, CaVulner_diff achieves a high precision (94.11%) but suffers from poor recall
+(58.12%) and a moderate F1-score (71.86%). CaVulner_ast improves substantially on recall (80.23%)
+and F1-score (88.72%) and achieves high precision (99.22%). However, both its recall and F1-score
+remain lower than those of CaVulner. This demonstrates that although AST -based tracing can
+boost precision, integrating LLM-driven VIC tracing is essential to maximize recall and overall F1
+performance.
+We further evaluated three additional LLMs, including DeepSeek R1, GPT 4.1-mini, and Qwen
+turbo. Table 5 compares the performance of four different large language models on both CVE and
+version levels, all run with zero temperature to ensure determinism.
+, Vol. 1, No. 1, Article . Publication date: January 2018.

@@ -1,0 +1,244 @@
+{
+  "cwe_id": "CWE-407",
+  "name": "Inefficient Algorithmic Complexity",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "An algorithm in a product has an inefficient worst-case computational complexity that may be detrimental to system performance and can be triggered by an attacker, typically using crafted manipulations that ensure that the worst case is being reached.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-405",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Asymmetric Resource Consumption (Amplification)"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Low",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "An algorithm in a product has an inefficient worst-case computational complexity that may be detrimental to system performance and can be triggered by an attacker, typically using crafted manipulations that ensure that...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "inefficient",
+      "complexity",
+      "computational",
+      "manipulations"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "inefficient",
+      "complexity",
+      "computational",
+      "manipulations",
+      "algorithmic",
+      "detrimental",
+      "performance",
+      "worst-case"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "JavaScript",
+        "nature": "Bad",
+        "summary": "This example attempts to check if an input string is a \"sentence\" [REF-1164].",
+        "snippet": "var test_string = \"Bad characters: $@#\"; var bad_pattern = /^(\\w+\\s?)*$/i; var result = test_string.search(bad_pattern);"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "JavaScript",
+        "nature": "Good",
+        "summary": "This example attempts to check if an input string is a \"sentence\" [REF-1164].",
+        "snippet": "var test_string = \"Bad characters: $@#\"; var good_pattern = /^((?=(\\w+))\\2\\s?)*$/i; var result = test_string.search(good_pattern);"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2021-32617",
+        "description": "C++ library for image metadata has \"quadratic complexity\" issue with unnecessarily repetitive parsing each time an invalid character is encountered",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-32617"
+      },
+      {
+        "reference": "CVE-2020-10735",
+        "description": "Python has \"quadratic complexity\" issue when converting string to int with many digits in unexpected bases",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-10735"
+      },
+      {
+        "reference": "CVE-2020-5243",
+        "description": "server allows ReDOS with crafted User-Agent strings, due to overlapping capture groups that cause excessive backtracking.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-5243"
+      },
+      {
+        "reference": "CVE-2014-1474",
+        "description": "Perl-based email address parser has \"quadratic complexity\" issue via a string that does not contain a valid address",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2014-1474"
+      },
+      {
+        "reference": "CVE-2003-0244",
+        "description": "CPU consumption via inputs that cause many hash table collisions.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0244"
+      },
+      {
+        "reference": "CVE-2003-0364",
+        "description": "CPU consumption via inputs that cause many hash table collisions.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0364"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

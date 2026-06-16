@@ -1,0 +1,40 @@
+6 Threats to Validity
+We discuss threats to the internal, external, and construct validity
+of our study.
+6.1 Internal Validity
+Sample Size.Budget constraints limit our evaluation to 100–200 fix
+commits per dataset, which may not capture the full distribution of
+bug types and fix patterns. We mitigate this by using fixed random
+seeds for sampling, reporting statistical significance tests and effect
+sizes for all comparisons with previous approaches, and providing
+all sampling scripts for reproducibility.
+Prompt Sensitivity.The instructions given to the agent may influ-
+ence its behavior and effectiveness. We did not perform systematic
+prompt optimization; our prompts are straightforward task descrip-
+tions and are released with our artifact.
+6.2 External Validity
+Language and Project Scope.Our evaluation covers C/C++ and
+Java projects across four datasets derived from the Linux kernel and
+GitHub repositories. Results may not generalize to other languages
+or project types. We selected these datasets because they are the
+most popular in SZZ research and allow direct comparison with
+prior work.
+LLM Evolution.Our results depend on current LLM capabilities
+and future models may yield different results. Our evaluation across
+six models and two agent frameworks (§4.3.4) demonstrates that
+the approach is not tied to a specific model.
+6.3 Construct Validity
+Ground Truth Quality.We rely on developer-annotated bug-
+introducing commits as ground truth. For DS_LINUX and DS_LINUX-
+26, these annotations come from Fixes: tags added by Linux ker-
+nel developers, which may occasionally be incorrect or incomplete.
+For DS_GITHUB-c and DS_GITHUB-j, the annotations were con-
+structed by identifying fix commits where developers explicitly ref-
+erence bug-introducing commits, followed by manual filtering [21].
+Inaccuracies in these labels would affect all approaches equally, but
+could bias absolute performance estimates.
+Single Bug-Introducing Commit Assumption.Our evaluation
+metrics assume that each fix commit has a well-defined set of bug-
+introducing commits. In practice, bugs can result from complex
+interactions across multiple commits, and the notion of a single
+introducing commit may oversimplify the true causal history. This

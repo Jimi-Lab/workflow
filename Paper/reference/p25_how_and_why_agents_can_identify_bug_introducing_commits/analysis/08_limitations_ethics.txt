@@ -1,0 +1,26 @@
+Stated Limitations:
+- 5 Discussion We discuss directions for future work motivated by our findings.
+- Second, the 4 cases where the bug-introducing commit is not in the candidate set reveal a limitation of the current candidate collection strategy: Simple-SZZ-Agent only searches the commit histories of files modified by the fix, so when the bug was introduced in a different file, the correct commit is never considered.
+- How to expand the candidate set beyond the files touched by the fix without introducing prohibitive infrastructure costs is an open question that we leave for future work.
+- This compression itself may have value beyond identifying the bug-introducing commit: it captures, in a concise form, what made the code buggy.
+- Our context ablation (§3.3.4) showed that the agent achieves 0.73 F1-score with only the diff and no commit message, demonstrating that it can extract the essential characteristics of a bug from code changes alone.
+- Whether these patterns can be used to generate useful explanations of how a bug was introduced— especially when the fix commit message is uninformative—is an open question for future work.
+Threats to Validity:
+- Simple-SZZ-Agent achieves up to 0.86 F1-score on the Linux kernel dataset, compared to 0.62 for the previous state of the art.
+Ethical Considerations:
+- [NEEDS EVIDENCE] ethics not detected
+Security / Misuse Discussion:
+- The problem is also highly relevant for practitioners, since identifying bug-introducing changes is essential to determine which software versions are affected by security-critical bugs [5].
+Responsible Disclosure:
+- [NEEDS EVIDENCE] responsible disclosure not detected
+Scope Boundaries:
+- 5 Discussion We discuss directions for future work motivated by our findings.
+- While these directions are beyond the scope of this paper, we hope they inspire other researchers to explore them.
+- Second, the 4 cases where the bug-introducing commit is not in the candidate set reveal a limitation of the current candidate collection strategy: Simple-SZZ-Agent only searches the commit histories of files modified by the fix, so when the bug was introduced in a different file, the correct commit is never considered.
+- How to expand the candidate set beyond the files touched by the fix without introducing prohibitive infrastructure costs is an open question that we leave for future work.
+- Our context ablation (§3.3.4) showed that the agent achieves 0.73 F1-score with only the diff and no commit message, demonstrating that it can extract the essential characteristics of a bug from code changes alone.
+- Whether these patterns can be used to generate useful explanations of how a bug was introduced— especially when the fix commit message is uninformative—is an open question for future work.
+Writing Pattern:
+- Separate dataset/tool limitations, generalizability, and artifact/reproducibility gaps.
+Relevance to Our Paper:
+- Useful for explicitly bounding affected-version claims and separating static evidence from execution/reproduction evidence.

@@ -1,0 +1,152 @@
+[
+  {
+    "page": 12,
+    "block_id": "page_012:block_001",
+    "block_type": "text",
+    "text": "12 Yu Shi et al.",
+    "bbox": [
+      45.64500045776367,
+      60.6286735534668,
+      440.1717529296875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_002",
+    "block_type": "text",
+    "text": "(5) Computational Resources. Experiments were conducted on a 48-core server with 1.5TB RAM. For parallel evaluation, each worker runs an isolated Neo4j instance in Docker, enabling concurrent processing across multiple cases. For the main comparison (Table 2 ) and controlled comparison (Table 4 ), we follow the evaluation protocol of LLM4SZZ [ 36 ]: both approaches are run three times independently, and we report metrics averaged across runs to reduce variance from LLM non-determinism. For statistical tests, we compare the best-performing run from each approach; we additionally test robustness by comparing our worst run against baselines’ best. For cost analysis (Table 3 ), we report the average processing time and cost per case across all three runs. For the ablation study and category breakdown analysis (RQ2), we report results from a single run, as our RQ1 results showed that performance overall is stable across runs (both for AgenticSZZ and LLM4SZZ).",
+    "bbox": [
+      45.52899932861328,
+      83.4370346069336,
+      440.3635559082031,
+      216.75738525390625
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_003",
+    "block_type": "text",
+    "text": "5.4 Data Leakage Prevention",
+    "bbox": [
+      45.827999114990234,
+      226.91925048828125,
+      182.25587463378906,
+      239.77101135253906
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_004",
+    "block_type": "text",
+    "text": "Commit messages in real repositories can contain explicit references to the BIC, added by developers who manually identified the bug-inducing commit. This is particularly prevalent in the Linux kernel, which follows a structured commit message format including Fixes: tags that directly reference the bug-inducing commit (this convention is how the DS_LINUX BIC dataset was constructed). Since SZZ aims to automate this manual identification process, we must prevent the agent from exploiting these ground truth hints during evaluation. For this reason, we sanitize all commit messages during TKG construction by removing Fixes: lines, Reverts: tags, and replacing inline commit SHA references with placeholder tokens. This ensures the agent must reason about code relationships rather than exploiting metadata leakage.",
+    "bbox": [
+      45.459999084472656,
+      240.84706115722656,
+      442.6627502441406,
+      350.25640869140625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_005",
+    "block_type": "text",
+    "text": "6 Evaluation Results",
+    "bbox": [
+      45.827999114990234,
+      360.41827392578125,
+      144.94590759277344,
+      373.27001953125
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_006",
+    "block_type": "text",
+    "text": "6.1 RQ1: How Effective is TKG-Guided Agentic Search for BIC Identification?",
+    "bbox": [
+      45.827999114990234,
+      375.3622741699219,
+      400.8951416015625,
+      388.2140197753906
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_007",
+    "block_type": "text",
+    "text": "6.1.1 Motivation. Our preliminary study (RQ0) revealed that existing blame-based approaches face fundamental limitations: a significant portion of BICs require traversing commit history beyond direct blame results, and many cases involve multiple candidates requiring intelligent selection. Current state-of-the-art approaches like LLM4SZZ [ 36 ] expand context around modified lines for blame candidate collection (Section 5.1 ) but do not traverse commit history to systematically explore ancestor commits.",
+    "bbox": [
+      45.827999114990234,
+      389.2900695800781,
+      441.7035827636719,
+      462.8343811035156
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_008",
+    "block_type": "text",
+    "text": "6.1.2 Approach. We evaluate AgenticSZZ on the complete set of 2,102 bug-fixing cases across DS_LINUX (1,500 cases), DS_APACHE (241 cases), and DS_GITHUB (361 cases). DS_GITHUB is further split into DS_GITHUB-c (C language, 286 cases) and DS_GITHUB-j (Java, 75 cases) to enable language-specific analysis, as Neural-SZZ and RA-SZZ are Java-only baselines. For each case, AgenticSZZ constructs a TKG through blame analysis and commit history traversal from two starting points, then employs an LLM agent to navigate the graph using the four specialized tools described in Section 4.2 . We compare against eight baselines (Section 5.1 ), including six SZZ variants, Neural-SZZ, and LLM4SZZ. For the controlled comparison (Table 4 ), both approaches use DeepSeek-V3.2, isolating the architectural contribution from LLM selection. All approaches are evaluated using Precision, Recall, and F1-score as defined in Section 5.2 . We use McNemar’s test for paired binary outcomes (correct/incorrect per case) and report Cohen’s 𝑔 as effect size, where 𝑔 ≥ 0 . 15 indicates a medium effect and 𝑔 ≥ 0 . 25 indicates a large effect [ 6 ].",
+    "bbox": [
+      45.57899856567383,
+      468.9910888671875,
+      440.17327880859375,
+      633.0657348632812
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_009",
+    "block_type": "text",
+    "text": "6.1.3 Results. AgenticSZZ achieves the best or comparable F1-score across all datasets. Table 2 presents results across all four dataset splits. AgenticSZZ outperforms all baselines including",
+    "bbox": [
+      45.52899932861328,
+      633.4849243164062,
+      441.8760681152344,
+      658.1023559570312
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 12,
+    "block_id": "page_012:block_010",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      45.827999114990234,
+      671.4816284179688,
+      225.87257385253906,
+      682.496337890625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

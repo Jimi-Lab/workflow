@@ -1,0 +1,82 @@
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 913
+Fig. 8. Some earlier major versions that are continuously updated.V2.2 to
+V2.5 have the same partial matching vulnerable code (red dotted frame).
+the corresponding git log by exactly matching the sf-diff against
+the DHs in the git logs. Then, we manually use log information
+(e.g., description, commit-id) to accurately determine whether
+the current version is vulnerable. This process is done for each
+sf-diff in the backward temporal order. Note that a sf-diff may
+consist of multiple consecutive diff hunks, and the diff hunks
+may be recorded in multiple git logs.
+Proper commit messages with information about what is being
+merged and why they merge are not always logged[42]. There-
+fore, our justiﬁcation result for a partially matching software
+version can be divided into three types: Yes, No, Probable.
+Among them, “Yes” means it is a vulnerable version because
+there is detailed information in the git logs, such as the exploit
+of Proof-of-Concept (POC) or the dependency relationship of
+the vulnerability, which is established in the form of text or
+commit-id. “No” means it is a non vulnerable version because the
+CVE-related Source fragments (SFs) does not exist. “Probable”
+means it is a suspicious version because we have no sufﬁcient
+information. It is worth noting that, in order to ensure the in-
+tegrity of the results, although some partially matching versions
+need to be reviewed by human experts to determine whether the
+code is vulnerable, the proportion of these versions is small and
+the cost is not high. We will report the number of CVEs/commit
+that require manual inspection and the total man-hours spend in
+the next evaluation section.
+We use one example to illustrate the idea. According to
+description of CVE-2011-2521, there is a vulnerability in func-
+tion ”x86_assign_hw_event”. However, when our tool checks
+the patch, many earlier versions are partially matched. By log
+tracing based on the commit-id of the patch, it is found that this
+vulnerability was originally introduced from the commit
+41bf498, and patched twice afterwards because the ﬁrst patch
+was not complete. This example demonstrates how the log
+tracing helps to identify the ﬁrst version of the vulnerability,
+3) The Method to Find the First Vulnerable V ersion:Our
+algorithm for determining V from is as following. First, for
+a CVE-ID, we obtain the matching results (exact or partial
+matching) by checking eachmajor version before the minimum
+committed version in the version tree (e.g.,V3.0.6 in Fig.9). If all
+the matching results are exact matches, then the ﬁrst vulnerable
+version is the earliest version with exact matching. Otherwise,
+Fig. 9. Identify the ﬁrst vulnerable version in the version tree.
+TABLE I
+WEBSITE DISTRIBUTION OF PATCHES
+we determine V from by the log tracing and vulnerability jus-
+tiﬁcation methods introduced in SectionIV-D2. We illustrate
+the process for determiningV from with our example in Fig.8.
+In the ﬁrst step, we ﬁnd the ﬁrst exact matching major version
+before V3.0.I fi ti sVroot, then Vroot is V from . If it is not, the
+ﬁrst exact matching version, sayV2.6, will be regarded asV from
+as long as the vulnerable ﬁle does not exist in the early version
+V2.5. Otherwise, in the second step, if the last partial matching
+version V2.5 does not contain the vulnerability or its vulnerability
+status cannot be veriﬁed by us,V2.6 is regarded asV from .I f
+the vulnerability exists, the versions beforeV2.5 with the same
+partial matching code are all regarded as vulnerable versions. In
+the backward order, through log tracing, eventually we will be
+able to identify the ﬁrst vulnerable version and label it asV from .
+V. EVA L UAT I O N
+We ﬁrst brieﬂy introduce the implementation of our system,
+and then evaluate the effectiveness of our algorithms via stan-
+dard metrics such as precision and recall. Let TP be the number
+of true vulnerabilities detected (true-positives), FP be the num-
+ber of false vulnerabilities detected (false-positives), and FN be
+the number of true vulnerabilities undetected (false-negatives).
+The metric precision= TP/(TP + FP) reﬂects the correctness
+among the detected positives. The metric recall=TP/(TP + FN)
+reﬂects the completeness of the detected positives.
+A. Implementation
+We implemented our system in Python 3.6.0. Our experi-
+ments ran on a PC with Intel CPU core i5-8265 U operating at
+1.80 GHz and 8 GB RAM. The implementation consists ofData
+Crawler, Vulnerable V ersion Finder, Log Tracer, and Result
+Generator. Data Crawler connects to the speciﬁed URLs to
+collect and preprocess software packages (such as Linux kernel,
+Qemu, OpenSSL), CVE database, patches, and Changelogs etc.
+Vulnerable Version Finder implements the algorithms in R1,
+R2 and R3 to ﬁnd the ﬁrst(‘from’) and last(‘upto’) vulnerable
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

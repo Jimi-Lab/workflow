@@ -1,0 +1,107 @@
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+framework that supports multi-step reasoning and tool use, mak-
+ing it suitable for complex repository analysis tasks. Overall, we
+compareAgentSZZagainst eleven baselines.
+4.4 Evaluation Metrics
+Following prior work on SZZ evaluation [36], we adopt precision,
+recall, and F1-score to measure bug-inducing commit identification
+accuracy. Let GT(𝑐𝑖 )and Pred(𝑐𝑖 )denote the ground-truth and
+predicted bug-inducing commit sets for bug-fixing commit 𝑐𝑖 . We
+compute metrics over all commits as follows:
+Precision=
+Í
+𝑖 |GT(𝑐𝑖 )∩Pred(𝑐 𝑖 )|Í
+𝑖 |Pred(𝑐𝑖 )| (1)
+Recall=
+Í
+𝑖 |GT(𝑐𝑖 )∩Pred(𝑐 𝑖 )|Í
+𝑖 |GT(𝑐𝑖 )| (2)
+𝐹1=2· Precision×Recall
+Precision+Recall (3)
+4.5 Implementation
+Using state-of-the-art code LLMs (e.g., Claude Opus 4.6 [2]) is im-
+practical for large-scale evaluation due to their high cost. A single
+evaluation run on our three datasets would cost approximately
+$400, making such models unsuitable for our study. While prior
+work [36] adopts GPT-4o-mini [25], we instead use GPT-5-mini [26],
+which provides stronger support for tool use and reasoning while
+remaining cost-effective.
+All experiments are conducted on a server equipped with an
+AMD EPYC 7763 64-core processor and 252 GB of RAM. We access
+LLM APIs via OpenRouter.2 We do not set the temperature to 0, as
+GPT-5 series models do not support temperature control [3]. The
+agent is limited to a maximum of 15 interaction turns.
+For the mini-SWE-agent (v2.2.5) baseline [ 47], we repurpose
+its bash-based repository interaction environment for BIC tracing
+instead of its default software repair workflow. The agent uses
+GPT-5-mini via OpenRouter and is run with a 300-second timeout
+per case. To ensure a fair comparison, it is provided with the same
+fix-side evidence asAgentSZZ: the repository path, the fix commit
+hash, and a filtered fix context derived from the fixing commit, with
+metadata trailers (e.g., Fixes:) removed. The agent is prompted to
+trace the origin of the bug using read-only git commands and to
+output the final BIC in a structured format.
+5 Results
+5.1 RQ1: Effectiveness ofAgentSZZ
+Table 2 presents the results across three datasets. Following prior
+work [36], we further split the GitHub dataset into C and Java
+subsets to analyze language-specific performance. This results
+in four datasets: DS_LINUX (Linux), DS_GITHUB-c (GitHub-C),
+DS_GITHUB-j (GitHub-J), and DS_APACHE (Apache). To ensure a
+fair comparison, we runAgentSZZ, LLM4SZZ, and LLM4SZZ (5-
+mini) three times and report the average results. Due to its high cost
+and low performance, mini-swe-agent is evaluated with a single
+run on each dataset.
+2https://openrouter.ai
+AgentSZZachieves the highest recall and F1-score across all
+four datasets among eleven baselines. Compared to the prior state-
+of-the-art LLM4SZZ [36], it improves F1 by 27.2%, 22.9%, 25.2%, and
+15.4% on Linux, GitHub-C, GitHub-J, and Apache, respectively. It
+also achieves strong precision (0.788, 0.830, 0.750, and 0.724), corre-
+sponding to relative improvements of 25.5%, 20.8%, 23.6%, and 18.7%
+over LLM4SZZ. AlthoughAgentSZZhas slightly lower precision,
+the extremely low recall of mini-swe-agent leads to misleadingly
+high precision due to its limited number of correct predictions.
+Using the same backbone model (LLM4SZZ with GPT-5-mini),
+AgentSZZimproves F1 by 26.1%, 21.1%, 19.3%, and 13.9%, indicating
+that the gains stem from the agent design and domain knowledge
+rather than the choice of LLM. In contrast, mini-swe-agent [ 47]
+performs poorly across all datasets (F1: 0.123, 0.123, 0.123, 0.011),
+largely due to unfocused exploration. While it retrieves many re-
+lated commits using general-purpose tools (e.g., git show , git
+log, git grep ), it rarely forms a stable tracing process toward
+the true BIC. Successful cases involve short tool chains and early
+convergence, whereas failures exhibit long exploratory sequences
+with repeated inspection but limited progress. Occasional command
+construction errors further degrade performance.
+We compare our results with both LLM4SZZ through static anal-
+ysis, as all run three times and the results show thatAgentSZZ
+consistently outperforms both LLM4SZZ with significant and effec-
+tive size.p < 0.001
+AgentSZZalso substantially improves recall. Compared to B-
+SZZ, recall increases by 23.0%, 22.0%, 5.9%, and 3.9% on Linux,
+GitHub-C, GitHub-J, and Apache, respectively, while maintaining
+high precision. The smaller gain on Apache is due to its higher
+average number of bug-inducing commits per fix (1.46 vs. 1.04 for
+Linux), whereAgentSZZtends to identify a single bug-inducing
+commit, limiting recall in multi-bug-inducing commits cases.
+AgentSZZfurther demonstrates strong consistency and gen-
+eralizability. Despite being designed based on Linux, it achieves
+substantial improvements on GitHub and Apache, and generalizes
+across both C and Java without dataset-specific tuning.
+Answers to RQ1:AgentSZZoutperforms state-of-the-art meth-
+ods in precision, recall, and F1-score across all datasets, achiev-
+ing F1 improvements of 14.5%-27.2%. It consistently outperforms
+LLM4SZZ under the same backbone, while mini-swe-agent per-
+forms poorly due to unfocused exploration.AgentSZZalso
+generalizes well across datasets and programming languages.
+5.2 RQ2. Efficiency ofAgentSZZ
+Table 3 compares the efficiency of four LLM-based approaches
+in terms of runtime, token consumption, interaction turns, and
+monetary cost. All API calls are made via OpenRouter to ensure a
+fair comparison, and all values are averaged over three datasets.
+AgentSZZachieves a strong balance between efficiency and
+effectiveness. Compared to LLM4SZZ, it incurs a modest increase
+in runtime (39.1s vs. 26.2s) and token usage (34,657 vs. 17,690),
+but requires substantially fewer interaction turns (5.7 vs. 11.2), re-
+sulting in a much higher per-turn information density (6,080 vs.

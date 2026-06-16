@@ -1,0 +1,46 @@
+Paper ID: p11_vccfinder_finding_potential_vulnerabilities_in_open_source_projects_to_assist_code_audits_2015
+Title: VCCFinder: Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder：Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+Paper Claims:
+- VCCFinder builds a CVE-to-VCC database and uses code metrics plus repository metadata to train an SVM classifier.
+- Paper says the database/tool/service will be shared.
+
+Implemented Components:
+- 1_vccfinder.py defines VCCFinder and patchCommit classes and statically imports GitPython/unidiff/config/abstract_szz.
+- abstract_szz.py defines AbstractSZZ and BlameData with blame/diff parsing surfaces.
+- comment_parser.py parses comments across language types and invokes srcml for some source types.
+- 2_gen_vuln_version.py maps selected VCCs/fix commits to vulnerable tags using GitLog utilities.
+- log_generation.py defines GitLog methods for git log/diff/tag operations.
+
+Unimplemented or Stubbed Components: full model-training pipeline, feature extraction table generation, SVM model artifacts, database dump, and web service are not present in the observed local source root. [NEEDS ARTIFACT]
+Dataset Availability: not present locally except small txt files with unclear semantics. [NEEDS ARTIFACT]
+Benchmark / Evaluation Scripts Visible by Static Inspection: not enough to reproduce paper-level evaluation; only adapted scripts are visible. [NEEDS ARTIFACT]
+Static Reproduction Instructions or Missing Instructions: README/dependency instructions are absent. [NEEDS ARTIFACT]
+Config Files: config.py exists but contains empty directory variables.
+Environment Constraints: imports imply GitPython, unidiff, tqdm, srcml, and git usage, but dependencies were not installed or executed. [EXECUTION NOT REQUESTED]
+Paper-Code Mismatches:
+- Paper's core ML/SVM/database artifact is not visible in the local source root.
+- Local package includes vulnerable-version generation script, which is not a central VCCFinder paper contribution but may be an adaptation for affected-version baselines.
+- README is absent, preventing artifact provenance verification. [NEEDS ARTIFACT]
+Engineering Lessons for Our Paper: keep baseline artifact roles separated: original paper method vs locally adapted affected-version scripts.
+
+Consistency Check:
+Claim: VCCFinder maps fix commits to VCCs using blame-like heuristics.
+Paper Location: methodology section.
+Artifact Evidence: 1_vccfinder.py, abstract_szz.py, comment_parser.py, source_static_symbols.json.
+Source Evidence: raw_extraction/source_static_inventory.txt.
+Consistency: partially supported by static inspection.
+Analysis Mode: static-only.
+Use in Our Paper: yes, with caution.
+
+Claim: VCCFinder trains/evaluates SVM classifier and reduces false positives.
+Paper Location: learning/evaluation sections.
+Artifact Evidence: no visible training/model/evaluation artifact in local root. [NEEDS ARTIFACT]
+Source Evidence: local scripts do not demonstrate paper-level ML pipeline by static inventory.
+Consistency: unsupported locally; paper-only.
+Analysis Mode: static-only.
+Use in Our Paper: paper-level related work only, not artifact-backed.

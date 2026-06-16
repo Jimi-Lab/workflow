@@ -1,0 +1,259 @@
+{
+  "cwe_id": "CWE-1285",
+  "name": "Improper Validation of Specified Index, Position, or Offset in Input",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product receives input that is expected to specify an index, position, or offset into an indexable resource such as a buffer or file, but it does not validate or incorrectly validates that the specified index/position/offset has the required properties.",
+  "extended_description": "Often, indexable resources such as memory buffers or files can be accessed using a specific position, index, or offset, such as an index for an array or a position for a file. When untrusted input is not properly validated before it is used as an index, attackers could access (or attempt to access) unauthorized portions of these resources. This could be used to cause buffer overflows, excessive resource allocation, or trigger unexpected failures.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-20",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Input Validation"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product receives input that is expected to specify an index, position, or offset into an indexable resource such as a buffer or file, but it does not validate or incorrectly validates that the specified...",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "position",
+      "offset",
+      "indexable",
+      "specified"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "position",
+      "offset",
+      "indexable",
+      "specified",
+      "could",
+      "file",
+      "unauthorized",
+      "incorrectly"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following example retrieves the sizes of messages for a pop3 mail server. The message sizes are retrieved from a socket that returns in a buffer the...",
+        "snippet": "/* capture the sizes of all messages */ int getsizes(int sock, int count, int *sizes) { ... char buf[BUFFER_SIZE]; int ok; int num, size; // read values from socket and added to sizes array while ((ok = gen_recv(sock,..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following example the method displayProductSummary is called from a Web service servlet to retrieve product summary information for display to the user....",
+        "snippet": "// Method called from servlet to obtain product information public String displayProductSummary(int index) { String productSummary = new String(\"\"); try { String productSummary = getProductSummary(index); } catch..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following example asks a user for an offset into an array to select an item.",
+        "snippet": "int main (int argc, char **argv) { char *items[] = {\"boat\", \"car\", \"truck\", \"train\"}; int index = GetUntrustedOffset(); printf(\"User selected %s\\n\", items[index-1]); }"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following example retrieves the sizes of messages for a pop3 mail server. The message sizes are retrieved from a socket that returns in a buffer the...",
+        "snippet": "/* capture the sizes of all messages */ int getsizes(int sock, int count, int *sizes) { ... char buf[BUFFER_SIZE]; int ok; int num, size; // read values from socket and added to sizes array while ((ok = gen_recv(sock,..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following example the method displayProductSummary is called from a Web service servlet to retrieve product summary information for display to the user....",
+        "snippet": "// Method called from servlet to obtain product information public String displayProductSummary(int index) { String productSummary = new String(\"\"); try { String productSummary = getProductSummary(index); } catch..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following example the method displayProductSummary is called from a Web service servlet to retrieve product summary information for display to the user....",
+        "snippet": "ArrayList productArray = new ArrayList(MAX_PRODUCTS); ... try { productSummary = (String) productArray.get(index); } catch (IndexOutOfBoundsException ex) {...}"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2005-0369",
+        "description": "large ID in packet used as array index",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-0369"
+      },
+      {
+        "reference": "CVE-2001-1009",
+        "description": "negative array index as argument to POP LIST command",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1009"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

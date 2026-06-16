@@ -1,0 +1,51 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 389
+Fig. 6. Temporal distribution of CVEs with knowledge cutoff boundary.
+Fig. 7. Impact of statement weight ratios on F1-Score.
+Fig. 8. Threshold sensitivity of V ERCATION.
+we normalize these statements to be identical. Table VIII sum-
+marizes the accuracy of different code clone detection methods.
+Edit distance [64] calculates the minimum number of edit
+operations required to transform one code statement into an-
+other. A smaller edit distance indicates a higher similarity. Hash
+values comparison [65] generates hash for each code statement
+through MD5 algorithm and then compares the hash similarity.
+CodeBERT embedding comparison [66] uses CodeBERT to
+generate embedding representations for each code statement,
+then computes the cosine similarity between these embeddings.
+FCDetection [18] generates AST and CFG representations as
+TABLE VIII
+ACCURACY OF CODE CLONE
+DETECTION METHODS
+Methods Level Precision Recall
+Edit distance s tatement 0.85 0.84
+Hash values statem ent 0.82 0.82
+CodeBERT statement 0.84 0.88
+FCDetector function 0.89 0.93
+VERCATION statement 0.90 0.95
+features. Word2vec and Graph2vec are used to embed these
+features. Then the fused feature vectors are input into a deep
+neural network model for classiﬁcation of code clones.
+For Edit distance, Hash values, and CodeBERT embedding
+comparisons, we conducted independent threshold optimiza-
+tion. Similar to our threshold sensitivity analysis for Vercation,
+we evaluated each method across different threshold values
+from 0.1 to 1.0 with a step of 0.1, and selected the threshold that
+achieved the best F1 for that speciﬁc method. As FCDetector
+is a specialized code clone detection tool, we used its original
+pre-trained model and thresholds as speciﬁed in their work. The
+results presented in TableVIII represent each method’s optimal
+performance with their respective optimized thresholds. The
+results show that the AST-based code clone detection achieves
+the best performance. Because the edit distance and hash value
+methods terminate the backtrack in cases of low textual simi-
+larity without considering code behavior, thus leads to a large
+number of false negatives. The results show that our method is
+robust against low syntactic similarity. CodeBERT embedding
+comparison, while effective for semantic similarity, cannot cap-
+ture ﬁne-grained structural information. AST representations
+preserve the exact syntactic structure of code, allowing for more
+precise comparisons of code organization and logic ﬂow. This
+structural analysis can identify clones that CodeBERT might
+miss, especially in cases where s imilar functionality is imple-
+mented with different coding patterns or variable names, which
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

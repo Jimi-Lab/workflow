@@ -1,0 +1,38 @@
+f discovering vulnerabilities from modified components.
+5.4 Speed and scalability of M OVERY
+In this section, we evaluate the speed and scalability of
+MOVERY in VCC discovery. We classify the total time tak-
+ing to discover VCCs into signature generation (i.e., the
+elapsed time for generating signatures), target preprocessing
+(i.e., the elapsed time for analyzing the target software), and
+matching times (i.e., the elapsed time required to discover the
+VCCs). We measured all the times for MOVERY , ReDeBug,
+and VUDDY , and then compared the results.
+Signature generation time. The signature generation time
+using the collected 4,219 security patches (see Table 2) was
+2 h in VUDDY and 32 h in MOVERY ; because ReDeBug
+USENIX Association 31st USENIX Security Symposium    3047
+
+===== PAGE 013 =====
+(a) Target preprocessing times.
+ (b) Matching times.
+ (c) Total times (preprocessing + matching).
+Figure 4: Target preprocessing and matching time spent on target software with various sizes.
+utilized the security patches as they were, there was no need
+for signature generation time. Unlike VUDDY , which simply
+extracts vulnerable functions, MOVERY required more time
+as it needed to reconstruct the oldest vulnerable functions and
+analyze the code line dependencies of functions; note that the
+signature generation is a one-time task.
+Target preprocessing and matching times.Figure 4 shows
+the target preprocessing and matching times for the three tools.
+The results present the following three main observations.
+(1) VUDDY requires the longest target preprocessing time.
+(2) MOVERY requires the longest matching time.
+(3) In total elapsed time,MOVERY requires the least amount
+of time and VUDDY requires the longest time (owing to
+its long preprocessing time).
+To precisely discover VCCs,MOVERY used the finer granular-
+ity (i.e., a set of code lines) that is slower than function units
+in VCC discovery [17], and further considered dependencies
+of code lines in matching, resulting in a longer matching time

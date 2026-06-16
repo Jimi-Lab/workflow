@@ -1,0 +1,280 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1500" viewBox="0 0 1900 1500">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+    </marker>
+    <marker id="dashArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8a6f00"/>
+    </marker>
+    <style>
+      .title { font: 700 34px Arial, "Microsoft YaHei", sans-serif; fill: #111; }
+      .subtitle { font: 18px Arial, "Microsoft YaHei", sans-serif; fill: #444; }
+      .laneTitle { font: 700 20px Arial, "Microsoft YaHei", sans-serif; fill: #111; }
+      .boxTitle { font: 700 17px Arial, "Microsoft YaHei", sans-serif; fill: #111; }
+      .boxText { font: 14px Arial, "Microsoft YaHei", sans-serif; fill: #222; }
+      .small { font: 12px Arial, "Microsoft YaHei", sans-serif; fill: #333; }
+      .solid { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #8a6f00; stroke-width: 2; fill: none; stroke-dasharray: 8 6; marker-end: url(#dashArrow); }
+      .groupInput { fill: #fafaf6; stroke: #777; stroke-width: 1.2; }
+      .groupCore { fill: #eef6ff; stroke: #2f5f93; stroke-width: 1.4; }
+      .groupDet { fill: #eefaf2; stroke: #277146; stroke-width: 1.4; }
+      .groupAgent { fill: #fff4e8; stroke: #9a5b14; stroke-width: 1.4; }
+      .groupArtifact { fill: #f4f1ff; stroke: #6250a5; stroke-width: 1.4; }
+      .groupEval { fill: #fff0f4; stroke: #9c3154; stroke-width: 1.4; }
+      .groupPlan { fill: #fffbe0; stroke: #9b7d00; stroke-width: 1.4; stroke-dasharray: 8 5; }
+      .nodeInput { fill: #f7f7f2; stroke: #6b6b60; stroke-width: 1; }
+      .nodeCore { fill: #e8f2ff; stroke: #2f5f93; stroke-width: 1.2; }
+      .nodeDet { fill: #eaf7ef; stroke: #277146; stroke-width: 1.2; }
+      .nodeAgent { fill: #fff0e1; stroke: #9a5b14; stroke-width: 1.2; }
+      .nodeArtifact { fill: #f0edff; stroke: #6250a5; stroke-width: 1.2; }
+      .nodeEval { fill: #ffe8ef; stroke: #9c3154; stroke-width: 1.2; }
+      .nodePlan { fill: #fff8cc; stroke: #9b7d00; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1900" height="1500" fill="#ffffff"/>
+  <text x="60" y="55" class="title">VulnVersion Overall Architecture</text>
+  <text x="60" y="86" class="subtitle">Current source pipeline + planned Step3 optimization + planned VulnMem-Agent self-evolution layer</text>
+
+  <rect x="60" y="115" width="330" height="330" rx="10" class="groupInput"/>
+  <text x="80" y="145" class="laneTitle">Inputs</text>
+  <rect x="85" y="170" width="280" height="58" rx="8" class="nodeInput"/>
+  <text x="105" y="194" class="boxTitle">Dataset record</text>
+  <text x="105" y="214" class="boxText">CVE, CWE, affected versions,</text>
+  <text x="105" y="232" class="boxText">fixing_commits, vuln_commit</text>
+  <rect x="85" y="248" width="280" height="58" rx="8" class="nodeInput"/>
+  <text x="105" y="272" class="boxTitle">Target repository</text>
+  <text x="105" y="292" class="boxText">Git history, release tags,</text>
+  <text x="105" y="310" class="boxText">branches, source files</text>
+  <rect x="85" y="326" width="280" height="45" rx="8" class="nodeInput"/>
+  <text x="105" y="352" class="boxTitle">CVE description</text>
+  <text x="105" y="371" class="boxText">NVD cache / crawler / user text</text>
+  <rect x="85" y="390" width="280" height="35" rx="8" class="nodeInput"/>
+  <text x="105" y="414" class="boxTitle">Config and model profile</text>
+
+  <rect x="445" y="115" width="360" height="330" rx="10" class="groupCore"/>
+  <text x="465" y="145" class="laneTitle">CLI and Current Orchestration</text>
+  <rect x="475" y="170" width="300" height="65" rx="8" class="nodeCore"/>
+  <text x="495" y="195" class="boxTitle">debug_cli.py</text>
+  <text x="495" y="215" class="boxText">semantic-aggregate</text>
+  <text x="495" y="233" class="boxText">rci-extract | verify-tags</text>
+  <rect x="475" y="260" width="300" height="65" rx="8" class="nodeCore"/>
+  <text x="495" y="285" class="boxTitle">Input guards</text>
+  <text x="495" y="305" class="boxText">repo path, artifact root,</text>
+  <text x="495" y="323" class="boxText">run_inputs.json</text>
+  <rect x="475" y="350" width="300" height="65" rx="8" class="nodeAgent"/>
+  <text x="495" y="375" class="boxTitle">OpenCodeAgent today</text>
+  <text x="495" y="395" class="boxText">readonly session, JSON output,</text>
+  <text x="495" y="413" class="boxText">current backend coupling</text>
+
+  <line x1="390" y1="280" x2="445" y2="280" class="solid"/>
+
+  <rect x="60" y="500" width="535" height="185" rx="10" class="groupDet"/>
+  <text x="80" y="530" class="laneTitle">Step 1: Semantic Patch / Vulnerable Chunk Recognition</text>
+  <rect x="85" y="555" width="150" height="85" rx="8" class="nodeDet"/>
+  <text x="102" y="580" class="boxTitle">Git diff</text>
+  <text x="102" y="602" class="boxText">extract chunks</text>
+  <text x="102" y="620" class="boxText">dedupe fixes</text>
+  <rect x="260" y="555" width="150" height="85" rx="8" class="nodeAgent"/>
+  <text x="277" y="580" class="boxTitle">Chunk agent</text>
+  <text x="277" y="602" class="boxText">PRIMARY_FIX</text>
+  <text x="277" y="620" class="boxText">SUPPORTING_FIX</text>
+  <rect x="435" y="555" width="135" height="85" rx="8" class="nodeArtifact"/>
+  <text x="450" y="580" class="boxTitle">Output</text>
+  <text x="450" y="602" class="boxText">patch_semantics</text>
+  <text x="450" y="620" class="boxText">.json</text>
+  <line x1="235" y1="598" x2="260" y2="598" class="solid"/>
+  <line x1="410" y1="598" x2="435" y2="598" class="solid"/>
+
+  <rect x="650" y="500" width="610" height="185" rx="10" class="groupDet"/>
+  <text x="670" y="530" class="laneTitle">Step 2: Root Cause and RCI Extraction</text>
+  <rect x="675" y="555" width="130" height="85" rx="8" class="nodeDet"/>
+  <text x="690" y="580" class="boxTitle">Navigation</text>
+  <text x="690" y="602" class="boxText">RepoMaster</text>
+  <text x="690" y="620" class="boxText">hints</text>
+  <rect x="825" y="555" width="150" height="85" rx="8" class="nodeAgent"/>
+  <text x="842" y="580" class="boxTitle">RCI agent</text>
+  <text x="842" y="602" class="boxText">root cause,</text>
+  <text x="842" y="620" class="boxText">predicates, guards</text>
+  <rect x="995" y="555" width="110" height="85" rx="8" class="nodeDet"/>
+  <text x="1010" y="580" class="boxTitle">Schema</text>
+  <text x="1010" y="602" class="boxText">normalize</text>
+  <text x="1010" y="620" class="boxText">strict retry</text>
+  <rect x="1125" y="555" width="110" height="85" rx="8" class="nodeDet"/>
+  <text x="1140" y="580" class="boxTitle">Self-check</text>
+  <text x="1140" y="602" class="boxText">anchor +</text>
+  <text x="1140" y="620" class="boxText">tokens</text>
+  <line x1="805" y1="598" x2="825" y2="598" class="solid"/>
+  <line x1="975" y1="598" x2="995" y2="598" class="solid"/>
+  <line x1="1105" y1="598" x2="1125" y2="598" class="solid"/>
+  <text x="1015" y="665" class="boxText">Artifacts: rci.json, rci_self_check.json, repomaster_index.json</text>
+
+  <line x1="595" y1="598" x2="650" y2="598" class="solid"/>
+
+  <rect x="60" y="735" width="805" height="270" rx="10" class="groupDet"/>
+  <text x="80" y="765" class="laneTitle">Step 3 Planning: Deterministic VulnTree</text>
+  <rect x="85" y="795" width="155" height="85" rx="8" class="nodeDet"/>
+  <text x="102" y="820" class="boxTitle">build_tag_plan</text>
+  <text x="102" y="842" class="boxText">VulnTree-only</text>
+  <text x="102" y="860" class="boxText">main path</text>
+  <rect x="270" y="795" width="155" height="85" rx="8" class="nodeDet"/>
+  <text x="287" y="820" class="boxTitle">Release lines</text>
+  <text x="287" y="842" class="boxText">line_key, family,</text>
+  <text x="287" y="860" class="boxText">partition</text>
+  <rect x="455" y="795" width="165" height="85" rx="8" class="nodeDet"/>
+  <text x="472" y="820" class="boxTitle">Commit clusters</text>
+  <text x="472" y="842" class="boxText">FIC / VIC, OR/AND,</text>
+  <text x="472" y="860" class="boxText">equivalence baseline</text>
+  <rect x="650" y="795" width="175" height="85" rx="8" class="nodeDet"/>
+  <text x="667" y="820" class="boxTitle">Graph state</text>
+  <text x="667" y="842" class="boxText">TagNode, LineNode,</text>
+  <text x="667" y="860" class="boxText">LineBoundary runtime</text>
+  <rect x="150" y="905" width="180" height="65" rx="8" class="nodeDet"/>
+  <text x="167" y="930" class="boxTitle">Family-local ordering</text>
+  <text x="167" y="952" class="boxText">OpenSSL streams split</text>
+  <rect x="365" y="905" width="200" height="65" rx="8" class="nodeDet"/>
+  <text x="382" y="930" class="boxTitle">no-FIC subtype</text>
+  <text x="382" y="952" class="boxText">dup_missed / never_fixed</text>
+  <rect x="600" y="905" width="220" height="65" rx="8" class="nodeArtifact"/>
+  <text x="617" y="930" class="boxTitle">Planner artifacts</text>
+  <text x="617" y="952" class="boxText">tag_plan, tree, boundaries, families</text>
+  <line x1="240" y1="838" x2="270" y2="838" class="solid"/>
+  <line x1="425" y1="838" x2="455" y2="838" class="solid"/>
+  <line x1="620" y1="838" x2="650" y2="838" class="solid"/>
+  <line x1="738" y1="880" x2="738" y2="905" class="solid"/>
+  <line x1="330" y1="938" x2="365" y2="938" class="solid"/>
+  <line x1="565" y1="938" x2="600" y2="938" class="solid"/>
+
+  <rect x="930" y="735" width="880" height="270" rx="10" class="groupAgent"/>
+  <text x="950" y="765" class="laneTitle">Step 3 Verification: Version Impact Confirmation</text>
+  <rect x="955" y="795" width="150" height="85" rx="8" class="nodeDet"/>
+  <text x="972" y="820" class="boxTitle">ASBS</text>
+  <text x="972" y="842" class="boxText">line-local boundary</text>
+  <text x="972" y="860" class="boxText">O(log n) probes</text>
+  <rect x="1130" y="795" width="155" height="85" rx="8" class="nodeDet"/>
+  <text x="1147" y="820" class="boxTitle">Prefetch</text>
+  <text x="1147" y="842" class="boxText">native git evidence,</text>
+  <text x="1147" y="860" class="boxText">anchor code</text>
+  <rect x="1310" y="795" width="150" height="85" rx="8" class="nodeDet"/>
+  <text x="1327" y="820" class="boxTitle">Prefilter</text>
+  <text x="1327" y="842" class="boxText">safe static</text>
+  <text x="1327" y="860" class="boxText">NOT_AFFECTED</text>
+  <rect x="1485" y="795" width="150" height="85" rx="8" class="nodeAgent"/>
+  <text x="1502" y="820" class="boxTitle">Tag agent</text>
+  <text x="1502" y="842" class="boxText">AFFECTED or</text>
+  <text x="1502" y="860" class="boxText">NOT_AFFECTED</text>
+  <rect x="1655" y="795" width="130" height="85" rx="8" class="nodeDet"/>
+  <text x="1672" y="820" class="boxTitle">Line state</text>
+  <text x="1672" y="842" class="boxText">discoveries +</text>
+  <text x="1672" y="860" class="boxText">relocation</text>
+  <rect x="1150" y="915" width="190" height="65" rx="8" class="nodeDet"/>
+  <text x="1167" y="940" class="boxTitle">Interval inference</text>
+  <text x="1167" y="962" class="boxText">certificate_id, inferred_from</text>
+  <rect x="1390" y="915" width="240" height="65" rx="8" class="nodeDet"/>
+  <text x="1407" y="940" class="boxTitle">Runtime graph closure</text>
+  <text x="1407" y="962" class="boxText">sync tag / line / boundary runtime</text>
+  <line x1="1105" y1="838" x2="1130" y2="838" class="solid"/>
+  <line x1="1285" y1="838" x2="1310" y2="838" class="solid"/>
+  <line x1="1460" y1="838" x2="1485" y2="838" class="solid"/>
+  <line x1="1635" y1="838" x2="1655" y2="838" class="solid"/>
+  <path d="M1720 880 C1720 1010 955 1010 955 880" class="solid"/>
+  <line x1="1030" y1="880" x2="1200" y2="915" class="solid"/>
+  <line x1="1340" y1="948" x2="1390" y2="948" class="solid"/>
+
+  <line x1="865" y1="870" x2="930" y2="870" class="solid"/>
+
+  <rect x="60" y="1060" width="805" height="190" rx="10" class="groupArtifact"/>
+  <text x="80" y="1090" class="laneTitle">Current Artifacts and Evaluation</text>
+  <rect x="85" y="1120" width="180" height="80" rx="8" class="nodeArtifact"/>
+  <text x="102" y="1145" class="boxTitle">per_tag_verdict</text>
+  <text x="102" y="1167" class="boxText">verdict, source, evidence,</text>
+  <text x="102" y="1185" class="boxText">inferred_from</text>
+  <rect x="295" y="1120" width="170" height="80" rx="8" class="nodeArtifact"/>
+  <text x="312" y="1145" class="boxTitle">Four buckets</text>
+  <text x="312" y="1167" class="boxText">agent, prefilter, inferred,</text>
+  <text x="312" y="1185" class="boxText">agent_error</text>
+  <rect x="495" y="1120" width="160" height="80" rx="8" class="nodeArtifact"/>
+  <text x="512" y="1145" class="boxTitle">Runtime snapshot</text>
+  <text x="512" y="1167" class="boxText">vuln_tree_runtime</text>
+  <text x="512" y="1185" class="boxText">final graph state</text>
+  <rect x="685" y="1120" width="150" height="80" rx="8" class="nodeEval"/>
+  <text x="702" y="1145" class="boxTitle">eval.json</text>
+  <text x="702" y="1167" class="boxText">metrics, confusion,</text>
+  <text x="702" y="1185" class="boxText">failure surfaces</text>
+  <line x1="265" y1="1160" x2="295" y2="1160" class="solid"/>
+  <line x1="465" y1="1160" x2="495" y2="1160" class="solid"/>
+  <line x1="655" y1="1160" x2="685" y2="1160" class="solid"/>
+  <line x1="1510" y1="1005" x2="655" y2="1120" class="solid"/>
+
+  <rect x="930" y="1060" width="880" height="190" rx="10" class="groupPlan"/>
+  <text x="950" y="1090" class="laneTitle">Planned Step3 Optimization Layer</text>
+  <rect x="955" y="1120" width="150" height="80" rx="8" class="nodePlan"/>
+  <text x="972" y="1145" class="boxTitle">BAPEE</text>
+  <text x="972" y="1167" class="boxText">branch-aware patch</text>
+  <text x="972" y="1185" class="boxText">equivalence expansion</text>
+  <rect x="1130" y="1120" width="170" height="80" rx="8" class="nodePlan"/>
+  <text x="1147" y="1145" class="boxTitle">Acceptance gate</text>
+  <text x="1147" y="1167" class="boxText">candidate generation,</text>
+  <text x="1147" y="1185" class="boxText">precision calibration</text>
+  <rect x="1325" y="1120" width="170" height="80" rx="8" class="nodePlan"/>
+  <text x="1342" y="1145" class="boxTitle">GT vs FIC split</text>
+  <text x="1342" y="1167" class="boxText">avoid optimizing</text>
+  <text x="1342" y="1185" class="boxText">dataset boundary gaps</text>
+  <rect x="1520" y="1120" width="170" height="80" rx="8" class="nodePlan"/>
+  <text x="1537" y="1145" class="boxTitle">ASBS guard</text>
+  <text x="1537" y="1167" class="boxText">confirmation probes,</text>
+  <text x="1537" y="1185" class="boxText">segmented recovery</text>
+  <line x1="1105" y1="1160" x2="1130" y2="1160" class="dash"/>
+  <line x1="1300" y1="1160" x2="1325" y2="1160" class="dash"/>
+  <line x1="1495" y1="1160" x2="1520" y2="1160" class="dash"/>
+  <path d="M1605 1120 C1650 1040 1040 1040 1030 880" class="dash"/>
+
+  <rect x="60" y="1300" width="805" height="150" rx="10" class="groupPlan"/>
+  <text x="80" y="1330" class="laneTitle">Planned Backend-Agnostic Runtime</text>
+  <rect x="85" y="1360" width="165" height="55" rx="8" class="nodePlan"/>
+  <text x="102" y="1384" class="boxTitle">AgentRuntime</text>
+  <text x="102" y="1404" class="boxText">run_json + capabilities</text>
+  <rect x="280" y="1360" width="150" height="55" rx="8" class="nodePlan"/>
+  <text x="297" y="1384" class="boxTitle">OpenCodeRuntime</text>
+  <text x="297" y="1404" class="boxText">current compatibility</text>
+  <rect x="460" y="1360" width="150" height="55" rx="8" class="nodePlan"/>
+  <text x="477" y="1384" class="boxTitle">Claude / Codex</text>
+  <text x="477" y="1404" class="boxText">backend comparison</text>
+  <rect x="640" y="1360" width="180" height="55" rx="8" class="nodePlan"/>
+  <text x="657" y="1384" class="boxTitle">ReplayRuntime + trace</text>
+  <text x="657" y="1404" class="boxText">no-API regression mode</text>
+  <line x1="250" y1="1388" x2="280" y2="1388" class="dash"/>
+  <line x1="430" y1="1388" x2="460" y2="1388" class="dash"/>
+  <line x1="610" y1="1388" x2="640" y2="1388" class="dash"/>
+  <path d="M625 415 C720 470 700 500 900 555" class="dash"/>
+
+  <rect x="930" y="1300" width="880" height="150" rx="10" class="groupPlan"/>
+  <text x="950" y="1330" class="laneTitle">Planned VulnMem-Agent Layer and Self-Evolution</text>
+  <rect x="955" y="1360" width="155" height="55" rx="8" class="nodePlan"/>
+  <text x="972" y="1384" class="boxTitle">Typed Memory</text>
+  <text x="972" y="1404" class="boxText">Evidence / Repo / RCI / Line</text>
+  <rect x="1135" y="1360" width="170" height="55" rx="8" class="nodePlan"/>
+  <text x="1152" y="1384" class="boxTitle">Failure + Procedure</text>
+  <text x="1152" y="1404" class="boxText">FP/FN/UNK attribution</text>
+  <rect x="1330" y="1360" width="170" height="55" rx="8" class="nodePlan"/>
+  <text x="1347" y="1384" class="boxTitle">SkillMemory</text>
+  <text x="1347" y="1404" class="boxText">verified prompt rules</text>
+  <rect x="1525" y="1360" width="170" height="55" rx="8" class="nodePlan"/>
+  <text x="1542" y="1384" class="boxTitle">ArtifactMemory</text>
+  <text x="1542" y="1404" class="boxText">repo adapters + repair rules</text>
+  <line x1="1110" y1="1388" x2="1135" y2="1388" class="dash"/>
+  <line x1="1305" y1="1388" x2="1330" y2="1388" class="dash"/>
+  <line x1="1500" y1="1388" x2="1525" y2="1388" class="dash"/>
+  <path d="M760 1200 C850 1300 950 1335 1030 1360" class="dash"/>
+  <path d="M1610 1360 C1720 1260 1755 985 1560 880" class="dash"/>
+  <path d="M1610 1360 C1410 1280 1040 1230 1035 1200" class="dash"/>
+
+  <rect x="60" y="1465" width="22" height="10" class="nodeDet"/>
+  <text x="90" y="1475" class="small">Implemented/current deterministic path</text>
+  <rect x="320" y="1465" width="22" height="10" class="nodeAgent"/>
+  <text x="350" y="1475" class="small">Current agent call sites</text>
+  <rect x="535" y="1465" width="22" height="10" class="nodeArtifact"/>
+  <text x="565" y="1475" class="small">Artifacts/evaluation</text>
+  <rect x="735" y="1465" width="22" height="10" class="nodePlan"/>
+  <text x="765" y="1475" class="small">Planned optimization or enhancement</text>
+</svg>

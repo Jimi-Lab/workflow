@@ -1,0 +1,120 @@
+execute the analysis software on the entire project and then
+check if any of the warnings relate to the commit. This can
+be a considerable amount of work, especially since many
+tools require source code to be annotated and dynamic tests
+would have to be constructed in a way that triggers the
+commit.
+Static and dynamic code analysis tools focus exclusively
+on the code without the context of who wrote the code and
+how it was committed. However, code repositories contain
+a wealth of metadata which can be highly relevant to the
+code quality. For instance, it can be seen whether a com-
+mitter is new to the project or if they are one of the core
+contributors. It is possible to see the time of day or night
+at which code was submitted and to monitor the activity of
+development in certain regions of code. Moreover, most ex-
+isting code-metric-based tools have very high false-positive
+rates, creating a (sometimes impossibly) high workload and
+undermining trust in the eﬀectiveness of the tools. For in-
+stance, Flawfinder tool created 5,460 false positives warnings
+for only 53 true positives on the dataset used in this paper.
+It is intuitively clear that code reviewers who want to find
+53 vulnerabilities in a set of 5,513 flagged commits have a
+tough time ahead of them.
+In this paper, we present a classifier that can identify po-
+tentially vulnerable commits with a significantly lower false-
+positive rate while retain high recall rates. Therefore, unlike
+most existing tools for vulnerability finding, we don’t focus
+solely on code metrics, but also leverage the rich metadata
+contained in code repositories.
+To evaluate the eﬀectiveness of our approach, we conduct
+a large-scale evaluation of 66 GitHub projects with 170,860
+commits, gathering both metadata about the commits as
+well as mapping CVEs to commits to create a database of
+vulnerability-contributing commits (VCCs) and a benchmark
+for future research.
+We conducted a statistical analysis of these VCCs and
+trained a Support Vector Machine (SVM) to detect them
+based on the combination of code metric analysis and Git-
+Hub metadata. For our evaluation we trained our classifier
+only on data up to December 31, 2010 and ran our tests
+against CVEs discovered in 2011-2014.
+In this dataset, our approach, called VCCFinder, pro-
+duces only 36 false positives compared to Flawfinder’s 5,460
+at the same level of recall. This is a reduction of over 99 %
+and significantly eases the workload of code reviewers.
+1.1 Our Contributions
+In summary, we make the following contributions in this
+paper:
+•We present VCCFinder, a code analysis tool that flags
+suspicious commits by using a SVM-based detection
+model. Our method outperforms Flawfinder by a great
+margin, reducing the false positives by over 99 % at the
+same level of recall. Our methodology is suited to work
+on code snippets, enabling us to analyse code at the
+commit level and making a lightweight analysis of new
+code far easier than requiring a full build environment
+to be set up for each test.
+•We construct the first large-scale database mapping
+CVEs to vulnerability-contributing commits (VCCs).
+The database contains 66 GitHub projects, 170,860
+commits and 640 VCCs. We conduct an extensive eval-
+uation of the methodology used to create this database
+to ascertain its quality as a benchmark for future re-
+search.
+•We present an extensive quantitative and qualitative
+evaluation of VCCFinder and discuss take-aways, in-
+cluding, for instance that, from a security perspective,
+gotos are not generally harmful but in combination
+with error-handling code they are responsible for a sig-
+nificant number of VCCs.
+2. RELATED WORK
+The discovery of vulnerabilities in program code is a fun-
+damental problem of computer security. Consequently, it
+has received much attention in the past. In the following,
+we give a sample of the prior work most closely related to
+our approach.
+Static analysis.
+The set of static analysis tools can be thought of as a spec-
+trum ranging from faster, lightweight approaches to slower
+but more thorough techniques. With VCCFinder being a
+lightweight tool, we compare ourselves to FlawFinder [34],
+a prominent representative of this class of tools. Other
+lightweight approaches include Rats [9], Prefast [8] as well
+as Splint [10], the later requiring manual annotations.
+Regarding more thorough approaches Bandhakavi et al.
+[11] search for vulnerabilities in browser extensions by apply-
+ing static information-flow analysis to the JavaScript code.
+Dahse and Holz [15] introduced a static analyzer for PHP
+that can detect sophisticated attacks against web applica-
+tions. Finally, commercial tools like Coventry [5], Fortify [6],
+CodeSonar [4], and IBM Security AppScan Source (formerly
+Rational) [7] focus on a thorough analysis with configurable
+rulesets and consequently long run times.
+Symbolic execution.
+Cadar et al. [12] present KLEE, a symbolic execution tool,
+which requires manual annotation and modification of the
+source code. Also the runtime grows exponentially with the
+number of paths in the program, which limits the size of
+project which can be tested with KLEE. Thus it is not fea-
+sible to execute KLEE on the same scale as VCCFinder.
+However, it is an interesting area of future work to execute
+KLEE as a second step after VCCFinder. Klee would then
+only be used on the commits flagged by VCCFinder which
+hopefully would significantly reduce the eﬀort needed to run
+KLEE. We see these tools as complementary and separate
+steps in the tool chain.
+Dynamic analysis.
+Cho et al. [14] use a combination of symbolic and con-
+crete execution to build an abstract model of the analyzed
+application and find vulnerabilities in several open-source
+projects. Yamaguchi et al. [37] provide an analysis plat-
+form oﬀering fuzzy parsing of code that generates a graph
+representing code suitable to be mined with graph-database
+queries. This approach allows application-specific vulnera-
+bility patterns to be expressed; however, in contrast to our
+approach, it requires manual specification of these patterns
+by the analyst. Holler et al. [20] used fuzzing on code frag-
+ments to find vulnerabilities in the Mozilla JavaScript inter-
+preter and the PHP interpreter.
+427

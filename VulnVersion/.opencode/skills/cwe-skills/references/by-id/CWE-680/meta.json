@@ -1,0 +1,238 @@
+{
+  "cwe_id": "CWE-680",
+  "name": "Integer Overflow to Buffer Overflow",
+  "abstraction": "Compound",
+  "status": "Draft",
+  "description": "The product performs a calculation to determine how much memory to allocate, but an integer overflow can occur that causes less memory to be allocated than expected, leading to a buffer overflow.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-190",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Integer Overflow or Wraparound"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-190",
+        "nature": "StartsWith",
+        "view_id": "709",
+        "ordinal": null,
+        "name": "Integer Overflow or Wraparound"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "This CWE entry is a named chain, which combines multiple weaknesses."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product performs a calculation to determine how much memory to allocate, but an integer overflow can occur that causes less memory to be allocated than expected, leading to a buffer overflow.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "integer",
+      "calculation",
+      "allocated",
+      "determine"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "integer",
+      "calculation",
+      "allocated",
+      "determine",
+      "allocate",
+      "expected",
+      "leading",
+      "causes"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following image processing code allocates a table for images.",
+        "snippet": "img_t table_ptr; /*struct containing img data, 10kB each*/ int num_imgs; ... num_imgs = get_num_imgs(); table_ptr = (img_t*)malloc(sizeof(img_t)*num_imgs); ..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2021-43537",
+        "description": "Chain: in a web browser, an unsigned 64-bit integer is forcibly cast to a 32-bit integer (CWE-681) and potentially leading to an integer overflow (CWE-190). If an integer overflow occurs, this can cause heap memory...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-43537"
+      },
+      {
+        "reference": "CVE-2017-1000121",
+        "description": "chain: unchecked message size metadata allows integer overflow (CWE-190) leading to buffer overflow (CWE-119).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2017-1000121"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

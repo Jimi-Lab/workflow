@@ -1,0 +1,273 @@
+{
+  "cwe_id": "CWE-1419",
+  "name": "Incorrect Initialization of Resource",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "The product attempts to initialize a resource but does not correctly do so, which might leave the resource in an unexpected, incorrect, or insecure state when it is accessed.",
+  "extended_description": "This can have security implications when the associated resource is expected to have certain properties or values. Examples include a variable that determines whether a user has been authenticated or not, or a register or fuse value that determines the security state of the product. For software, this weakness can frequently occur when implicit initialization is used, meaning the resource is not explicitly set to a specific value. For example, in C, memory is not necessarily cleared when it is allocated on the stack, and many scripting languages use a default empty, null value, or zero value when a variable is not explicitly initialized. For hardware, this weakness frequently appears with reset values and fuses. After a product reset, hardware may initialize registers incorrectly. During different phases of a product lifecycle, fuses may be set to incorrect values. Even if fuses are set to correct values, the lines to the fuse could be broken or there might be hardware on the fuse line that alters the fuse value to be incorrect.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-665",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Initialization"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation",
+    "Manufacturing",
+    "Installation",
+    "System Configuration",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product attempts to initialize a resource but does not correctly do so, which might leave the resource in an unexpected, incorrect, or insecure state when it is accessed.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation",
+      "Manufacturing",
+      "Installation",
+      "System Configuration",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "values",
+      "fuse",
+      "hardware",
+      "fuses"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "values",
+      "fuse",
+      "hardware",
+      "fuses",
+      "set",
+      "initialization",
+      "determines",
+      "explicitly"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "Consider example design module system verilog code shown below. The register_example module is an example parameterized module that defines two parameters,...",
+        "snippet": "// Parameterized Register module example // Secure_mode : REGISTER_DEFAULT[0] : When set to 1 register is read only and not writable// module register_example #( parameter REGISTER_WIDTH = 8, // Parameter defines width..."
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code attempts to login a user using credentials from a POST request:",
+        "snippet": "// $user and $pass automatically set from POST request if (login_user($user,$pass)) { $authorized = true; } ... if ($authorized) { generatePage(); }"
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The following example code is excerpted from the Access Control module, acct_wrapper, in the Hack@DAC'21 buggy OpenPiton System-on-Chip (SoC). Within this...",
+        "snippet": "module acct_wrapper #( ... always @(posedge clk_i) begin if(~(rst_ni && ~rst_6)) begin for (j=0; j < AcCt_MEM_SIZE; j=j+1) begin acct_mem[j] <= 32'hffffffff; end end ..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "Consider example design module system verilog code shown below. The register_example module is an example parameterized module that defines two parameters,...",
+        "snippet": "register_example #( .REGISTER_WIDTH (32), .REGISTER_DEFAULT (1225) // Correct default value set, to enable Secure_mode ) Secure_Device_ID_example ( .Data_in (Data_in), .Data_out (Secure_reg), .Clk (Clk), .resetn..."
+      },
+      {
+        "language": "PHP",
+        "nature": "Good",
+        "summary": "This code attempts to login a user using credentials from a POST request:",
+        "snippet": "$user = $_POST['user']; $pass = $_POST['pass']; $authorized = false; if (login_user($user,$pass)) { $authorized = true; } ..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The following example code is excerpted from the Access Control module, acct_wrapper, in the Hack@DAC'21 buggy OpenPiton System-on-Chip (SoC). Within this...",
+        "snippet": "module acct_wrapper #( ... always @(posedge clk_i) begin if(~(rst_ni && ~rst_6)) begin for (j=0; j < AcCt_MEM_SIZE; j=j+1) begin acct_mem[j] <= 32'h00000000; end end ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2020-27211",
+        "description": "Chain: microcontroller system-on-chip uses a register value stored in flash to set product protection state on the memory bus and does not contain protection against fault injection (CWE-1319) which leads to an...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-27211"
+      },
+      {
+        "reference": "CVE-2023-25815",
+        "description": "chain: a change in an underlying package causes the gettext function to use implicit initialization with a hard-coded path (CWE-1419) under the user-writable C:\\ drive, introducing an untrusted search path element...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2023-25815"
+      },
+      {
+        "reference": "CVE-2022-43468",
+        "description": "WordPress module sets internal variables based on external inputs, allowing false reporting of the number of views",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-43468"
+      },
+      {
+        "reference": "CVE-2022-36349",
+        "description": "insecure default variable initialization in BIOS firmware for a hardware board allows DoS",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-36349"
+      },
+      {
+        "reference": "CVE-2015-7763",
+        "description": "distributed filesystem only initializes part of the variable-length padding for a packet, allowing attackers to read sensitive information from previously-sent packets in the same memory location",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2015-7763"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

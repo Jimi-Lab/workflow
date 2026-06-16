@@ -1,0 +1,294 @@
+{
+  "cwe_id": "CWE-193",
+  "name": "Off-by-one Error",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "A product calculates or uses an incorrect maximum or minimum value that is 1 more, or 1 less, than the correct value.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-617",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Reachable Assertion"
+      },
+      {
+        "cwe_id": "CWE-170",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Null Termination"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "A product calculates or uses an incorrect maximum or minimum value that is 1 more, or 1 less, than the correct value.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "calculates",
+      "off-by-one",
+      "correct",
+      "maximum"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "calculates",
+      "off-by-one",
+      "correct",
+      "maximum",
+      "minimum",
+      "error"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code allocates memory for a maximum number of widgets. It then gets a user-specified number of widgets, making sure that the user does not...",
+        "snippet": "int i; unsigned int numWidgets; Widget **WidgetList; numWidgets = GetUntrustedSizeValue(); if ((numWidgets == 0) || (numWidgets > MAX_NUM_WIDGETS)) { ExitError(\"Incorrect number of widgets requested!\"); } WidgetList =..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In this example, the code does not account for the terminating null character, and it writes one byte beyond the end of the buffer.",
+        "snippet": "char firstname[20]; char lastname[20]; char fullname[40]; fullname[0] = '\\0'; strncat(fullname, firstname, 20); strncat(fullname, lastname, 20);"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The Off-by-one error can also be manifested when reading characters from a character array within a for loop that has an incorrect continuation condition.",
+        "snippet": "#define PATH_SIZE 60 char filename[PATH_SIZE]; for(i=0; i<=PATH_SIZE; i++) { char c = fgetc(stdin); if (c == EOF) { filename[i] = '\\0'; } else { filename[i] = c; } }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "As another example the Off-by-one error can occur when using the sprintf library function to copy a string variable to a formatted string variable and the...",
+        "snippet": "int setFilename(char *filename) { char name[20]; sprintf(name, \"%16s.dat\", filename); int success = saveFormattedFilenameToDB(name); return success; }"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In this example, the code does not account for the terminating null character, and it writes one byte beyond the end of the buffer.",
+        "snippet": "char firstname[20]; char lastname[20]; char fullname[40]; fullname[0] = '\\0'; strncat(fullname, firstname, sizeof(fullname)-strlen(fullname)-1); strncat(fullname, lastname, sizeof(fullname)-strlen(fullname)-1);"
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The Off-by-one error can also be manifested when reading characters from a character array within a for loop that has an incorrect continuation condition.",
+        "snippet": "for(i=0; i<PATH_SIZE; i++) { ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2003-0252",
+        "description": "Off-by-one error allows remote attackers to cause a denial of service and possibly execute arbitrary code via requests that do not contain newlines.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0252"
+      },
+      {
+        "reference": "CVE-2001-1391",
+        "description": "Off-by-one vulnerability in driver allows users to modify kernel memory.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1391"
+      },
+      {
+        "reference": "CVE-2002-0083",
+        "description": "Off-by-one error allows local users or remote malicious servers to gain privileges.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0083"
+      },
+      {
+        "reference": "CVE-2002-0653",
+        "description": "Off-by-one buffer overflow in function usd by server allows local users to execute arbitrary code as the server user via .htaccess files with long entries.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0653"
+      },
+      {
+        "reference": "CVE-2002-0844",
+        "description": "Off-by-one buffer overflow in version control system allows local users to execute arbitrary code.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0844"
+      },
+      {
+        "reference": "CVE-1999-1568",
+        "description": "Off-by-one error in FTP server allows a remote attacker to cause a denial of service (crash) via a long PORT command.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-1568"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

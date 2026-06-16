@@ -1,0 +1,192 @@
+5 Experiment Results
+In this section, we first demonstrate the effectiveness of LLM4SZZ (RQ1). Next, we evaluate the
+impact of its key components (RQ2). Finally, we show that LLM4SZZ can be applied to other large
+language models (RQ3).
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 013 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:13
+Table 2. The performance comparisions between all methods in finding c bug-inducing commits
+Method DS_LINUX DS_GITHUB-cPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.452 0.5780.507 0.3610.6560.466
+AG-SZZ 0.448 0.553 0.495 0.410 0.592 0.484
+MA-SZZ 0.421 0.538 0.472 0.335 0.624 0.436
+R-SZZ 0.583 0.448 0.5070.671 0.582 0.620
+L-SZZ 0.560 0.430 0.486 0.486 0.422 0.452
+LLM4SZZ0.6280.5520.588 0.6870.6410.663
+Table 3. The performance comparison between methods in finding java bug-inducing commits
+Method DS_GITHUB-j DS_APACHEPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.285 0.6800.401 0.2510.4350.318
+AG-SZZ 0.421 0.533 0.470 0.328 0.310 0.318
+MA-SZZ 0.239 0.560 0.335 0.307 0.345 0.329
+R-SZZ 0.538 0.467 0.500 0.497 0.288 0.364
+L-SZZ 0.492 0.427 0.457 0.366 0.211 0.267
+RA-SZZ 0.337 0.440 0.382 0.264 0.325 0.293
+Neural-SZZ 0.556 0.486 0.5200.563 0.364 0.442
+LLM4SZZ0.6070.5690.587 0.6100.3980.482
+5.1 RQ1. Effectiveness of LLM4SZZ in Identifying Bug-inducing Commits
+Table 2 and 3 present the results ofLLM4SZZ and baselines in identifying bug-inducing commits in
+C and Java projects, respectively. Since DS_GITHUB consists of both c projects and Java projects, we
+split it into DS_GITHUB-c and DS_GITHUB-j, containing C projects and Java projects, respectively.
+As shown in Table 2, for DS_LINUX, all baselines perform almost the same, mirroring the
+experimental results in the original whole dataset [Lyu et al. 2024]. This suggests that our selected
+dataset has the same statistical patterns as the original dataset. The B-SZZ and R-SZZ algorithms
+achieve the highest F1-scores among all baselines. Specifically, B-SZZ achieves the highest recall,
+while R-SZZ achieves the highest precision. We also analyze why B-SZZ outperforms its variants,
+such as AG-SZZ, MA-SZZ, and L-SZZ in DS_LINUX. B-SZZ outperforms AG-SZZ because Linux
+contains numerous bug-fixing commits related only to comments and configurations. While B-SZZ
+successfully identifies these commits, AG-SZZ filters them out. Similarly, MA-SZZ assumes that
+commits with only meta-changes are not bug-inducing, but DS_LINUX shows that developers
+do label such commits as bug-inducing. L-SZZ, on the other hand, assumes the commit with the
+most changed lines among those identified by AG-SZZ is the bug-inducing commit. However, this
+assumption also often fails, as shown by the dataset. These limitations explain why these variants
+perform worse than the B-SZZ algorithm. In DS_GITHUB-c, the R-SZZ algorithm performs the best,
+significantly outperforming all other baselines, with an F1-score of 0.620. LLM4SZZ achieves the
+highest precision and F1-score across these two datasets. In DS_LINUX, it improves precision by
+7.7% and F1-score by 16.0% compared to the best baseline. In DS_GITHUB-c, it improves precision
+by 2.4% and F1-score by 6.9%, respectively.
+From Table 3, we observe that the NeuralSZZ algorithm performs the best in precision and
+F1-score among all baselines. This suggests that utilizing deep learning to rank code statements
+is an effective way to enhance performance. LLM4SZZ also performs the best in precision and
+F1-score in these two datasets. Specifically, it improves precision by 9.2% in DS_GITHUB-j and
+8.3% in DS_APACHE. Additionally, it enhances the F1-score by 12.9% in DS_GITHUB-j and 9.0%
+in DS_APACHE. This demonstrates the effectiveness of LLM4SZZ in handling large bug-fixing
+commits, as most bug-fixing commits in DS_APACHE are large.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 014 =====
+ISSTA016:14 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+Table 4. The performance comparisons in ablation study
+Model DS_LINUX DS_GITHUB DS_APACHEPrecision Recall F1-score Precision Recall F1-score Precision Recall F1-score
+LLM4SZZ-raw 0.4700.6090.531 0.4410.6590.528 0.402 0.393 0.397
+LLM4SZZ-r 0.621 0.520 0.566 0.669 0.609 0.637 0.599 0.382 0.467
+LLM4SZZ-re 0.560 0.511 0.534 0.633 0.567 0.598 0.584 0.383 0.463
+LLM4SZZ-c 0.668 0.450 0.538 0.6910.498 0.5790.6440.316 0.424
+LLM4SZZ-h 0.6800.379 0.487 0.564 0.307 0.397 0.523 0.195 0.284
+LLM4SZZ0.628 0.5520.588 0.671 0.6260.647 0.6100.398 0.482
+SMU Classification: Restricted
+36%
+64%
+DS_LINUX
+40%
+60%
+DS_GITHUB
+42%
+58%
+DS_APACHE
+Context-enhanced 
+    identification
+Rank-based 
+identification
+Fig. 7. The proportions of the two identification approaches in LLM4SZZ
+Combining the three datasets, we observe that the R-SZZ algorithm performs better than other
+baselines except the Neural-SZZ algorithm. This is consistent with the finding of Rodriguez et
+al. [Rodríguez-Pérez et al. 2020] that defects are typically introduced in the most recent changes.
+Moreover, we can find that all baselines’ performance varies a lot in different datasets. For example,
+R-SZZ outperforms other baselines a lot in DS_GITHUB-c but it performs almost the same as
+B-SZZ in DS_LINUX. Neural-SZZ, the deep-learning based approach, also has the same problem. It
+outperforms other baselines a lot in DS_APACHE but only shows a slight improvement over R-SZZ
+in DS_GITHUB-j. In contrast, LLM4SZZ does not have the same problem. In the worst scenario,
+it can still outperform other baselines by 6.9% in F1-score. Additionally, our method improves
+precision and F1-score without sacrificing too much recall. In all three datasets, LLM4SZZ achieves
+a higher recall than all other baselines, except for the B-SZZ algorithm.
+RQ-1: LLM4SZZ is more precise in identifying bug-inducing commits compared to all baselines,
+with an increase in precision from 2.4% to 9.2%. Additionally, LLM4SZZ achieves a significant
+enhancement in F1-score, increasing by 6.9% to 16.0% compared to the best baselines. It also exhibits
+more consistent performance across the three datasets. Furthermore, LLM4SZZ improves both
+precision and F1-score without a substantial sacrifice in recall.
+5.2 RQ2. Effectiveness of Key Components in LLM4SZZ
+In this section, we investigate the effectiveness of key components in LLM4SZZ. In LLM4SZZ-raw,
+we implement the most basic setting. First, we use the LLM to analyze the root cause of the bug,
+and then locate the buggy statements based on this root cause. Finally, we trace back the buggy
+statements to identify the commits that introduced them, marking these as bug-inducing commits.
+In LLM4SZZ-r, we remove context-enhanced assessment and apply rank-based identification across
+all test cases. The LLM4SZZ-re variant is built on LLM4SZZ-r by providing the LLM with expanded
+context during rank-based identification, rather than the original patch. InLLM4SZZ-c, we similarly
+exclude context-enhanced assessment but utilize context-enhanced identification in all scenarios.
+The LLM4SZZ-h variant is based on LLM4SZZ-c. It omits the hint and provides only the context of
+the commit along with the root cause of the bug when asking the LLM to determine whether a
+given commit contains the bug. This allows us to evaluate the contribution of the hint to the LLM’s
+ability to identify the presence of the bug.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 015 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:15
+Table 5. The performance comparison between different language models
+Model DS_LINUX DS_GITHUB DS_APACHEPrecision Recall F1-score Precision Recall F1-score Precision Recall F1-score
+llama3-8b 0.607 0.536 0.569 0.648 0.595 0.620 0.567 0.371 0.449
+llama3-70b0.6450.5510.594 0.657 0.611 0.6330.6120.3970.482
+gpt-4o-mini 0.6280.5520.588 0.671 0.626 0.6480.6100.398 0.482
+Table 4 presents the performance of the LLM4SZZ and its variants in identifying bug-inducing
+commits. The best results are highlighted in bold. As shown in the table, the LLM4SZZ-raw variant
+does not perform very well. This shows that utilizing the LLMs directly on the SZZ algorithm
+can not improve the performance too much. For example, LLM4SZZ-raw only improves the F1-
+socre by 4.7% compared to the best baseline R-SZZ and B-SZZ in DS_LINUX and it performs
+much worse than NeuralSZZ in DS_APACHE. The LLM4SZZ-r variant, which adopts rank-based
+identification in all scenarios, outperforms LLM4SZZ-raw in F1-score across all three datasets, with
+improvements ranging from 6.5% to 20.6%. In contrast,LLM4SZZ-re performs worse thanLLM4SZZ-
+r in almost all metrics, indicating that if the LLM cannot comprehend the bug, providing additional
+context undermines its performance. The table also shows thatLLM4SZZ-c, which employs context-
+enhanced identification in all test cases, improves precision compared to LLM4SZZ-r. However,
+it may produce empty results in some test cases, leading to lower recall. Additionally, omitting
+the hint during context-enhanced identification has a significantly negative impact on recall, as
+evidenced by the performance of LLM4SZZ-h, which is inferior to LLM4SZZ-c in both recall and
+F1-score.
+Overall, LLM4SZZ outperforms all other variants in F1-score, highlighting that the combination
+of rank-based identification and context-enhanced identification can enhance performance. This
+also demonstrates the effectiveness of the context-enhanced assessment which evaluates the LLM’s
+capabilities and determines the appropriate identification approach. We also provide the proportions
+of the two identification approaches in LLM4SZZ across all three datasets. As shown in Figure 7,
+context-enhanced identification is used more frequently in all three datasets. In DS_LINUX , 64% of
+the total test cases utilize context-enhanced identification while in DS_GITHUB and DS_APACHE
+about 60% of test cases adopt this approach.
+RQ-2: The key designs of LLM4SZZ, including the context-enhanced assessment, the context-
+enhanced identification and the rank-based identification, all contribute to the overall performance.
+Compared to the rank-based identification, the context-enhanced identification makes a greater
+contribution. Furthermore, the hint notably enhances the LLM’s ability to determine whether a
+commit contains the bug. Additionally, utilizing LLMs directly in the SZZ algorithm does not
+significantly improve performance.
+5.3 RQ3. Effectiveness of LLM4SZZ on Other LLMs
+In this research question, we aim to examine whether the core ideas of our approach (e.g., prepa-
+ration, context-enhanced ability check, and commits identification) can be applied to other open-
+source large language models. For evaluation, we choose two additional open-source LLMs: llama3-
+8b and llama3-70b. The configurations of these two LLMs are described in Section 4.2.
+Table 5 presents the performance of different LLMs across three datasets. Among all LLMs,
+llama3-8b performs the worst. Despite this, it still outperforms all baselines that are not based on
+LLMs in RQ1, suggesting that our method can be effectively applied to other large language models.
+Llama3-70b outperforms llama3-8b in all datasets, which is understandable given that llama3-70b
+contains more parameters. This also suggests that better LLMs can enhance the performance of
+LLM4SZZ.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 016 =====
+ISSTA016:16 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+1 if (i == MLX5_MAX_PORTS) {
+2 -  if (ldev->nb.notifier_call)
+3 +  if (ldev->nb.notifier_call) {
+4   unregister_netdevice_notifier_net(&init_net, &ldev->nb);
+5 +   ldev->nb.notifier_call = NULL;
+6 +  }
+Fixing Commit: 0b136454741 in linux
+After returning from unregister_netdevice_notifier_dev_net(), set the notifier_call field to NULL so successive call to 
+mlx5_lag_add() will function as expected.
+1 files changed, 3 addition(+) and 1 deletion(-)
+drivers/net/ethernet/mellanox/mlx5/core/lag.c
+Fig. 8. An example where LLM4SZZ fails to choose the correct bug-inducing commit among candidates.
+Compared to gpt4o-mini, llama3-70b performs better in DS_LINUX, worse in DS_GITHUB,
+and similarly in DS_APACHE. In DS_LINUX, llama3-70b outperforms gpt-4o-mini in precision
+and F1-score. To understand the performance differences, we investigate the test cases where the
+two models produced different results. We find that llama3-70b tends to be conservative when
+locating buggy statements and produces an empty result if it is uncertain. For instance, llama3-70b
+produces results for 1,334 test cases in DS_LINUX, while gpt-4o-mini produces results for 1,373
+test cases. In DS_LINUX, gpt-4o-mini and llama3-70b identified almost the same number of true
+bug-inducing commits, resulting in higher precision for llama3-70b. In DS_GITHUB, many bug-
+inducing commits can only be found by tracing back unmodified code statements, while llama3-70b
+tends to conservatively identify deleted lines as buggy statements. Therefore, in DS_GITHUB,
+gpt-4o-mini outperforms llama3-70b in both precision and recall.
+RQ-3: The core ideas of LLM4SZZ can be applied to other large language models and better LLMs
+can enhance the performance of LLM4SZZ.

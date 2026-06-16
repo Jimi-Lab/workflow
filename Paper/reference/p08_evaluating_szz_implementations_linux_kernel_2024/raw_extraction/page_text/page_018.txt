@@ -1,0 +1,105 @@
+2236
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+(2) Partial Bug-ﬁxing: This case occurs when a bug-ﬁxing
+commit rectiﬁes a previous, incorrect bug-ﬁx attempt, and
+the bug-inducing commit, as labeled by the developer, is the
+one that the initial, ﬂawed bug-ﬁx was attempting to correct.
+The SZZ algorithm identiﬁes the recent, incorrect ﬁx as the
+bug-inducing commit. For example, the bug-ﬁxing commit
+c0702a426 addressed a bug originally introduced by commit
+297ccce. Prior to this, commit 829969927 attempted to ﬁx the
+bug originating from commit 297ccce but failed, leading to the
+necessity of bug-ﬁxing commit c0702a4.
+(3) Affected by Other Changes: In some cases, code that
+was previously correct becomes problematic due to subsequent
+changes. These subsequent changes are then considered the
+bug-inducing commits. However, the SZZ algorithm might in-
+correctly identify the commit that originally wrote the code as
+the bug-inducing commit. For instance, the bug-ﬁxing commit
+9b7becf128 addresses a bug induced by a previous commit.
+The actual bug-inducing commit, 219fb0c, modiﬁed a function
+but failed to update the relevant failure message. While the
+change code made in commit 9b7becf1 was appropriate at the
+time, it became ﬂawed when commit 219fb0c did not make
+the necessary update. However, the SZZ algorithm incorrectly
+identiﬁes the commit that initially introduced the changed code
+as the bug-inducing one.
+(4) Developer Error: Even developers are not infallible and
+can sometimes incorrectly label commits. For example, in the
+bug-ﬁxing commit e04e7a7,29 the developer identiﬁed commit
+8195b13 as the bug-inducing commit. However, these two com-
+mits address different aspects of deadlock issues in hv_netvsc.
+The bug-ﬁxing commit e04e7a7 resolves a deadlock caused
+by a race condition between two functions and their locking
+mechanisms. In contrast, the commit labeled by the developer as
+bug-inducing, 8195b13, deals with a deadlock resulting channel
+offer messages in the same queue. Moreover, after our review,
+the commit 7bf7bb3,30 identiﬁed by the SZZ algorithm as the
+bug-inducing one, is considered correct. The rationale is that
+in commit 7bf7bb3, rtnl_lock() was added at an inappropriate
+location, leading to a deadlock. This can be understood from the
+code comments in the bug-ﬁxing commit, as shown in Fig, 10.
+This revision emphasizes the role of rtnl_lock() in preventing
+the deadlock and clariﬁes why the SZZ algorithm’s identiﬁ-
+cation of the bug-inducing commit is considered accurate in
+this context.
+IX. THREATS TO VALIDITY
+Construct validity. Our dataset, collected from the Linux
+kernel serves as an excellent study subject. As outlined in Sec-
+tion III, we employed an automated approach to collect the data.
+26https://github.com/torvalds/linux/commit/c0702a4bd41829f05638ec2dab7
+0f6bb8d8010ce
+27https://github.com/torvalds/linux/commit/829969956f97e880dd01086be47
+747226e48a3f0
+28https://github.com/torvalds/linux/commit/9b7becf103e2689d7f005895130
+ccf89a153fef1
+29https://github.com/torvalds/linux/commit/e04e7a7bbd4bbabef4e1a58367e
+5fc9b2edc3b10
+30https://github.com/torvalds/linux/commit/7bf7bb37f16a80465ee3bd7c6c9
+66f96f5a075a6
+Fig. 10.
+Example of Failure Reason: Developer Error.
+By following the ofﬁcial Linux documentation for identifying
+bug-ﬁxing commits, we ensured 100% accuracy in our collected
+data. A few bug-ﬁxing commits may have been missed due
+to formatting errors, but this small percentage should have no
+impact on our results. We used a minimum number (the commit
+ID must have at least 7 characters) when searching for bug-
+inducing commits to minimize instances where a partial commit
+ID matches multiple bug-inducing commits.
+As Linux Kernel does not have an issue tracker, e.g., Bugzilla
+or JIRA, it is challenging to ensure that all bugs are consid-
+ered. Furthermore, the Linux documentation does not enforce
+the inclusion of bug-inducing commits when submitting bug-
+ﬁxing commits, as the guideline suggests “If the patch ﬁxes
+a bug, cite the commit which introduced the bug if possible
+(and please provide both the commit ID and the title when
+citing commits).” Therefore, it is possible that some bug-ﬁxing
+commits may not be linked to their corresponding bug-inducing
+commits, depending on the developer’s discretion. Additionally,
+our dataset does not include extrinsic bugs as described by
+Rodriguez et al. [61], which are bug ﬁxes not directly traceable
+to changes within the repository. As a result, our research does
+not claim to document every single bug-ﬁxing commit from the
+past decade. Instead, our objective is to collate as many bug-
+ﬁxing commits as possible, each with a veriﬁed origin, to offer
+a thorough and accurate overview.
+Another threat to construct validity of our dataset is that
+around 96% of bug-ﬁxing commits are linked to a single bug-
+inducing commit. This raises questions about the complexity
+of bugs. The majority of bug-ﬁxing commits linked to a single
+bug-inducing commit may be indicative of developers con-
+forming to speciﬁc guidelines within the Linux kernel project,
+potentially introducing a bias into the dataset. Our comparison
+with prior research by Rosa et al. [28] revealed a similar trend:
+out of 1,115 bug-ﬁxing commits, 1,113 were associated with
+just one bug-inducing commit. Given these ﬁndings, it becomes
+challenging to deﬁnitively assert whether the reality of bug
+genesis is more accurately reﬂected in bug-ﬁxing commits with
+a single or multiple bug-inducing commits. Therefore, we leave
+this as an open question, acknowledging the need for further
+discussion and exploration in this area.
+In our study, we conducted the evaluation of SZZ implemen-
+tations solely at the commit level, aligning with the methodol-
+ogy used by Rosa et al. [28]. It is important to note that the
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

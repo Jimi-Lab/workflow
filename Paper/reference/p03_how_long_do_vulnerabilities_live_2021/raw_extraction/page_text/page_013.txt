@@ -1,0 +1,104 @@
+UBSan26) to expose latent bugs, started being widely used
+for FOSS in around 2016 (AFL introduced to the Linux com-
+munity in 2015 27, first syzkaller talk in 2016 28, OSSFuzz
+launched in late 201629). One may expect a measurable im-
+pact on vulnerability lifetimes by the adoption of fuzzing tools.
+Before approaching this question empirically, we discuss the
+theoretically expected impact on vulnerability lifetimes from
+the introduction of fuzzing tools. The introduction of fuzzers
+in long-lived projects would result in the discovery of some
+very old bugs, and thus we would expect an initial increase
+of the average lifetime of vulnerabilities for a short period of
+time. Then, considering these old bugs have been removed,
+we would expect continuous fuzzing to result in the discovery
+of bugs relatively quickly after their introduction, resulting in
+a drop in the average vulnerability lifetime. Overall, the ex-
+pected behaviour would be a surge followed by a considerable
+decline.
+We move on to empirically approach the question. Making
+the simplifying assumption that memory-related bugs are the
+traditional and natural targets of fuzzing, we plot the trend
+of Linux memory-related CVEs compared to Linux CVEs
+that fall into other categories (categories as presented in Sec-
+tion 5.5). Figure 10 shows no significant difference in the
+lifetime trend for the two sets of CVEs. Also, we do not ob-
+serve any behaviour consistent with our expectation. It seems
+that the introduction of “modern” fuzzing tools did not have
+any noticeable impact on Linux lifetimes.
+2011 2012 2013 2014 2015 2016 2017 2018 2019 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Memory vulnerabilities
+Others
+Figure 10: Lifetimes of memory-related vs. all other vulnera-
+bility categories for Linux.
+Why would this be the case? We continue the investi-
+gation by looking into the five longest-surviving CVEs in
+our ground truth dataset for any project. Four of them are
+Linux CVEs (CVE-2019-15291, CVE-2019-19768, CVE-
+2019-11810, CVE-2019-19524), each with a lifetime of
+around 5,000 days (more than 13 years). All CVEs describe
+26https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.
+html
+27https://lwn.net/Articles/657959/
+28https://github.com/google/syzkaller/blob/master/docs/
+talks.md
+29https://opensource.googleblog.com/2016/12/
+announcing-oss-fuzz-continuous-fuzzing.html
+memory-related issues. Interestingly, 2 of them (first and last)
+describe issues related to USB drivers discovered by syzkaller.
+Fuzzing of the USB subsystem of the kernel has a rich history.
+Andrey Konovalov reported a batch of Linux USB vulner-
+abilities in 201730, before reporting a new batch in 2019 31
+upon resumption of the USB fuzzing project. Moreover, Peng
+and Payer [30] (USBFuzz) used USB device emulation and
+coverage-guided fuzzing to discover a number of vulnerabil-
+ities in “already extensively fuzzed – versions of the Linux
+kernel”, showing that their approach is complementary to
+syzkaller. The progressive discovery of vulnerabilities in this
+one specific subsystem of the Linux kernel showcases that
+the notion of “already fuzzed” may be misleading, even for
+relatively small subsystems of complex systems. The lack of
+observable impact on memory-related CVE lifetimes upon
+the introduction of fuzzing tools supports this assertion as
+very old bugs continue to get discovered with (possibly new)
+fuzzing tools years after fuzzing has started on the specific tar-
+get. Our evidence suggests that fuzzing complex systems
+is not a “one-off” automated task, rather a complex ever-
+evolving process. A different but similar interpretation is that
+the “initial increase” in lifetimes that we expected due to the
+introduction of fuzzing is prolonged as new tools and tech-
+niques continuously enter the arsenal of testers (e.g. consider
+the new approaches to USB fuzzing referenced above).
+None of the above imply that fuzzing in general, or as car-
+ried out in the Linux kernel, does not significantly contribute
+to improving security. Continues fuzzing finds large numbers
+of bugs (e.g. >3,000 Linux bugs discovered by syzkaller and
+fixed32). Most of these bugs are not assigned CVEs due to
+several reasons, e.g. they are fixed before the next release of a
+version or their security implications are unclear. This might
+be a reason why no decrease in vulnerability lifetimes is ob-
+served in our dataset, which only includes CVEs. However our
+techniques are of general relevance and can be used to mea-
+sure the lifetimes of other bugs (e.g. discovered by syzkaller)
+as well. Furthermore, some of these bugs are not memory-
+related (e.g. KCSAN33 is a sanitizer for Linux concurrency
+bugs). Overall, this case study highlights the complicated
+nature of fuzzing and its relation to vulnerability lifetimes.
+Quantifying the impact of fuzzing in improving the security of
+codebases and its impact on lifetimes is still an open problem
+that needs further investigation.
+6 Implications and discussion
+Is software getting more secure over time? In Section 5,
+we presented a number of results related to this question.
+30https://www.openwall.com/lists/oss-security/2017/12/12/
+7
+31https://www.openwall.com/lists/oss-security/2019/08/20/
+2
+32https://syzkaller.appspot.com/upstream/fixed
+33https://github.com/google/ktsan/wiki/KCSAN

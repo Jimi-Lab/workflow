@@ -1,0 +1,77 @@
+{
+  "baseline": "root-cause-v2-semantic-baseline-10",
+  "scope": "10-CVE Root Cause Agent semantic baseline",
+  "source_files": {
+    "evaluation_csv": "evaluation.csv",
+    "manual_semantic_labels": "manual_semantic_labels.csv",
+    "manual_semantic_labels_normalized": "manual_semantic_labels_normalized.csv",
+    "manual_semantic_review": "manual_semantic_review.md",
+    "summary": "summary.json",
+    "failure_taxonomy": "failure_taxonomy.json"
+  },
+  "total_cases": 10,
+  "ingested_raw_cases": 8,
+  "structural_rejected_cases": 1,
+  "parse_error_cases": 1,
+  "real_opencode_invocations": 10,
+  "all_case_overall_correct": 0.6,
+  "all_case_overall_correct_fraction": "6/10",
+  "accepted_only_overall_correct": 0.75,
+  "accepted_only_overall_correct_fraction": "6/8",
+  "all_case_anchor_hunk_precision": 0.8,
+  "all_case_anchor_hunk_precision_fraction": "8/10",
+  "accepted_only_anchor_hunk_precision": 0.875,
+  "accepted_only_anchor_hunk_precision_fraction": "7/8",
+  "all_case_evidence_link_precision": 0.4,
+  "all_case_evidence_link_precision_fraction": "4/10",
+  "accepted_only_evidence_link_precision": 0.5,
+  "accepted_only_evidence_link_precision_fraction": "4/8",
+  "all_case_unsupported_inference_rate": 0.6,
+  "all_case_unsupported_inference_rate_fraction": "6/10",
+  "accepted_only_unsupported_inference_rate": 0.75,
+  "accepted_only_unsupported_inference_rate_fraction": "6/8",
+  "structural_multi_fix_coverage": 1.0,
+  "structural_multi_fix_coverage_fraction": "2/2",
+  "semantic_multi_fix_coverage": 0.5,
+  "semantic_multi_fix_coverage_fraction": "1/2",
+  "multi_fix_cases": [
+    "CVE-2020-14212",
+    "CVE-2020-11984"
+  ],
+  "structural_multi_fix_covered_cases": [
+    "CVE-2020-14212",
+    "CVE-2020-11984"
+  ],
+  "semantic_multi_fix_covered_cases": [
+    "CVE-2020-11984"
+  ],
+  "semantic_multi_fix_failed_cases": [
+    "CVE-2020-14212"
+  ],
+  "failed_overall_cases": [
+    "CVE-2020-14212",
+    "CVE-2020-19667",
+    "CVE-2022-0171",
+    "CVE-2020-11869"
+  ],
+  "correct_overall_cases": [
+    "CVE-2020-8231",
+    "CVE-2020-11984",
+    "CVE-2022-0286",
+    "CVE-2020-15389",
+    "CVE-2020-1967",
+    "CVE-2020-13164"
+  ],
+  "failure_classes": {
+    "CVE-2020-14212": "incomplete_hunk_coverage",
+    "CVE-2020-19667": "structural_gate/function_binding",
+    "CVE-2022-0171": "schema_validation_missing_path",
+    "CVE-2020-11869": "overbroad_semantic_inference"
+  },
+  "metric_notes": {
+    "accepted_for_semantic_metric": "status == ingested_raw",
+    "fix_set_structurally_complete": "original structural/multi-fix gate coverage; only meaningful for multi-fix cases",
+    "fix_set_semantically_complete": "manual semantic hunk coverage; only meaningful for multi-fix cases",
+    "evidence_link_precise": "judged from patch_diff/git show unified evidence only; git log --follow and stat are contextual only"
+  }
+}

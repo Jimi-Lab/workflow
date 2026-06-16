@@ -1,0 +1,137 @@
+[
+  {
+    "page": 11,
+    "block_id": "page_011:block_001",
+    "block_type": "text",
+    "text": "386 IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026",
+    "bbox": [
+      42.345001220703125,
+      32.515541076660156,
+      556.4161987304688,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_002",
+    "block_type": "text",
+    "text": "increase the weight of memset operation, thus backtrac- ing to the correct vic . However, SZZ algorithms sepa- rately backtrack different deleted lines, resulting in the identiﬁcation of 5 different vic , signiﬁcantly reducing the precision. 3) Comparison with Clone-based Methods: In the same dataset, V0Finder achieved a precision of 82.9% and a recall of 74.5%. There are two reasons for the inaccuracies of V0Finder: 1) V0Finder generates a hash value for the entire vulnerable function as a vulnerability ﬁngerprint. This ﬁngerprint is coarse because the vulnerable function contains a lot of vulnerability- irrelevant code, introducing a signiﬁcant amount of noise. 2) V0Finder considers the function containing all deleted patch code as a vulnerable function clone. This approach also over- looked the inserted code of the security patch. V1SCAN achieves an F1-score of 0.788, combining version- based detection with code-based detection methods. For version-based detection, V1SCAN obtains CVE-affected OSS versions from NVD’s CPE database and ﬁlters out functions belonging to versions outside the CVE’s affected range. As we mentioned earlier, there are many errors in NVD’s affected version information, which consequently affects V1SCAN’s detection results. For code-based detection, V1SCAN primarily relies on text similarity comparisons, overlooking deeper rela- tionships between code snippets. When functions are refactored or outlined into new functions, this approach fails to identify vulnerability-related code, resulting in false negatives. Table III reports a low recall of 0.247 in VERJava. VERJava has a fundamental issue in determining vulnerable versions: it requires the target version’s code to simultaneously meet two strict conditions - perfect matching of deleted lines in the vfc (delSim ≥ 1.0) and the absence of most added patch code (addSim ≤ 0.9). In project development, code frequently undergoes changes, including variable name modiﬁcations and function refactoring. This means that even versions that con- tain vulnerabilities are unlikely to meet such strict matching requirements due to code evolution. As a result, many vulnera- ble versions are incorrectly identiﬁed as safe versions, leading to serious false negatives. Another problem with VERJava is similar to V0Finder, it incorrectly assumes that deleted lines in the patch represent vulnerable features. Vision achieves an F1 of 0.861, combining critical statement selection with weighted dependency graphs. Vision relies on taint analysis as a ﬁrst step for critical statement selection. However, this approach often includes many statements that are control or data-dependent but not actually relevant to the vulnerability, which consequently affects Vision’s precision in extracting vulnerable code. Moreover, Vision’s analysis is lim- ited to Java packages from Maven repositories, which may not fully capture the vulnerability patterns in other languages.",
+    "bbox": [
+      42.34303283691406,
+      63.788570404052734,
+      293.406494140625,
+      660.7227783203125
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_003",
+    "block_type": "text",
+    "text": "Accuracy of V ERCATION . V ERCATION demonstrates consis- tent performance across most projects, achieving high precision ( > 0.90) on 9 out of 12 projects and perfect recall (1.00) on several projects, including cJSON and Libcaca. Notably, while baseline methods like V-SZZ and V0Finder show signiﬁcant performance ﬂuctuations across different projects, V ERCATION",
+    "bbox": [
+      42.34403991699219,
+      667.1580200195312,
+      293.40704345703125,
+      738.4234619140625
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_004",
+    "block_type": "text",
+    "text": "maintains more stable performance. For instance, on the Binutils project, which has complex version management and frequent refactoring, Vercation achieves a 0.95 F1 score, outperforming V-SZZ (0.47 F1 score) and V0Finder (0.88 F1 score). Though V ERCATION performed well in the version identiﬁ- cation, it still failed to identify inducing commits for a small number of vulnerabilities. One reason is that in some cases, slight modiﬁcations in the AST have little impact on the sim- ilarity between the AST before and after the modiﬁcation, but are crucial in introducing vulnerabilities. Another reason is that despite using the weight allocation strategies, there are still some statements related to patch variables that are not relevant to the vulnerability but have been assigned high weights. The above two reasons may incorrectly identify vic , leading to a misidentiﬁcation of the vulnerable version range. In our evaluation, 5.7% of traced commit histories involved merge commits with multiple parents. For example, in CVE- 2022-1355 [61] from Libtiff, the vulnerability was introduced in a feature branch that was later merged into the main de- velopment line, creating a non-linear history with two parent commits at the merge point. For these cases involving non- linear histories, V ERCATION achieved a precision of 91.2% and recall of 92.5%, demonstrating that our multi-path traversal strategy effectively handles branching scenarios without signif- icant performance degradation.",
+    "bbox": [
+      305.3510437011719,
+      63.788570404052734,
+      556.4287719726562,
+      361.836181640625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_005",
+    "block_type": "text",
+    "text": "RQ1 : V ERCATION demonstrates superior performance in vul- nerable version identiﬁcation on our ground-truth dataset, achieving an F1 score of 93.1%. This signiﬁcantly outper- forms SOTA works. The prompt strategy combining Few- shot and CoT techniques performs the best.",
+    "bbox": [
+      310.3739318847656,
+      368.6548767089844,
+      551.395263671875,
+      427.9591979980469
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_006",
+    "block_type": "text",
+    "text": "B. RQ2: Architectural Contribution",
+    "bbox": [
+      305.35211181640625,
+      451.3249206542969,
+      451.20672607421875,
+      462.2837829589844
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_007",
+    "block_type": "text",
+    "text": "1) Program Slicing & LLM Ablation Study: We conducted ablation experiments by separately removing the program slic- ing component (implemented by Joern) and the LLM compo- nent (DeepSeek) from phase 1.",
+    "bbox": [
+      305.35211181640625,
+      468.1128845214844,
+      556.4259643554688,
+      515.0964965820312
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_008",
+    "block_type": "text",
+    "text": "Static Analysis Only. As depicted in Table IV , the effective- ness of Joern in extracting vulnerability logic is signiﬁcantly inferior to that harnessed by the power of LLM models, with an F1 score 46.9% less than Joern + DeepSeek (Few-shot + CoT). This discrepancy primarily stems from Joern’s reliance on ﬁxed dependency extraction patterns, leading to the retrieval of numerous statements irrelevant to vulnerabilities. As shown in Fig. 5 (a), using only the static analysis tool Joern parser for program slicing extracts statements on Lines 3, 7-8, 11- 12. While these statements are related to control ﬂow, they are not directly relevant to the vulnerability. This illustrates how static analysis alone can include extraneous information that is not crucial to understanding the speciﬁc vulnerability logic. Meanwhile, we found that Joern cannot accurately address pointer structure dataﬂows, thus missing some statements that have data or control dependencies. To elaborate, on average, Joern extracts 3.64 times more vulnerable statements per CVE compared to combined DeepSeek.",
+    "bbox": [
+      305.35113525390625,
+      521.5463256835938,
+      556.4169311523438,
+      736.273193359375
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_009",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

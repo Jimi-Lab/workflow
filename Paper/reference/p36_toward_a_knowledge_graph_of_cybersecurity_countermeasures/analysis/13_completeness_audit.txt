@@ -1,0 +1,34 @@
+Completeness Audit
+
+Required Outputs:
+- raw_extraction/: present.
+- analysis/: present.
+- raw_extraction/agent_index.json: present before final rebuild.
+- raw_extraction/extraction_profile.txt: present before final rebuild.
+- raw_extraction/source_static_inventory.txt: present and updated with local ontology/source/artifact evidence.
+- analysis/13_completeness_audit.txt: present.
+
+PDF Extraction:
+- Page count: 11.
+- Text layer: complete enough for section-level analysis.
+- Tables: no clean table extraction; Table I is visible in text but not structurally extracted. [NEEDS TABLE REPAIR]
+- Figures: captions/context partial only; no figure crops. [NEEDS FIGURE EXTRACTION]
+- Layout: no layout-block extraction. [NEEDS LAYOUT BLOCK EXTRACTION]
+- Citation metadata: venue/DOI/BibTeX not verified. [NEEDS CITATION VERIFICATION]
+
+Source Static Analysis:
+- README, DESIGN, CONVENTIONS, Makefile, Docker/Pipenv configs, core TTL ontology, SPARQL queries, Python update/build scripts, mappings, and test files identified.
+- Core ontology file and RDF/OWL structural signals were statically inspected.
+- No code, build, test, SPARQL query, reasoner, Docker, or dependency installation was executed. [EXECUTION NOT REQUESTED]
+
+Writing Readiness:
+- Method/ontology design: medium-high readiness after citation verification.
+- Relevance to VulnVersion graph design: high conceptual readiness.
+- Evaluation claims: low readiness because the paper is preliminary and mostly qualitative.
+- Figure/table claims: low readiness until crop/table repair.
+
+Next Repair Steps:
+1. Verify official citation metadata and BibTeX. [NEEDS CITATION VERIFICATION]
+2. Extract page crops for Figures 3, 4, 7, and 8. [NEEDS FIGURE EXTRACTION]
+3. Repair Table I if numeric/category details are needed. [NEEDS TABLE REPAIR]
+4. If later requested, run ontology build/test in a controlled reproduction pass; not done here. [EXECUTION NOT REQUESTED]

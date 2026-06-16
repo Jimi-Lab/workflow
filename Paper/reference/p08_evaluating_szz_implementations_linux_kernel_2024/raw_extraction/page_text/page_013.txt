@@ -1,0 +1,134 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2231
+TABLE VIII
+INDEPENDENT T-TEST RESULTS COMPARING TC-SZZ WITH
+OTHER SZZ ALGORITHMS IN TERMS OF RECALL,
+INCLUDING EFFECT SIZES
+Comparison
+T-Statistic
+P-Value
+Effect Size
+TC-SZZ vs B-SZZ
+10.3439
+< 0.0001
+4.876
+TC-SZZ vs AG-SZZ
+15.5688
+< 0.0001
+7.339
+TC-SZZ vs L-SZZ
+47.7760
+< 0.0001
+22.522
+TC-SZZ vs MA-SZZ
+18.6914
+< 0.0001
+8.811
+TC-SZZ vs PD-SZZ
+18.4269
+< 0.0001
+8.687
+TC-SZZ vs R-SZZ
+30.8874
+< 0.0001
+14.560
+in recall between TC-SZZ and other SZZ algorithms, with all
+p-values signiﬁcantly less than 0.05. Furthermore, we calcu-
+lated the effect size using Cohen’s d [54], as reported in the
+fourth column of Table VIII. The effect sizes are notably large
+across all comparisons—with Cohen’s d values exceeding 2.0—
+signifying substantial differences in recall between TC-SZZ and
+the other SZZ algorithms. Our analysis reveals that there is a
+signiﬁcant difference every year between the performance of
+TC-SZZ and the other SZZ variants.
+Given that TC-SZZ can resolve 17.7% of failure cases, we
+check whether we can pinpoint even more bug-inducing com-
+mits by using a TC-SZZ-like approach. We apply git log to
+all ﬁles affected by the bug-ﬁxing commit, and then apply
+git log -L to all code lines within the function containing the
+deleted/modiﬁed lines from the bug-ﬁxing commit.
+We further deﬁne three new types of failure cases:
+(1) Function-Log Detection: This refers to situations where the
+bug-inducing commit is located in the history of the function
+containing deleted code, as identiﬁed using the command git log
+-L. For instance, in the bug-ﬁxing commit cbcf099,14 two lines
+were deleted and two lines were added. Despite this, neither the
+SZZ algorithm (B-SZZ) nor the use of git blame on all of the
+lines in the function that contains the deleted line can identify
+the bug-inducing commit. However, by applying git log -L to
+all of the lines in the function that contains the deleted lines,
+we are able to successfully identify the bug-inducing commit.
+(2) Within-File Detection: This term refers to the identiﬁcation
+of bug-inducing commits within the history of a speciﬁc ﬁle,
+particularly the one that was modiﬁed in a bug-ﬁxing commit
+where lines of code were deleted. For example, in commit
+d53c51f,15 methods like the SZZ algorithm and the use of git
+log -L on the function that contains the deleted lines can not
+identify the bug-inducing commit. Speciﬁcally, the line of code
+introduced by the bug-inducing commit is not the same as the
+one modiﬁed in the bug-ﬁxing commit, although they are in the
+same ﬁle. In contrast, by applying git log to the entire ﬁle that
+encompasses these deleted lines, we can successfully uncover
+the bug-inducing commit.
+(3) Cross-File
+Detection: This term describes instances
+where the ﬁles are not shared between the bug-inducing
+14https://github.com/torvalds/linux/commit/cbcf0999ae33e7a8e1dba7ca9355
+56634f679ccf
+15https://github.com/torvalds/linux/commit/d53c51f26145657aa7c55fa396f9
+3677e613548d
+and bug-ﬁxing commits. Speciﬁcally, the bug-inducing com-
+mit cannot be located within the same ﬁle as the deleted
+code when using the git log -L command. As a result,
+since the ﬁles between bug-inducing and bug-ﬁxing com-
+mits are not shared (as required by SZZ), it is challeng-
+ing to reach such bug-inducing commits given the bug-ﬁxing
+commits. For example, in the bug-ﬁxing commit d15d731,16
+all modiﬁcations (both additions and deletions) occur in the
+ﬁle “drivers/base/ﬁrmware_loader/main.c”. However, the bug-
+inducing commit f531f0517 only modiﬁes the ﬁle “driver-
+s/base/ﬁrmware_class.c”. This discrepancy prevents the SZZ
+algorithm from identifying the bug-inducing commit. As a re-
+sult, we introduce a new category of Mapping Ghosts known as
+“Cross-File Mapping Ghosts” to capture these scenarios where
+the bug-inducing changes are not found in the same ﬁle as the
+bug-ﬁxing changes.
+The results in Table VII reveal that out of the remaining
+14,437 failure cases, 4,994 (34.6%) are Function-Log De-
+tection, 3,965 (27.5%) are Within-File Detection, and 5,478
+(37.9%) are Cross-File Detection. Note that the category
+Within-File Detection comprises only cases that are in the ﬁle
+history but are not in the function history. For the 37.9% of
+failure cases that are not present in the ﬁle history, unless the
+bug-ﬁxing commit explicitly mention the bug-inducing com-
+mits or specify a particular ﬁle, it becomes challenging for a
+researcher without domain expertise to correctly identify the
+bug-inducing commits. This task becomes even more difﬁcult
+for an automated approach.
+RQ3 Findings: Our ﬁndings show that our pro-
+posed TC-SZZ can successfully address 17.7% of
+failure cases. 5,478 of 14,437 (37.9%) failure cases
+have bug-inducing commits that are not in the ﬁle
+history, making them hard to resolve.
+VII. CLASSICAL MEETS MODERN: ENHANCING
+SZZ WITH CHATGPT
+In this section, we attempt to address three types of failure
+situations (i.e., Function-Log Detection, Within-File Detection,
+and Cross-File Detection) utilizing ChatGPT, based on the GPT-
+4 version, which is one of the most sophisticated Large Lan-
+guage Models (LLMs) currently available.
+Given that ChatGPT is adept at addressing Software Engi-
+neering tasks [31], [32], we aim to investigate whether it can
+assist researchers or developers in more effectively identifying
+bug-inducing commits. We interacted with GPT-4 through web
+chat using the default settings. OpenAI does not release the
+speciﬁc settings it employs for the web chat. Both the prompt
+and the corresponding results from ChatGPT are available in the
+replication package. We conducted the experiment from June
+28th to July 4th, 2023 and from November 30th, 2023 to Jan
+3rd, 2024.
+16https://github.com/torvalds/linux/commit/d15d7311550983be97dca44ad68
+cbc2ca001297b
+17https://github.com/torvalds/linux/commit/f531f05ae9437df5ba1ebd90017e
+4dd5526048e9
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

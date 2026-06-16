@@ -1,0 +1,309 @@
+{
+  "cwe_id": "CWE-129",
+  "name": "Improper Validation of Array Index",
+  "abstraction": "Variant",
+  "status": "Draft",
+  "description": "The product uses untrusted input when calculating or using an array index, but the product does not validate or incorrectly validates the index to ensure the index references a valid position within the array.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1285",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Validation of Specified Index, Position, or Offset in Input"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Input Validation"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-823",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Out-of-range Pointer Offset"
+      },
+      {
+        "cwe_id": "CWE-789",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Memory Allocation with Excessive Size Value"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++",
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Variant level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses untrusted input when calculating or using an array index, but the product does not validate or incorrectly validates the index to ensure the index references a valid position within the array.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "array",
+      "calculating",
+      "incorrectly",
+      "references"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "array",
+      "calculating",
+      "incorrectly",
+      "references",
+      "untrusted",
+      "validates",
+      "position",
+      "validate"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the code snippet below, an untrusted integer value is used to reference an object in an array.",
+        "snippet": "public String getValue(int index) { return array[index]; }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following example takes a user-supplied value to allocate an array of objects and then operates on the array.",
+        "snippet": "private void buildList ( int untrustedListSize ){ if ( 0 > untrustedListSize ){ die(\"Negative value supplied for list size, die evil hacker!\"); } Widget[] list = new Widget [ untrustedListSize ]; list[0] = new Widget();..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following code, the method retrieves a value from an array at a specific array index location that is given as an input parameter to the method",
+        "snippet": "int getValueFromArray(int *array, int len, int index) { int value; // check that the array index is less than the maximum // length of the array if (index < len) { // get the value at the specified index of the array..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following example retrieves the sizes of messages for a pop3 mail server. The message sizes are retrieved from a socket that returns in a buffer the...",
+        "snippet": "/* capture the sizes of all messages */ int getsizes(int sock, int count, int *sizes) { ... char buf[BUFFER_SIZE]; int ok; int num, size; // read values from socket and added to sizes array while ((ok = gen_recv(sock,..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In the following code, the method retrieves a value from an array at a specific array index location that is given as an input parameter to the method",
+        "snippet": "... // check that the array index is within the correct // range of values for the array if (index >= 0 && index < len) { ..."
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following example retrieves the sizes of messages for a pop3 mail server. The message sizes are retrieved from a socket that returns in a buffer the...",
+        "snippet": "/* capture the sizes of all messages */ int getsizes(int sock, int count, int *sizes) { ... char buf[BUFFER_SIZE]; int ok; int num, size; // read values from socket and added to sizes array while ((ok = gen_recv(sock,..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following example the method displayProductSummary is called from a Web service servlet to retrieve product summary information for display to the user....",
+        "snippet": "// Method called from servlet to obtain product information public String displayProductSummary(int index) { String productSummary = new String(\"\"); try { String productSummary = getProductSummary(index); } catch..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following example the method displayProductSummary is called from a Web service servlet to retrieve product summary information for display to the user....",
+        "snippet": "ArrayList productArray = new ArrayList(MAX_PRODUCTS); ... try { productSummary = (String) productArray.get(index); } catch (IndexOutOfBoundsException ex) {...}"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2005-0369",
+        "description": "large ID in packet used as array index",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-0369"
+      },
+      {
+        "reference": "CVE-2001-1009",
+        "description": "negative array index as argument to POP LIST command",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1009"
+      },
+      {
+        "reference": "CVE-2003-0721",
+        "description": "Integer signedness error leads to negative array index",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0721"
+      },
+      {
+        "reference": "CVE-2004-1189",
+        "description": "product does not properly track a count and a maximum number, which can lead to resultant array index overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-1189"
+      },
+      {
+        "reference": "CVE-2007-5756",
+        "description": "Chain: device driver for packet-capturing software allows access to an unintended IOCTL with resultant array index error.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-5756"
+      },
+      {
+        "reference": "CVE-2005-2456",
+        "description": "Chain: array index error (CWE-129) leads to deadlock (CWE-833)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-2456"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

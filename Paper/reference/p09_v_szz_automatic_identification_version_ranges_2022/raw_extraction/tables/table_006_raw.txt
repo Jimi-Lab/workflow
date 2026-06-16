@@ -1,0 +1,89 @@
+pared to false positives (i.e., a version is identified
+as vulnerable, but it is not vulnerable), false negatives might result
+in more potential security risk. Because a conservative action is
+to upgrade the newest version without the vulnerability for false
+positives, while if a version is considered not vulnerable, no action
+might be taken. On the other hand, our approach based on V-SZZ
+has similar precisions to the other SZZ algorithms. Overall, in terms
+of F1-score, our approach based on V-SZZ achieves the best perfor-
+mance on the vulnerabilities from both C/C++ and Java projects
+(0.928 and 0.952, respectively). Furthermore, to measure whether
+Table 5: The results of SZZ algorithms on identifying vulner-
+able versions in C/C++ projects.
+#Correct
+AvgRecall
+AvgPrecision
+AvgF1
+B-SZZ
+69
+0.789
+0.960
+0.866
+AG-SZZ
+73
+0.821
+0.950
+0.881
+MA-SZZ
+71
+0.829
+0.930
+0.877
+V-SZZ
+87
+0.930
+0.927
+0.928
+Table 6: The results of SZZ algorithms on identifying vulner-
+able versions in Java projects.
+#Correct
+AvgRecall
+AvgPrecision
+AvgF1
+B-SZZ
+53
+0.875
+0.948
+0.910
+AG-SZZ
+55
+0.871
+0.957
+0.912
+MA-SZZ
+54
+0.894
+0.934
+0.914
+RA-SZZ
+30
+0.640
+0.672
+0.656
+V-SZZ
+59
+0.941
+0.963
+0.952
+the improvement of our approach based on V-SZZ over the previ-
+ous SZZ algorithms is statistically significant, we apply Wilcoxon
+signed-rank test [58] at 95% significance level on F1-scores. We
+find that the p-values are smaller than 0.05, which indicates the
+improvement is statistically significant at the confidence level of
+95%.
+In terms of F1-score, our approach based on V-SZZ can effec-
+tively refine version ranges affected by CVE vulnerabilities and
+achieve higher performance than those based on the previous
+SZZ algorithms.
+6
+DISCUSSION
+6.1
+The Impact of Duplicated Changes
+The second step of our approach is to detect commits that have the
+duplicated changes of the fixing commits and inducing commits.
+The novelty contribution of this step is minor, but it has a significant
+impact on the results of our approach. We find that the patches for
+approximately half of the vulnerabilities we annotated in the study
+are copied among different fixing commits (i.e., 48/100 and 37/72
+for the C/C++ and Java dataset, respectively). Similarly, we also
+find that 8 and 11 vulnerabilities

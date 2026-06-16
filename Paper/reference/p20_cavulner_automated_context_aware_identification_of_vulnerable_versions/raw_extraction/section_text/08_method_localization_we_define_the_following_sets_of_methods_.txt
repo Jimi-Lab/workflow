@@ -1,0 +1,366 @@
+Method Localization. We define the following sets of methods. 𝑀𝑝𝑟𝑒 : The set of all methods
+in the pre-fix version of files modified by the commit. 𝑀𝑝𝑜𝑠𝑡 : The set of all methods in the
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 007 =====
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 7
+post-fix version of files modified by the commit. 𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 : The set of methods containing
+deleted lines of code from the fix commit (identified based on the pre-fix version). 𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 :
+The set of methods containing added lines of code from the fix commit (identified based on
+the post-fix version). We classify method changes into five types based on these sets to reduce
+irrelevant information and enhance the LLM’s focus. ① Methods with only line deletions: 𝑚 ∈
+(𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 )\ 𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 . ② Completely deleted methods: 𝑚 ∈𝑀𝑝𝑟𝑒 \𝑀𝑝𝑜𝑠𝑡 . ③
+Methods with only line additions: 𝑚 ∈(𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 )\𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 . ④ Methods with
+both line additions and deletions: 𝑚 ∈𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 ∩𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 . ⑤ Newly added
+methods: 𝑚 ∈𝑀𝑝𝑜𝑠𝑡 \𝑀𝑝𝑟𝑒 .
+•CVE (Common Vulnerabilities and Exposures). CVE is a standardized identifier for publicly
+disclosed security vulnerabilities. Each known security vulnerability is assigned a unique ID,
+and a standardized description is provided, detailing the characteristics of the vulnerability.
+•CWE (Common Weakness Enumeration). CWE is a community-maintained classification
+standard for software and hardware security weaknesses, aimed at systematically describing
+common weaknesses in code, design, or logic (e.g., root causes of vulnerabilities). It reveals the
+mechanism behind the vulnerability.
+Guided Prompt Construction. We employ a guided prompting mechanism that integrates role
+assignment, multi-source context and an expert analysis framework to direct the LLM’s reasoning.
+•Role Assignment. The LLM is assigned the role of a senior Java vulnerability analysis expert
+and is tasked with performing logical inference based on the provided multi-source context.
+•Multi-source Context. This consists of method change types, CVE ID, CVE description, CWE
+ID and CWE name.
+•Expert Analysis Framework. We prompt the LLM to consider how different MCTs may be
+related to the remediation of vulnerabilities (e.g., line additions might indicate the introduction
+of new security checks). The model is guided to integrate multi-source data with its reasoning
+capabilities in order to identify the methods most associated with vulnerability and explain the
+rationale behind its conclusions.
+•Output. The LLM outputs the signatures of the methods it has identified as vulnerable, which
+serve as part of the input to the subsequent fine-grained vulnerable code block identification
+module.
+3.1.2 Fine-grained Vulnerable Code Block Identification.This submodule builds on the vulnerable
+candidate methods identified in the previous coarse-grained submodule by using the LLM to perform
+a fine-grained analysis. The goal is to identify vulnerable code blocks within these methods.
+Specifically, for each vulnerable candidate method, we extract its complete code content before
+and after the fix and generate a diff between them. Compared to analyzing the full diff of a fix
+commit, which may contain much non-security content, this method-level organization significantly
+reduces the processing burden on the LLM and improves the accuracy of its analysis. Additionally,
+we provide the LLM with two supplementary inputs: the CWE description and the commit message
+for the fix. The CWE description highlights common vulnerability patterns and root causes, and the
+commit message explains the developer’s intention behind the fix. Together, these inputs enable
+more accurate vulnerability analysis.
+Prompt Construction and LLM Reasoning Process. We design prompts for the LLM that
+include the following information and guide it through a specific reasoning process.
+•Input Information. This includes the complete source code of the vulnerable candidate method
+in both its pre-fix and post-fix versions, along with the corresponding code differences. Addi-
+tionally, it contains the CWE description and the fix commit description.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 008 =====
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+8 Anon.
+Algorithm 1 VIC Tracing
+1: procedure TraceVIC(fixCommit, vulnerableLine, cveInfo, cweInfo, methodSignature)
+2: queue ←empty queue
+3: prevCommit ←GitBlame(fixCommit, vulnerableLine)
+4: Enqueue(queue, prevCommit)
+5: while queue not empty do
+6: candidate ←Dequeue(queue)
+7: if not ExistsMethodInParent(candidate, methodSignature) then
+8: return candidate
+9: end if
+10: parentCommit ←ParentCommit(candidate)
+11: sourceCode ←GetMethodSource(parentCommit, methodSignature)
+12: (isVuln, newLines) ←LLMAnalyze(sourceCode, cveInfo, cweInfo)
+13: if not isVuln then
+14: return candidate
+15: else
+16: for all line in newLines do
+17: prevCommit2 ←GitBlame(parentCommit, line)
+18: Enqueue(queue, prevCommit2)
+19: end for
+20: end if
+21: end while
+22: end procedure
+•LLM Reasoning. The LLM starts by analyzing the method-level code changes to understand
+how these modifications address the vulnerability. By integrating the common vulnerability
+patterns from the CWE description, the developer’s intent from the fix commit message, and
+the specific code changes, the LLM further infers the root cause of the vulnerability. It then
+identifies and highlights the precise code blocks in the pre-fix version that are responsible for
+the vulnerability, providing an explanation for why these blocks are considered vulnerable.
+•Structured Output. The final analysis is returned in JSON format and contains the following
+information: project name, CVE ID, fix commit hash, vulnerable file path, method signature, and
+identified vulnerable code blocks.
+For a small number of CVEs, the code fixes cannot be explicitly attributed to any specific method.
+In such cases, due to the lack of effective method-level context, we provide the LLM with code
+before and after fix, the CVE and the CWE information to help it identify potentially vulnerable
+code blocks.
+3.2 LLM-based Vulnerability-Inducing Commit Tracing
+This module aims to identify the vulnerability-inducing commit (VIC) by tracing commits based on
+the previously identified vulnerable code blocks. First, for each vulnerable code block detected in
+the prior stage, we locate its corresponding line numbers of vulnerable codes in the pre-fix version
+of the repository. Next, we leverage a combination of the git blame command and the analytical
+capabilities of the LLM to identify VICs.
+Algorithm 1 details the systematic approach employed for VIC tracing. Initialized with the fix
+commit, vulnerable line, CVE information, CWE information and method signature, it utilizes git
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 009 =====
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 9
+blame to obtain the previous commit, establishing an initial VIC candidate (lines 1-4). To address
+potential inaccuracies arising from code evolution, an iterative verification mechanism is triggered
+to examine the candidate’s parent commit.
+This verification involves a branching logic: if the vulnerable method does not exist in the parent
+commit, it indicates that the current commit introduced the vulnerable method, triggering the
+process to terminate and identify the current commit as the VIC (lines 7-9). In cases where the
+vulnerable method exists, an LLM performs a semantic assessment to determine if the vulnerability
+remains active in the parent version, using the CVE and CWE information together with the source
+code of the method in the parent commit. It is important to highlight that the LLM input is carefully
+curated to exclude the fix commit message, because the parent commit’s message is likely unrelated
+to the vulnerability. If the LLM determines that the method in the parent commit is not vulnerable,
+then the previous commit is confirmed as the VIC (lines 10-14). Otherwise, the LLM identifies the
+vulnerable lines in the commit. We then apply the git blame command and further LLM analysis
+to these lines to trace earlier commits (lines 15-20).
+3.3 Vulnerable Version Determination
+In the context of version control systems (e.g., GitHub), tags are commonly used to denote versions.
+Once the LLM identifies the vulnerability-inducing commit (VIC) corresponding to a given fix
+commit, we can determine the set of vulnerable tags by examining the tags that include the VIC
+but not the fix commit.
+However, in the real world, repositories often maintain multiple active branches (e.g., main,
+release-1.0 and release-2.0), and developers often propagate both VICs and fix commits across these
+branches through merges, cherry-picks, or manual copying. These operations result in duplicate
+commits, which are commits that introduce the same changes but have different commit IDs.
+Failure to identify all instances of duplicate fix commits or VICs can result in inaccurate reporting
+of vulnerable tags, leading to an underestimation or overestimation of their scope.
+Duplicate Commit Identification. We identify duplicate commits by comparing the content
+of their patches. Specifically, we compute a hash for each hunk in every commit. For a given
+commit, we identify all other commits that share the same hunk hashes. If the set of hunk hashes
+in the candidate commit is equal to, or a subset of, that of another commit, we regard them as
+duplicates. This enables us to track semantically equivalent changes across branches, ensuring a
+more comprehensive identification of commits that introduce or fix vulnerabilities.
+Vulnerable Tags Determination. Given a CVE, along with its associated fix commits and
+VICs, we analyse the git tags in the project’s repository to identify the vulnerable tags. For each fix
+commit and its duplicates, we collect all tags that contain these commits, labeled 𝑇𝑓 . Similarly, for
+each VIC and its duplicates, we gather all the corresponding tags, 𝑇𝑖 . The set of vulnerable tags 𝑇𝑣
+is then those tags that belong to 𝑇𝑖 but not to 𝑇𝑓 :
+𝑇𝑣 = {𝑡 |𝑡 ∈𝑇𝑖 ∧𝑡 ∉ 𝑇𝑓 }
+This approach enables accurate identification of affected tags, even in complex branching sce-
+narios involving cherry-picks or manual copying.
+Version Normalization. We normalize GitHub tags to address non-standard naming conven-
+tions (e.g., 2016-04-03_UMLet_v14.2 or STRUTS_2_0_0) that do not follow semantic versioning. In
+real-world development workflows, developers typically retrieve precompiled libraries from the
+Maven Central Repository [4] rather than building them directly from GitHub source code. There-
+fore, we treat Maven Central as the authoritative source for version identifiers and align GitHub tags
+accordingly. Specifically, we design project-specific normalization strategies to map non-standard
+GitHub tags to their corresponding Maven Central versions (e.g., mapping2016-04-03_UMLet_v14.2
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 010 =====
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+10 Anon.
+Table 1. Number of projects, stars, CVEs, fix commits, and tags in our dataset
+Project Stars CVEs Fix commits Tags
+jackson-databind 3.7k 62 147 213
+liferay-portal 2.2k 18 19 233
+jenkins 25k 17 17 1,835
+struts 1.3k 14 20 175
+tomcat 8.1k 7 8 488
+spring-framework 59.6k 7 9 340
+spring-security 9.4k 3 3 348
+other - 48 50 5,098
+Total - 176 273 8,730
+to 14.2, STRUTS_2_0_0 to 2.0.0). For projects available in Maven Central, we compute the inter-
+section between the normalized GitHub versions that are tagged as vulnerable and the full set
+of versions in Maven Central. This intersection forms the final list of vulnerable versions. For
+projects not published in Maven Central, the normalized GitHub tags themselves serve as vulnerable
+versions.

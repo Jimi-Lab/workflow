@@ -1,0 +1,296 @@
+{
+  "cwe_id": "CWE-805",
+  "name": "Buffer Access with Incorrect Length Value",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product uses a sequential operation to read or write a buffer, but it uses an incorrect length value that causes it to access memory that is outside of the bounds of the buffer.",
+  "extended_description": "When the length value exceeds the size of the destination, a buffer overflow could occur.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++",
+      "Assembly"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a sequential operation to read or write a buffer, but it uses an incorrect length value that causes it to access memory that is outside of the bounds of the buffer.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "destination",
+      "sequential",
+      "operation",
+      "exceeds"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "destination",
+      "sequential",
+      "operation",
+      "exceeds",
+      "bounds",
+      "causes",
+      "could",
+      "write"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example takes an IP address from a user, verifies that it is well formed and then looks up the hostname and copies it into a buffer.",
+        "snippet": "void host_lookup(char *user_supplied_addr){ struct hostent *hp; in_addr_t *addr; char hostname[64]; in_addr_t inet_addr(const char *cp); /*routine that ensures user_supplied_addr is in the right format for conversion */..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following example, it is possible to request that memcpy move a much larger segment of memory than assumed:",
+        "snippet": "int returnChunkSize(void *) { /* if chunk info is valid, return the size of usable memory, * else, return -1 to indicate an error */ ... } int main() { ... memcpy(destBuf, srcBuf, (returnChunkSize(destBuf)-1)); ... }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following example, the source character string is copied to the dest character string using the method strncpy.",
+        "snippet": "... char source[21] = \"the character string\"; char dest[12]; strncpy(dest, source, sizeof(source)-1); ..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In this example, the method outputFilenameToLog outputs a filename to a log file. The method arguments include a pointer to a character string containing the...",
+        "snippet": "#define LOG_INPUT_SIZE 40 // saves the file name to a log file int outputFilenameToLog(char *filename, int length) { int success; // buffer with size set to maximum size for input to log file char buf[LOG_INPUT_SIZE];..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In the following example, the source character string is copied to the dest character string using the method strncpy.",
+        "snippet": "... char source[21] = \"the character string\"; char dest[12]; strncpy(dest, source, sizeof(dest)-1); ..."
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In this example, the method outputFilenameToLog outputs a filename to a log file. The method arguments include a pointer to a character string containing the...",
+        "snippet": "... // copy filename to buffer strncpy(buf, filename, sizeof(buf)-1); ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2011-1959",
+        "description": "Chain: large length value causes buffer over-read (CWE-126)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-1959"
+      },
+      {
+        "reference": "CVE-2011-1848",
+        "description": "Use of packet length field to make a calculation, then copy into a fixed-size buffer",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-1848"
+      },
+      {
+        "reference": "CVE-2011-0105",
+        "description": "Chain: retrieval of length value from an uninitialized memory location",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-0105"
+      },
+      {
+        "reference": "CVE-2011-0606",
+        "description": "Crafted length value in document reader leads to buffer overflow",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-0606"
+      },
+      {
+        "reference": "CVE-2011-0651",
+        "description": "SSL server overflow when the sum of multiple length fields exceeds a given value",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-0651"
+      },
+      {
+        "reference": "CVE-2010-4156",
+        "description": "Language interpreter API function doesn't validate length argument, leading to information exposure",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-4156"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

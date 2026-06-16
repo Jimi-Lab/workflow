@@ -1,0 +1,164 @@
+Distributions
+Lines of Code
+Date
+Collected
+Early
+2011
+(Σ1)
+Debian Lenny
+257,796,235
+Jan. 2011
+Ubuntu Maverick
+245,237,215
+Mar. 2011
+Linux Kernel 2.6.37.4
+8,968,871
+Mar. 2011
+SourceForge (C/C++)
+922,424,743
+Mar. 2011
+Late
+2011
+(Σ2)
+Debian Squeeze
+348,754,939
+Nov. 2011
+Ubuntu Oneiric
+397,399,865
+Nov. 2011
+Total
+2,180,581,868
+-
+Table I: Source Dataset
+Dataset
+# ﬁles
+# diffs
+Date Released
+Patches before 2011 (δ1)
+274
+1,079
+2001∼2010
+Patches in 2011 (δ2)
+102
+555
+2011
+Total
+376
+1,634
+-
+Table II: Security-related Patch Dataset
+kernel v2.6.37.4. In the SourceForge data set we removed
+identiﬁable non-active code branches such as branches
+and tags directories. In November 2011, we prepared our
+Late 2011 Dataset (Σ2): all source packages for Debian
+6.0 Squeeze and Ubuntu 11.10 Oneiric. Table I shows the
+detailed breakup of the dataset. The data set consists of a
+large number of projects written in a wealth of languages
+including C, C++, Java, Shell, Perl, Python, Ruby, and PHP.
+In order to ﬁnd notable bugs, we collected security-related
+patches from the Debian/Ubuntu security advisory which
+has the links to the corresponding packages and patch-
+es/diffs. We performed our experiments on 376 security-
+related patches consisting of 1,634 diffs. We only included
+the patches whose related CVE numbers are recognizable
+by the patch ﬁle names. As described in Table II, we
+downloaded security-related patches released before 2011
+(δ1) which were available at the time of collecting Σ1,
+and patches released in 2011 (δ2) which were distributed
+between Σ1 and Σ2.
+In
+the
+original
+source
+packages
+for
+Debian
+and
+Ubuntu there are a number of existing patches (e.g.,
+debian/patches/) that can be applied during a build;
+we applied these patches as well. As a result, the packages
+were patched current up to security advisories on the down-
+load date. Since we downloaded the SourceForge packages
+via revision control systems, we assume all patches were
+already applied.
+The experiments show the number of duplicate buggy
+code segments that are still likely vulnerable. We have
+veriﬁed the presence of all reported unpatched code clones,
+i.e., clones of the exact same buggy code, to conﬁrm
+the ReDeBug implementation is correct. We discuss this
+measurement in § III-F.
+ 0
+ 5
+ 10
+ 15
+ 20
+ 25
+9.0M
+245M
+258M
+349M
+397M
+922M
+Time to build a database (hours)
+                    Lines of Code
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 3: Time to build a database with various sizes of
+dataset
+Distributions
+DB Size
+Projects #
+Files #
+Debian Lenny
+6.0GB
+10,699
+1,155,594
+Ubuntu Maverick
+5.6GB
+11,237
+1,067,579
+Linux Kernel 2.6.37.4
+344MB
+-
+57,653
+SourceForge (C/C++)
+29GB
+30,437
+5,574,905
+Debian Squeeze
+8.2GB
+14,977
+1,586,325
+Ubuntu Oneiric
+9.8GB
+18,240
+1,892,911
+Table III: Size of created databases
+Default Parameters: The default context in a diff ﬁle
+is 3 lines of code. Unless otherwise noted, we set n = 4.
+n = 4 when the amount of context c = 3 guarantees that
+every reported duplicate had at least one changed line along
+with surrounding context. In all experiments for unpatched
+code clones we set θ = 1, e.g., with the default parameters
+all n-tokens from the original buggy code segment needed
+to be found in an unpatched copy to report a bug. m is
+the size of a Bloom ﬁlter and N is the number of n-tokens
+to be hashed into a Bloom ﬁlter. ReDeBug used 256KB-
+sized Bloom ﬁlters where the m/N ratio was always at least
+greater than 32. ReDeBug took advantage of 3 fast hash
+functions: djb2, sdbm, and jenkins [6].
+C. Performance
+We ran ReDeBug to create the database for each source
+code dataset. Figure 3 shows the database build time. The
+database build for Ubuntu Maverick and Debian Lenny both
+took about 6 hours. The database build for SourceForge took
+about 23.3 hours. This is the end-to-end time including the
+time to read in ﬁles, normalize, tokenize, put into the Bloom
+ﬁlter, and to store on disk for all source code written in a
+variety of languages, e.g., C/C++, Java, Shell, Perl, Python,
+54
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

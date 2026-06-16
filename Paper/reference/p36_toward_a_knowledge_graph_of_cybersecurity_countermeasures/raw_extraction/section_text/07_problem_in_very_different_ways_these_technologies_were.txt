@@ -1,0 +1,107 @@
+problem in very different ways. These technologies were
+developed over two decades and deployed in radically dif-
+ferent form-factors ranging from endpoint software agents to
+software compiler technologies. Additionally, their analytical
+approaches to veriﬁcation were different. It was apparent
+there may be advantages and disadvantages to the different
+approaches. Despite the signiﬁcant differences, these technolo-
+gies were designed to solve the same problem: verify that the
+code segments (also known as text segments—Figure 5) within
+a running process were as expected.
+To accurately make claims that a product implements a
+given technique, we must understand the technique’s seman-
+tics. We deﬁne the term process code segment to mean the
+portions of memory assigned to a running process that contain
+machine code for execution. These code segments are usually
+loaded from disk when the application is executed to launch
+the process. By specifying process code segment we explain
+that this technique is not concerned with the application image
+on disk but its state once it is loaded into the memory of a
+launched process. Veriﬁcation suggests that we are not only
+concerned with the integrity of the code segment but that
+a source of truth exists to verify against. This technique
+name is rooted in the computer science domain; the term
+code segment is used in many computer science textbooks
+to describe the machine code portions of an executable ﬁle.
+Additional research is required to objectively quantify the
+quality of technique names.
+Now that we have vocabulary for understanding a speciﬁc
+D3FEND technique, we can ask the vendor key questions:
+Under what circumstances does your technology read and
+verify the process code segments? What is the source of truth
+used in the veriﬁcation of the code segments; is it on the
+victim machine or a remote system? What happens if the code
+segments are determined to be invalid? The answers to these
+questions were interesting and illustrated the creativity and
+cleverness of the cybersecurity technology developers.
+This knowledge, intellectual property references, and anal-
+ysis were recorded in our D3FEND knowledge graph under
+the technique Process Code Segment Veriﬁcation. With this
+information organized and the intellectual property catalogued,
+practitioners are now able not only to understand how the
+technique works but also to consider which approach is more
+suitable to their unique requirements.
+Our example— process code segment veriﬁcation —
+illustrates positioning within two key dimensions of semantic
+speciﬁcity, Figure 6. The level of speciﬁcity required for
+describing functionality is dependent on usage context.
+Our taxonomical approach accommodates various levels of
+speciﬁcity. This enables the model to be easily tailored to a
+particular use case. For example, an acquisition analyst may
+require more generalization, while an engineer may require
+more speciﬁcity.
+D. D3FEND Tactics & Techniques
+As we developed techniques in the D3FEND knowledge
+graph, we identiﬁed sets of similar techniques that had com-
+mon relationships. For example, some techniques primarily
+analyze raw network trafﬁc, while others focus purely on
+process analysis. These techniques then naturally grouped
+together further to organize more general types of techniques.
+
+===== Page 008 =====
+Fig. 6. Key Dimensions of Semantic Speciﬁcity
+We distinguish the top-level techniques as base techniques ,
+from which all the other techniques are derived. For example,
+the technique process code segment veriﬁcation falls under the
+base technique “Process Analysis.”
+As we grouped the techniques, we identiﬁed another higher-
+level concept, the defensive tactic. A defensive tactic is the
+most general organizing class in the D3FEND knowledge
+graph; see Figure 4. A defensive tactic is a maneuver in
+response to some adversary action. These are action-oriented
+and carefully selected terms to generalize multiple techniques.
+Example defensive tactics we identiﬁed are Detect, Harden,
+Deceive, Evict, and Isolate.
+The tactics are represented in the top row, and the base
+techniques are represented in the second row of Figure 3.
+More speciﬁc defensive techniques appear in the columns
+below the base techniques. Techniques belong to only one base
+technique; in general, techniques form a hierarchy from the
+most general to the most speciﬁc. For clarity, only two levels
+of the defensive technique hierarchy are depicted in Figure 3.
+Finally, the circled number in the individual techniques rep-
+resents the number of source documents analyzed to develop
+the technique.
+An implicit notion of state is expressed in terms chosen
+for tactics. A defender cannot Evict an adversary if he cannot
+Detect the adversary, and he cannot Detect the adversary if
+they are not there. Ideally, the defender would Harden his
+environment before the adversary penetrates it.
+Tactics are the maneuvers defenders take against an
+adversary—“the what” of an action. The techniques are the
+methods used to employ those actions—“the how” of imple-
+menting the tactic. We say that these tactics are enabled by
+the techniques.
+E. Digital Objects, Digital Artifacts, and Technique Mapping
+A key construct in D3FEND is the Digital Artifact Ontol-
+ogy (DAO) . This ontology speciﬁes the concepts necessary
+to classify and represent the digital objects of interest for
+cybersecurity analysis. In the D3FEND knowledge model, a
+Fig. 7. Offensive and Defensive Techniques Mapping Via Digital Artifacts
+digital object becomes a digital artifact when a cyber actor,
+either defensive or offensive, interacts with the object in any
+way. To ensure a reasonable modeling scope, the D3FEND
+knowledge model is only concerned with capturing knowledge
+about digital artifacts relevant to known cyber actors and
+known technologies—not all possible digital objects or their
+representations.

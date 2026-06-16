@@ -1,0 +1,17 @@
+Paper ID: p06_enhancing_bug_inducing_commit_identification_a_fine_grained_semantic_analysis_approach_2024
+Title: Enhancing Bug-Inducing Commit Identification: A Fine-Grained Semantic Analysis Approach
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\SEM-SZZ\Enhancing Bug-Inducing Commit Identification：A Fine-Grained Semantic Analysis Approach.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\SEM-SZZ\SEM-SZZ
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+Input: A bug-fixing commit and repository history; for source implementation, README and scripts imply datasets and generated result files are expected but local dataset/result directories are absent. [NEEDS ARTIFACT]
+Output: Bug-inducing commit candidates, based on traced buggy statements.
+Objects / Entities: bug-fixing commit, added lines, deleted lines, unmodified neighboring lines, basic block, control flow graph, execution path, variable data flow, path constraints, buggy statement, bug-inducing commit.
+Formal Definitions: The paper gives formula-style metric definitions for precision/recall/F1 in the experiment setting; formula layout is not repaired. [NEEDS FORMULA REPAIR]
+Objective: Improve precision/F1 of bug-inducing commit identification while preserving useful recall in added-line and deleted-line settings.
+Constraints: Requires source history and static code parsing; README mentions tree-sitter and Joern environment requirements, but execution was not requested. [EXECUTION NOT REQUESTED]
+Evaluation Target: Performance against SZZ variants/baselines on DATASET-A, DATASET-FA, and DATASET-D as stated by the paper/README; local datasets not verified. [NEEDS ARTIFACT]
+Boundary Conditions: The discussion states failures where line similarity misjudges semantics or buggy statements are not correctly identified.
+What Is Not Solved: It does not claim to identify affected versions directly; it does not solve cases where the fix changes only non-function regions or where tracing changed functions still cannot find the origin. [PAPER-ONLY]
+Reusable Formalization Pattern: Define the code-history task through input/output and then isolate the narrow class of commits the method can handle.

@@ -1,0 +1,38 @@
+Results.Table 8 shows the results. Simple-SZZ-Agent is effec-
+tive across all tested configurations. Even the cheapest configu-
+ration (OpenHands with minimax-m2.5 at $0.04 per fix commit)
+achieves 0.79 F1-score, outperforming all previous non-agentic ap-
+proaches. The best configuration (OpenHands with Claude Sonnet
+4.5) achieves 0.86 F1-score at $0.38 per fix commit, surpassing the
+Claude Opus 4.5 configurations. Within the same agent framework,
+more capable models generally perform better, though the differ-
+ence between Sonnet and Opus is small or even reversed.
+Finding 8:Simple-SZZ-Agent generalizes across agent frame-
+works and LLM backbones. Even the worst-performing configura-
+tion (Claude Code with Claude Haiku 4.5, 0.74 F1) outperforms the
+previous state of the art by 12 percentage points, and the best con-
+figuration reaches 0.86 F1-score, suggesting that further progress
+with improved models and agents is likely.
+
+===== Page 009 =====
+How and Why Agents Can Identify Bug-Introducing Commits Preprint, Under Submission, arXiv
+100fix commits
+87correct
+13incorrect
+4BIC not incandidate set
+9BIC in candidateset, wrong selection 1could notdetermine
+3incorrectanalysis
+2near miss(≤3 positions)
+3questionableground truth label
+Figure 6: Manual error analysis of Simple-SZZ-Agent on 100 fix commits from DS_LINUX-26.
+Table 8: RQ4c: Simple-SZZ-Agent with different underlying models and agents. Best results in bold.
+Avg. per Fix Commit
+Agent Model Precision Recall F1-Score Cost Tool Calls Tokens
+Claude Code claude-haiku-4-5 0.75 0.73 0.74 $0.09 14.2 339k
+Claude Code claude-sonnet-4-5 0.81 0.80 0.80 $0.25 16.7 290k
+Claude Code claude-opus-4-5 0.83 0.81 0.82 $0.38 14.3284k
+OpenHands claude-haiku-4-5 0.80 0.79 0.79 $0.14 15.7 1.3M
+OpenHands claude-sonnet-4-50.87 0.86 0.86$0.3814.01.0M
+OpenHands claude-opus-4-5 0.84 0.82 0.83 $0.63 16.9 1.0M
+OpenHands minimax-m2.5 0.80 0.78 0.79$0.0420.0 1.3M
+OpenHands glm-5 0.79 0.78 0.78 $0.26 17.8 754k

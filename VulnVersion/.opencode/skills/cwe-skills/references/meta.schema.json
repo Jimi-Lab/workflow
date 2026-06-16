@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vulnversion.local/schemas/cwe-meta.schema.json",
+  "title": "VulnVersion CWE Meta Schema",
+  "type": "object",
+  "required": [
+    "cwe_id",
+    "name",
+    "abstraction",
+    "status",
+    "description",
+    "relationships",
+    "applicable_platforms",
+    "introduction_phases",
+    "likelihood_of_exploit",
+    "mapping",
+    "mechanism",
+    "code_signals",
+    "predicate_priors",
+    "stage_hints",
+    "examples",
+    "metadata"
+  ],
+  "properties": {
+    "cwe_id": {
+      "type": "string",
+      "pattern": "^CWE-[0-9]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "abstraction": {
+      "type": "string",
+      "enum": ["Pillar", "Class", "Base", "Variant", "Compound", "Chain", "Category", "Unknown"]
+    },
+    "status": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "extended_description": {
+      "type": "string",
+      "default": ""
+    },
+    "relationships": {
+      "type": "object",
+      "required": ["parents", "children", "peers"],
+      "properties": {
+        "parents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRef" },
+          "default": []
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRef" },
+          "default": []
+        },
+        "peers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationshipRef" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "applicable_platforms": {
+      "type": "object",
+      "required": ["languages", "technologies", "architectures", "paradigms"],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "technologies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "architectures": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "paradigms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "introduction_phases": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "likelihood_of_exploit": {
+      "type": "string",
+      "default": "Unknown"
+    },
+    "mapping": {
+      "type": "object",
+      "required": ["usage", "fit", "rationale"],
+      "properties": {
+        "usage": { "type": "string", "default": "" },
+        "fit": { "type": "string", "default": "" },
+        "rationale": { "type": "string", "default": "" }
+      },
+      "additionalProperties": false
+    },
+    "mechanism": {
+      "type": "object",
+      "required": [
+        "root_cause_summary",
+        "typical_preconditions",
+        "typical_sources",
+        "typical_sinks",
+        "typical_fix_actions",
+        "negative_nonfix_signals"
+      ],
+      "properties": {
+        "root_cause_summary": { "type": "string" },
+        "typical_preconditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "typical_sources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "typical_sinks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "typical_fix_actions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "negative_nonfix_signals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "code_signals": {
+      "type": "object",
+      "required": [
+        "vuln_search_patterns",
+        "fix_search_patterns",
+        "guard_patterns",
+        "dangerous_generic_tokens",
+        "preferred_distinctive_tokens"
+      ],
+      "properties": {
+        "vuln_search_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "fix_search_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "guard_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "dangerous_generic_tokens": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "preferred_distinctive_tokens": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "predicate_priors": {
+      "type": "object",
+      "required": [
+        "preferred_scope",
+        "good_predicate_kinds",
+        "discouraged_predicate_kinds",
+        "recommended_guard_templates",
+        "recommended_predicate_templates"
+      ],
+      "properties": {
+        "preferred_scope": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "good_predicate_kinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "discouraged_predicate_kinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "recommended_guard_templates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "recommended_predicate_templates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "stage_hints": {
+      "type": "object",
+      "required": ["stage1", "stage2", "stage3"],
+      "properties": {
+        "stage1": { "$ref": "#/$defs/stageHint" },
+        "stage2": { "$ref": "#/$defs/stageHint" },
+        "stage3": { "$ref": "#/$defs/stageHint" }
+      },
+      "additionalProperties": false
+    },
+    "examples": {
+      "type": "object",
+      "required": ["bad_examples", "good_examples", "observed_examples"],
+      "properties": {
+        "bad_examples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/exampleItem" },
+          "default": []
+        },
+        "good_examples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/exampleItem" },
+          "default": []
+        },
+        "observed_examples": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/observedExample" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "repo_notes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "default": {}
+    },
+    "evolution": {
+      "type": "object",
+      "required": ["usage_count", "success_count", "fp_lessons", "fn_lessons", "last_updated"],
+      "properties": {
+        "usage_count": { "type": "integer", "minimum": 0, "default": 0 },
+        "success_count": { "type": "integer", "minimum": 0, "default": 0 },
+        "fp_lessons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "fn_lessons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "last_updated": {
+          "type": ["string", "null"],
+          "default": null
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["source_xml", "catalog_version", "generated_at"],
+      "properties": {
+        "source_xml": { "type": "string" },
+        "catalog_version": { "type": "string" },
+        "generated_at": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "relationshipRef": {
+      "type": "object",
+      "required": ["cwe_id", "nature"],
+      "properties": {
+        "cwe_id": {
+          "type": "string",
+          "pattern": "^CWE-[0-9]+$"
+        },
+        "nature": { "type": "string" },
+        "view_id": { "type": ["string", "null"], "default": null },
+        "ordinal": { "type": ["string", "null"], "default": null },
+        "name": { "type": ["string", "null"], "default": null }
+      },
+      "additionalProperties": false
+    },
+    "stageHint": {
+      "type": "object",
+      "required": ["goal", "must_focus", "must_avoid"],
+      "properties": {
+        "goal": { "type": "string" },
+        "must_focus": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "must_avoid": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "recommended_queries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "exampleItem": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "language": { "type": ["string", "null"], "default": null },
+        "nature": { "type": ["string", "null"], "default": null },
+        "summary": { "type": "string" },
+        "snippet": { "type": ["string", "null"], "default": null }
+      },
+      "additionalProperties": false
+    },
+    "observedExample": {
+      "type": "object",
+      "required": ["reference", "description"],
+      "properties": {
+        "reference": { "type": "string" },
+        "description": { "type": "string" },
+        "link": { "type": ["string", "null"], "default": null }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

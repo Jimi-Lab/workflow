@@ -1,0 +1,125 @@
+Motivation. Figure 1 highlights two major limitations of
+existing solutions, along with the key challenges that must
+be addressed to overcome them. Speciﬁcally:
+Challenge 1: No Large-Scale Labeled Datasets.Developing
+large-scale annotated datasets mapping CVEs to ATT&CK
+TTPs is challenging [14] due to vague and ambiguous CVE
+descriptions, requiring expert annotators for precise alignment.
+Existing datasets [4]–[8], [15], [16] remain limited, typically
+covering fewer than 8K of over 276K CVEs and fewer than
+52 of 656 enterprise techniques [17], leading to poor model
+generalization. Expanding these datasets with accuracy and
+consistency is crucial for improving models.
+Challenge 2: Difﬁculty in Accurately Mapping CVEs to TTPs.
+Extracting attack behaviors from CVE descriptions and map-
+ping them to TTPs remains difﬁcult for both supervised and
+unsupervised methods [3], [10]. CVEs often contain irrelevant
+information (such as version histories, patch notes, or meta-
+data) that obscures exploitation details, reduces model effec-
+tiveness [18]–[20], and hinders detection of attack patterns [3],
+[9], [11], [21]. Variability in CVE length, structure, and
+extraneous content also consumes model capacity, especially
+for LLMs with token limits, lowering accuracy and efﬁciency.
+Challenge 3: Data Imbalance and Limited TTP Cover-
+age in Dataset. Data imbalance in datasets leads to over-
+representation of certain TTPs, causing supervised models
+to favor common techniques and miss rare or emerging
+ones [14] (e.g., ENISA dataset [15], [16] has 2,699 CVEs
+for T1027 vs. 427 forT1190), especially in multi-label cases
+where CVEs map to multiple TTPs [22]. Additionally, many
+datasets (e.g., [3], [4], [16]) omit critical TTPs used in real
+attacks [23]–[26]; for example,T1059 (Command Execution
+Attacks) is missing from ENISA [16] despite frequent CVE
+mentions [23], [24]. This limits the effectiveness of models
+[18]–[20] and affects both supervised and unsupervised ap-
+There are thousands of new vulnerabilities (e.g., 12,009 
+vulnerabilities in Q1 of 2025 [1] ) reported every year through 
+the Common Vulnerabilities and Exposures (CVE) program. 
+However, those CVE descriptions  do not include much details 
+on how  those vulnerabilities can be exploited. In contrast, 
+MITRE ATT&CK framework [2] deﬁnes various attack tactics, 
+techniques, and procedures (TTP), but does not link them to 
+speciﬁc vulnerabilities. Bridging this gap by automatically 
+mapping CVEs to TTPs can signiﬁcantly help both in detecting 
+and mitigating security threats [3], [4].
+Existing efforts to map CVE descriptions to TTPs fall into 
+two categories. Supervised approaches (e.g., [5]–[8]) map CVE 
+descriptions to TTPs by training classiﬁcation models on 
+labeled datasets to predict TTPs for new sam-ples. 
+Unsupervised approaches use language models (e.g.,[3], [9], 
+[10]) and graph-based methods (e.g., [11]–[13]) to infer 
+relationships between CVEs (or other threat reports) and TTP 
+deﬁnitions based on semantic similarity, structural
+Network and Distributed System Security (NDSS) Symposium 2026
+23-27 February 2026, San Diego, CA, USA
+ISBN 979-8-9919276-8-0
+https://dx.doi.org/10.14722/ndss.2026.242926
+www.ndss-symposium.org
+
+===== Page 002 =====
+ChallengesOur Ideas
+CVEs
+CWEs
+Capecs
+TTPs
+ New
+Dataset
+>92K CVEs
+141 TTPs
+Predicted
+TTPs
+CVE
+Analyst
+NEXUS FPs FNs
+Feedback
+Start
+Fixes FPs and
+FNs for future
+similar CVEs
+T1027: 2,699 CVEsImbalance
+Important
+Missed
+TTPs
+E.g., Top 10 TTPs
+in 2022 and 2024
+T1190: 427 CVEs
+Original
+Dataset
+Label
+Adjustment
+Data
+Augmentation
+Important Missed TTPs
+Less
+Imbalanced
+and Supports
+67 more TTPs
+New
+Dataset
+Generate Large-
+Scale Dataset
+Extract TTP Details More
+Accurately Enhance Dataset Utilize Analyst Feedback
+Limited Availability of 
+Large-Scale Datasets
+1
+Difficulty in Accurately Mapping 
+CVE Details to TTPs
+2
+Data Imbalance and Limited
+TTP Coverage in Dataset
+3
+Lack of Adaptive Learning for
+Continuous Improvement
+4
+CVE
+Description
+ LLM
+CVE-specific
+attack patterns
+3000
+samples
+Irrelevant
+Information
+Attack
+Patterns

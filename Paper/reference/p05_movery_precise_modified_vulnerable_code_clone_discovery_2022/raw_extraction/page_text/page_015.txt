@@ -1,0 +1,96 @@
+VCC discovery techniques. Jang et al . proposed ReDe-
+Bug [14], which is a token-based VCC discovery approach
+using the slicing window technique. Kim et al. proposed
+VUDDY [17], a function-level scalable VCC discovery tech-
+nique. Bowman et al. proposed VGRAPH [3], a CPG-based
+VCC discovery technique, which is more robust to code mod-
+ification, especially for Type-3 code clones. Xiao et al. pro-
+posed MVP [49], a recurring vulnerability detection approach.
+By considering only the sliced code lines that are directly
+related to vulnerabilities, MVP can discover VCCs with low
+syntax similarity of disclosed vulnerable functions.
+However, these existing techniques (1) cannot precisely
+discover modified VCCs caused by internal OSS modifica-
+tions, and (2) can only discover VCCs with code lines that
+have been deleted from security patches, thereby showing
+low accuracy when applied to our target problem (see Sec-
+tion 5.1 and Section 5.2). Some other techniques attempted
+to discover vulnerable codes based on learning algorithms
+(e.g., [22, 23]) or to detect buggy codes (e.g., [20, 26]). They
+hold the promise of detecting general vulnerable or buggy
+code, however, they are not capable of precisely discovering
+VCCs propagated by modified OSS reuse.
+8 Conclusion
+Discovering propagated vulnerabilities from modified OSS
+components is a pressing issue, because unpatched vulnerabil-
+ities can pose a critical threat to the entire software. In regards
+to this, we present MOVERY , a precise approach that discov-
+ers VCCs from modified OSS components. Our experimen-
+tal results affirmed that MOVERY significantly outperformed
+existing VCC discovery techniques in terms of VCC discov-
+ery accuracy. Equipped with VCC discovery results from
+MOVERY , developers can address potential threats caused
+by propagated vulnerabilities in modified OSS components,
+rendering a safer software ecosystem.
+Acknowledgment
+We appreciate the anonymous reviewers for their valuable
+comments to improve the quality of the paper. This work
+was supported by Institute of Information & Communications
+Technology Planning & Evaluation (IITP) grant funded by
+the Korea government (MSIT) (No.2019-0-01697 Develop-
+ment of Automated Vulnerability Discovery Technologies
+for Blockchain Platform Security, No.2022-0-01198 Conver-
+gence Security Core Talent Training Business, and No.IITP-
+2022-2020-0-01819 ICT Creative Consilience program).
+Availability
+The source code of MOVERY is publicly available at
+GitHub: https://github.com/wooseunghoon/MOVERY-
+public.
+References
+[1] Aqua Security. Trivy: scanner for vulnerabilities in
+container images, file systems, and Git repositories,
+as well as for configuration issues, 2022. https:
+//aquasecurity.github.io/trivy/v0.22.0/.
+[2] Michael Backes, Sven Bugiel, and Erik Derr. Reliable
+Third-Party Library Detection in Android and its Se-
+curity Applications. In Proceedings of the 23rd ACM
+SIGSAC Conference on Computer and Communications
+Security (CCS), pages 356–367, 2016.
+[3] Benjamin Bowman and H Howie Huang. VGRAPH:
+A Robust Vulnerable Code Clone Detection System
+Using Code Property Triplets. In Proceedings of the
+5th IEEE European Symposium on Security and Privacy
+(EuroS&P), pages 53–69, 2020.
+[4] Lutz Büch and Artur Andrzejak. Learning-Based Re-
+cursive Aggregation of Abstract Syntax Trees for Code
+Clone Detection. In Proceedings of the IEEE 26th In-
+ternational Conference on Software Analysis, Evolution
+and Reengineering (SANER), pages 95–104, 2019.
+[5] Common Weakness Enumeration. 2021 CWE
+Top 25 Most Dangerous Software Weaknesses,
+2021. https://cwe.mitre.org/top25/archive/
+2021/2021_cwe_top25.html.
+[6] Ctags. Universal Ctags, 2021. https://github.com/
+universal-ctags/ctags.
+[7] CVE Details. The Ultimate Security Vulnerability Data
+source, 2021. https://www.cvedetails.com.
+[8] Ying Dong, Wenbo Guo, Yueqi Chen, Xinyu Xing,
+Yuqing Zhang, and Gang Wang. Towards the detec-
+tion of inconsistencies in public security vulnerability
+reports. In Proceedings of the 28th USENIX Security
+Symposium (Security), pages 869–885, 2019.
+[9] Ruian Duan, Ashish Bijlani, Meng Xu, Taesoo Kim, and
+Wenke Lee. Identifying Open-Source License Violation
+and 1-day Security Risk at Large Scale. In Proceed-
+ings of the 24th ACM SIGSAC Conference on Computer
+and Communications Security (CCS), pages 2169–2185,
+2017.
+[10] Mohammad Gharehyazie, Baishakhi Ray, Mehdi Ke-
+shani, Masoumeh Soleimani Zavosht, Abbas Hey-
+darnoori, and Vladimir Filkov. Cross-project code
+clones in GitHub. Empirical Software Engineering ,
+pages 1–36, 2018.
+[11] GitHub. The GitHub Blog - Thank you for 100 million
+repositories, 2018. https://github.blog/2018-
+11-08-100m-repos/ .
+3050    31st USENIX Security Symposium USENIX Association

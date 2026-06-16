@@ -1,0 +1,35 @@
+7 Conclusion and Future Work
+In this paper, we proposeAgentSZZ, an agent-based framework
+that leverages LLM-driven agents to identify bug-inducing commits
+through interactive repository investigation. Unlike staticgit blame
+pipelines,AgentSZZcombines task-specific tools, domain knowl-
+edge, and a ReAct-style loop to enable adaptive, evidence-driven
+exploration of the repository. A structured compression module
+further reduces token consumption by over 30% with negligible
+impact, improving efficiency without sacrificing effectiveness.
+Extensive experiments on three developer-annotated datasets
+show thatAgentSZZoutperforms all eleven baselines, achieving F1
+improvements of 15.4%–27.2% over LLM4SZZ. The gains are most
+pronounced in challenging scenarios: recall improves by up to 300%
+on cross-file cases and 60% on ghost commits, where static tracing
+methods often fail. Ablation studies show that task-specific tools
+are indispensable, domain knowledge significantly improves recall,
+and the overall architecture generalizes well across multiple LLM
+backbones. These results suggest that structured tool interaction,
+rather than purely model-based reasoning, is key to effective and
+efficient bug-inducing commit identification.
+Several directions remain for future work. The dominant failure
+mode is misattribution among plausible commits rather than lo-
+calization errors, suggesting the need for finer-grained temporal
+reasoning or stronger causal verification. For example, incorporat-
+ing execution-based validation could help distinguish commits that
+introduce faults from those that merely expose them.AgentSZZ
+
+===== Page 011 =====
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+currently tends to identify a single BIC per fix, limiting recall in
+multi-BIC cases (e.g., DS_APACHE). Future work could extend the
+framework to support multiple BICs by modeling dependencies
+across commits. Future work could also explore automated domain
+knowledge extraction and integrate execution or static analysis to
+better verify causal relationships.

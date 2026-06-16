@@ -1,0 +1,96 @@
+III. O VERVIEW
+the
+Figure 3 illustrates the workflow of VULTURE for detecting
+1-day vulnerabilities introduced by reusing TPLs. V ULTURE
+consists of three phases, TPLF ILTER Construction, TPL Reuse
+Identification, and 1-day Vulnerability Detection.
+TPLF ILTER Construction. VULTURE employs TPLF ILTER
+to construct a unique database tailored specifically for the
+target platform. It is comprised of two segments, the compo-
+nent segment, and the vulnerability segment. The component
+segment contains the TPL details (e.g., TPL names, TPL ver-
+sions, and code information) while the vulnerability segment
+includes information on vulnerabilities that have previously or
+currently existed in the previous and current versions of each
+TPL, respectively.
+TPL Reuse Identification. Given a target program, VULTURE
+conducts a function-level TPL reuse detection. By extracting
+the function hashing of all functions in the target program,
+VULTURE identifies the TPLs and their versions that have
+been reused by the target program via function-based similarity
+comparison. To eliminate the false alarms driven by the custom
+TPL reuses, VULTURE analyzes the dependencies among TPLs
+to optimize the results and creates a TPL reuse report.
+1-day Vulnerability Detection. As TPLs are reused in two
+different ways, i.e., exact reuse and custom reuse, V ULTURE
+analyzes each type of reuse by utilizing version-based match-
+ing and chunk-based analysis, respectively. Through version-
+based matching, V ULTURE specifically identifies the functions
+that are reused exactly and verifies whether these functions
+are vulnerable by searching for the official patches provided
+by the TPL contributors. In cases of custom reuses, V ULTURE
+re-generates the modified functions into chunk representatives
+and analyzes the code modifications within each chunk. It
+can determine whether the modifications introduce any vul-
+nerabilities at a granular level. As TPLF ILTER includes the
+official patches for certain vulnerable TPLs, V ULTURE further
+provides fix suggestions based on the reported vulnerabilities.
+4
+
+===== PAGE 005 =====
+1.  TPLFILTER Construction 2. TPL Reuse Identification
+Similarity
+Comparison
+Function Hash 
+Hashing
+Birth-time Comparison
+Path-name Comparison
+Target Program
+ Identification Optimization
+3. 1-day Vulnerability Detection
+CVE-Commit Mapping
+Patch Commit
+V1 V2 ...... Vn
+V1.2
+Release Slice
+Reused
+LibraryRedundant
+Function
+Elimination
+Vulnerability
+Report
+Selection
+TPL
+Selection
+TPL Hash
+Flaw Report
+Line Match
+Chunk Match
+Chunk Extraction
+Code FormatSyntactic Analysis
+Chunk-based Analysis
+File Path
+Version
+Func Hashing
+CVE ID
+CPE
+Patch Commit
+ Reuse Report
+TPL Summary
+SynChunk Process
+Candidate
+Vulnerability
+Extraction
+Component 
+Segment
+Vulnerability 
+Segment
+Candidate Libraries
+Public database
+Birth Time
+Description
+Parsing
+Commit
+Mapping
+LLM
+Fig. 3: Workflow of V ULTURE

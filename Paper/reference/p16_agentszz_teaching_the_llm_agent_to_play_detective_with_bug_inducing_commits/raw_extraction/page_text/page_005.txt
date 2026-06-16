@@ -1,0 +1,110 @@
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+the modified or deleted lines at the parent of the bug-fixing commit
+(fix~1). For ghost commits (where the bug-fixing commit does
+not contain modified or deleted lines), our domain knowledge sug-
+gests blaming surrounding context lines. Moreover, we suggest that
+the agent use git_log_s or git_log_func to trace the history of
+relevant identifiers when blaming surrounding context does not
+work. For cross-file cases, we suggest that the agent may instead
+begin with broader search tools (e.g.,git_log_s, git_grep).Step 2
+(Candidate analysis).Candidate commits surfaced during explo-
+ration are classified into two categories: (i)non-semantic changes,
+including refactoring and meta-changes (e.g., merge, branch), which
+are bypassed via iterative re-blame at the candidate’s parent com-
+mit to reach the true origin, following established SZZ practices
+such as MA-SZZ [11] and RA-SZZ [24]; and (ii)semantic introduc-
+tions, which introduce or modify logic and are treated as likely
+bug-inducing commits. When multiple semantic candidates exist,
+the prompt provides a counterfactual heuristic for disambiguation:
+“would the bug exist if this commit had not been introduced?”Step 3
+(Causal confirmation).Before reporting, the agent verifies a direct
+causal link between the selected candidate and the bug, ensuring it
+is causally responsible rather than merely correlated.
+Rules.The prompt further encodes lightweight operational con-
+straints that can be applied at the agent’s discretion. These include
+prioritizing path-restricted queries before broadening scope, avoid-
+ing redundant inspection (e.g., limiting repeated git_show calls on
+the same commit), retrying with narrower parameters after time-
+outs, and accounting for file path changes across commits. It also
+encodes a key semantic distinction: commits that merelyexposeor
+triggera pre-existing bug are not considered BICs; only commits
+thatintroducefaulty logic qualify.
+3.5 Context Compression
+To manage context consumption during multi-turn investigation,
+we design a multi-layer compression pipeline (Algorithm 1) that
+reduces tool output size while preserving high-signal evidence.
+Search Bound Enforcement.Before tool execution, the system
+automatically caps the before parameter of temporal search tools
+to the fix commit date 𝑑𝑓 𝑖𝑥. Since a bug-inducing commit must
+predate its fix, this removes irrelevant results without requiring the
+agent to explicitly enforce this constraint.
+Layer 1: Cache Deduplication.A call-level cache keyed by tool
+name and arguments returns previously computed results when
+queries are repeated, preventing duplicate outputs from accumulat-
+ing across turns.Timeout Recovery.If a tool call times out, the
+system injects targeted hints (e.g., “Retry with a smaller line range”)
+to guide the agent toward narrower queries, avoiding repeated
+expensive operations.
+Layer 2: Formatted Outputs.Each tool applies internal for-
+matting before returning results to improve readability and reduce
+noise. git_blame converts git’s verbose porcelain format into a
+concise L{n}: {hash} | {code} representation with a commit
+legend. All commit-displaying tools filter out metadata trailers (e.g.,
+Signed-off-by, Reviewed-by) that are irrelevant to bug-inducing
+commit identification. Additionally, each tool enforces a maximum
+output length (100–300 lines) with truncation notifications, en-
+abling the agent to iteratively refine queries with narrower scopes.
+Algorithm 1Structured Context Compression
+Require:Tool name𝑡, arguments𝑎𝑟𝑔𝑠, fix date𝑑 𝑓 𝑖𝑥, threshold𝜏
+Ensure:Compressed output𝑂 ′
+1:// Search bound enforcement
+2:if𝑡∈{log_s,log_func}and𝑎𝑟𝑔𝑠.before>𝑑 𝑓 𝑖𝑥 then
+3:𝑎𝑟𝑔𝑠.before←𝑑 𝑓 𝑖𝑥
+4:end if
+5:// Layer 1: Cache deduplication
+6:ifCache.Has(𝑡,𝑎𝑟𝑔𝑠)then
+7:𝑂 raw ←Cache.Get(𝑡,𝑎𝑟𝑔𝑠)
+8:else
+9:𝑂 raw ←ExecuteTool(𝑡,𝑎𝑟𝑔𝑠)
+10:if𝑂 raw is timeoutthen
+11:Inject hint: “Retry with narrower parameters”
+12:returntimeout message
+13:end if
+14:Cache.Store(𝑡,𝑎𝑟𝑔𝑠,𝑂 raw)
+15:end if
+16:// Layer 2: Formatted output
+17:𝑂←Format(𝑡,𝑂 raw):
+18:Reformat raw output into concise representation
+19:Strip metadata trailers; truncate at max line limit
+20:// Layer 3: Structured extraction
+21:if|𝑂|≤𝜏then return𝑂
+22:end if
+23:𝑂 ′←Extract(𝑡,𝑂):
+24: show: Strip diff context lines (keep only +/-/@@); head-tail
+truncate at𝐾1
+25: blame: Deduplicate commits into summary header; head-
+tail truncate at𝐾2
+26:log: Keep first𝐾 3 entries
+27:grep: Group by file; keep first𝐾 4 matches
+28:return𝑂 ′
+The truncation thresholds (100–300 lines) are set based on the typ-
+ical output volume of each tool: git_grep produces many short
+matching lines and is capped at 100 to avoid flooding the context
+with repetitive results, while git_log_func includes inline diffs
+that require more space and is allowed up to 300 lines. When output
+exceeds the threshold, the tool appends a truncation notification,
+prompting the agent to retry with narrower parameters (e.g., adding
+a path filter or line range). We did not perform systematic tuning
+of these thresholds; they are designed to balance information com-
+pleteness with context window efficiency.
+Layer 3: Structured Extraction.When formatted outputs ex-
+ceed a character threshold 𝜏= 3000, a deterministic, tool-specific
+extractor further compresses them. Forgit_show, diff context lines
+are removed, retaining only change markers (+/-/@@) and file head-
+ers with head-tail truncation at 𝐾1 lines. For git_blame, repeated
+commits are deduplicated into a summary header, followed by head-
+tail truncation at 𝐾2 lines. For git_log variants, only the first 𝐾3
+entries are retained, and for git_grep, matches are grouped by
+file before limiting to 𝐾4 entries. These rules preserve structurally
+important information (e.g., commit hashes, line numbers, and
+changed code) while aggressively removing redundant context.

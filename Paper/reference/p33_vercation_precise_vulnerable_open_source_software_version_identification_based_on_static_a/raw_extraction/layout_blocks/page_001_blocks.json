@@ -1,0 +1,152 @@
+[
+  {
+    "page": 1,
+    "block_id": "page_001:block_001",
+    "block_type": "text",
+    "text": "376 IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026",
+    "bbox": [
+      42.345001220703125,
+      32.515541076660156,
+      556.4161987304688,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_002",
+    "block_type": "text",
+    "text": "V ERCATION : Precise Vulnerable Open-Source Software Version Identiﬁcation Based on Static Analysis and LLM",
+    "bbox": [
+      66.72653198242188,
+      57.34751892089844,
+      532.0663452148438,
+      139.8141326904297
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_003",
+    "block_type": "text",
+    "text": "Yiran Cheng , Ting Zhang , Lwin Khin Shar , Member, IEEE , Shouguo Yang , Chaopeng Dong , David Lo , Fellow, IEEE , Shichao Lv , Zhiqiang Shi , and Limin Sun",
+    "bbox": [
+      60.74100112915039,
+      147.37692260742188,
+      534.1807250976562,
+      172.55828857421875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_004",
+    "block_type": "text",
+    "text": "Abstract —Open-source software (OSS) has experienced a surge in popularity, attributed to its collaborative development model and cost-effective nature. However, the adoption of speciﬁc software versions in development projects may introduce security risks when these versions bring along vulnerabilities. Current methods of identifying vulnerable versions typically analyze and extract the code features involved in vulnerability patches using static analysis with pre-deﬁned rules. They then use code clone detection to identify the vulnerable versions. These methods are hindered by imprecision due to (1) the exclusion of vulnerability- irrelevant code in the analysis and (2) the inadequacy of code clone detection. This paper presents V ERCATION , an approach designed to identify vulnerable versions of OSS written in C/C++. V ERCATION combines program slicing with a Large Language Model (LLM) to identify vulnerability-relevant code from vulner- ability patches. It then backtracks historical commits to gather previous modiﬁcations of identiﬁed vulnerability-relevant code. We propose code clone detection based on expanded and normal- ized ASTs to compare the differences between pre-modiﬁcation and post-modiﬁcation code, thereby locating the vulnerability- introducing commit ( vic ) and enabling the identiﬁcation of the vulnerable versions between the vulnerability-ﬁxing commit and the vic . We curate a dataset linking 122 OSS vulnerabilities and 1,211 versions to evaluate V ERCATION . On this dataset, our approach achieves an F1 score of 93.1%, outperforming current state-of-the-art methods. More importantly, V ERCATION detected 202 incorrect vulnerable OSS versions in NVD reports.",
+    "bbox": [
+      42.34428405761719,
+      203.2304229736328,
+      293.421630859375,
+      472.5980529785156
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_005",
+    "block_type": "text",
+    "text": "Received 1 March 2025; revised 14 July 2025; accepted 13 August 2025. Date of publication 19 August 2025; date of current version 13 February 2026. This research was supported in part by Beijing Natural Science Foundation under Grant L234033, in part by the National Research Foundation, Singa- pore, and in part by the Smart Nation Group’s Translational R&D under Grant TRANS2023-TGC02. Recommended for acceptance by L. Pasquale. (Corresponding authors: Shichao Lv; Ting Zhang) Yiran Cheng, Chaopeng Dong, Shichao Lv, Zhiqiang Shi, and Limin Sun are with Institute of Information Engineering, Chinese Academy of Sciences, Beijing, 1000852, China, and also with the School of Cyber Security, University of Chinese Academy of Sciences, Beijing, 1014083, China (e- mail: chengyiran@iie.ac.cn; dongchaopeng@iie.ac.cn; shizhiqiang@iie.ac.cn; lvshichao@iie.ac.cn; sunlimin@iie.ac.cn). Ting Zhang was with the School of Computing and Information Systems, Singapore Management University, Singapore 178903. She is now with the Department of Software Systems and Cybersecurity, Monash University, Clayton, VIC 3800, Australia (e-mail: ting.zhang@monash.edu). Lwin Khin Shar and David Lo are with Monash University, Clayton, VIC 3800, Australia (e-mail: lkshar@smu.edu.sg; davidlo@smu.edu.sg). Shouguo Yang is with Zhongguancun Laboratory, Beijing, 100194, China (e-mail: yangshouguo@iie.ac.cn). Digital Object Identiﬁer 10.1109/TSE.2025.3599581",
+    "bbox": [
+      42.34468078613281,
+      514.8938598632812,
+      293.43548583984375,
+      712.08447265625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_006",
+    "block_type": "text",
+    "text": "Index Terms —Open-source software security, vulnerable ver- sion, large language model.",
+    "bbox": [
+      305.35235595703125,
+      203.2304229736328,
+      556.4152221679688,
+      223.53213500976562
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_007",
+    "block_type": "text",
+    "text": "I. I NTRODUCTION O PEN-SOURCE software (OSS) has become increasingly popular in recent years, thanks to its collaboration and cost-effectiveness. In the rapidly evolving world of OSS, nu- merous versions exist due to continuous evolution. While OSS plays a pivotal role in expediting software development, the integration of particular software versions in development projects can pose security risks, as these versions may contain vulnerabilities. Therefore, having a comprehensive knowledge of vulnerable versions of OSS becomes imperative for software developers. Public vulnerability repositories collect vulnerability reports of software products and disseminate information regarding the affected versions of the software. The National Vulnera- bility Database (NVD) [1] , recognized as the largest public vulnerability database, employs the Common Platform Enu- meration (CPE) format to store information about vulnerable versions. However, the NVD often encompasses all versions before the reported vulnerability or designates only the versions mentioned in the report as vulnerable. For instance, CVE-2018- 5785 reported only version v2.3.0 as vulnerable in CPE [2] . Yet, upon manual validation, it was uncovered that versions v2.1.1 to v2.3.0 are all susceptible to the vulnerability. Recent research [3] , [4] , [5] , [6] indicates that incomplete and incorrect infor- mation about vulnerable versions is prevalent in such reports. Therefore, there is a need for an automated method that can more accurately identify vulnerable versions of released OSS vulnerabilities.",
+    "bbox": [
+      305.3520202636719,
+      235.1485595703125,
+      556.474365234375,
+      575.0397338867188
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_008",
+    "block_type": "text",
+    "text": "Two limitations of current approaches. The approaches for conﬁrming vulnerabilities involve utilizing Proof of Concept (PoC) to trigger the vulnerability. PoC triggers vulnerabilities through dynamic execution, offering conclusive evidence of their existence. However, executing a PoC for each software version is a time-intensive process that requires meticulous environment setup. Additionally, the PoC input may not be universal across all vulnerable versions [7] . Therefore, current researches use static analysis to identify vulnerable versions [8] , [9] , [10] , [11] , [12] , [13] , [14] , [15] . These methods typically consist of two steps: extracting vulnerability features from code",
+    "bbox": [
+      305.35504150390625,
+      581.4805297851562,
+      556.4277954101562,
+      712.5245971679688
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_009",
+    "block_type": "text",
+    "text": "0098-5589 © 2025 IEEE. All rights reserved, including rights for text and data mining, and training of artiﬁcial intelligence and similar technologies. Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.",
+    "bbox": [
+      41.525360107421875,
+      725.40380859375,
+      557.27001953125,
+      743.262451171875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_010",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

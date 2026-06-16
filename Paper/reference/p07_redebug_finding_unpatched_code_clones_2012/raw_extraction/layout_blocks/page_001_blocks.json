@@ -1,0 +1,302 @@
+[
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:001",
+    "block_type": "text",
+    "text": "ReDeBug: Finding Unpatched Code Clones in Entire OS Distributions\n",
+    "bbox": [
+      98.71260070800781,
+      84.46045684814453,
+      512.4842529296875,
+      102.42530822753906
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:002",
+    "block_type": "text",
+    "text": "Jiyong Jang, Abeer Agrawal, and David Brumley\nCarnegie Mellon University\nPittsburgh, PA, USA\n{jiyongj, abeer, dbrumley}@cmu.edu\n",
+    "bbox": [
+      205.41380310058594,
+      131.01353454589844,
+      405.7790222167969,
+      185.36083984375
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:003",
+    "block_type": "text",
+    "text": "Abstract—Programmers should never ﬁx the same bug twice.\nUnfortunately this often happens when patches to buggy code\nare not propagated to all code clones. Unpatched code clones\nrepresent latent bugs, and for security-critical problems, latent\nvulnerabilities, thus are important to detect quickly.\nIn this paper we present ReDeBug, a system for quickly\nﬁnding unpatched code clones in OS-distribution scale code\nbases. While there has been previous work on code clone\ndetection, ReDeBug represents a unique design point that uses\na quick, syntax-based approach that scales to OS distribution-\nsized code bases that include code written in many different\nlanguages. Compared to previous approaches, ReDeBug may\nﬁnd fewer code clones, but gains scale, speed, reduces the\nfalse detection rate, and is language agnostic. We evaluated\nReDeBug by checking all code from all packages in the Debian\nLenny/Squeeze, Ubuntu Maverick/Oneiric, all SourceForge C\nand C++ projects, and the Linux kernel for unpatched code\nclones. ReDeBug processed over 2.1 billion lines of code at\n700,000 LoC/min to build a source code database, then found\n15,546 unpatched copies of known vulnerable code in currently\ndeployed code by checking 376 Debian/Ubuntu security-related\npatches in 8 minutes on a commodity desktop machine. We\nshow the real world impact of ReDeBug by conﬁrming 145\nreal bugs in the latest version of Debian Squeeze packages.\n",
+    "bbox": [
+      56.11362838745117,
+      213.7830352783203,
+      296.6791076660156,
+      451.9963684082031
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:004",
+    "block_type": "text",
+    "text": "Keywords-debug, unpatched code clone, scalability\n",
+    "bbox": [
+      65.97520446777344,
+      455.56463623046875,
+      260.2419128417969,
+      467.1482238769531
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:005",
+    "block_type": "text",
+    "text": "I. INTRODUCTION\nPatches to buggy code are often not propagated to code\nclones in real OS distributions. For example, the following\npatch was issued for Expat, a widely used XML parser to\nﬁx a bounds checking bug in August 2009.\n",
+    "bbox": [
+      56.11179733276367,
+      475.1364440917969,
+      296.69989013671875,
+      537.2821044921875
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:006",
+    "block_type": "text",
+    "text": "const char *end,\nPOSITION *pos)\n",
+    "bbox": [
+      188.07029724121094,
+      557.0523681640625,
+      260.1048889160156,
+      575.1217041015625
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:007",
+    "block_type": "text",
+    "text": "{\n",
+    "bbox": [
+      80.01570129394531,
+      574.3860473632812,
+      84.51786041259766,
+      582.2498779296875
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:008",
+    "block_type": "text",
+    "text": "-\nwhile (ptr != end) {\n",
+    "bbox": [
+      62.00699996948242,
+      582.3772583007812,
+      188.06756591796875,
+      590.9989013671875
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:009",
+    "block_type": "text",
+    "text": "+\nwhile (ptr < end) {\n",
+    "bbox": [
+      62.00699996948242,
+      590.8194580078125,
+      183.56539916992188,
+      599.4411010742188
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:010",
+    "block_type": "text",
+    "text": "switch (BYTE_TYPE(enc, ptr)) {\n",
+    "bbox": [
+      116.03389739990234,
+      599.2607421875,
+      251.09884643554688,
+      607.8823852539062
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:011",
+    "block_type": "text",
+    "text": "#define LEAD_CASE(n) \\\n",
+    "bbox": [
+      80.01570129394531,
+      608.1531372070312,
+      179.06329345703125,
+      616.0169677734375
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:012",
+    "block_type": "text",
+    "text": "case BT_LEAD ## n: \\\n",
+    "bbox": [
+      98.02519989013672,
+      616.1443481445312,
+      188.0684814453125,
+      624.7659912109375
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:013",
+    "block_type": "text",
+    "text": "Listing 1: CVE-2009-3720\n",
+    "bbox": [
+      124.91200256347656,
+      630.212890625,
+      227.88565063476562,
+      641.5158081054688
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:014",
+    "block_type": "text",
+    "text": "This bug, when exploited, causes a denial of service\nto the victim [14]. While the above patch ﬁxed Expat in\n2009, an additional 386 locations across various Debian,\nUbuntu, and SourceForge packages currently have clones\nof the exact same buggy code, all of which are also likely\nto be vulnerable. We call such bugs unpatched code clones.\n",
+    "bbox": [
+      56.11220169067383,
+      651.142822265625,
+      296.70037841796875,
+      722.2086181640625
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:015",
+    "block_type": "text",
+    "text": "In this paper we present ReDeBug, a lightweight syntax-\nbased code clone detection system that identiﬁes unpatched\ncode clones at scale. We have used ReDeBug to analyze\nentire OS distributions to understand the current situation of\nunpatched code clones: 1) how much (potentially) vulnerable\ncode can an attacker identify when a patch is released, 2)\nhow responsive is the new version of an OS to known secu-\nrity vulnerabilities, and 3) how many persisting unpatched\ncode clones are from the previous version of an OS to the\nlatest version of an OS.\nExisting research has focused on methods for improving\nthe number of code clones detected, e.g., [21, 23–25]. While\nadvancements in ﬁnding more code clones is important,\ncurrent algorithms make several trade-offs:\n",
+    "bbox": [
+      314.5036926269531,
+      213.2275848388672,
+      555.1017456054688,
+      378.9820251464844
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:016",
+    "block_type": "text",
+    "text": "• Scalability: To give a sense of the scale necessary to\nﬁnd all unpatched code clones, consider that Debian\nLenny currently contains over 210 million lines of non-\nempty, non-comment lines of C code alone. Current\napproaches focus on ﬁnding as many code clones as\npossible, not scale. For example, Deckard [23] was\napplied to the Linux kernel and JDK, but could not\nscale to the entire Debian Lenny code base, and started\nconsuming more than 20GB of memory in less than 2\nminutes. In big development houses one can use clus-\nters of computers to make the approaches scale [21].\nHowever, solutions that can ﬁnd a competitive number\nof code clones without requiring clusters are relevant\nbecause they are cheaper to run (thus can be run more\noften) and are applicable to the wider number of de-\nvelopers who don’t readily have distributed computing\nresources.\n",
+    "bbox": [
+      324.3664855957031,
+      380.8957214355469,
+      555.087890625,
+      582.158447265625
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:017",
+    "block_type": "text",
+    "text": "• Lack of support for many different languages: Since\nOS distributions include programs written in a variety\nof languages such as C/C++, Java, Shell, Python, Perl,\nRuby, and PHP, we want techniques that are language\nagnostic. Current research such as Deckard [23], CP-\nMiner [25], CCFinder [24], and Deja Vu [21] ﬁrst parse\nthe program and use a variety of matching heuristics\nbased upon high-level code representations such as\nCFGs and parse trees. However, implementing robust\nparsers for many different languages is a very difﬁcult\nproblem [7].\n",
+    "bbox": [
+      324.3664855957031,
+      582.1021118164062,
+      555.0877685546875,
+      712.3482666015625
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:018",
+    "block_type": "text",
+    "text": "2012 IEEE Symposium on Security and Privacy\n",
+    "bbox": [
+      209.67999267578125,
+      43.0888671875,
+      402.30987548828125,
+      54.1630859375
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:019",
+    "block_type": "text",
+    "text": "© 2012, Jiyong Jang. Under license to IEEE.\nDOI 10.1109/SP.2012.13\n48\n",
+    "bbox": [
+      50.0,
+      739.87109375,
+      310.0,
+      758.73046875
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:001:020",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

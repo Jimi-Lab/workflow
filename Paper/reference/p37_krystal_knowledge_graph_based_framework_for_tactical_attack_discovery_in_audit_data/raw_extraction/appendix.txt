@@ -1,0 +1,66 @@
+Appendix 
+Scenario 2 - Nginx backdoor w/ Drakon in-memory In this sce- 
+nario our system detects several alarms on the provenance graph 
+as shown on Fig. 12 . We performed backward-forward chaining 
+with query federation to construct the attack graph together with 
+its kill-chain phases. We successfully linked the generated attack 
+graph to MITRE ATT&CK techniques such as Gather Victim Iden- 
+tity Information (T1589), File and Directory Permissions Modiﬁcation 
+Fig. 12. Scenario 2 ( Nginx backdoor w/ Drakon in-memory ). The attack begins with a vulnerable Nginx installed on a FreeBSD host that gets exploited by an attacker. The 
+attacker sends a malformed HTTP request that results in downloading several malicious ﬁles on the local system. One of the ﬁles i.e. /tmp/pEja72mA then gets executed, 
+which spawns a process pEja72mA . This process reads sensitive information /etc/passwd) and connects remotely via C&C to the attacker console. 
+16 
+
+===== Page 016 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 13. Scenario 3 ( Nginx backdoor w/ Drakon in-memory) . The same case as before, this time the attacker successfully exploits a vulnerable Nginx by downloading another 
+payload ﬁle (“/tmp/vUgefal”). The attacker spawns an elevated process. This process later reads sensitive information (“/etc/passwd”) from the local system and sends data 
+the the external network. 
+Fig. 14. Scenario 4 ( Firefox backdoor w/ Drakon in-memory ) The attack starts with the exploitation of Firefox 54.01 on Ubuntu 12.04 by a malicious ad server. The Firefox 
+process gets compromised after visiting a malicious website, and subsequently downloads a malicious ﬁle to the user directory “/home/admin/clean ”. This ﬁle is then executed 
+spawning a new process Clean . Another ﬁle Proﬁle is also created and spawned. Both processes access a sensitive ﬁle “/etc/passwd ”a n d send the data to an external network 
+( 161.116.88.72:80 ). 
+(T1222), Exploitationfor Client Execution (T1203) and Automated Ex- 
+ﬁltration (T1020). Finally, following the connection from techniques 
+to tactics, we can see kill-chain phases including Reconnaissance, 
+Defense-evasion, Execution and Exﬁltration . 
+Scenario 3 - Nginx backdoor w/ Drakon in-memory 
+As shown in Fig. 13 , from the detected alerts, we performed 
+backward-forward chaining over the provenance graphs together 
+with query federation to external background knowledge. The sys- 
+tem successfully constructed this scenario attack graph together 
+with connections to MITRE ATT&CK techniques and tactics. In that 
+ﬁgure, we see identiﬁed attack techniques such as Gather Victim 
+Identity Information (T1589), File and Directory Permissions Modiﬁ- 
+cation (T1222), Exploitation for Client Execution (T1203) and Auto- 
+mated Exﬁltration (T1020). Finally, these detected techniques lead 
+to the attack phases including Reconnaissance, Defense-evasion, Ex- 
+ecution and Exﬁltration . 
+Scenario 4 - Firefox backdoor w/ Drakon in-memory As shown 
+in Fig. 14 , our system detects several alarms in this scenario, 
+including ﬁle execution (“Clean ”a n d “Proﬁle ” process) and data 
+leaks (both “Clean ”a n d “Proﬁle ” processes read a sensitive ﬁle 
+“/etc/passwd ”a n d send data to “161.116.88.72:80 ”). Furthermore, 
+due to the query federation those detected alarms are automati- 
+cally linked and mapped to our CTI background knowledge, yield- 
+ing two MITRE ATT&CK techniques namely Exploitation for Client 
+17 
+
+===== Page 017 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 15. Scenario 5 ( Firefox backdoor w/ Drakon in-memory ). This attack begins with 
+the exploitation of Firefox 54.01, installed on a Windows 10 host. The exploit loads 
+drakon into Firefox memory, which opens a C&C connection to the attack network. 
+Via the Firefox process, multiple user documents are successfully exﬁltrated to the 
+attacker’s network. 
+Execution (T1203) and Automated Exﬁltration (T1020). Those tech- 
+niques are further linked to high-level MITRE ATT&CK tactics, i.e. 
+Execution and Exﬁltration . 
+Scenario 5 - Firefox backdoor w/ Drakon in-memory As shown in 
+Fig. 15 , our system detects several alerts within this scenario. After 
+performing backward-forward chaining and queries with federation 
+to background knowledge, our system successfully identiﬁed two 
+MITRE ATT&CK attack techniques within the attack graph, namely 
+Gather Victim Identity Information (T1589) and Automated Exﬁltra- 
+tion (T1020). Finally, we identify kill-chain phases such us Recon- 
+naissance and Exﬁltration .

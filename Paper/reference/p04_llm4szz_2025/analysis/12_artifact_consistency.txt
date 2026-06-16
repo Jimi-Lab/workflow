@@ -1,0 +1,30 @@
+Paper Claims: LLM4SZZ uses LLM-based rank/context assessment to improve bug-inducing commit identification across datasets.
+Implemented Components: Static source shows LLM-named scripts, baseline scripts, V-SZZ comparison scripts, CFG/tree-sitter utilities, SZZ core files, patch parsing, result parsing, version-range helper scripts, README, requirements, and a small dataset file.
+Unimplemented or Stubbed Components: Full benchmark datasets, model outputs, save_logs, result directories, and complete reproduction artifacts were not verified. [NEEDS ARTIFACT]
+Dataset Availability: dataset/FFmpeg_dataset_fa.json is visible; README claims dataset files for multiple datasets, but only this visible dataset file was confirmed in this pass.
+Benchmark / Evaluation Scripts Visible by Static Inspection: gen_results_for_dels_llm.py, gen_results_for_no_dels_llm.py, gen_baseline_results_for_*.py, ablation.py, 5_parse_result.py.
+Static Reproduction Instructions or Missing Instructions: README provides high-level commands and requirements, but it refers to a different paper title and directory structure than fully visible locally.
+Config Files: constant.py and requirements.txt are present.
+Environment Constraints: requirements and imports indicate tree-sitter, GitPython/git, Levenshtein, pydriller, networkx/matplotlib, and external tools; exact setup was not tested. [EXECUTION NOT REQUESTED]
+Paper-Code Mismatches: README title refers to "Enhancing Bug-Inducing Commit Identification: A Fine-Grained Semantic Analysis Approach" / SEMA-SZZ rather than the PDF title LLM4SZZ; README lists dataset/result/DelBaselines/NoDelBaselines directories, but the local visible layout contains core, dataset, and top-level scripts instead. This is a static documentation/artifact mismatch.
+Engineering Lessons for Our Paper: Keep artifact README synchronized with the paper title, directory layout, data availability, and execution boundaries.
+
+Consistency Check:
+Claim: LLM4SZZ uses LLM-assisted assessment with SZZ/history tracing.
+Paper Location: Abstract and Approach sections.
+Artifact Evidence: gen_results_for_dels_llm.py, gen_results_for_no_dels_llm.py, core/vszz.py, CFG.py, util.py.
+Source Evidence: AST inventory in raw_extraction/source_static_inventory.txt.
+Consistency: partially supported
+Analysis Mode: static-only
+Notes: Source structure aligns with the claim, but precomputed model outputs and runtime behavior were not checked.
+Use in Our Paper: yes, with caution.
+
+Consistency Check:
+Claim: artifact fully supports paper evaluation.
+Paper Location: Evaluation sections.
+Artifact Evidence: README/requirements/scripts/dataset file.
+Source Evidence: missing visible result directories and incomplete dataset visibility.
+Consistency: unclear
+Analysis Mode: static-only
+Notes: [NEEDS ARTIFACT]; [EXECUTION NOT REQUESTED]
+Use in Our Paper: no, until artifact completeness is checked.

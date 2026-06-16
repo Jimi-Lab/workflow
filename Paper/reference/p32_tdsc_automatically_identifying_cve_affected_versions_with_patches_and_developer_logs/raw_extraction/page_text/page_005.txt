@@ -1,0 +1,58 @@
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909
+Fig. 3. Overview of our approach with three major steps numbered from 1 to 3.
+version of each version branch and (R3) to determine the ﬁrst
+vulnerable version. To ensure the accuracy of the results, in this
+step, we need address some special problems, such as solving
+the vulnerability reappearance problem, using developer logs to
+detect whether there are vulnerabilities in the partial matching
+source code. Finally, we compare the vulnerable version set of
+our tool against the vulnerable version set accoding to the NVD,
+and report the error rate of the NVD set. Among them, if there is
+a CVE vulnerability in a certain version but not reported in the
+NVD, it is a false negative case. If a certain version has no CVE
+vulnerability but is reported in the NVD, it is a false positive
+case.
+A. Build V ersion Tree and Acquire Committed V ersion Set
+Software versions are published in git as tags. Every tag
+has its commit log in which parent commits are recorded. We
+can build the version tree by recursively traversing from the
+commit logs of versions to its parent and grand parent commit
+logs. However, there is a common protocol to arrange versions.
+Taking the Linux operating system as an example, the team
+publicly announced the types of versions on the Linux kernel
+ofﬁcial website, including main branch version (Mainline), sta-
+ble version and long-term version. The main branch version is
+the starting point version of each vertical branch in the version
+tree, which introduces all new functions based on the previous
+main branch version. From the main branch version, new stable
+versions are released later one by one, which form the trunk of
+the version tree. Based on this protocol, we can build the version
+tree for Linux kernel by digits in its version. Next we brieﬂy
+introduce a few notations about the version tree and give an
+example. We refer to the overall structure of the software release
+versions as aversion tree, with the ﬁrst version as the root node
+Vroot.F i g .4 shows an example version tree with version 1.0
+Fig. 4. Version tree: structural model of source code release versions. A red
+triangular node represents a vulnerable version, a red triangular node in green
+dotted circle represents a known unpatched version, a blue node represents a
+version with unknown status.R1,R 2,R 3 indicate the three directions in which
+we are looking for other vulnerable versions.
+as Vroot. In the version tree, nodes,Vi.j, with two digit version
+numbers (e.g., versions 2.6 and 4.0) are calledmajor versions,
+and nodesVi.j.k with three digit version numbers (e.g., versions
+3.3.5 and 5.0.4) are calledminor versions, and they are located
+in the branches of the corresponding major versions. For the
+version branch ofVi.j, we refer to the end of the branch (i.e., its
+largest minor version) asVi.j.E (e.g., version 3.3.22 in Fig.4).
+In addition, we useV i.j.k to denote a vulnerable version, and
+V i.j.U is the last (or upto) vulnerable version in the branch of
+Vi.j.W ea l s ou s eV i.j.k(E) (‘E’ means “excluding”) to denote
+the vulnerable versionimmediately beforeVi.j.k, whereVi.j.k is
+not vulnerable (i.e., patched). Finally, foreach reported vulnera-
+bility (CVE-ID), we useV from and V upto to denote its ﬁrst and
+last vulnerable versions in the entire version tree, respectively.
+Speciﬁcally, as shown in Fig.4, for a given CVE-ID, we will
+search the other vulnerable versions in the version tree in three
+directions R1,R 2,R 3. R1 is the direction (process) to ﬁnd the
+ﬁrst vulnerable versionV from , R2 is to ﬁnd the last vulnerable
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

@@ -1,0 +1,57 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:5
+1    static void deferred_probe_timeout_work_func(struct work_struct *work)
+2    {         
+3   -          struct device_private *private, *p;
+4   +         struct device_private *p;
+5              driver_deferred_probe_timeout = 0;
+6              driver_deferred_probe_trigger();
+7              flush_work(&deferred_probe_work);
+8   -          list_for_each_entry_safe(private, p, &deferred_probe_pending_list, deferred_probe)
+9   -                     dev_info(private->device, "deferred probe pending\n");
+10 +         mutex_lock(&deferred_probe_mutex);
+11 +         list_for_each_entry(p, &deferred_probe_pending_list, deferred_probe)
+12 +                      dev_info(p->device, "deferred probe pending\n");
+13 +         mutex_unlock(&deferred_probe_mutex);
+14 +         wake_up_all(&probe_timeout_waitqueue);
+15    }
+16    static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+17          deferred_probe_timeout_work_func);
+Fixing Commit: eed6e41813d in linux
+driver core: Fix locking bug in deferred_probe_timeout_work_func(). list_for_each_entry_safe() is only useful if we are 
+deleting nodes in a linked list within the loop. It doesn't protect against other threads adding/deleting nodes to the list in 
+parallel.
+1 files changed, 5 additions(+) and 3 deletions(-)
+dd.c
+Fig. 1. Motivation example one
+bug-inducing commits. Since refactoring operations do not affect the program’s behavior, including
+them may introduce noise. Therefore, they used two tools RefDiff [Silva and Valente 2017] and
+Refactoring Miner [Tsantalis et al. 2018] to exclude refactoring modifications before tracing back
+lines. However, this algorithm is limited to Java projects, as the two tools mentioned above cannot
+work on other programming languages.
+Neural-SZZ. Neural-SZZ, proposed by Tang et al. [Tang et al. 2023], is based on deep learning.
+They observed that the previous methods fail to consider the semantic meaning of changed lines
+and the relationships between them. To address this, they utilize the CodeBERT [Feng et al. 2020]
+model to embed the changed lines, capturing their semantic meanings. Additionally, they use a
+heterogeneous graph attention network (HAN) [Wang et al . 2019] to capture the relationships
+between changed lines. After obtaining the embeddings of the changed lines, they employ the
+RankNet [Burges 2010] model to select the deleted lines that are most likely to be the root cause of
+the bug. Finally, they trace back the top N lines in the ranked list to locate bug-inducing commits.
+The authors implemented the algorithm only for the Java programming language.
+2.2 Potential and Limitations of LLMs
+In this subsection, we present motivation examples to demonstrate the potential and limitations
+of LLMs in locating bug-inducing commits. We utilize the LLM GPT-4o-mini [OpenAI 2024] to
+illustrate these examples.
+LLMs have the potential to identify the root cause of the bug from the bug-fixing
+commit and reduce false positives by pinpointing the bug-inducing commit from a set of
+candidates. We illustrate this with the example presented in Figure 1, which involves a bug-fixing
+commit 𝑒𝑒𝑑6𝑒41813𝑑in Linux. We feed the prompt, "Based on the content of the bug-fixing commit,
+analyze the root cause of the bug and output the code statements leading to the bug", along with
+the content of the bug-fixing commit to the LLM. The LLM successfully predicts that the bug occurs
+because the function list_for_each_entry_safe fails to protect the list when multiple threads
+add or delete nodes in parallel. It identifies lines 8 and 9 as buggy statements, filtering out line 3.
+Tracing back these two lines will yield two candidate bug-inducing commits, 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 and
+25𝑏4𝑒70𝑑𝑐𝑐𝑒. We then use the LLM to determine which candidate commit introduces the bug. The
+LLM finds that the commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 introduces line 9 but only modifies the second parameter
+of the dev_infofunction, which does not affect the existence of the bug. Consequently, we filter
+out commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 and identify 25𝑏4𝑒70𝑑𝑐𝑐𝑒 as the final bug-inducing commit.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

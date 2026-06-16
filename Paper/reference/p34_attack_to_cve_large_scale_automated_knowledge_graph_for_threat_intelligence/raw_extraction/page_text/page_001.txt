@@ -1,0 +1,90 @@
+A TT&CK to CVE: A Large-Scale Automated
+Knowledge Graph for Threat Intelligence
+Moqsadur Rahman ∗, Monika Akbar ∗, Joseph T . Aguayo †, Mahmud Shahriar Hossain ∗, Tina M. Ellis †,
+Siddhartha Shankar Das †, Mohammad F . Babar ‡, Monowar Hasan ‡, Aaron Sanchez ‡,
+Luis Fernando de la T orre ‡, Mahantesh Halappanavar †
+∗The University of T exas at El Paso, USA
+{mrahman20, makbar, mhossain }@utep.edu
+†Paciﬁc Northwest National Laboratory , USA
+{joseph.aguayo, tina.ellis, siddhartha.das, hala }@pnnl.gov
+‡W ashington State University , USA
+{m.babar, monowar.hasan, aaron.m.sanchez, luis.delatorre }@wsu.edu
+Abstract—Cyber threat intelligence (CTI) includes collecting
+and analyzing cybersecurity-related information across diverse
+and heterogeneous sources. Those sources may include repos-
+itories that curate vulnerabilities, weaknesses, attack pattern
+related data in different formats with varying degrees of detail.
+Analysts must continuously reconcile these sources to gain a
+coherent view of the evolving threat landscape, yet this process
+is often manual, incomplete, and error-prone. In this work,
+we present a fully automated cybersecurity knowledge graph
+pipeline that systematically ingests and normalizes data from
+the National V ulnerability Database (CVE and CVSS), MITRE
+CWE, CAPEC, and A TT&CK frameworks, and integrates them
+into a Neo4j graph database. Our system extracts a rich set of
+properties and inter- and intra-entity relationships from each
+dataset, including hierarchical links, cross-domain mappings,
+and temporal metadata, while ensuring daily synchronization
+with upstream feeds. The resulting knowledge graph contains
+hundreds of thousands of interconnected entities and edges,
+enabling multi-hop analysis in various directions (e.g., from
+attack techniques to vulnerabilities, from vulnerabilities to attack
+techniques). W e demonstrate the usefulness of the knowledge
+graph for comprehensive weakness analysis, linking adversary
+groups to exploited vulnerabilities, and graph-based inference
+tasks that include variable-length path traversal and link discov-
+ery . Our case studies on CISA advisories show that hierarchical
+graph traversals uncover CVEs beyond those explicitly listed,
+bridging critical gaps in threat intelligence. By combining au-
+tomation, completeness, and semantic richness, our knowledge
+graph provides a scalable, continuously updated foundation for
+cyber defense analytics, supporting both operational decision-
+making and advanced research in graph learning and reasoning
+over CTI.
+Index T erms—Cyber Threat Intelligence, Knowledge Graph,
+Graph Databases, CWE, CVE, A TT&CK, CAPEC
+I. I N T RO D U C T I O N
+The modern cyber threat landscape is vast, dynamic, and
+fragmented across multiple authoritative but heterogeneous
+sources of intelligence. The National V ulnerability Database
+(NVD) [1] provides detailed records of disclosed Common
+V ulnerabilities and Exposures (CVEs [2]) and their severity
+scores, while MITRE [3] curates complementary catalogs:
+Common W eakness Enumeration (CWE [4]), which lists hard-
+ware and software security weakness classes; Common Attack
+Pattern Enumeration and Classiﬁcation (CAPEC [5]), which
+describes adversary attack patterns; and Adversarial T actics,
+T echniques, and Common Knowledge (A TT&CK [6]), which
+captures tactics, techniques, and procedures (TTPs) observed
+in cyberattacks. Each of these resources is indispensable in
+its own domain, yet their siloed formats, differing schemas,
+and inconsistent cross-references present signiﬁcant hurdles
+for analysts who need an integrated and holistic view that
+interconnects vulnerabilities, weaknesses, attack patterns, and
+adversarial behaviors.
+Existing efforts to unify CTI often focus on one or two
+sources, rely on static or manually curated mappings, or lack
+mechanisms to keep pace with daily updates. As a result,
+organizations are left with incomplete or outdated views of
+how newly published vulnerabilities may be exploited, which
+weaknesses cause recurring attacks, or how defensive mea-
+sures align with adversary techniques. Without automation and
+the full-spectrum integration of diverse security-related data
+sources, the potential for utilizing CTI in proactive defense
+and explainable analytics remains signiﬁcantly limited.
+In this paper, we introduce a fully automated cybersecurity
+knowledge graph that bridges these gaps. Our system develops
+dedicated ingestion pipelines for CVE, CWE, CAPEC, and
+A TT&CK, handling their native formats (e.g., JSON, XML,
+STIX bundles), normalizing properties into a uniﬁed schema,
+and encoding explicit relationships among entities in a Neo4j
+graph database (detailed in §III). This automation ensures
+that knowledge is refreshed regularly , requiring no manual
+intervention while continuously incorporating new informa-
+tion. The resulting knowledge graph is both comprehensive
+and expressive: it captures hundreds of thousands of nodes
+representing vulnerabilities, weaknesses, attack patterns, tech-
+niques, malware, tools, intrusion sets, mitigations, etc. The en-
+tities are linked through rich, typed relationships. This enables
+analysts to run multi-hop queries that explain, for example,
+how a speciﬁc CVE maps to underlying weaknesses, which

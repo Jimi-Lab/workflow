@@ -1,0 +1,97 @@
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+CaVulner: Automated Context-Aware Identification of
+Vulnerable Versions
+ANONYMOUS AUTHOR(S)
+Modern software systems increasingly rely on third-party open-source components, which now constitute
+the majority of code in typical applications. While this reuse accelerates development, it also exposes systems
+to significant security risks, as known vulnerabilities in reused components can propagate downstream. To
+assess such risks, maintainers and Software Composition Analysis (SCA) tools depend on public vulnerability
+databases, such as the National Vulnerability Database (NVD) and GitHub Advisories, which specify affected
+version ranges. However, recent studies have shown that these databases often contain inaccurate or incomplete
+version metadata, leading to false negatives that leave systems unpatched or false positives that trigger
+unnecessary and potentially disruptive upgrades. This issue is amplified by the rapid growth in reported
+vulnerabilities and the adoption of large language models (LLMs), which accelerate vulnerability detection but
+shift pressure to the slower downstream tasks of confirmation and auditing.
+In this paper, we proposeCaVulner, an automated, LLM-assisted framework for context-aware identification
+of vulnerable versions. To localize vulnerable code, CaVulner first narrows candidate methods using commit
+change patterns and CVE/CWE metadata, then guides the LLM to extract the root cause through fine-grained
+reasoning over pre- and post-fix code. To infer affected versions, CaVulner traces vulnerability-inducing
+commits using git blame, identifies semantically duplicated commits via hunk hash comparison, and normalizes
+their associated tags into standardized version ranges. We evaluated CaVulner on 43 real-world Java open
+source projects that included 176 CVEs and 8,730 versions. The results show that CaVulner significantly
+outperforms state-of-the-art approaches, including V-SZZ, VERJava, and LLM4SZZ. It achieves an accuracy
+gain of at least 35.8% on CVE level. At the version level, F1-score increases by at least 23.94%, and the cost of
+using the LLM per vulnerability is only around $0.06. It offers a scalable and semantically grounded solution
+for supply chain security.
+1 Introduction
+Modern software development heavily relies on third-party open-source software (OSS). The World
+Economic Forum highlights that OSS makes up as much as 70% to 90% of the code in software
+systems [10]. While the reuse of OSS significantly improves development efficiency and reduces
+costs, it also introduces substantial security risks. For instance, a report [6] by Black Duck reveals
+that 86% of codebases contain components with known vulnerabilities.
+The number of known software vulnerabilities has been increasing rapidly in recent years,
+which extensively influenced the ecosystem. To manage this growing threat, organizations such
+as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate
+critical information on disclosed vulnerabilities, to support the wide usage of software supply
+chain tools like Software Composition Analysis (SCA), to assess potential risks. In this case,
+SCA tools rely heavily on the accuracy of vulnerability data, especially the correct vulnerable
+versions, for automated mappings of security risks in downstream user projects. However, multiple
+studies [9, 16, 33, 42] have shown that these vulnerability records often contain inconsistencies
+or errors, which can seriously mislead maintenance decisions. Moreover, as the integration of
+large language models (LLMs) has significantly accelerated the discovery of new vulnerabilities,
+the downstream tasks, like vulnerability confirmation and auditing, face increasing pressure to
+keep pace, and more automated solutions with less human effort, especially on vulnerable version
+identification, are urgently needed.
+To precisely identify vulnerable versions in OSS, researchers have proposed a variety of solutions
+broadly categorized into dynamic analysis and static analysis. Dynamic approaches [26, 45, 47, 48]
+typically employ fuzzing to confirm whether a vulnerability can be triggered. While dynamic meth-
+ods produce no false positives, they inherently suffer from false negatives due to the fundamental
+, Vol. 1, No. 1, Article . Publication date: January 2018.

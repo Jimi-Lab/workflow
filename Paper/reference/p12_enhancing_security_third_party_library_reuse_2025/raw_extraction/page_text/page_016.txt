@@ -1,0 +1,124 @@
+[43] W. Tang, Z. Xu, C. Liu, J. Wu, S. Yang, Y . Li, P. Luo, and Y . Liu,
+“Towards understanding third-party library dependency in c/c++ ecosys-
+tem,” in Proceedings of the 37th IEEE/ACM International Conference
+on Automated Software Engineering (ASE) , 2022, pp. 1–12.
+[44] P. Wang, J. Svajlenko, Y . Wu, Y . Xu, and C. K. Roy, “Ccaligner: A token
+based large-gap clone detector,” inProceedings of the 40th International
+Conference on Software Engineering (ICSE) , 2018, pp. 1066–1077.
+[45] S. Wang, Y . Zhang, L. Bao, X. Xia, and M. Wu, “Vcmatch: A ranking-
+based approach for automatic security patches localization for oss
+vulnerabilities,” in IEEE 29th International Conference on Software
+Analysis, Evolution and Reengineering (SANER) , 2022, pp. 589–600.
+[46] S. Woo, E. Choi, H. Lee, and H. Oh, “V1scan: Discovering 1-day
+vulnerabilities in reused c/c++ open-source software components using
+code classification techniques,” in 32nd USENIX Security Symposium
+(USENIX Security 23) , 2023, pp. 6541–6556.
+[47] S. Woo, H. Hong, E. Choi, and H. Lee, “Movery: A precise approach for
+modified vulnerable code clone discovery from modified open-source
+software components,” in 31st USENIX Security Symposium (USENIX
+Security 22), 2022, pp. 3037–3053.
+[48] S. Woo, S. Park, S. Kim, H. Lee, and H. Oh, “Centris: A precise and
+scalable approach for identifying modified open-source software reuse,”
+in IEEE/ACM 43rd International Conference on Software Engineering
+(ICSE), 2021, pp. 860–872.
+[49] J. Wu, Z. Xu, W. Tang, L. Zhang, Y . Wu, C. Liu, K. Sun, L. Zhao,
+and Y . Liu, “Ossfp: Precise and scalable c/c++ third-party library de-
+tection using fingerprinting functions,” in IEEE/ACM 45th International
+Conference on Software Engineering (ICSE) , 2023, pp. 270–282.
+[50] Y . Wu, C. Sun, D. Zeng, G. Tan, S. Ma, and P. Wang, “Libscan: Towards
+more precise third-party library identification for android applications,”
+in 32nd USENIX Security Symposium (USENIX Security 23) , 2023, pp.
+3385–3402.
+[51] Y . Xiao, B. Chen, C. Yu, Z. Xu, Z. Yuan, F. Li, B. Liu, Y . Liu,
+W. Huo, W. Zou, and W. Shi, “MVP: Detecting vulnerabilities using
+Patch-Enhanced vulnerability signatures,” in 29th USENIX Security
+Symposium (USENIX Security 20) , 2020, pp. 1165–1182.
+[52] C. Xu, B. Chen, C. Lu, K. Huang, X. Peng, and Y . Liu, “Tracking
+patches for open source software vvlnerabilities,” in Proceedings of
+the 30th ACM Joint European Software Engineering Conference and
+Symposium on the Foundations of Software Engineering (ESEC/FSE) ,
+2022, pp. 860–871.
+[53] X. Xu, C. Liu, Q. Feng, H. Yin, L. Song, and D. Song, “Neural network-
+based graph embedding for cross-platform binary code similarity detec-
+tion,” in Proceedings of the 24th ACM SIGSAC Conference on Computer
+and Communications Security (CCS) , 2017, pp. 363–376.
+[54] J. Zeng, D. Han, Y . Zhu, Y . Wang, and F. Weng, “A survey of third-
+party library security research in application software,” arXiv preprint
+arXiv:2404.17955, 2024.
+[55] X. Zhan, L. Fan, S. Chen, F. We, T. Liu, X. Luo, and Y . Liu, “Atvhunter:
+Reliable version detection of third-party libraries for vulnerability
+identification in android applications,” in IEEE/ACM 43rd International
+Conference on Software Engineering (ICSE) , 2021, pp. 1695–1707.
+[56] X. Zhan, L. Fan, T. Liu, S. Chen, L. Li, H. Wang, Y . Xu, X. Luo,
+and Y . Liu, “Automated third-party library detection for android ap-
+plications: Are we there yet?” in Proceedings of the 35th IEEE/ACM
+International Conference on Automated Software Engineering (ASE) ,
+2020, pp. 919–930.
+[57] H. Zhang and Z. Qian, “Precise and accurate patch presence test for
+binaries,” in 27th USENIX Security Symposium (USENIX Security 18) ,
+2018, pp. 887–902.
+[58] B. Zhao, S. Ji, J. Xu, Y . Tian, Q. Wei, Q. Wang, C. Lyu, X. Zhang,
+C. Lin, J. Wu et al. , “A large-scale empirical analysis of the vul-
+nerabilities introduced by third-party components in iot firmware,” in
+Proceedings of the 31st ACM SIGSOFT International Symposium on
+Software Testing and Analysis (ISSTA) , 2022, pp. 442–454.
+[59] B. Zhao, S. Ji, J. Xu, Y . Tian, Q. Wei, Q. Wang, C. Lyu, X. Zhang,
+C. Lin, J. Wu et al. , “One bad apple spoils the barrel: Understanding
+the security risks introduced by third-party components in iot firmware,”
+IEEE Transactions on Dependable and Secure Computing , 2023.
+[60] B. Zhao, S. Ji, X. Zhang, Y . Tian, Q. Wang, Y . Pu, C. Lyu, and
+R. Beyah, “Uvscan: Detecting third-party component usage violations in
+iot firmware,” in 32nd USENIX Security Symposium (USENIX Security
+23), 2023, pp. 3421–3438.
+APPENDIX
+A. Appendix A
+In this section, we present the complete process used by
+VULTURE to identify the patch commit for a given vulnera-
+bility, using CVE-2013-4080 as an instance.
+The CVE/NVD provides a description for CVE-2013-
+4080: “The dissect r3 upstreamcommand queryconfig func-
+tion in epan/dissectors/packet-assa r3.c in the Assa Abloy R3
+dissector in Wireshark 1.8.x before 1.8.8 does not properly
+handle a zero-length item, which allows remote attackers to
+cause a denial of service (infinite loop, and CPU and memory
+consumption) via a crafted packet”. The mapping process is
+detailed as follows:
+1) LLM-based description parsing.
+VULTURE analyzes the CVE description to parse vulnera-
+ble elements. The parsing results are as follows:
+• File: packet-assa r3.c
+• Function: dissect r3 upstreamcommand queryconfig
+• Variable: None
+2) Slice-based commit filtering.
+First, V ULTURE performs date-specific commit slicing to
+pinpoint the date range which contains the patch commit.
+According to CVE/NVD, ”wireshark-1.8.7” is the last vul-
+nerable version and ”wireshark-1.8.8” is the fixed version,
+narrowing the time range to (2013-05-17T16:41:42Z, 2013-06-
+07T15:49:07Z). A total of 348 commits fall within this period.
+Next, VULTURE divides these commits into 18 slices, each
+containing 20 commits (the last slice contains only 8 commits).
+It analyzes code changes in each slice by calculating the code
+changes between the first and the last commit, marking those
+with vulnerable elements as candidate slices. Only the third
+slice meets this criterion.
+3) Candidate commit selection.
+VULTURE sequentially analyzes the 20 commits
+within the candidate slice, selecting the commit that
+genuinely modifies the vulnerable elements as the
+candidate commit. Only the commit with the hash
+779d28d39039ada8970c910d8350fc2eb05cf00a is identified
+as the candidate commit in this step.
+4) LLM-based patch commit mapping.
+By combining the CVE description with the candi-
+date commit, V ULTURE employs feature engineering to in-
+voke an LLM (GPT-4.0) for analyzing whether the can-
+didate commit serves as the patch for the vulnerabil-
+ity. Finally, V ULTURE successfully identifies the patch
+commit (779d28d39039ada8970c910d8350fc2eb05cf00a) for
+CVE-2013-4080.
+B. Appendix B
+The details of targeted projects used in the simulation are
+listed in Table IX. The ”Stars” column shows the number of
+stars on GitHub, the ”Lines” column indicates the number of
+16

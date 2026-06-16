@@ -1,0 +1,183 @@
+Training
+ID >3K Sub-sentences
+1 A crafted payload inserted into the Search box
+2 Users advised to upgrade
+n ...
+Analyze
+Analyst
+Annotate
+AP
+...
+Fine-tune
+I
+II
+APD Model
+~95%
+accuracy
+Attack Pattens 
+(APs)
+Prediction
+CVE-2024-4985
+APD Model
+This vulnerability reported
+via the GitHub Bug Bounty
+program
+Two of Sub-sentences
++ Main Sentence 
+as Context
+An attacker gain access to
+a user with site
+administrator privileges
++ Main Sentence 
+as Context
+Attack Pattern Classification
+Fig. 7: An example of attack pattern classiﬁcation.
+augmentation. As shown in Section IV-C and Appendix C,
+fully generative LLMs perform well on clean samples but
+degrade on large or noisy data, motivating our hybrid design.
+This step is performed as follows.
+1) Label Adjustment: The goal of this sub-step is to
+enhance the dataset by automatically adding relevant TTPs
+missing from the original ground truth. First, we identify
+67 crucial TTPs (27 main techniques and 40 associated
+sub-techniques) that are frequently referenced by adversaries
+across documented cybersecurity campaigns (e.g., [23]–[26])
+but were not included in the initial dataset described in
+Section III-B. Second, we construct an extended candidate set
+for each CVE by merging its previously assigned TTPs with
+these newly identiﬁed ones as follows:
+ZCV Ei = Tassigned(CV Ei) → Tmissed (1)
+where Tassigned is the set of TTPs already linked toCVE i,
+and Tmissed is the group of 67 newly discovered critical TTPs
+missing from the original dataset. ZCV Ei denotes the full
+candidate TTP set associated with that CVE.
+Third, we use GPT-4o-mini to automatically check whether
+each missing TTP in ZCV Ei is consistent with the CVE
+description or the extracted attack pattern. As in Appendix
+C and prior work [28], [37], GPT-4o-mini achieves strong
+precision and recall, especially with constrained candidate sets.
+Each candidate TTP description is paired with the CVE or
+pattern text, and the model is prompted to judge its exploit
+relevance. To ensure consistency, responses are restricted to
+deterministic “Yes”/“No” outputs using temperature 0.2 and
+top-p 0.9. To ensure label quality and fairness, we verify
+both new and existing TTPs per CVE. This avoids preserving
+prior errors, leverages GPT-4o-mini’s high recall (Appendix C)
+and supportsNEXUS’sfeedback loop (Section III-F), enabling
+consistent TTP assignment and improved label recovery.
+Finally, we reﬁne assigned labels by enforcing consistency
+within the attack pattern dependency graph, ensuring child
+nodes inherit a subset or equivalent set of TTPs from their par-
+ents. This prevents more speciﬁc patterns from being assigned
+broader or unrelated TTPs, preserving contextual coherence.
+This step is further outlined in Algo. 2 in Appendix A.
+Example 4. Figure 8 shows the label adjustment process for
+Attack Pattern 3, extracted from CVE-2024-4985.
+GPT-4o-mini evaluatesT1548, T1606, and T1566 as can-
+didate TTPs based on the description. Although T1566
+(Phishing) is initially considered relevant due to the
+Label Adjustment
+T1548 (Abuse Elevation Control Mechanism) T1606 (Forge Web Credentials) T1566 (Phishing)
+GPT-4o-mini
+Candidates
+T1548
+T1606
+T1566...
+Response
+ Label Verification Adjusted
+T1548
+T1606
+...
+Attack Pattern
+T1548
+T1606
+T1566... 3
+1 2 T1548
+T1606
+T1566...
+Direct Parents
+an attacker gain access to a user
+with site administrator privileges
+3
+Fig. 8: An example of the Label Adjustment process.
+CVE Sample Augmentation
+An authentication bypass vulnerability was present in
+the GitHub Enterprise Server (GHES) when utilizing
+SAML single sign-on authentication with the optional
+encrypted assertions feature. This vulnerability allowed an
+attacker to forge a SAML response to provision and/or
+gain access to a user with site administrator privileges.
+Exploitation of this vulnerability ...
+A vulnerability in GitHub Enterprise Server (GHES)
+was found when using SAML single sign-on (SSO)
+with the optional encrypted assertions feature. This
+flaw allowed attackers to craft a fake SAML
+response, which could grant them access to a user
+account with site administrator privileges. By
+exploiting this vulnerability ...
+Llama-3.1-8B
+1 2 3Attack
+Patterns
+...
+T1548 T1606 ...TTPs
+Paired/Assigned
+Support
+≤ T?
+Yes
+Original Description
+CVE-2024-4985
+Augmented Description
+Unique?
+Paraph-
+raseCheck Check
+Pair Attack Patterns
+Yes Assign TTPs
+Update Supports
+Add to Dataset
+Fig. 9: An example of the CVE Sample Augmentation process.
+limited context ofAttack Pattern 3, which loosely sug-
+gests user interaction, the label veriﬁcation step cross-checks it
+against the direct ParentAttack Patterns 1 and 2. Since
+both parents strictly describe privilege escalation through
+forged SAML responses—without any phishing or social
+engineering context—T1566 is removed as unsupported. As
+a result, only the contextually consistent labelsT1548 and
+T1606 are retained forAttack Pattern 3.
+2) CVE Sample Augmentation:To address TTP imbalance,
+we augment CVE samples through paraphrasing with Llama-
+3.1-8B, selected for quality, open-source availability, and efﬁ-
+cient local use. Augmentation increases data diversity without
+collecting new samples [51]–[55]. Step 1: For each sampleS
+i
+in Z (CVE text + attack pattern), if any TTP in its label setL
+has support ! <T , the sample is marked for augmentation.
+Step 2: Llama-3.1-8B generates one paraphrase ” using
+temperature 0.6 and top-p 0.9 to balance ﬁdelity and variation.
+Step 3: If”
+j(Si) is unique inZ, it is added as a new sample
+with the same attack pattern and labels, and support counts
+are updated. The process repeatsN times per eligible sample.
+Augmentation parameters (T , N) are selected empirically
+based on TTP classiﬁer performance (Section IV-D3). The
+formulation is:
+Z ↑ Z →
+∑
+Si→Z
+N∑
+j=1
+{
+!j(Si)
+⏐⏐⏐↓TTP ↔ L(Si), ”(TTP) ↗ T,
+!j(Si) /↔ Z, Update(”,L (Si))
+}
+(2)
+Example 5.Figure 9 shows if CVE-2024-4985 maps to under-
+supported TTPs, its description is paraphrased using Llama-
+3.1-8B. Semantically consistent, novel samples are added to
+the dataset with preserved TTPs and updated support counts.
+E. TTP Classiﬁer Model Building
+We ﬁne-tune a BERT-based model [18] for multi-label
+CVE-to-TTP classiﬁcation after addressing Challenges [19],
+[22] and tokenized. The model was trained on 75% of the
+data, while the remaining 25% was evenly divided between
+5

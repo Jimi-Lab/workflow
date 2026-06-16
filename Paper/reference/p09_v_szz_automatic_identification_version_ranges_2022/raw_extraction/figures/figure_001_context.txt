@@ -1,0 +1,53 @@
+6621
+The decode_frame function in libavcodec/utvideodec.c in FFmpeg through 3.2 
+allows remote attackers to cause a denial of service (out of array read) via a 
+crafted AVI file.
+Project: FFmpeg
+Change from 3.4.1 to 3.2
+Fixing Commit: 118e1b
+Previous Commit: 3ecc59
+if (slice_end < 0 || slice_end < slice_start ||
+-
+bytestream2_get_bytes_left(&gb) < slice_end) {
++     bytestream2_get_bytes_left(&gb) < slice_end + 1024LL) 
++ if (slice_end < 0 || slice_end < slice_start ||
++     bytestream2_get_bytes_left(&gb) < slice_end) {
+from 3.1 to 3.2.10, 
+3.3.x before 3.3.8, 
+3.4.x before 3.4.2
+Version tags
+Vulnerable Version Tags
+Non-Vulnerable Version Tags
+n3.1.x (1≤x≤11)
+n3.1, n3.1.1, …, n3.1.11
+n3.2.x (1≤x≤15)
+n3.2, n3.2.1, …, n3.2.10
+n3.2-dev
+n3.2.11, n3.2.12, …, n3.2.15
+n3.3.x (1≤x≤9)
+n3.3, n3.3.1, …, n3.3.7
+n3.3-dev
+n3.3.8, n3.3.9
+n3.4.x (1≤x≤8)
+n3.4, n3.4.1, n3.4-dev
+n3.4.2, n3.4.3, …, n3.4.8
+Figure 1: The first motivating example from CVE-2018-6621
+a version contains the vulnerable code, this version is vulnerable;
+otherwise, the version is not vulnerable. Thus, the versions between
+the inducing commit and the fixing commit are vulnerable. Since
+a version in a git repository is usually assigned to a tag, we first
+identify the tags of vulnerable versions (see Figure 1). Then, we
+find that the vulnerable versions can be summarized into ‘from 3.1
+to 3.2.10, 3.3.x before 3.3.8, and 3.4.x before 3.4.2’, which is different
+from the version information in the CVE description. Additionally,
+we find that several development versions (e.g., 3.2-dev) are also
+vulnerable.
+However, the current SZZ algorithms cannot identify the true
+inducing commits for some vulnerabilities. Figure 2 present another
+motivating example from CVE-2015-1830. For the fixing commit
+of this vulnerability, the SZZ algorithms identify the commit that
+last modified the vulnerable line as the inducing commit (called
+‘Previous Commit’ in Figure 2). But if we use this previous commit
+to infer the versions affected by this vulnerability, no vulnerable
+version would be detected. Nevertheless, this vulnerability still
+exists in the version with respect to the previous c

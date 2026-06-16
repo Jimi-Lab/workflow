@@ -1,0 +1,263 @@
+{
+  "cwe_id": "CWE-1339",
+  "name": "Insufficient Precision or Accuracy of a Real Number",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product processes a real number with an implementation in which the number's representation does not preserve required accuracy and precision in its fractional part, causing an incorrect result.",
+  "extended_description": "When a security decision or calculation requires highly precise, accurate numbers such as financial calculations or prices, then small variations in the number could be exploited by an attacker. There are multiple ways to store the fractional part of a real number in a computer. In all of these cases, there is a limit to the accuracy of recording a fraction. If the fraction can be represented in a fixed number of digits (binary or decimal), there might not be enough digits assigned to represent the number. In other cases the number cannot be represented in a fixed number of digits due to repeating in decimal or binary notation (e.g. 0.333333...) or due to a transcendental number such as Π or √2. Rounding of numbers can lead to situations where the computer results do not adequately match the result of sufficiently accurate math.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-190",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Integer Overflow or Wraparound"
+      },
+      {
+        "cwe_id": "CWE-834",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Excessive Iteration"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product processes a real number with an implementation in which the number's representation does not preserve required accuracy and precision in its fractional part, causing an incorrect result.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "number",
+      "accuracy",
+      "digits",
+      "real"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "number",
+      "accuracy",
+      "digits",
+      "real",
+      "represented",
+      "fractional",
+      "precision",
+      "accurate"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Rust",
+        "nature": "Bad",
+        "summary": "Muller's Recurrence is a series that is supposed to converge to the number 5. When running this series with the following code, different implementations of...",
+        "snippet": "fn rec_float(y: f64, z: f64) -> f64 { 108.0 - ((815.0 - 1500.0 / z) / y); } fn float_calc(turns: usize) -> f64 { let mut x: Vec<f64> = vec![4.0, 4.25]; (2..turns + 1).for_each(|number| { x.push(rec_float(x[number - 1],..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Rust",
+        "nature": "Good",
+        "summary": "Muller's Recurrence is a series that is supposed to converge to the number 5. When running this series with the following code, different implementations of...",
+        "snippet": "Use num_rational::BigRational; fn rec_big(y: BigRational, z: BigRational) -> BigRational { BigRational::from_integer(BigInt::from(108)) - ((BigRational::from_integer(BigInt::from(815)) -..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2018-16069",
+        "description": "Chain: series of floating-point precision errors (CWE-1339) in a web browser rendering engine causes out-of-bounds read (CWE-125), giving access to cross-origin data",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2018-16069"
+      },
+      {
+        "reference": "CVE-2017-7619",
+        "description": "Chain: rounding error in floating-point calculations (CWE-1339) in image processor leads to infinite loop (CWE-835)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2017-7619"
+      },
+      {
+        "reference": "CVE-2021-29529",
+        "description": "Chain: machine-learning product can have a heap-based buffer overflow (CWE-122) when some integer-oriented bounds are calculated by using ceiling() and floor() on floating point values (CWE-1339)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-29529"
+      },
+      {
+        "reference": "CVE-2008-2108",
+        "description": "Chain: insufficient precision (CWE-1339) in random-number generator causes some zero bits to be reliably generated, reducing the amount of entropy (CWE-331)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-2108"
+      },
+      {
+        "reference": "CVE-2006-6499",
+        "description": "Chain: web browser crashes due to infinite loop - \"bad looping logic [that relies on] floating point math [CWE-1339] to exit the loop [CWE-835]\"",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-6499"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

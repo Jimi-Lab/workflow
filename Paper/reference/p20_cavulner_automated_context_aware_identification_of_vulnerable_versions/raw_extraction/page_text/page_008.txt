@@ -1,0 +1,95 @@
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+8 Anon.
+Algorithm 1 VIC Tracing
+1: procedure TraceVIC(fixCommit, vulnerableLine, cveInfo, cweInfo, methodSignature)
+2: queue ←empty queue
+3: prevCommit ←GitBlame(fixCommit, vulnerableLine)
+4: Enqueue(queue, prevCommit)
+5: while queue not empty do
+6: candidate ←Dequeue(queue)
+7: if not ExistsMethodInParent(candidate, methodSignature) then
+8: return candidate
+9: end if
+10: parentCommit ←ParentCommit(candidate)
+11: sourceCode ←GetMethodSource(parentCommit, methodSignature)
+12: (isVuln, newLines) ←LLMAnalyze(sourceCode, cveInfo, cweInfo)
+13: if not isVuln then
+14: return candidate
+15: else
+16: for all line in newLines do
+17: prevCommit2 ←GitBlame(parentCommit, line)
+18: Enqueue(queue, prevCommit2)
+19: end for
+20: end if
+21: end while
+22: end procedure
+•LLM Reasoning. The LLM starts by analyzing the method-level code changes to understand
+how these modifications address the vulnerability. By integrating the common vulnerability
+patterns from the CWE description, the developer’s intent from the fix commit message, and
+the specific code changes, the LLM further infers the root cause of the vulnerability. It then
+identifies and highlights the precise code blocks in the pre-fix version that are responsible for
+the vulnerability, providing an explanation for why these blocks are considered vulnerable.
+•Structured Output. The final analysis is returned in JSON format and contains the following
+information: project name, CVE ID, fix commit hash, vulnerable file path, method signature, and
+identified vulnerable code blocks.
+For a small number of CVEs, the code fixes cannot be explicitly attributed to any specific method.
+In such cases, due to the lack of effective method-level context, we provide the LLM with code
+before and after fix, the CVE and the CWE information to help it identify potentially vulnerable
+code blocks.
+3.2 LLM-based Vulnerability-Inducing Commit Tracing
+This module aims to identify the vulnerability-inducing commit (VIC) by tracing commits based on
+the previously identified vulnerable code blocks. First, for each vulnerable code block detected in
+the prior stage, we locate its corresponding line numbers of vulnerable codes in the pre-fix version
+of the repository. Next, we leverage a combination of the git blame command and the analytical
+capabilities of the LLM to identify VICs.
+Algorithm 1 details the systematic approach employed for VIC tracing. Initialized with the fix
+commit, vulnerable line, CVE information, CWE information and method signature, it utilizes git
+, Vol. 1, No. 1, Article . Publication date: January 2018.

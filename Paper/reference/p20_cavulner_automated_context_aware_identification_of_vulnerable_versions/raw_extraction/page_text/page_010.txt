@@ -1,0 +1,93 @@
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+10 Anon.
+Table 1. Number of projects, stars, CVEs, fix commits, and tags in our dataset
+Project Stars CVEs Fix commits Tags
+jackson-databind 3.7k 62 147 213
+liferay-portal 2.2k 18 19 233
+jenkins 25k 17 17 1,835
+struts 1.3k 14 20 175
+tomcat 8.1k 7 8 488
+spring-framework 59.6k 7 9 340
+spring-security 9.4k 3 3 348
+other - 48 50 5,098
+Total - 176 273 8,730
+to 14.2, STRUTS_2_0_0 to 2.0.0). For projects available in Maven Central, we compute the inter-
+section between the normalized GitHub versions that are tagged as vulnerable and the full set
+of versions in Maven Central. This intersection forms the final list of vulnerable versions. For
+projects not published in Maven Central, the normalized GitHub tags themselves serve as vulnerable
+versions.
+4 Evaluation
+Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+To mitigate stochastic noise in LLM-generated responses and reduce logical bias, we set the
+temperature to zero for LLMs. Our approach is implemented in about 8,500 lines of Python code in
+total. All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32
+GB of RAM, and running Ubuntu 20.04. We leverage API calls to interact with LLM services. We
+systematically evaluate CaVulner by addressing the following three research questions (RQs):
+RQ1. Effectiveness Evaluation. How accurate is CaVulner in identifying vulnerable versions?
+How does the performance of CaVulner compare to state-of-the-art approaches?
+RQ2. Ablation Study. What is the contribution of each component of CaVulner to its overall
+effectiveness? How effective is CaVulner when applied with different LLMs?
+RQ3. Resource Consumption. What are the costs associated with LLMs?
+4.1 Dataset
+CVE Dataset. We leveraged the dataset compiled by Ponta et al. [35], who manually collected and
+curated vulnerabilities in open-source software along with their corresponding fixing commits.
+This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42]. The dataset of V-SZZ
+covered various types of vulnerabilities. VERJava selected the TOP6 projects with respect to the
+number of CVEs having available patches. Additionally, it included Liferay-portal, which contains
+the highest number of CVEs in NVD. The CVEs in the VERJava dataset span a broad period of each
+project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+Our study specifically targeted CVEs from this collection that affect open-source projects hosted
+on GitHub. To construct our dataset, we merged the CVEs used by V-SZZ and VERJava, then
+excluded those whose vulnerable versions were not available on GitHub, such as tomcat 5.x.x or
+6.x.x. As shown in Table 1, it resulted in a corpus of 176 CVEs across 43 distinct Java projects and
+encompassing all 8,730 versions, including popular projects such as jackson-databind [19], liferay-
+portal [29], jenkins [22], struts [7], tomcat [8], spring-framework [40] and spring-security [41]. We
+, Vol. 1, No. 1, Article . Publication date: January 2018.

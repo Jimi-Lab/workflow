@@ -1,0 +1,250 @@
+{
+  "cwe_id": "CWE-384",
+  "name": "Session Fixation",
+  "abstraction": "Compound",
+  "status": "Incomplete",
+  "description": "Authenticating a user, or otherwise establishing a new user session, without invalidating any existing session identifier gives an attacker the opportunity to steal authenticated sessions.",
+  "extended_description": "Such a scenario is commonly observed when: A web application authenticates a user without first invalidating the existing session, thereby continuing to use the session already associated with the user. An attacker is able to force a known session identifier on a user so that, once the user authenticates, the attacker has access to the authenticated session. The application or container uses predictable session identifiers. In the generic exploit of session fixation vulnerabilities, an attacker creates a new session on a web application and records the associated session identifier. The attacker then causes the victim to associate, and possibly authenticate, against the server using that session identifier, giving the attacker access to the user's account through the active session.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-610",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Externally Controlled Reference to a Resource in Another Sphere"
+      },
+      {
+        "cwe_id": "CWE-610",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Externally Controlled Reference to a Resource in Another Sphere"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-346",
+        "nature": "Requires",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Origin Validation Error"
+      },
+      {
+        "cwe_id": "CWE-472",
+        "nature": "Requires",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "External Control of Assumed-Immutable Web Parameter"
+      },
+      {
+        "cwe_id": "CWE-441",
+        "nature": "Requires",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Unintended Proxy or Intermediary ('Confused Deputy')"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Web Based",
+      "Web Server"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This is a well-known Composite of multiple weaknesses that must all occur simultaneously, although it is attack-oriented in nature."
+  },
+  "mechanism": {
+    "root_cause_summary": "Authenticating a user, or otherwise establishing a new user session, without invalidating any existing session identifier gives an attacker the opportunity to steal authenticated sessions.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "session",
+      "user",
+      "identifier",
+      "authenticated"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "session",
+      "user",
+      "identifier",
+      "authenticated",
+      "authenticates",
+      "invalidating",
+      "associated",
+      "existing"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following example shows a snippet of code from a J2EE web application where the application authenticates users with LoginContext.login() without first...",
+        "snippet": "private void auth(LoginContext lc, HttpSession session) throws LoginException { ... lc.login(); ... }"
+      },
+      {
+        "language": "HTML",
+        "nature": "Bad",
+        "summary": "The following example shows a snippet of code from a J2EE web application where the application authenticates users with a direct post to the...",
+        "snippet": "<form method=\"POST\" action=\"j_security_check\"> <input type=\"text\" name=\"j_username\"> <input type=\"text\" name=\"j_password\"> </form>"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-2820",
+        "description": "Website software for game servers does not proprerly terminate user sessions, allowing for possible session fixation",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-2820"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,68 @@
+Fig. 2: ReactOS patching of CVE-2018-14498 and CVE-2017-14032. Due to custom reuse, the ReactOS patch differs from the
+official one in statement format and the line numbers where the patches are applied.
+provided by CVE [5] and NVD [8]. However, many vulnerabil-
+ities disclosed by CVE/NVD come with either vague security
+patch information or no patch information whatsoever [45].
+Commit ranking is a common process [20], [40], [41], [45]
+of labeling direct references between security patch-related
+commits and vulnerabilities. To identify the patch commit
+of a vulnerability, specific sets of features related to commit
+candidates and the vulnerabilities (e.g., vulnerability location,
+vulnerability identifier) are collected. Then, a pre-trained rank-
+ing model is used to estimate the relevance between each
+commit and the vulnerability. The most relevant commits
+related to security patches are supposed to be prioritized.
+Nonetheless, the ranking results highly rely on the quality of
+the selected correlation features and the information collected
+from CVE/NVD, which are typically manual processes. Al-
+though the manual effort is a one-time cost, the variable quality
+of the data collected by humans can affect the accuracy and
+reliability of the commit ranking. Driven by the fact that public
+LLMs such as GPT -4.0have undergone extensive training on a
+vast array of data accessible online, including documentation,
+blogs, and forums, LLMs have become highly proficient in
+grasping the semantic meaning of natural language [13].
+Conclusion 3: LLM can assist in natural language
+processing to analyze commits and CVE descriptions
+semantically and syntactically. It minimizes manual ef-
+forts, enhancing the data quality in identifying security-
+related information and assessing the implications of code
+changes.
+III. O VERVIEW
+the
+Figure 3 illustrates the workflow of VULTURE for detecting
+1-day vulnerabilities introduced by reusing TPLs. V ULTURE
+consists of three phases, TPLF ILTER Construction, TPL Reuse
+Identification, and 1-day Vulnerability Detection.
+TPLF ILTER Construction. VULTURE employs TPLF ILTER
+to construct a unique database tailored specifically for the
+target platform. It is comprised of two segments, the compo-
+nent segment, and the vulnerability segment. The component
+segment contains the TPL details (e.g., TPL names, TPL ver-
+sions, and code information) while the vulnerability segment
+includes information on vulnerabilities that have previously or
+currently existed in the previous and current versions of each
+TPL, respectively.
+TPL Reuse Identification. Given a target program, VULTURE
+conducts a function-level TPL reuse detection. By extracting
+the function hashing of all functions in the target program,
+VULTURE identifies the TPLs and their versions that have
+been reused by the target program via function-based similarity
+comparison. To eliminate the false alarms driven by the custom
+TPL reuses, VULTURE analyzes the dependencies among TPLs
+to optimize the results and creates a TPL reuse report.
+1-day Vulnerability Detection. As TPLs are reused in two
+different ways, i.e., exact reuse and custom reuse, V ULTURE
+analyzes each type of reuse by utilizing version-based match-
+ing and chunk-based analysis, respectively. Through version-
+based matching, V ULTURE specifically identifies the functions
+that are reused exactly and verifies whether these functions
+are vulnerable by searching for the official patches provided
+by the TPL contributors. In cases of custom reuses, V ULTURE
+re-generates the modified functions into chunk representatives
+and analyzes the code modifications within each chunk. It
+can determine whether the modifications introduce any vul-
+nerabilities at a granular level. As TPLF ILTER includes the
+official patches for certain vulnerable TPLs, V ULTURE further
+provides fix suggestions based on the reported vulnerabilities.
+4

@@ -1,0 +1,25 @@
+iable flags
+must be assigned without clearing the pending bit (lines 12-
+13). Secondly, the variable flag must be passed to the function
+atomic_cmpxchg (lines 16-17). It’s the interaction between
+these statements that triggers the bug. Thus, when pinpointing
+bug-inducing commits, it’s essential to ensure that both state-
+ments are present within the identified commit, rather than just
+one of them.
+III. A
+PPROACH
+Building on the motivation example, our proposed method
+aims to effectively identify all statements contributing to the
+appearance of the bug. The architecture of S
+EM-SZZ is shown
+in Fig. 2.
+Observation 1 leads our approach to focusing on program
+segments near the added lines. Thus, we begin by performing
+program slicing [23], [24] to extract relevant program parts
+close to the additions. Based on Observation 2, after slicing the
+program, we delve into a more detailed analysis. This involves
+comparing the states of both versions of the program, one with
+the added lines and one without. Through thorough comparison
+and analysis, we identify specific statements associated with
+the added lines, pinpointing them as the triggers for the bug.
+Drawing on Observation 3, we proceed to loca

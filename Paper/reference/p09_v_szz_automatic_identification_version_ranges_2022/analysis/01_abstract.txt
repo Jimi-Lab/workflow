@@ -1,0 +1,26 @@
+# 01 Abstract Analysis
+
+Problem:
+- Public CVE/NVD entries associate vulnerabilities with affected software versions, and organizations/SCA tools rely on those affected-version claims for remediation.
+- The paper argues that NVD affected-version information is often unreliable or conservative, causing unnecessary upgrade/remediation work.
+
+Gap:
+- Prior work used SZZ-style inducing commits to identify spurious affected-version claims, but classic SZZ is designed for ordinary bugs.
+- The paper claims this is a mismatch because many vulnerabilities are foundational or introduced in early versions, while classic SZZ usually selects the last commit that modified a fixed line.
+
+Method:
+- The proposed approach, V-SZZ, modifies SZZ to keep tracing vulnerable lines backward through line mapping and selects the earliest commit that modified vulnerable lines.
+- It then infers affected version tags from inducing and fixing commits, with duplicated fixing/inducing changes considered in the pipeline.
+
+Evaluation:
+- The paper manually annotates true inducing commits and verifies affected versions for 172 CVE vulnerabilities from public C/C++ and Java datasets.
+- Paper-reported results: 99/172 vulnerabilities have spurious version information; V-SZZ reports F1 0.736/0.630 for VIC identification on C/C++/Java and 0.928/0.952 for affected-version refinement. [NEEDS TABLE REPAIR]
+
+Contributions:
+- A manually annotated dataset linking CVEs to vulnerability-inducing commits and verified affected versions.
+- A vulnerability-specific SZZ variant and affected-version inference workflow.
+- Empirical evidence that vulnerability-specific assumptions improve affected-version refinement over general SZZ variants.
+
+Limitations:
+- Evaluation uses small fixing commits and C/C++ plus Java projects.
+- Exact table cells require repair before final citation. [NEEDS TABLE REPAIR]

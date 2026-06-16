@@ -1,0 +1,118 @@
+1. INTRODUCTION
+Despite the best eﬀort of the security community, the
+number of serious vulnerabilities discovered in deployed soft-
+ware is on the rise. The Common Vulnerabilities and Expo-
+sures (CVE) database operated by MITRE tracks the most
+serious vulnerabilities. In 2000, around 1,000 CVEs were
+registered. By 2010, there were about 4,500. In 2014, al-
+most 8,000 CVEs were registered. The trend seems to be
+increasing in speed.
+While it is considered a best practice to perform code
+reviews before code is released, as well as to retroactively
+checking old code, there is often not enough manpower to
+rigorously review all the code that should be reviewed. Al-
+though open-source projects have the advantage that any-
+body can, in theory, look at all the source code, and although
+bug-bounty programs create incentives to do so, usually only
+a small team of core developers reviews the code.
+In order to support code reviewers in finding vulnerabili-
+ties, tools and methodologies that flag potentially dangerous
+code are used to narrow down the search. For C-like lan-
+guages, a wide variety of code metrics can raise warning
+flags, such as a variable assigned inside an if-statement or
+unreachable cases in a switch-statement. The Clang static
+analyzer [1] as well as the dynamic analyzer Valgrind [3] and
+others, can pinpoint further pitfalls such as invalid mem-
+ory access. For the Linux kernel, the Trinity system call-
+fuzzer [2] has found and continues to find many bugs. Fi-
+nally, static analysis tools like Flawfinder [34] help find pos-
+sible security vulnerabilities.
+Most of these approaches operate on an entire software
+project and deliver a (frequently very large) list of poten-
+tially unsafe code. However, software grows incrementally
+and it is desirable to have tools to assist in reviewing these
+increments as well as tools to check entire projects. Most
+open-source projects manage their source code with version
+control systems (VCS) such as Git, Mercurial, CVS or Sub-
+version. In such systems, code - including vulnerable code
+- is inserted into the software in the form of commits to the
+repository. Therefore, the natural unit upon which to check
+whether new code is dangerous is the commit. However,
+most existing tools cannot simply be executed on code snip-
+pets contained within a commit. Thus, if a code reviewer
+wants to check the security of a commit, the reviewer must
+426
+
+
+===== PAGE 002 =====
+
+execute the analysis software on the entire project and then
+check if any of the warnings relate to the commit. This can
+be a considerable amount of work, especially since many
+tools require source code to be annotated and dynamic tests
+would have to be constructed in a way that triggers the
+commit.
+Static and dynamic code analysis tools focus exclusively
+on the code without the context of who wrote the code and
+how it was committed. However, code repositories contain
+a wealth of metadata which can be highly relevant to the
+code quality. For instance, it can be seen whether a com-
+mitter is new to the project or if they are one of the core
+contributors. It is possible to see the time of day or night
+at which code was submitted and to monitor the activity of
+development in certain regions of code. Moreover, most ex-
+isting code-metric-based tools have very high false-positive
+rates, creating a (sometimes impossibly) high workload and
+undermining trust in the eﬀectiveness of the tools. For in-
+stance, Flawfinder tool created 5,460 false positives warnings
+for only 53 true positives on the dataset used in this paper.
+It is intuitively clear that code reviewers who want to find
+53 vulnerabilities in a set of 5,513 flagged commits have a
+tough time ahead of them.
+In this paper, we present a classifier that can identify po-
+tentially vulnerable commits with a significantly lower false-
+positive rate while retain high recall rates. Therefore, unlike
+most existing tools for vulnerability finding, we don’t focus
+solely on code metrics, but also leverage the rich metadata
+contained in code repositories.
+To evaluate the eﬀectiveness of our approach, we conduct
+a large-scale evaluation of 66 GitHub projects with 170,860
+commits, gathering both metadata about the commits as
+well as mapping CVEs to commits to create a database of
+vulnerability-contributing commits (VCCs) and a benchmark
+for future research.
+We conducted a statistical analysis of these VCCs and
+trained a Support Vector Machine (SVM) to detect them
+based on the combination of code metric analysis and Git-
+Hub metadata. For our evaluation we trained our classifier
+only on data up to December 31, 2010 and ran our tests
+against CVEs discovered in 2011-2014.
+In this dataset, our approach, called VCCFinder, pro-
+duces only 36 false positives compared to Flawfinder’s 5,460
+at the same level of recall. This is a reduction of over 99 %
+and significantly eases the workload of code reviewers.
+1.1 Our Contributions
+In summary, we make the following contributions in this
+paper:
+•We present VCCFinder, a code analysis tool that flags
+suspicious commits by using a SVM-based detection
+model. Our method outperforms Flawfinder by a great
+margin, reducing the false positives by over 99 % at the
+same level of recall. Our methodology is suited to work
+on code snippets, enabling us to analyse code at the
+commit level and making a lightweight analysis of new
+code far easier than requiring a full build environment
+to be set up for each test.
+•We construct the first large-scale database mapping
+CVEs to vulnerability-contributing commits (VCCs).
+The database contains 66 GitHub projects, 170,860
+commits and 640 VCCs. We conduct an extensive eval-
+uation of the methodology used to create this database
+to ascertain its quality as a benchmark for future re-
+search.
+•We present an extensive quantitative and qualitative
+evaluation of VCCFinder and discuss take-aways, in-
+cluding, for instance that, from a security perspective,
+gotos are not generally harmful but in combination
+with error-handling code they are responsible for a sig-
+nificant number of VCCs.

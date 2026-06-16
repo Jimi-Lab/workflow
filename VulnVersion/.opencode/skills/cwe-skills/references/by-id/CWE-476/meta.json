@@ -1,0 +1,272 @@
+{
+  "cwe_id": "CWE-476",
+  "name": "NULL Pointer Dereference",
+  "abstraction": "Base",
+  "status": "Stable",
+  "description": "The product dereferences a pointer that it expects to be valid but is NULL.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-710",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Adherence to Coding Standards"
+      },
+      {
+        "cwe_id": "CWE-754",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Check for Unusual or Exceptional Conditions"
+      },
+      {
+        "cwe_id": "CWE-754",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Check for Unusual or Exceptional Conditions"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++",
+      "Java",
+      "C#",
+      "Go"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product dereferences a pointer that it expects to be valid but is NULL.",
+    "typical_preconditions": [
+      "unchecked return value",
+      "optional allocation/use path",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "unchecked return value",
+      "optional allocation/use path"
+    ],
+    "typical_sinks": [
+      "dereference/call through possibly-null pointer"
+    ],
+    "typical_fix_actions": [
+      "null check",
+      "early return",
+      "fallback path"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "pointer use without preceding null check",
+      "null",
+      "dereferences",
+      "dereference",
+      "expects"
+    ],
+    "fix_search_patterns": [
+      "if (!ptr)",
+      "if (ptr == NULL)",
+      "return error on null"
+    ],
+    "guard_patterns": [
+      "same pointer variable in check and use"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "null",
+      "dereferences",
+      "dereference",
+      "expects",
+      "valid",
+      "but"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same pointer variable in check and use"
+    ],
+    "recommended_predicate_templates": [
+      "pointer use without preceding null check",
+      "if (!ptr)",
+      "if (ptr == NULL)",
+      "return error on null"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "pointer use without preceding null check",
+        "if (!ptr)",
+        "if (ptr == NULL)"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "pointer use without preceding null check",
+        "same pointer variable in check and use"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (!ptr)",
+        "if (ptr == NULL)",
+        "pointer use without preceding null check"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example takes an IP address from a user, verifies that it is well formed and then looks up the hostname and copies it into a buffer.",
+        "snippet": "void host_lookup(char *user_supplied_addr){ struct hostent *hp; in_addr_t *addr; char hostname[64]; in_addr_t inet_addr(const char *cp); /*routine that ensures user_supplied_addr is in the right format for conversion */..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following code, the programmer assumes that the system always has a property named \"cmd\" defined. If an attacker can control the program's environment...",
+        "snippet": "String cmd = System.getProperty(\"cmd\"); cmd = cmd.trim();"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "This Android application has registered to handle a URL when sent an intent:",
+        "snippet": "... IntentFilter filter = new IntentFilter(\"com.example.URLHandler.openURL\"); MyReceiver receiver = new MyReceiver(); registerReceiver(receiver, filter); ... public class UrlHandlerReceiver extends BroadcastReceiver {..."
+      },
+      {
+        "language": "Go",
+        "nature": "Bad",
+        "summary": "Consider the following example of a typical client server exchange. The HandleRequest function is intended to perform a request and use a defer to close the...",
+        "snippet": "func HandleRequest(client http.Client, request *http.Request) (*http.Response, error) { response, err := client.Do(request) defer response.Body.Close() if err != nil { return nil, err } ... }"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-41130",
+        "description": "C++ library for LLM inference has NULL pointer dereference if a read operation fails",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-41130"
+      },
+      {
+        "reference": "CVE-2005-3274",
+        "description": "race condition causes a table to be corrupted if a timer activates while it is being modified, leading to resultant NULL dereference; also involves locking.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-3274"
+      },
+      {
+        "reference": "CVE-2002-1912",
+        "description": "large number of packets leads to NULL dereference",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-1912"
+      },
+      {
+        "reference": "CVE-2005-0772",
+        "description": "packet with invalid error status value triggers NULL dereference",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-0772"
+      },
+      {
+        "reference": "CVE-2009-4895",
+        "description": "Chain: race condition for an argument value, possibly resulting in NULL dereference",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-4895"
+      },
+      {
+        "reference": "CVE-2020-29652",
+        "description": "ssh component for Go allows clients to cause a denial of service (nil pointer dereference) against SSH servers.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-29652"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

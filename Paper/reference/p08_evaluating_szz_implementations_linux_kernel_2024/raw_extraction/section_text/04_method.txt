@@ -1,0 +1,726 @@
+===== PAGE 006 =====
+2224
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE I
+DATASETS PREVIOUSLY USED FOR EVALUATING THE SZZ ALGORITHM.
+B-SZZ IS INDICATED AS //, AS THE AUTHOR DID NOT USE A DATASET
+FOR EVALUATION. ‘‘RE.’’ MEANS THE DATASET IS ANNOTATED BY
+RESEARCHERS. ‘‘DEV.’’ MEANS THE DATASET IS ANNOTATED
+BY DEVELOPERS
+Approach / Dataset
+#Dataset type
+#Projects
+#Bug Fixes
+B-SZZ [1]
+//
+//
+//
+AG-SZZ [2]
+Manually (re.)
+2
+301
+DJ-SZZ [15]
+Manually (re.)
+1
+25
+L-SZZ & R-SZZ [16]
+Manually (re.)
+3
+174
+MA-SZZ [12]
+Auto metrics
+10
+2,637
+RA-SZZ [13]
+Manually (re.)
+10
+365
+RA-SZZ∗[14]
+Manually (re.)
+10
+365
+Rosa’s Dataset [28]
+Auto (dev.)
+1,625
+1,930
+of the defect prediction model relies heavily on the quality of
+the dataset labeled by the SZZ algorithm [7]. A lot of mislabeled
+commits in the dataset will seriously affect the model prediction
+results, which highlights the importance of the accuracy of the
+SZZ algorithm.
+The SZZ algorithm is also used to analyze factors related
+to software quality [9], [10], [11], [25], [26], [27]. A study
+by Eyolfson et al. [25] discusses the correlation between the
+time-based factors of a commit (such as the commit’s time of
+day, day of the week, and commit frequency) and the commit’s
+bugginess. Izquierdo-Cortázar et al. [27] and Tufano et al. [9]
+explore the correlation between the developer’s experience and
+the tendency to induce defects.
+SZZ has also been used to identify bug-inducing commits
+at the pull request level in studies by Petrulio et al. [46] and
+Bludau et al. [47]. Furthermore, SZZ has been employed to
+determine the correct version information about vulnerable soft-
+ware within the National Vulnerability Database [48]. Given the
+importance and widespread use of SZZ, we aim to evaluate its
+performance in our study.
+III. CONSTRUCTING A DATASET OF BUG-INDUCING COMMITS
+INFORMED BY DEVELOPERS
+Evaluating the accuracy of the SZZ algorithm and its vari-
+ants requires a dataset of bug-ﬁxing commits accompanied in
+each case by the set of commits that introduced the ﬁxed bug.
+´sliwerski, Zimmermann, and Zeller [1] proposed experiments
+based on ECLIPSE and MOZILLA in which bug-ﬁxing com-
+mits were chosen based on their references to a bug tracker;
+no evaluation was made of the accuracy of the corresponding
+collected bug-inducing commits. Subsequent SZZ variants were
+mostly evaluated using small, manually-validated datasets, as
+shown in Table I.
+A. The Dataset of Rosa et al.
+In 2021, Rosa et al. [28] proposed a new methodology to
+build a dataset for evaluating SZZ variants based on the obser-
+vation that the log messages of some commits both contain a
+statement that the commit is ﬁxing a bug and explicitly identify
+the commit that introduced the bug that is being ﬁxed. For
+example, they have found the message “THRIFT-4513: ﬁx bug
+in comparator introduced by e58f75d” in the commit a8a97bd
+in the project apache/thrift.5 The presence of such messages
+raises the possibility of creating a large-scale dataset fully auto-
+matically, relying on the expertise of project developers to map
+bug-ﬁxing commits to the corresponding set of bug-introducing
+commits. Nevertheless, they did not identify a standardized
+means of providing bug-ﬁxing and bug-introducing commit in-
+formation neither across projects nor within projects. Thus, they
+proposed to mine such information in commit logs using natural
+language processing (NLP) techniques, followed by manual
+veriﬁcation. Using their approach, they created a dataset of
+1,930 bug-ﬁxing commits from 1,625 software projects written
+in a variety of programming languages. Using the resulting
+dataset, they compare the precision, recall, and F-measure of
+nine SZZ variants, and study the impact of dropping reported
+bug-inducing commits that postdate the associated entry in the
+bug tracker.
+While the NLP-based approach of Rosa et al. [28] made
+it possible to obtain a large dataset, exploiting developer
+knowledge, researchers have identiﬁed some weaknesses in
+their results. The dataset remains small, containing 1,930 bug-
+ﬁxing commits from 19,603,736 commits collected on GitHub,
+amounting to 0.001% of the total commits collected. While not
+all commits on GitHub are ﬁxes or introduce bugs, previous
+studies [49], [50] have highlighted that 55% to 95% of the
+total cost of software development is devoted to maintenance.
+Therefore, it is likely that the 1,930 commits collected in the
+dataset is a vast underestimation of the actual number of bug
+ﬁxes. And as there are on average only 1.2 commits per project,
+the collected commits may not be representative of the full
+scope of issues that arise in each project’s development.
+B. A Dataset Extracted From the Development History of the
+Linux kernel
+The Linux kernel was ﬁrst released in 1991 and has grown to
+23 MLOC as of the release of Linux v6.0 in October 2022. The
+Linux kernel has been developed using git since April 2005.
+Prior to October 2013, Linux kernel developers sporadically
+included in their commit log messages comments beginning
+with Fixes: followed by a reference to Bugzilla or some other
+URL. Starting with the commit 629c66a22c216 from security
+researcher Kees Cook on October 24, 2013, the Linux kernel
+developer community has mostly settled on a strict format
+for bug-ﬁx information. This format consists of one or more
+lines starting with the keyword Fixes:, each followed by the
+commit id of the bug-introducing commit, followed by the
+ﬁrst line of the commit log message of the bug-introducing
+commit in parentheses. This format is encouraged by the Linux
+kernel documentation7 and by the Linux kernel “linting” tool
+checkpatch.8
+5https://github.com/apache/thrift/commit/a8a97bde9eeada5ce0571ea1650b1
+8f3ebc50e42
+6https://github.com/torvalds/linux/commit/629c66a22c21b692b6e58b9c1d8
+fa56a60ccb52d
+7https://www.kernel.org/doc/html/v4.9/kernel-documentation.html
+8https://docs.kernel.org/dev-tools/checkpatch.html
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 007 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2225
+Using git, we collect 78,384 potential bug-ﬁxing com-
+mits with Fixes:. We further mine all bug-inducing com-
+mits in each bug-ﬁxing commit. In the ﬁrst step, we use
+[0-9a-f]{7,40} to ﬁnd the partial commit IDs (7-40 digits)
+of potential bug-inducing commits. We exclude partial com-
+mit IDs with fewer than seven characters to prevent ambi-
+guity. In the second step, we search for the partial commit
+IDs in the list of actual complete commit IDs in the repos-
+itory. If the partial commit ID can be found anywhere as
+a substring of a complete commit ID, we return the com-
+plete commit ID as the bug-inducing commit. To investi-
+gate the number of false positives in this step, we compare
+our results with those obtained using the git rev-parse com-
+mand, which returns the full hash from a partial commit ID.9
+As a result of this comparative analysis (of 104 cases), we
+observed two main issues that account for the differences
+between our method and the git rev-parse command: (1) Over-
+lapping Partial Commit IDs: In certain instances, a par-
+tial commit ID is shared by multiple complete commit IDs,
+leading to false positives. We manually veriﬁed such cases
+and corrected 51. (2) Typos in Commit IDs: We found
+that the remaining 55 cases were the result of typos in com-
+mit IDs. Occasionally, commit IDs in the Linux kernel are
+incorrect due to typos, such as missing characters, which
+prevents git rev-parse from identifying the correct commit.
+For example, the partial commit ID af4df655040 should ac-
+tually be 3af4df655040, making git rev-parse unable to ﬁnd
+3af4df65504088e9a7d20c0251e1016e521ad4fc. Searching for
+partial commit IDs in the list accurately identiﬁed 55 of 56
+cases. We encountered one instance where the commit did not
+belong to any branch in the repository, being part of a fork
+outside the repository. In the last step, we collect all the potential
+bug-ﬁxing commits for which we can ﬁnd at least one bug-
+inducing commit into the Bug-ﬁxing Commit Dataset. We
+then collect those commits for which we cannot ﬁnd any bug-
+inducing commits into the CSV ﬁle included in the replica-
+tion package.
+Our resulting Bug-ﬁxing Commit Dataset contains 76,046
+commits from between Oct 24, 2013 and Nov 20, 2022 that
+contain one or more properly formatted Fixes: annotations. The
+Linux kernel does not have an associated bug tracker through
+which we can validate that the annotated commits are ﬁxing
+bugs. Nevertheless, the Fixes: annotation has, like the rest of
+the commit, been subject to the Linux kernel review process.
+Furthermore, we ﬁnd that over 99% of the Fixes: annotations
+refer to existing commits.
+We name our newly collected dataset KFC (Linux Kernel
+Bug-Fixing Commits). KFC contains a one-to-many relation-
+ship between bug-inducing commits and bug-ﬁxing commits,
+as a single bug-inducing commit can lead to multiple future
+bug-ﬁxing commits. Conversely, there is also a many-to-one
+relationship, where a single bug-ﬁxing commit may be the result
+of multiple bug-inducing commits.
+9https://git-scm.com/docs/git-rev-parse
+C. Veriﬁcation of the Dataset
+To verify the quality of our dataset, we conduct a manual
+analysis on a subset of the KFC dataset. This analysis aims to
+conﬁrm that the “Fixes:” ﬁeld is indeed used in practice to point
+to the cause of the bug, rather than mistakenly pointing to the
+initial implementation of related functionalities.
+In this study, we followed four steps to validate the subset of
+the KFC dataset:
+(i) Sampling: The complete KFC dataset includes 76,046
+bug-ﬁxing commits. We selected a random sample of 383
+cases to provide a statistically signiﬁcant representation,
+aiming for a 95% conﬁdence level with a 5% margin of
+error, according to standard sample size calculations.10
+(ii) Preparation: Three annotators initially discussed and re-
+ﬁned their approach to ensure consistent labeling, based
+on an examination of a preliminary set of examples. This
+led to the creation of a comprehensive set of labeling
+guidelines.
+(iii) Labeling: Following these guidelines, the dataset was
+then labeled. One annotator was responsible for labeling
+all 383 cases, while the other two split the complete set,
+each labeling either 191 or 192 cases.
+(iv) Discussion: Upon completion of labeling, the annotators
+met to discuss and resolve all discrepancies.
+After the preparation step, six categories were established
+for the labeling process: (1) “Yes”: The bug-inducing commit
+clearly points to the cause of the bug. (2) “Affected by other
+changes”: External modiﬁcations led to the emergence of the
+bug. (3) “Partial ﬁx”: An intermediate commit attempted to ﬁx
+the bug but did not completely succeed. (4) “Introducing a new
+function”: The commit introduced new functionality that was
+later involved in a bug, but was not directly the cause. (5) “No”:
+The bug-inducing commit does not point to the cause of the bug
+and does not ﬁt into categories (2)-(4). Annotators are required
+to mark the reasoning behind this classiﬁcation. (6) “Not sure”:
+The annotator could not determine whether the bug-inducing
+commit is related to the cause of the bug and is instructed to
+mark the reasons for this uncertainty.
+After the Labeling and Discussion steps, we found that 81%
+(317 out of 383) of the sample cases fell into the “Yes” cate-
+gory. Additionally, classiﬁcations for the remaining cases were
+distributed as follows: 4% (15 out of 383) were categorized as
+“Introducing a new function,” 2% (9 out of 383) as “Affected
+by other changes,” and 3% (11 out of 383) as “Partial ﬁx.”
+A further 2% (9 out of 383) of cases were labeled as “No,”
+as the annotators could not discern a relationship between the
+bug-ﬁxing and bug-inducing commits. Lastly, 7% (26 out of
+383) of the cases were tagged as “Not sure,” due to the anno-
+tators’ lack of expertise in the Linux kernel, which prevented
+them from making judgments. Despite a small percentage of
+cases not directly representing the cause of the bug, the vast
+majority of the dataset accurately reﬂects the intended use of the
+“Fixes:” ﬁeld.
+10https://www.surveymonkey.com/mp/sample-size-calculator
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 008 =====
+2226
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+IV. STUDY DESIGN
+The purpose of this study is to empirically evaluate the var-
+ious implementations of the SZZ algorithm on the currently
+largest dataset for SZZ evaluation and to investigate patterns
+that cannot be identiﬁed by SZZ (i.e., how to improve the recall
+of the SZZ algorithms), particularly Ghost Commits. To achieve
+these goals, we formulate three research questions:
+RQ1: How well do the different variants of SZZ perform
+in identifying bug-inducing changes?
+In our ﬁrst research question, we aim to examine the per-
+formance of different SZZ variants on our dataset relative to
+a previous study by Rosa et al. [28]. Our study involves a
+dataset with more bug-ﬁxing commits than in previous studies.
+Evaluating SZZ is crucial to ascertain if the prior studies’claims
+remain valid in an updated and more comprehensive dataset
+from a complete software project.
+RQ2: What is the impact of Ghost Commits on the
+behavior of SZZ in a real software project?
+In our second research question, we aim to explore the effects
+of ghost commits on the use of SZZ variants in a real software
+project, We divide RQ2 into two speciﬁc questions: (1) How
+frequently do ghost commits (Remove Mapping Ghost as bug-
+ﬁxing commits, Add Mapping Ghost as bug-inducing commits)
+occur? (2) How do ghost commits impact the SZZ algorithms?
+RQ3: What other situations, besides Ghost Commits,
+are undetectable by SZZ algorithms? In our ﬁnal research
+question, we aim to identify additional situations where the SZZ
+algorithms fail, apart from the Ghost Commit situation. Given
+that SZZ algorithms are founded on the assumption that “a bug-
+inducing change adds lines that are later removed by a ﬁx,”
+we address two speciﬁc questions within RQ3: (1) Do all fail-
+ure cases, besides Ghost Commits, adhere to this assumption?
+(2) Beyond the previously studied situation, what other situa-
+tions prevent SZZ from successfully identifying bug-inducing
+commits?
+A. Algorithm Selection & Data Collection
+We conduct experiments on several variants of the SZZ al-
+gorithm. Speciﬁcally, we adapt the main variants from the prior
+study by Rosa et al. [28] to run on our dataset. Of these, we do
+not use SZZ Unleashed since our commits are not associated
+with an issue tracker; thus there is no issue date. We do not
+use OpenSZZ since it needs a Jira URL as input. RA-SZZ∗
+only works on Java as Refactoring Miner [30] can only detect
+refactoring operations in Java ﬁles. Therefore we do not use
+RA-SZZ∗because the Linux kernel is a C-based project. In
+summary, we use B-SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ,
+and PyDriller (SZZ@PYD). We used the KFC dataset, featur-
+ing the complete set of 76,046 Fixes: annotated bug-ﬁxes.
+B. Data Analysis
+Given the set of bug-inducing commits predicted by the
+tested SZZ algorithms and the collected dataset, we evaluate
+the accuracy of the tested SZZ algorithms using recall and
+precision, two well-known Information Retrieval metrics [51].
+We also use F1 score [52], which calculates the harmonic
+mean of recall and precision. These metrics have been used
+in previous studies to evaluate SZZ performance [28], [46].
+The metrics for a bug-ﬁxing commits are deﬁned as follows,
+where correctci is the ground truth of bug-ﬁxing commit ci,
+i.e., the bug-inducing commits annotated by the original Linux
+kernel developer, identiﬁedci is the bug-inducing commits of
+bug-ﬁxing commit ci identiﬁed by the SZZ algorithms, and N
+is the total number of bug-ﬁxing commits:
+recall = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|correctci|
+precision = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|identiﬁedci|
+cF1 = 2 · recall × precision
+recall + precision
+We also analyze the complementarity of the SZZ variants
+following previous work [28]. Given the set of evaluated SZZ
+variants SZZ eval = {v1, v2, . . . , vn}, we compute their comple-
+mentarity using the following metrics for each vi [53]:
+correctvi∩vj = |correctvi ∩correctvj|
+|correctvi ∪correctvj|
+correctvi\(SZZ exp\vi) = |correctvi \ correct(SZZ exp\vi)|
+|correctvi ∪correct(SZZ exp\vi)|
+correctvi denotes the set of correct bug-inducing commits
+predicted by the SZZ algorithm vi. correct(SZZexp\vi) de-
+notes the correct bug-inducing commits predicted by all eval-
+uated SZZ algorithms except for vi. correctvi∩vj represents
+the overlap between the correct bug-inducing commits identi-
+ﬁed by the SZZ algorithm vi and another SZZ algorithm vj.
+correctvi\(SZZexp\vi), denotes the correct bug-inducing com-
+mits that are only identiﬁed by the SZZ algorithm vi.
+To analyze the frequency of each Remove Mapping Ghost
+and Add Mapping Ghost, we use the same computation as Rezk
+et al. [17]. Remove Mapping Ghost: the percentage of bug-
+ﬁxing commits that do not remove lines and only add lines out
+of all bug-ﬁxing commits. Add Mapping Ghost: the percentage
+of commits that do not add lines and only remove lines out of all
+commits. With respect to Add Mapping Ghost, we also report
+the percentage of bug-inducing commits that do not add lines
+and only remove lines out of the set of bug-inducing commits, as
+these are the only commits that only remove lines that actually
+have an impact on the SZZ results.
+V. TC-SZZ
+The fundamental premise of the SZZ algorithm is that “a bug-
+inducing change adds lines that are later removed by a ﬁx.” In
+other words, for a bug-ﬁxing commit, the SZZ algorithms use
+the git show command to identify deleted or modiﬁed lines, and
+the git blame command to identify the most recent change to
+each such line. However, we discovered that some bug-inducing
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 014 =====
+2232
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+Considering that GPT-4 currently has a cap of 25 messages
+every 3 hours and the manual process involved, we selected
+a sample of 375 failure cases18 (with a 95% conﬁdence level
+and 5% margin of error, following previous work [55], [56],
+[57], [58]) from the total of 14,437 identiﬁed failure cases.
+We exclude the “Line Change Detection” category because
+TC-SZZ was able to identify all bug-inducing commits in this
+group. To simplify, we do not use TC-SZZ in this section, as
+our ground truth in Section VI-C only uses git log -L.
+In Section VI-C, we classiﬁed the 14,437 failure cases into
+three categories: Function-Log Detection, Within-File Detec-
+tion, and Cross-File Detection. This section introduces an
+additional category, Function-Blame Detection, which is a
+subset of Function-Log Detection. The differentiation lies in
+the method used for identifying the bug-inducing commit. In
+the case of Function-Log Detection, the git log -L command
+is employed. This command helps in tracing the evolution of
+speciﬁc parts of a ﬁle, revealing the historical changes that led
+to the current state. For Function-Blame Detection, we utilize
+the git blame command only once. This command allows us to
+pinpoint the last change made to those lines. There are a total of
+3,200 Function-Blame Detection cases and 4,994 Function-Log
+Detection cases. For instance, consider the commit 06bbf75.19
+This commit involves a single deleted line within the function
+“process_response_list”. By applying git blame to all the lines
+of this function, we can identify the commit that initially intro-
+duced the bug. Although git log -L can also be used for this
+purpose by showing the evolution of the function over time, git
+blame speciﬁcally returns only the most recent changes.
+In our sample of 375 cases, we found that 8.5% (32 out of
+375) are Function-Log Detections (excluding Function-Blame
+Detection cases), and 25.1% (94 out of 375) are Function-
+Blame Detections. Moreover, 30.9% (116 out of 375) of the
+cases are Within-File Detections, while 35.5% (133 out of
+375) of the cases are the Cross-File Detections.
+A. Pipeline of ChatGPT Experiment
+Fig. 5 shows the pipeline of the ChatGPT experiment.
+The pipeline has three steps: (A) Cross-File Detection, (B)
+Within-File Detection (C) Function-Log (Function-Blame) De-
+tection. The prompts used in the different steps are shown
+in Table IX.
+For the Function-Log Detection cases, we use the Prompt C
+in the Table IX to query ChatGPT. Speciﬁcally, for the 〈Commit
+Message〉in the table, we use the commit log subject and body
+of the bug-ﬁxing commit. For 〈Code of the Function〉, we use
+the code of all changed functions as input for ChatGPT. Subse-
+quently, we execute git log -L on the line(s) of code suggested
+by ChatGPT to trace the bug-inducing commits. Similarly, for
+the Function-Blame Detection cases, we apply the git blame
+command to the line(s) of code that ChatGPT indicates to
+18This sample size was determined to be statistically representative using
+a popular sample size calculator (https://www.surveymonkey.com/mp/sample-
+size-calculator/) with a conﬁdence level of 95% and a 5% margin of error.
+19https://github.com/torvalds/linux/commit/06bbf753476dab23eb262cb5fba
+b6d6d277a0ba3
+Fig. 5.
+The Pipeline of the ChatGPT Experiment.
+TABLE IX
+PROMPT FOR GPT-4 IN DIFFERENT SITUATIONS
+Situations
+Template
+Prompt A:
+Cross-File
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit, which ﬁle in the Linux
+kernel could be causing this bug-ﬁxing
+commit?
+Prompt B:
+Within-File
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit and function names in
+ﬁle 〈ﬁle_name〉, which function or functions
+could be causing this bug-ﬁxing commit?
+〈Function Name List〉
+Prompt C:
+Function-Log
+(Function-Blame)
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit, please identify the line
+or lines of code in the following code that
+could be causing this bug-ﬁxing commit:
+〈Code of the Function〉
+identify the bug-inducing commits. To ensure fairness in the
+experiment, we remove all portions of the commit message that
+directly reference a bug-inducing commit.
+Figs. 6 and 7 show an example where ChatGPT successfully
+aids in identifying a bug-inducing commit from a Function-
+Blame Detection case.20 Initially, we query ChatGPT using the
+prompt depicted in Fig. 6. Subsequently, the line(s) of code
+returned by ChatGPT (shown in Fig. 7) are subjected to the git
+blame command to get the bug-inducing commits.
+20https://github.com/torvalds/linux/commit/761e205b559be52852d85e0db4a
+034c9f57965f9
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 015 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2233
+Fig. 6.
+Input Provided to ChatGPT for Commit 761e205 in Linux kernel.
+In practice, we provide the entire function code to ChatGPT, however, space
+constraints prevent us from including the full screenshot in the paper. The
+complete screenshot is available in the replication package.
+Fig. 7.
+ChatGPT’s Output for Commit 761e205 in Linux kernel. If the
+details in the ﬁgure are difﬁcult to discern, please refer to our replication
+package.
+For the Within-File Detection cases, we follow a two-step
+method: (1) We ﬁrst use ctags21 to extract all function names
+in a ﬁle. Subsequently, we pose the Prompt B in Table IX
+to ChatGPT. We provide ChatGPT with the function names
+extracted using ctags, instead of the entire code, because the
+number of code tokens in a ﬁle often exceeds the token limit
+set by ChatGPT. (2) We then apply the same method as in the
+Function-Log Detection category for any correctly identiﬁed
+function to ﬁnd the bug-inducing commits.
+For the Cross-File Detection cases, we follow the three steps
+shown in Fig. 5: (A) The initial step involves identifying the
+ﬁle containing the bug-inducing commits. We pose the Prompt
+21https://ctags.io
+A in Table IX to ChatGPT. Given that the Linux kernel has
+15,000 ﬁles and limited information is available in the commit
+message, ChatGPT might have difﬁculty identifying an exact
+ﬁle. We have observed that it could instead return a directory,
+despite not having been prompted to do so, containing the code
+affected by the bug-inducing commit. Hence, we evaluate Chat-
+GPT’s performance based on the correctness of the identiﬁed
+directory and ﬁle. (B) If ChatGPT correctly identiﬁes the ﬁle,
+we adopt the same method as the ﬁrst step in the Within-File
+Detection category to determine the function. (3) If the correct
+function is determined by ChatGPT, we proceed with the same
+method as for the Function-Log Detection category to identify
+the bug-inducing commits.
+B. Results
+Since the Function-Blame
+Detection category shares
+similar principles with the SZZ algorithm, we adopt the SZZ al-
+gorithm’s evaluation methodology, as detailed in Section IV-B,
+to compute the precision, recall, and F1 for this category.
+In contrast, the evaluation for the remaining three categories
+(i.e., Function-Log Detection, Within-File Detection, Cross-
+File Detection) diverges from the evaluation of the Function-
+Blame Detection. Instead of adhering strictly to SZZ-based
+principles, for these categories, we focused on assessing the
+number of bug-ﬁxing commits that could ﬁnd their bug-
+inducing commits (i.e., Recall) with the assistance of ChatGPT.
+We also used the git log -L command to identify as many bug-
+inducing commits as possible, aiming to evaluate the potential
+of a git blame based approach augmented with ChatGPT. For
+the Within-File Detection category, we evaluate three indicators
+(Function, Line of code, and Recall) as returned by ChatGPT.
+For the Cross-File Detection cases, we evaluate ﬁve indicators:
+Directory, File, Function, Line of code and Recall.
+The result of the ChatGPT experiment is shown in Table X.
+For Function-Blame Detection, ChatGPT exhibits a high recall
+of 0.62, comparable to that of B-SZZ on the complete Linux
+dataset. The precision is, however, only 0.28, because Chat-
+GPT selects from lines of all changed functions, resulting in a
+substantially larger selection space, especially given that some
+functions span hundreds of lines. For Function-Log Detection,
+the recall of our ChatGPT method dips to 0.31. Regarding
+Within-File Detection, ChatGPT successfully predicts the cor-
+rect function in 32 out of 76 cases (42.1%). In 44 instances,
+ChatGPT makes an incorrect prediction, and in ten other cases,
+the prediction fails due to token limitations, no functions, or
+ChatGPT’s inability to discern the correct function. Cross-
+File Detection presents a signiﬁcant challenge as the commit
+messages often lack sufﬁcient information to identify the ﬁle.
+In over half the cases, ChatGPT could only return the directory
+of the ﬁle that might contain the bug-inducing commits. How-
+ever, we found that ChatGPT correctly predicts the directory in
+65% of these cases. Furthermore, it successfully identiﬁes bug-
+inducing commits in 11 cases where the bug-inducing commit
+is not in the ﬁle modiﬁed in the bug-ﬁxing commit. In analyzing
+the 11 successful cases of Cross-File Detections, we observed
+that the majority of the pairs of bug-ﬁxing and bug-inducing
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 016 =====
+2234
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE X
+RESULTS OF THE CHATGPT EXPERIMENT // INDICATES THAT THE RESPECTIVE INDICATOR WAS
+NOT EVALUATED IN THE CORRESPONDING CATEGORY
+Failure Situations
+Number
+Directory
+File
+Function
+Line of Code
+Recall
+Precision
+F1
+Function-Blame Detection
+94
+//
+//
+//
+//
+0.62
+0.28
+0.39
+Function-Log Detection
+32
+//
+//
+//
+✓: 8 ✗: 24
+0.31
+//
+//
+Within-File Detection
+116
+//
+//
+✓: 32 ✗: 44
+✓: 25 ✗: 26
+0.22
+//
+//
+Cross-File Detection
+133
+✓: 86 ✗: 46
+✓: 43 ✗: 46
+✓: 10 ✗: 11
+✓: 11 ✗: 5
+0.08
+//
+//
+commits are located within the same directory. For example,
+the bug-ﬁxing commit 5b8481f and the bug-inducing commit
+89a23c8 are both found within the ‘net/ipv6’ directory. Never-
+theless, there are four instances where the bug-ﬁxing commit is
+not even in the same root directory as the bug-inducing commit.
+Through this ChatGPT experiment, we conclude that Chat-
+GPT exhibits potential in assisting researchers and developers
+in identifying bug-inducing commits. We acknowledge that this
+exploration is only preliminary, given that our experimental
+setup does not reﬂect realistic conditions, as we knew the cate-
+gories beforehand. Nonetheless, considering that ChatGPT is
+a generalized model not speciﬁcally ﬁne-tuned for this task,
+its performance hints at the potential beneﬁts of similar LLMs.
+We hope that this work will catalyze further research efforts on
+using LLMs to overcome the limitations of the SZZ algorithm
+in identifying bug-inducing commits, including challenges such
+as ghost commits and cross-ﬁle detection.
+C. Evaluating ChatGPT Beyond the 2021 Data Cutoff
+ChatGPT may have been trained on the data used in our
+experiment, which could bias the results. Our initial work with
+ChatGPT, involving 165 commits, was carried out from June
+28th to July 4th, 2023, prior to OpenAI’s announcement on
+September 27th, 2023 that it had enhanced ChatGPT’s capabil-
+ities, extending its knowledge base beyond the previous cutoff
+in September 2021.22 This raises the opportunity to compare
+the success rate ChatGPT on those commits that were released
+prior to September 2021 to those that were released after that
+date, that were certain to be outside of the knowledge base of
+ChatGPT.
+In an analysis of 165 commits up to September 2023, 134
+were made before September 2021, and the remaining 31 oc-
+curred after this date. This date serves as the data cutoff point,
+dividing the commits into two groups for evaluation: commits
+before the cutoff may have been part of the ChatGPT training
+data, while those subsequent to the cutoff had not. As shown
+in Table XI, for Function-Blame Detection, testing cases subse-
+quent to the data cutoff exhibited a notable improvement with
+ChatGPT, achieving a 24% increase in recall (from 0.47 to 0.71)
+and a 7% increase in precision (from 0.26 to 0.33). However,
+for Function-Log Detection and Within-File Detection, testing
+cases subsequent to the data cutoff resulted in a 2% decrease
+in performance. Regarding Cross-File Detection, testing cases
+before the data cutoff had an 8% recall rate, whereas cases
+after the data cutoff failed to identify the correct bug-inducing
+commits in this category. Given that testing cases after the data
+22https://twitter.com/OpenAI/status/1707077710047216095?s=20
+TABLE XI
+COMPARATIVE OF CHATGPT ON BEFORE AND AFTER 2021 DATA CUTOFF
+Failure
+Before (134)
+After (31)
+Situations
+Recall
+Pr.
+Recall
+Pr.
+Function-Blame Detection
+0.47
+0.26
+0.71
+0.33
+Function-Log Detection
+0.35
+-
+0.33
+-
+Within-File Detection
+0.24
+-
+0.22
+-
+Cross-File Detection
+0.08
+-
+0
+-
+cutoff demonstrated a signiﬁcant advantage of up to 24% in one
+category, and no substantial disadvantage in the three remaining
+categories—with drops ranging from 2% to 8%—there is no
+conclusive evidence to suggest that testing cases potentially
+seen by ChatGPT would impact the experimental results.
+D. Compare With Code-Speciﬁc Models
+To further evaluate the performance of ChatGPT, we conduct
+a comparative analysis with the code-speciﬁc models CodeT5+
+[59] and CodeGen2.0 [60], applying a consistent experimen-
+tal setting as outlined in Section VII-A. We follow again the
+evaluation methodology described at the beginning of Section
+VII-B. We use the same prompts for ChatGPT, CodeT5+, and
+CodeGen2.0 to ensure a fair comparison. CodeT5+, proposed
+by Wang et al. [59], stands out as an encoder-decoder code foun-
+dation LLMs, demonstrating good performance across more
+than 20 code-related benchmarks involving both understanding
+or generative tasks, including in the zero-shot setting. Given
+that the 2B, 6B, and 16B parameter sizes of CodeT5+ are built
+upon CodeGen, we also include a comparison with CodeGen2.0
+in our analysis. However, due to constraints related to GPU
+memory, our assessment is conﬁned to the codet5p-2b and
+codegen2-3_7B models for the inference stage, as these are the
+largest model sizes we can load. Both models are deployed on a
+Docker environment with NVIDIA RTX 6000 Ada Generation
+(48GB of graphics memory). We use the same settings for the
+CodeT5+ 2B23 and CodeGen2-3.7B24 models from Hugging
+Face. The default conﬁgurations for CodeT5+ include parame-
+ters such as temperature of 1.0, model type as encoder-decoder,
+and 16-bit ﬂoating point tensors. On the other hand, CodeGen2
+uses similar defaults with a temperature of 1.0 but employs the
+GPT2Tokenizer and conﬁgures tensors to use 32-bit ﬂoating
+point. Additionally, for both models, we adjust the max_length
+parameter to 2048.
+23https://huggingface.co/Salesforce/codet5p-2b
+24https://huggingface.co/Salesforce/codegen2-3_7B_P
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

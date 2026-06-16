@@ -1,0 +1,29 @@
+Status: partial-success
+Tools Used: PyMuPDF text/layout/page rendering; regex source static inventory
+Successful Outputs:
+- metadata.json
+- 00_source_manifest.txt
+- full_text.txt
+- page_text/page_NNN.txt for 15 pages
+- layout_blocks/page_NNN_blocks.json for 15 pages
+- sections.txt and section_text/ with 9 repaired top-level sections
+- figures/ with 2 caption/page-crop records
+- tables/ with 0 caption-neighbor records
+- references.txt
+- source_static_inventory.txt
+Failed Outputs:
+- precise table cell extraction is not verified [NEEDS TABLE REPAIR]
+- precise figure-region crops are not verified; saved page crops [NEEDS FIGURE EXTRACTION]
+- original C implementation and large-scale evaluation datasets are absent [NEEDS ARTIFACT]
+Pages With Empty Text: []
+OCR Needed: no
+Tables Extracted: 6 caption-neighbor records, not citation-ready
+Figures/Captions Extracted: 9 caption/page-crop records, figure-ready=partial
+References Extracted: yes
+Known Losses: multi-column reading order may be imperfect; table cells and exact figure bounding boxes are not repaired.
+Next Repair Step: repair tables/figures if exact numeric or visual claims are needed; verify DOI/BibTeX.
+PDF Text Complete: yes
+PDF Layout Partial: yes
+Citation-Ready Tables: no
+Figure-Ready: partial
+Agent Index: pending build_agent_index.py

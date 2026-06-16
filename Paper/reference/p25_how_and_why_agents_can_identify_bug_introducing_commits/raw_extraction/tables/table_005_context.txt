@@ -1,0 +1,176 @@
+Page: 5
+BBox: [54.136827850341795, 299.32212611607144, 293.623592376709, 311.6105651855469]
+Context:
+How and Why Agents Can Identify Bug-Introducing Commits
+Preprint, Under Submission, arXiv
+Table 4: RQ2c: Impact of withholding the fix commit message
+and diff. Best results in bold.
+Approach
+With
+Message
+With
+Diff
+Precision
+Recall
+F1-Score
+SZZ
+–
+–
+0.54
+0.59
+0.56
+SZZ-Agent
+✗
+✗
+0.49
+0.48
+0.48
+SZZ-Agent
+✗
+✓
+0.74
+0.73
+0.73
+SZZ-Agent
+✓
+✗
+0.78
+0.77
+0.77
+SZZ-Agent
+✓
+✓
+0.81
+0.80
+0.81
+Table 5: RQ2d: Contribution of Stage 1 and Stage 2. Costs are
+average per fix commit. Best results in bold.
+Approach
+Precision
+Recall
+F1-Score
+Cost (USD)
+Stage 1 Only
+0.48
+0.47
+0.48
+$0.18
+Stage 2 Only
+0.77
+0.76
+0.76
+$1.20
+SZZ-Agent
+0.81
+0.80
+0.81
+$0.67
+not meaningfully improve its F1-score (0.64 →0.61 →0.65). In con-
+trast, SZZ-Agent with the same Claude Opus 4.5 backbone achieves
+0.77. This demonstrates that SZZ-Agent’s advantage stems from its
+agentic approach rather than from using a better LLM.
+Finding 1: SZZ-Agent outperforms all previous approaches by at
+least 12 percentage points in F1-score on three established datasets
+(RQ1). This improvement cannot be explained by data leakage
+(RQ2a) or by the use of a more capable LLM backbone (RQ2b), but
+stems from the agentic approach itself.
+3.3.4
+RQ2c: Context Ablation. We investigate which contextual in-
+formation enables SZZ-Agent to identify bug-introducing commits.
+Setup. We ablate the fix commit message and the fix commit diff by
+selectively withholding them from the agent. We run all variants
+on DS_LINUX-26 with Claude Opus 4.5.
+Results. Table 4 shows the results. Without both the commit mes-
+sage and the diff, SZZ-Agent drops to 0.48 F1-score, below standard
+SZZ (0.56). Providing only the diff recovers performance to 0.73,
+and providing only the message reaches 0.77—each individually
+already exceeding the previous state-of-the-art (LLM4SZZ, 0.62 on
+DS_LINUX-26). This suggests that the two sources carry partially
+redundant information. However, combining both achieves 0.81, in-
+dicating that each source also provides complementary information
+not captured by the other.
+Finding 2: The fix commit message and the fix commit diff carry
+partially redundant information: each alone already surpasses
+the previous state-of-the-art. However, combining both yields the
+highest performance (0.81 F1), showing that neither source fully
+subsumes the other.
+3.3.5
+RQ2d: Stage 1 vs. Stage 2. We investigate the individual con-
+tribution of each stage to the overall pipeline.
+Table 6: RQ2e: Impact of the commit selection threshold.
+Costs are average per fix commit. Best results in bold.
+Commit
+Identifier
+Threshold
+Precision
+Recall
+F1-Score
+Cost (USD)
+8
+0.76
+0.75
+0.76
+$0.68
+32
+0.81
+0.80
+0.81
+$0.67
+128
+0.80
+0.79
+0.80
+$0.39
+512
+0.81
+0.80
+0.81
+$0.35
+∞
+0.82
+0.81
+0.82
+$0.33
+Setup. We run Stage 1 and Stage 2 in isolation and compare against
+the combined pipeline. All experiments use DS_LINUX-26 with
+Claude Opus 4.5. We also report the average cost per fix commit in
+USD.
+Results. Table 5 shows the results. Stage 1 alone achieves only 0.48
+F1-score at $0.18 per fix commit, while Stage 2 alone reaches 0.76 at
+$1.20. The combined pipeline achieves the best F1-score of 0.81 at
+$0.67, demonstrating that both stages are complementary: Stage 1
+cheaply resolves straightforward cases, reducing the number of
+entries that require the more expensive Stage 2.
+Finding 3: Stage 1 and Stage 2 are complementary. Stage 1
+cheaply resolves straightforward cases, while Stage 2 handles the
+remaining difficult cases. Their combination achieves the best
+F1-score at moderate cost.
+3.3.6
+RQ2e: Commit Selection Threshold. We investigate how the
+commit selection threshold—the number of remaining candidates
+at which Stage 2 switches from binary search to direct selection—
+affects performance and cost.
+Setup. We vary the threshold across values of 8, 32, 128, 512, and
+∞(no binary search, always direct selection). All experiments use
+DS_LINUX-26 with Claude Opus 4.5.
+Results. Table 6 shows the results. Performance is remarkably
+stable across thresholds, ranging from 0.76 to 0.82 F1-score. Higher
+thresholds reduce cost ($0.68 at threshold 8 vs. $0.33 at ∞) because
+fewer binary search steps are needed. The ∞threshold—which skips
+binary search entirely and always uses direct selection—achieves
+the best F1-score (0.82) at the lowest cost ($0.33).
+Finding 4 (Most Surprising): Skipping binary search entirely
+and always using direct candidate selection yields the best F1-score
+(0.82) at the lowest cost. The agent can identify the bug-introducing
+commit from a large candidate set in a single step, without iterative
+narrowing. This observation led us to question whether binary
+search is necessary at all, and motivated the development of a
+drastically simplified approach: Simple-SZZ-Agent (§4).
+4
+Part 2: Simple-SZZ-Agent
+Our experiment on varying the commit selection threshold (RQ2e,
+§3.3.6) revealed that skipping binary search entirely and always
+using direct candidate selection yields the best performance at the
+
+
+Citation Readiness: medium; verify against page crop.

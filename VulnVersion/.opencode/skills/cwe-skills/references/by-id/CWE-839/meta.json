@@ -1,0 +1,309 @@
+{
+  "cwe_id": "CWE-839",
+  "name": "Numeric Range Comparison Without Minimum Check",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product checks a value to ensure that it is less than or equal to a maximum, but it does not also verify that the value is greater than or equal to the minimum.",
+  "extended_description": "Some products use signed integers or floats even when their values are only expected to be positive or 0. An input validation check might assume that the value is positive, and only check for the maximum value. If the value is negative, but the code assumes that the value is positive, this can produce an error. The error may have security consequences if the negative value is used for memory allocation, array access, buffer access, etc. Ultimately, the error could lead to a buffer overflow or other type of memory corruption. The use of a negative number in a positive-only context could have security implications for other types of resources. For example, a shopping cart might check that the user is not requesting more than 10 items, but a request for -3 items could cause the application to calculate a negative price and credit the attacker's account.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1023",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incomplete Comparison with Missing Factors"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-195",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Signed to Unsigned Conversion Error"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-124",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Buffer Underwrite ('Buffer Underflow')"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product checks a value to ensure that it is less than or equal to a maximum, but it does not also verify that the value is greater than or equal to the minimum.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "negative",
+      "positive",
+      "could",
+      "error"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "negative",
+      "positive",
+      "could",
+      "error",
+      "but",
+      "maximum",
+      "minimum",
+      "equal"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code is intended to read an incoming packet from a socket and extract one or more headers.",
+        "snippet": "DataPacket *packet; int numHeaders; PacketHeader *headers; sock=AcceptSocketConnection(); ReadPacket(packet, sock); numHeaders =packet->headers; if (numHeaders > 100) { ExitError(\"too many headers!\"); } headers =..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code reads a maximum size and performs a sanity check on that size. It then performs a strncpy, assuming it will not exceed the boundaries of the...",
+        "snippet": "int GetUntrustedInt () { return(0x0000FFFF); } void main (int argc, char **argv) { char path[256]; char *input; int i; short s; unsigned int sz; i = GetUntrustedInt(); s = i; /* s is -1 so it passes the safety check -..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following code, the method retrieves a value from an array at a specific array index location that is given as an input parameter to the method",
+        "snippet": "int getValueFromArray(int *array, int len, int index) { int value; // check that the array index is less than the maximum // length of the array if (index < len) { // get the value at the specified index of the array..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code shows a simple BankAccount class with deposit and withdraw methods.",
+        "snippet": "public class BankAccount { public final int MAXIMUM_WITHDRAWAL_LIMIT = 350; // variable for bank account balance private double accountBalance; // constructor for BankAccount public BankAccount() { accountBalance = 0; }..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In the following code, the method retrieves a value from an array at a specific array index location that is given as an input parameter to the method",
+        "snippet": "... // check that the array index is within the correct // range of values for the array if (index >= 0 && index < len) { ..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "The following code shows a simple BankAccount class with deposit and withdraw methods.",
+        "snippet": "public class BankAccount { public final int MINIMUM_WITHDRAWAL_LIMIT = 0; public final int MAXIMUM_WITHDRAWAL_LIMIT = 350; ... // method to withdraw amount from BankAccount public void withdraw(double withdrawAmount) {..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2010-1866",
+        "description": "Chain: integer overflow (CWE-190) causes a negative signed value, which later bypasses a maximum-only check (CWE-839), leading to heap-based buffer overflow (CWE-122).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-1866"
+      },
+      {
+        "reference": "CVE-2009-1099",
+        "description": "Chain: 16-bit counter can be interpreted as a negative value, compared to a 32-bit maximum value, leading to buffer under-write.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1099"
+      },
+      {
+        "reference": "CVE-2011-0521",
+        "description": "Chain: kernel's lack of a check for a negative value leads to memory corruption.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-0521"
+      },
+      {
+        "reference": "CVE-2010-3704",
+        "description": "Chain: parser uses atoi() but does not check for a negative value, which can happen on some platforms, leading to buffer under-write.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-3704"
+      },
+      {
+        "reference": "CVE-2010-2530",
+        "description": "Chain: Negative value stored in an int bypasses a size check and causes allocation of large amounts of memory.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-2530"
+      },
+      {
+        "reference": "CVE-2009-3080",
+        "description": "Chain: negative offset value to IOCTL bypasses check for maximum index, then used as an array index for buffer under-read.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-3080"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,80 @@
+===== PAGE 001 =====
+V1SCAN: Discovering 1-day Vulnerabilities in Reused C/C++ Open-source
+Software Components Using Code Classification Techniques
+Seunghoon Woo, Eunjin Choi, Heejo Lee∗, Hakjoo Oh
+Korea University, {seunghoonwoo, silver_jin, heejo, hakjoo_oh}@korea.ac.kr
+Abstract
+We present V1SCAN, an effective approach for discovering
+1-day vulnerabilities in reused C/C++ open-source software
+(OSS) components. Reusing third-party OSS has many bene-
+fits, but can put the entire software at risk owing to the vul-
+nerabilities they propagate. In mitigation, several techniques
+for detecting propagated vulnerabilities, which can be clas-
+sified into version- and code-based approaches, have been
+proposed. However, state-of-the-art techniques unfortunately
+produce many false positives or negatives when OSS projects
+are reused with code modifications.
+In this paper, we show that these limitations can be ad-
+dressed by improving version- and code-based approaches
+and synergistically combining them. By classifying reused
+code from OSS components, V1SCAN only considers vulner-
+abilities contained in the target program and filters out unused
+vulnerable code, thereby reducing false alarms produced by
+version-based approaches. V1SCAN improves the coverage
+of code-based approaches by classifying vulnerable code and
+then detecting vulnerabilities propagated with code changes in
+various code locations. Evaluation on GitHub popular C/C++
+software showed that V1SCAN outperformed state-of-the-art
+vulnerability detection approaches by discovering 50% more
+vulnerabilities than they detected. In addition, V1SCAN re-
+duced the false positive rate of the simple integration of ex-
+isting version- and code-based approaches from 71% to 4%
+and the false negative rate from 33% to 7%. With V1SCAN,
+developers can detect propagated vulnerabilities with high
+accuracy, maintaining a secure software supply chain.
+1
+Introduction
+Open-source software (OSS) reuse has become an indispens-
+able trend in software development [9,36,41]. In addition to
+the benefits of using existing functionalities, reusing OSS in-
+creases the reliability of software because OSS is often more
+exposed to verification by multiple parties.
+* Heejo Lee is the corresponding author.
+However, improper OSS reuse may compromise the secu-
+rity of the entire system (e.g., vulnerability propagation [9,
+14, 15, 34]). To obviate the threats imposed by unmanaged
+OSS reuse, many approaches have been proposed for detect-
+ing vulnerabilities in OSS components. These approaches are
+mainly classified into version- and code-based techniques.
+• A version-based approach discovers vulnerabilities by
+identifying OSS versions [9, 36, 40]. It determines
+whether the versions contain known vulnerabilities such
+as Common Vulnerabilities and Exposures (CVE).
+• A code-based approach detects propagated vulnerabili-
+ties by identifying codes that are syntactically or seman-
+tically similar to vulnerable code [12,14,34,37].
+Although resolving vulnerabilities is crucial for securing
+software, existing version- and code-based approaches easily
+produce false positives or negatives, resulting in impeding an
+effective vulnerability management process. This is primarily
+owing to the recent tendency of developers to typically reuse
+OSS with code or structural modifications [9,36].
+Limitations of existing approaches. Existing version-based
+approaches (e.g., [9,36,40]) easily produce false positives be-
+cause they fail to consider the impact of modified OSS reuse
+on vulnerability propagation, and thus misinterpret the unused
+vulnerable code as still being present in the target program. In
+contrast, existing code-based approaches (e.g., [12,14,34,37])
+easily report false negatives when the syntax of the vulner-
+able code is modified. Moreover, because these approaches
+focus on a specific granularity (e.g., function units), they miss
+vulnerabilities that exist outside the selected granularity.
+Our approach. To overcome their shortcomings, we present
+V1SCAN, a novel approach for the precise and comprehensive
+discovery of 1-day security vulnerabilities propagated as a
+result of the reuse of C/C++ OSS components.
+We devise a new way to combine version- and code-based
+approaches to take full advantage of their strengths and avoid
+weaknesses. The main idea of V1SCAN, which is significantly
+distinguishable from existing approaches, is to detect propa-
+gated vulnerabilities using the code classification techniques.

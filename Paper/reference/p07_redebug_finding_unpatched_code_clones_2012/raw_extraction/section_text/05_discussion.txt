@@ -1,0 +1,116 @@
+# IV. DISCUSSION
+
+A. Comparison to Prior Work
+ReDeBug improves scalability with decreased false de-
+tection rate, but may ﬁnd fewer code clones than previous
+code clone detection work. In order to measure the number
+of unpatched code clones that ReDeBug missed, we com-
+pared the number of code clones detected by ReDeBug to
+the number of code clones reported by Deckard [23]. We
+chose Deckard because it claims better code clone detection
+performance than CP-Miner [25] and CloneDR [5].
+Theoretically, the code clones reported by Deckard should
+be the superset of the code clones found by ReDeBug. In
+practice, however, Deckard missed more code clones than
+ReDeBug. We used Deckard v1.2 2 for our experiments,
+and set parameters as follows: minT (minimum number
+of tokens required for clones) = 30 and stride (size of
+the sliding window) = 2 for their conservative results, and
+Similarity = 1 to minimize their false detection. This
+was similar to the setup in their paper.
+Deckard did not scale to the entire Debian Lenny dis-
+tribution (257,796,235 LoC) in our test setup. During pair-
+2https://github.com/skyhover/Deckard
+59
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 013 =====
+Clone Detection
+Real Clones
+False Detection
+Missed
+ReDeBug
+180
+0
+15
+Deckard
+96
+183
+99
+Table VI: Code clone detection performance
+wise comparisons Deckard consumed more than 20 GB of
+memory in less than 2 minutes, after which we killed the
+process. Instead of the entire OS, we ran Deckard on each
+package at a time with 28 randomly selected C code ﬁles
+which contain security bugs. We report only code clones
+which match with the buggy code regions. Deckard took
+more than 12 hours to complete the code clone detection
+in Debian Lenny, utilizing 8 threads to process 8 packages
+at the same time. While Deckard processed only the source
+code written in C (Deckard can process one language at
+a time), ReDeBug processed a wealth of languages (e.g.,
+C/C++, Java, Shell, Python, Perl, Ruby, and PHP) in 6 hours.
+Table VI shows the code clone detection results of
+Deckard and ReDeBug. As expected, ReDeBug had no false
+detections, and surprisingly, missed 6 times as few code
+clones compared to Deckard. The code clones that ReDeBug
+missed came from the use of different variable names or
+types.
+Deckard faired worse than ReDeBug despite using a more
+sophisticated strategy. We investigated the causes, and found
+that 38 out of 99 of the cases were due to parse failures
+in Deckard, with the remainder just being missed due to
+the algorithm for detecting code clones. This result lends
+support that parsing code is hard and can be a limiting factor
+in practice, and that ReDeBug’s relatively simpler approach
+can be valuable in such circumstances.
+B. Unpatched code clones that are not vulnerable
+Since ReDeBug gets rid of Bloom ﬁlter errors and dead
+code, a metric for false positives is the number of unpatched
+code clones that were not vulnerable for some other reason.
+We have identiﬁed two other causes for this type of false
+positive. First, normalization may be too aggressive in some
+circumstances and thus the identiﬁed code clone is not
+really a code clone. Second, we may ﬁnd real unpatched
+code clones, but other code modiﬁcations may prevent the
+unpatched code from being called in an exploitable context.
+Normalization reduces the false negative rate, but may
+increase the false positive rate. For example, imagine two
+code sequences that are equivalent but one is performed on
+an unsigned integer “A” and the other on a signed integer
+“a”. If the bug relates to signedness, only the latter code is
+vulnerable. However, normalization converts all variables to
+lower-case, thus we would mistakenly report the former as
+also buggy.
+Listing 10 shows an example of an unpatched code clone
+that is present but not vulnerable. The patch ﬁxes an integer
+signedness bug in various BSD kernels. NetBSD contains the
+same vulnerable code, but ﬁxed the problem by changing the
+type of crom_buf->len from signed integer to unsigned
+integer instead of using the shown patch.
+- if (crom_buf->len < len)
++ if (crom_buf->len < len && crom_buf->len > 0)
+Listing 10: CVE-2006-6013
+An unpatched code clone was detected in the ircd-ratbox
+package from the patch shown in Listing 11. The package
+maintainer informed us that the vulnerability was ﬁxed in
+a different location, i.e., adding a separate error checking
+routine if (len<=1) break; ahead of the vulnerable
+code.
+else
+*d++ = *src;
+-
+++src;
+-
+--len;
++
+if (len > 0) {
++
+++src, --len;
++
+}
+}
+*d = ’\0’;
+return dest;
+Listing 11: CVE-2009-4016

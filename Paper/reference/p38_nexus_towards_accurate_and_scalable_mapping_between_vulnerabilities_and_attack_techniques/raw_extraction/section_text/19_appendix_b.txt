@@ -1,0 +1,84 @@
+APPENDIX B
+APD MODEL WITH ADDITIONAL EPOCHS
+To validate APD model robustness, we ﬁne-tune Secure-
+BERT [43] for 15 epochs. As shown in Table XIII and
+Figure 25, training loss decreases, but validation loss rises
+after 5 epochs, indicating overﬁtting. Precision, Recall, and
+Algorithm 1: Data Preprocessing Sub-step
+Input: cve text, srl model
+Output: sub sentences dic list
+1 tokenized_sentences ↑ Clean and tokenizecve_text
+2 foreach sentence in tokenized_sentences do
+3 sentence_srl_tags ↑ Get SRL tags;
+4 if SRL tags existthen
+5 Extract verbs_list and words;
+6 foreach verb in verbs_list do
+7 Collect non-empty tag indexes;
+8 if tags contain ARG1-ARG5then
+9 Formulate sub_sentence and append to list;
+10 if sub_sentence_list not empty then
+11 Create directed graph;
+12 foreach sub-sentence pair (A, B)do
+13 if A’s verbs⇑ B’s verbs and B has more verbsthen
+14 A ≃ child of B;
+15 else ifB’s verbs⇑ A’s verbs and A has more verbsthen
+16 A ≃ parent of B;
+17 Append to sub_sentences_dic_list;
+18 return sub_sentences_dic_list
+Algorithm 2: Label Adjustment Sub-step
+Input: CVEs with attack patterns and missing TTPsZCV Ei
+Output: Updated TTP labels per attack pattern
+1 foreach CVE in datasetdo
+2 Get description, patterns, andZCV Ei;
+3 foreach pattern in CVEdo
+4 foreach TTP in ZCV Ei do
+5 Ask GPT-4o-mini if TTP is relevant;
+6 if “Yes” then
+7 Assign TTP to pattern;
+8 Label veriﬁcation with dependency graph;
+9 foreach node in graphdo
+10 foreach direct child do
+11 if child TTPs ⇓⇔ parent TTPs then
+12 Remove extra TTPs from child;
+13 return Updated labels;
+Algorithm 3: Model Adaptation Sub-step
+Input: AP, Pred(AP), Feedback DB, Cluster Dictionary, LLM
+Output: AdaptedPred(AP)
+1 exact sig ↑ SHA-256(AP + <CONTEXT> + CVE);
+2 behav sig ↑ ClusterIDs(Pred(AP), Cluster Dictionary);
+3 Retrieve exact and behavioral feedback from DB using exactsig and
+behav sig (with coverageS and threshold ε);
+4 Apply exact feedback and tentatively apply behavioral feedback to Pred(AP);
+5 if LLM enabled then
+6 foreach TTP in behavioral feedbackdo
+7 Prompt LLM with (AP, TTP description);
+8 if (TP or FN and LLM =‘‘Yes’’) or (FP and LLM =‘‘No’’)
+then
+9 Update Pred(AP);
+10 return AdaptedPred(AP)
+Model Epochs Precision Recall F1-score
+SecureBERT [43] 5 95.99% 95.73% 95.86%
+SecureBERT [43] 15 93.60% 93.60% 93.60%
+TABLE XIII: Impact of extending SecureBERT [43] ﬁne-
+tuning from 5 to 15 epochs on APD model performance.
+F1-score drop, conﬁrming that 5 epochs are sufﬁcient for this
+dataset.
+17
+
+===== Page 018 =====
+(a) Training and validation loss
+over epochs.
+(b) Validation Precision, Recall,
+and F1-score over epochs.
+(c) TPR, FPR and FNR for posi-
+tive and negative classes.
+(d) Precision, Recall and F1-score
+for positive and negative classes.
+Fig. 25: Training and evaluation dynamics of the SecureBERT-
+based APD model over 15 epochs.
+(a) Performance on the 200 aggre-
+gated ATT&CK dataset [2].
+(b) Performance on the D5
+dataset.
+Fig. 26: Labeling performance of LLMs [35], [36] and Lad-
+der [9].

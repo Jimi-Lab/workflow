@@ -1,0 +1,33 @@
+7. LIMITATIONS
+Our approach has several limitations. We selected 66
+open-source projects written in C or C++ that created at
+least one CVE but otherwise varied in numbers of contribu-
+tors, commits, or governance. We believe that applying our
+results to other projects using C or C++ should not threaten
+the validity. However, we can make no predictions on how
+VCCFinder performs on projects which to date have not re-
+ceived any CVEs. For generalization to other programming
+languages, the feature extraction and training will need to
+be re-done per language, so that the SVM does not mis-train
+based on diﬀerences in syntax.
+We used a heuristic to map CVEs to VCCs. Our manual
+analysis of 15 % of these mappings showed that we have an
+error rate of 3.1 %. This needs to be taken into account by
+any project building on this dataset.
+While we were able to map CVEs to VCCs, it is of course
+unknown how many unknown vulnerabilities are contained
+in our annotated database. Thus, our true positives must be
+considered a lower bound and the false positives an upper
+bound. So both VCCFinder’s and Flawfinder’s results might
+be better than reported and the relation between them could
+change. However, since VCCFinder outperforms Flawfinder
+by a large margin, it seems unlikely that the outcome would
+change.
+Our experiments demonstrate that VCCFinder is able to
+automatically spot vulnerability-contributing commits with
+high precision; yet this alone does not ensure that an under-
+lying vulnerability will be uncovered. Significant work and
+expertise is still necessary to audit commits for potential
+security flaws. However, our approach reduces the amount
+of code to inspect considerably and thus helps increase the
+eﬀectiveness of code audits.

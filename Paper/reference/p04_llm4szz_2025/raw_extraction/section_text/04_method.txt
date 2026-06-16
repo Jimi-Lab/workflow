@@ -1,0 +1,393 @@
+3 Approach
+Building on the motivation examples, we propose a new framework called LLM4SZZ to effectively
+detect buggy statements and locate bug-inducing commits. Fig. 3 presents the overview of our
+framework, which consists of three parts: preparation, context-enhanced assessment, and commits
+identification. In the preparation phase, we analyze the bug-fixing commit, identify the core files
+related to the bug, and determine its root cause. During the context-enhanced assessment, we
+assess whether the LLM can understand the bug and determine its presence in the commit. If the
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 007 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:7
+SMU Classification: Restricted
+Preparation
+ Commits Identification
+root 
+cause
+related 
+files
+… 
+  flush_work(&deferred_probe_work);
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list,    
+deferred_probe)
++             dev_info(private->device, "deferred probe pending\n");
+…
+…
+  flush_work(&deferred_probe_work);
+  list_for_each_entry_safe(private, p,  &deferred_probe_pending_list, 
+deferred_probe)
+- dev_info(private->device, "deferred probe pending");
+  …
+Based on the commit message, the root cause 
+and the patch provided below, you need to:
+1. explain how the bug occurs, including code 
+statements that are likely to lead to the bug 
+and why. 
+2. explain how the bug is fixed, including code 
+statements fixing the bug and why. 
+Prompt
+LLM hints
+and 𝑪𝑪𝒇𝒇𝒇𝒇𝒇𝒇
+^ 1𝑪𝑪𝒇𝒇𝒇𝒇𝒇𝒇refined contexts for
+The code statements that lead to the bug are:
+…
+Reason:
+…
+The code statements that fix the bug are:
+Reason:
+…
+bug-fixing
+commit
+Based on the summary and commit 
+message, you need to:
+1. analyze the root cause of the bug in 
+detail. 
+2. output the file name that is most 
+likely to cause the bug.
+Prompt
+shuffle expanded
+context
+refine
+You will be given details about a bug, including:
+[a commit with refined context]
+[root cause]
+[LLM hints]
+Based on these details, your task is to 
+determine whether the provided code snippet 
+contains the bug.
+Prompt
+ability check
+Rank-based 
+identificationshuffled 
+patch
+context 
+expanding
+LLM
+1
+2
+3
+4
+Context-enhanced Assessment
+Context-enhanced
+identification
+Change 
+summary
+buggy statements
+Fig. 3. Overview of LLM4SZZ
+LLM demonstrates this ability, we employ the context-enhanced identification approach during the
+commit identification process; otherwise, we fall back to the rank-based identification approach.
+3.1 Preparation
+In this step, we use the large language model (LLM) to analyze bug-fixing commits. We aim to
+summarize the root cause of the bug based on the bug-fixing commit and filter out irrelevant files.
+In motivation example one, we have shown that irrelevant files undermine the LLM’s ability and
+we need to filter them out.
+Following the chain-of-thought (CoT) concept [Wei et al . 2022], we first require the LLM to
+analyze the patch, summarizing the modifications and their interrelationships within the bug-fixing
+commit. Next, we ask the LLM to identify the root cause of the bug and the related files based on
+the modification summary and the commit message.
+To enhance performance when handling large bug-fixing commits with multiple modified files,
+we employ two additional approaches. First, we shuffle the sequence of modified files in the patch,
+ensuring that each file has an equal chance of being identified as related to the root cause. Previous
+studies [Liu et al. 2024] reveal that LLMs tend to ignore content in the middle of text when handling
+long texts. Second, we run the LLM three times for the same question and shuffle the patch at each
+run-time. This approach is similar to a voting system [Wang et al. 2022]. However, instead of only
+considering files with majority votes, we take a more conservative approach: if a file name appears
+in any of the LLM outputs, we regard it as related to the root cause. This strategy helps minimize
+the risk of omitting important files. After this step, we obtain the root cause of the bug and filter
+out all irrelevant files.
+3.2 Context-Enhanced Assessment
+In this section, we explain the necessity of the assessment and our approach to it. In the first
+motivation example, we demonstrate that LLMs can determine whether a bug exists in a commit,
+allowing us to use them to select the final bug-inducing commit from a set of candidates. The second
+example illustrates that providing more context can enhance the LLM’s ability to understand the
+patch and help identify buggy statements more accurately. However, previous studies in automatic
+program repair have shown that LLMs still do not comprehend certain bugs [Bouzenia et al .
+2024; Parasaram et al. 2024], even with enough context. This indicates that LLMs are unable to
+determine whether these kinds of bugs exist in programs because they cannot understand the bugs.
+If LLMs cannot understand the bug even with additional context, providing more context becomes
+meaningless, and alternative methods are required to address these cases. Therefore, it is crucial to
+assess the LLM’s ability to comprehend the bug and identify its presence.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 008 =====
+ISSTA016:8 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+To assess the LLM’s ability to determine whether the bug exists, we need two versions of the
+program: one containing the bug and another where it has been fixed. Therefore, an ideal approach
+is to make use of the bug-fixing commit𝐶𝑓 𝑖𝑥, where the version𝐶𝑓 𝑖𝑥∧1 is buggy and version𝐶𝑓 𝑖𝑥 is
+correct. Although we can directly require the LLM to assess whether the commit is buggy based on
+the root cause of the bug, experimental results indicate that this approach yields low performance
+(see section 4). Instead, we first require the LLM to generate a hint to assist in determining whether
+the commit contains the bug. The hint includes detailed information about the code statements in
+the patch. Its further specifics will be provided later in this section. Then, we separately feed the
+hint and the bug-related contexts extracted from commit 𝐶𝑓 𝑖𝑥 and 𝐶𝑓 𝑖𝑥∧1 to the LLM, asking it to
+identify whether each version contains the bug. If the LLM even cannot identify the two versions
+correctly using its own produced hint, we regard that the LLM is unable to comprehend the bug,
+let alone select the final bug-inducing commit from a set of candidates.
+As shown in Figure 3, the entire context-enhanced assessment process consists of four steps,
+which are as follows:
+❶ Context Expanding: First, we provide the LLM with sufficient context through a process
+that we call context expanding. Previous studies have found that the contextual code is crucial for
+providing information to the model [Chen et al . 2019; Xia et al. 2023]. However, the bug-fixing
+commit often does not contain the full content of the changed functions. The partial content of
+functions in the fixing commit may hinder the LLM’s ability to understand both the functions and
+the modifications. Therefore, for each modified function, we expand its context by extracting the
+full content of both buggy and fixed versions and generating their diffs. For modified lines outside
+the function, we expand their context by extracting three unmodified lines around them. We have
+presented an example of context expanding in the second motivation example, as illustrated in
+Figure 2. Specifically, the code highlighted in blue represents new additions, and the others are
+collected from the original patch. As indicated in Section 2.2, the buggy code this.instanceName
+= clientConf.get(ClientProperty.INSTANCE_NAME)is not located in the original patch but in
+the expanded context, indicating the necessity of the context expanding.
+❷ Hint Generation: Next, we require the LLM to establish a hint to determine whether the bug
+exists in a commit. Specifically, we ask the LLM to identify the code statements leading to the bug
+and provide a reason. Additionally, we require the LLM to identify the code statements that fix the
+bug and provide a reason. Note that we do not limit the LLM to choosing code statements only
+from deleted lines. It can select any code statements from the expanded context.
+❸ Context Refinement: Before assessing the LLMs’ ability to determine whether the bug exists
+in a commit, we need to refine the expanded context to obtain the refined context. This step is
+necessary because the expanded context may contain much irrelevant content that is not related
+to the bug. For example, the expanded context might include an entire function with hundreds of
+lines, while only a few lines are relevant to the bug. Feeding the expanded context directly to LLMs
+may undermine their ability to assess the existence of the bug in a commit, as previous studies [Li
+et al. 2023a] suggest that LLMs struggle with intricate tasks when handling long texts. Therefore,
+we attempt to refine the expanded context. We first extract the buggy statements identified in the
+hint from the file in commit 𝐶𝑓 𝑖𝑥∧1. These buggy statements are then sorted in ascending order
+based on their line numbers {𝑙1, 𝑙2, ... 𝑙𝑛 } in commit 𝐶𝑓 𝑖𝑥∧1, where 𝑙1 is the smallest line number
+and 𝑙𝑛 is the largest. Here, we define 𝑙𝑚𝑖𝑛 as 𝑙1 −𝑁 and 𝑙𝑚𝑎𝑥 as 𝑙𝑛 +𝑁. N is a constant starting from
+3 to ensure that lines 𝑙𝑚𝑖𝑛 and 𝑙𝑚𝑎𝑥 can be mapped to corresponding lines in commit 𝐶𝑓 𝑖𝑥. If line
+𝑙𝑚𝑖𝑛 or line 𝑙𝑚𝑎𝑥 cannot be mapped, we keep incrementing N. Then, we extract the content ranging
+from the line number 𝑙𝑚𝑖𝑛 to the line number 𝑙𝑚𝑎𝑥 , forming the refined context for commit 𝐶𝑓 𝑖𝑥∧1.
+To obtain the refined context for commit𝐶𝑓 𝑖𝑥, we map lines 𝑙𝑚𝑖𝑛 and 𝑙𝑚𝑎𝑥 to their corresponding
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 009 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:9
+SMU Classification: Restricted
+1      driver_deferred_probe_timeout = 0;
+2      driver_deferred_probe_trigger();
+        
+3      flush_work(&deferred_probe_work);
+4 -    list_for_each_entry_safe(private, p, &deferred_probe_pending_list,
+5 -                             deferred_probe)
+6 -       dev_info(private->device, "deferred probe pending\n");
+7      }
+8      static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+9          deferred_probe_timeout_work_func);
+1       driver_deferred_probe_timeout = 0;
+2       driver_deferred_probe_trigger();
+3       flush_work(&deferred_probe_work);
+4+     mutex_lock(&deferred_probe_mutex);
+5+     list_for_each_entry(p, &deferred_probe_pending_list, 
+6+                                   deferred_probe)
+7+        dev_info(p->device, "deferred probe pending\n");
+8+     mutex_unlock(&deferred_probe_mutex);
+9+     wake_up_all(&probe_timeout_waitqueue);
+10     }
+11     static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+12          deferred_probe_timeout_work_func);
+eed6e41813d^1 eed6e41813d
+The code statements that lead to the bug are:
+list_for_each_entry_safe(private, p, &deferred_probe_pending_list, deferred_probe)
+dev_info(private->device, "deferred probe pending\nn"); 
+Reason: The provided code snippet is indeed buggy because it uses `list_for_each_entry_safe()` to 
+traverse the `deferred_probe_pending_list` without protecting against concurrent modifications from 
+other threads…
+The code statements that fix the bug are:
+mutex_lock(&deferred_probe_mutex); 
+mutex_unlock(&deferred_probe_mutex); 
+Reason: The provided code snippet correctly uses a mutex lock (`mutex_lock(&deferred_probe_mutex);`) 
+before iterating over the `deferred_probe_pending_list` with `list_for_each_entry()`…
+Hint
+Fig. 4. An example of context-enhanced ability check
+SMU Classification: Restricted
+Extract 
+statements
+hint
+…
+buggy 
+statements
+C1
+C2
+Cn …
+candidate
+contexts
+git
+blame
+context
+generation
+find
+commit
+C𝑓𝑓
+candidate
+commits
+LLM
+The code statements that lead to the 
+bug are:
+…
+Reason:
+…
+The code statements that fix the bug 
+are:
+Reason:
+…
+Check buggy statements
+cid𝑗𝑗
+context for 
+ 𝐜𝐜𝐜𝐜𝐜𝐜𝒋𝒋
+context for 
+ 𝐜𝐜𝐜𝐜𝐜𝐜𝒋𝒋^𝟏𝟏
+……
+1
+2
+Fig. 5. The workflow of context-enhanced identification
+line numbers 𝑙
+′
+𝑚𝑖𝑛 and 𝑙
+′
+𝑚𝑎𝑥 and extract the content between these two line numbers in commit
+𝐶𝑓 𝑖𝑥, forming the refined context for commit 𝐶𝑓 𝑖𝑥.
+❹ Ability Check: Finally, with the contexts for both commits obtained, we begin to check the
+LLM’s ability to determine whether the bug exists in the commit. We provide the LLM with the root
+cause of the bug, the hint collected above, and the refined contexts for two versions. If the LLM can
+correctly identify the fixed version and the buggy version, we proceed to adopt context-enhanced
+identification. Otherwise, we fall back to rank-based identification.
+One example of the context-enhanced ability check is shown in Figure 4, which corresponds to
+the motivation example one. Here, we set N to 3. The LLM identifies lines from 4 to 6 as buggy
+statements in 𝑒𝑒𝑑6𝑒41813𝑑∧1. Therefore, 𝑙𝑚𝑖𝑛 is 1 and 𝑙𝑚𝑎𝑥 is 9. To generate the refined context for
+this commit, we extract lines ranging from line 1 to line 9. We then map line 1 and line 9 to commit
+𝑒𝑒𝑑6𝑒41813𝑑, getting 𝑙
+′
+𝑚𝑖𝑛 as 1 and 𝑙
+′
+𝑚𝑎𝑥 as 12. Finally, we extract the lines between them, forming
+the refined context in commit 𝑒𝑒𝑑6𝑒41813𝑑. We feed the LLM with the root cause of the bug, the
+hint, and two versions of the context. It identifies the context for commit 𝑒𝑒𝑑6𝑒41813𝑑∧1 as buggy
+and the context for commit 𝑒𝑒𝑑6𝑒41813𝑑 as correct, demonstrating its ability to determine whether
+the bug exists in a commit.
+3.3 Commits Identification
+3.3.1 Context-Enhanced Identification. Given a bug-fixing commit, once we verify that the LLM
+can understand the bug in it with the expanded and refined context, we apply context-enhanced
+identification to identify the bug-inducing commits, as shown in Figure 5. First, we retrieve all
+buggy statements from the hint. We then trace back these buggy code statements, obtain a set of
+candidate commits, and sort them in descending order by commit date, forming a candidate list
+{𝐶1, 𝐶2, ... 𝐶𝑖 }. Next, we generate the refined context for each candidate commit following the same
+process used in the ability check. For each candidate commit 𝐶𝑗 , we create the context for both 𝐶𝑗
+and its previous version 𝐶∧
+𝑗 1.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 010 =====
+ISSTA016:10 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+SMU Classification: Restricted
++    driver_deferred_probe_trigger();
++    flush_work(&deferred_probe_work);
++    list_for_each_entry_safe(private, p, &deferred_probe_pending_list,     
+deferred_probe)
++                 dev_info(private->device, "deferred probe pending");
++     }
++    static  DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
++              deferred_probe_timeout_work_func);
+driver_deferred_probe_trigger();
+  flush_work(&deferred_probe_work);
+  
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list, 
+deferred_probe)
+-             dev_info(private->device, "deferred probe pending");
+  }
+  static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+            deferred_probe_timeout_work_func);
+driver_deferred_probe_trigger();
+  flush_work(&deferred_probe_work);
+  
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list,    
+deferred_probe)
++             dev_info(private->device, "deferred probe pending\n");
+  }
+  static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+            deferred_probe_timeout_work_func);
+<empty>
+eb7fbc9fb11 eb7fbc9fb11^1
+25b4e70dcce
+（initial commit） 25b4e70dcce^1
+Candidate
+commit1
+Candidate
+commit2
+Fig. 6. An example of context-enhanced identification
+To enhance the LLM’s ability to determine whether the candidate commit𝐶𝑗 contains the bug,
+we split the determination process into two steps. In the first step, we input the context of commit
+𝐶𝑗 and the buggy statements in the hint to the LLM, asking the LLM to determine whether the
+commit contains the buggy code statements or code statements with similar semantic meanings to
+the buggy code statements. If the LLM answers "no", we simply believe that the commit𝐶𝑗 does
+not contain the bug. If the LLM answers "yes", we proceed to let it determine whether the commit
+is buggy. In the second step, we feed the context of commit 𝐶𝑗 , the root cause of the bug, and the
+hint to the LLM, asking it to determine whether the commit contains the bug.
+We utilize the LLM to check the candidate commits in the list from index1 to 𝑖. If we can find
+an index 𝑓, where the LLM believes that the context of the commit 𝐶𝑓 is buggy but 𝐶∧
+𝑓 1 is not,
+we designate it as the bug-inducing commit. If we can not find such a commit, we fall back to
+rank-based identification conservatively.
+Figure 6 provides an example, which corresponds to the first motivation example. Firstly,
+LLM4SZZ traces back the buggy statements in the hint and finds two candidate commits, the
+commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 (denoted as 𝐶1) and commit 25𝑏4𝑒70𝑑𝑐𝑐𝑒 (denoted as 𝐶2). We sort them based
+on their commit date in descending order and get the candidates list {𝐶1, 𝐶2}. We first check the
+contexts for commits 𝐶1 and 𝐶1∧1, following the steps above and requiring the LLM to determine
+whether the two versions are buggy. The LLM identifies that both the 𝐶1 and 𝐶1∧1 versions of
+the program contain the bug. Therefore, this candidate commit is not the bug-inducing commit.
+LLM4SZZ then checks the commit 𝐶2 and 𝐶2∧1 , following the same steps. Here, 𝐶2 is the initial
+commit that introduces the file. Therefore, the context of𝐶2∧1 is empty. The LLM finds the commit
+𝐶2 contains the bug and the context of commit 𝐶2∧1 contains no code statements and is not buggy.
+Therefore, LLM4SZZ finally designates the commit 𝐶2 as the final bug-inducing commit.
+3.3.2 Rank-Based Identification. Rank-based identification addresses cases where the LLM
+cannot fully understand the bug and cannot determine whether the bug exists in the program.
+Therefore, in this approach, we do not use LLMs to select the final bug-inducing commit from
+candidate commits. Instead, we simply follow the idea of NerualSZZ [Tang et al. 2023] and proceed
+as follows:
+•Buggy Statements Identification: We first ask the LLM to identify buggy statements from
+the bug-fixing commit based on the commit message and the root cause obtained in section
+3.1. In this phase, we input only the root cause, the commit message, and the original changed
+files obtained in section 3.1. We do not provide the LLM with expanded context, as we observe
+that if the LLM cannot understand the bug, additional context will undermine its performance
+(see Section 5.2).
+•Relevance Ranking: By utilizing a listwise rank algorithm [Sun et al. 2023] based on the
+LLM, we rank these buggy statements according to their relevance to the root cause.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 011 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:11
+Table 1. The statistics of the bugs and corresponding bug fixing commits in three datasets
+Dataset Project #Bug-Fixing #Bug-Inducing #SMALL #LARGEDS_LINUXlinux 1,500 1,562 681 819
+DS_GITHUB
+systemdqemugpacunitimeJohnTheRipperlibvirtopensips...(279 more projects)
+151096544308
+151096544309
+5322221130
+10774323171Total 361 362 146 207
+DS_APACHE
+accumuloambarihadoopluceneoozie
+3538537045
+55445714550
+71633
+2837476842Total 241 351 20 222
+•Candidate Commits Generation: For each file, we retrieve the top N code statements, trace
+them back to their corresponding commits, and add these commits to our list of candidate
+commits.
+•Final Commit Designation: We then sort these candidate commits by their commit date
+and designate the most recent commit as the bug-inducing commit. This approach aligns
+with previous studies [Bao et al. 2022; Rodríguez-Pérez et al. 2020], which suggest that bugs
+are typically introduced by recent commits.

@@ -1,0 +1,27 @@
+Abstract—Open-source software (OSS) has experienced a surge
+in popularity, attributed to its collaborative development model
+and cost-effective nature. However, the adoption of speciﬁc
+software versions in development projects may introduce security
+risks when these versions bring along vulnerabilities. Current
+methods of identifying vulnerable versions typically analyze and
+extract the code features involved in vulnerability patches using
+static analysis with pre-deﬁned r ules. They then use code clone
+detection to identify the vulnera ble versions. These methods are
+hindered by imprecision due to (1) the exclusion of vulnerability-
+irrelevant code in the analysis and (2) the inadequacy of code
+clone detection. This paper presents V
+ERCATION, an approach
+designed to identify vulnerable versions of OSS written in C/C++.
+V
+ERCATION combines program slicing with a Large Language
+Model (LLM) to identify vulnerability-relevant code from vulner-
+ability patches. It then backtrack s historical commits to gather
+previous modiﬁcations of identiﬁed vulnerability-relevant code.
+We propose code clone detection based on expanded and normal-
+ized ASTs to compare the differences between pre-modiﬁcation
+and post-modiﬁcation code, thereby locating the vulnerability-
+introducing commit ( vic) and enabling the identiﬁcation of the
+vulnerable versions between the vulnerability-ﬁxing commit and
+the vic. We curate a dataset linking 122 OSS vulnerabilities
+and 1,211 versions to evaluate V
+ERCATION. On this dataset, our

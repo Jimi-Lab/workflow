@@ -1,0 +1,5 @@
+| Field | Value |
+| --- | --- |
+| Page | 15 |
+| Caption | Table 5. The performance comparison between different language models Model DS_LINUX DS_GITHUB DS_APACHEPrecision Recall F1-score Precision Recall F1-score Precision Recall F1-score llama3-8b 0.607 0.536 0.569 0.648 0.595 0.620 0.567 0.371 0.449 llama3-70b0.6450.5510.594 0.657 0.611 0.6330.6120.3970.482 gpt-4o-mini 0.6280.5520.588 0.671 0.626 0.6480.6100.398 0.482 |
+| Status | caption/context only; [NEEDS TABLE REPAIR] |

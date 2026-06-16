@@ -1,0 +1,47 @@
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 9
+the temporal dimension of software evolution, constructing a temporal knowledge graph that
+preserves commit ordering and enables chronological reasoning about bug introduction.
+4.2 Agentic BIC Search
+As shown in Figure 4, the Agentic BIC Search phase navigates the TKG to identify the most likely
+BIC through structural reasoning and causality verification. The search agent receives context
+about the BFC (modified files, extracted functions, commit message) and produces a prediction
+identifying the BIC commit with a reasoning chain.
+4.2.1 Design Rationale.Our agentic loop design draws inspiration from recent advances in tool-
+augmented LLM agents for software engineering tasks [43, 46, 47]. These agents demonstrate that
+LLMs can effectively navigate complex search spaces when provided with specialized tools and
+structured reasoning. We adapt this paradigm to BIC identification, where the agent must reason
+about causal relationships between code changes across time. Unlike agents for issue resolution
+that operate on static code snapshots, our agent operates on a temporal knowledge graph, using
+tools designed for graph traversal and temporal reasoning. The key insight is that an LLM can
+perform nuanced semantic analysis (e.g., distinguishing a refactoring from a bug introduction)
+that heuristic-based SZZ variants cannot, while the TKG provides the structured search space that
+enables efficient exploration.
+4.2.2 Search Tools.The agent operates on the TKG through four specialized tools:
+(1) Candidate Enumeration( list_candidates): The agent’s mandatory first step. Returns the top-
+𝐾 candidates sorted by fitness score (see Algorithm 1), following the standard SZZ assumption
+that commits directly modifying fixed lines are most likely BICs. The tool also provides blame
+statistics to help the agent assess case complexity.
+(2) Structural Traversal( traverse_graph): FollowsMODIFIES_FILEand MODIFIES_FUNCTIONedges
+to discover commits that modified the same code entities. Results are ordered by commit type
+(blame commits first, then blame ancestors, then BFC ancestors), with function-level matches
+prioritized over file-level matches since they indicate more precise code co-location.
+(3) Property Query( query_node): Accesses metadata of a specific commit node, including the
+commit message, timestamp, modified files, and any code overlap with other candidates.
+(4) Causal Analysis( read_node_content): Reads the code diff stored in a commit node to perform
+causal analysis between BFC and BIC candidates. The agent checks if lines added by a candidate
+match what the BFC fixes, validating whether the candidate actually introduced the bug.
+4.2.3 Search Strategy.Algorithm 1 presents the agentic search loop. The agent begins by calling
+list_candidatesto obtain all candidate commits ranked by fitness score. This ranking prioritizes
+commit types based on our RQ0 findings: blame commits receive the highest score (1.0) since 57.2%
+of BICs appear directly in blame results; blame ancestors receive 0.6 as they require one level of
+traversal; BFC ancestors receive 0.3 as they represent the broadest exploration. These scores serve
+as ordinal rankings to guide the agent’s attention; the key property is the relative ordering, other
+values preserving this pattern would yield similar results.
+The agent then iteratively investigates the ranked candidates using the available tools. At each
+step, the LLM receives the full ranked candidate list along with outputs accumulated from previous
+tool calls (the ‘output’ variable in Algorithm 1), and may choose any candidate to investigate:
+querying its properties, reading its code diff to verify causal relationships, or traversing the graph
+to find related commits. In other words, the LLM could override the initial ranking returned by
+list_candidates based on its reasoning process. The loop continues until the agent reaches a
+decision or exhausts the maximum step limit (50 steps). To control API costs, we empirically limit
+, Vol. 1, No. 1, Article . Publication date: February 2026.

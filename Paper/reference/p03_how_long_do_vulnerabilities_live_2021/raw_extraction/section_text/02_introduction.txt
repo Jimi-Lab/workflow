@@ -1,0 +1,126 @@
+1 Introduction
+Software flaws that can potentially be exploited by an ad-
+versary are referred to as security bugs or vulnerabilities.
+Reducing the number of vulnerabilities in software by find-
+ing existing ones and avoiding the introduction of new ones
+(e.g. by employing secure coding practices or formal verifica-
+tion techniques) is one of the primary pursuits of computer
+security.
+Measurement studies on the different stages of the vul-
+nerability lifecycle play an important role in this pursuit, as
+they help us better understand the impact of security efforts
+and improve software security practices and workflows. The
+community has produced a number of such outputs in recent
+years [5, 8, 14, 18, 23, 28, 36]. A vulnerability’s lifecycle, or
+window of exposure as introduced by Schneier [34], describes
+the phases between the introduction of a vulnerability in the
+code, and the point in time when all systems affected by that
+vulnerability have been patched. There have been several
+adaptations of the vulnerability lifecycle concept (e.g. w.r.t.
+the number of phases or their ordering and its non-linearity),
+but the general concept remains the same, and a simple ver-
+sion is shown in Fig 1. The lifecycle of a vulnerability (or
+t int t f t d t ﬁx t p 
+vuln. introducedvuln. foundvuln. pub. disclosedﬁx availableall hosts patched
+time Phase 1 Phase 2 Phase 3 Phase 4
+Figure 1: Simplified plot of a vulnerability’s lifecycle. Continuous
+line shows period of possible exploitation.
+alternatively the window of exposure to a vulnerability) be-
+gins with its introduction into a product (at time t int). This
+first phase (Phase 1) of its lifecycle ends with its discovery
+by some party (t f). Phase 2 covers the time period during
+which a vulnerability is known to at least one individual (and
+there is an associated risk of exploitation depending on their
+intentions), but is not publicly disclosed yet. Phase 3 begins
+with the public disclosure of the vulnerability (td) and ends
+
+===== PAGE 002 =====
+with the publication of a patch fixing the vulnerability (tfix).
+Finally, Phase 4 ends when all vulnerable hosts have been
+patched (tp). The phases described above can be long, short or
+even non-existent, depending on the specific vulnerability and
+the processes of the affected product’s vendor. For example,
+if a vulnerability is discovered by an ethical hacker and re-
+sponsibly disclosed, the software vendor has the opportunity
+to eliminate Phase 3 by disclosing the vulnerability together
+with the fix. This is common practice for many projects. In
+some cases (more often for proprietary software) a vulner-
+ability can be silently patched, meaning public disclosure
+never occurs, and the phases may differ significantly from the
+figure.
+While the latter phases of the vulnerability lifecycle have
+received renewed research attention [14, 23, 36], this has not
+been the case for the early phases. A particularly interesting
+quantity describing the early part of the lifecycle (Phases 1–3),
+is the amount of time a vulnerability remains in the (upstream)
+codebase of a project. In the context of a version control
+system, it is the time between a Vulnerability Contributing
+Commit (VCC), and a fixing commit. We refer to this quantity,
+as a vulnerability’s code lifetime, or just lifetime for the rest
+of this paper. This quantity can provide valuable insights
+regarding code maturity, can guide practical decisions, and
+can help us investigate fundamental questions: Is the quality
+of software improving? How long should the “stable” freeze
+last? Are some vulnerabilities harder to find than others?
+What impact do automated testing tools have on the lifetimes
+of vulnerabilities?
+Previous approaches towards measuring vulnerability life-
+times either relied on manual mappings of fixing commits to
+VCCs [10, 11, 28], which meant they were limited in scale
+(low number of vulnerabilities affecting one project), or used
+heuristics to estimate lower bounds [18]. Li and Paxson [18],
+in particular, provided lower bound estimates for vulnerability
+lifetimes using an automated approach, as part of their large
+scale study on security patches.
+Research Questions. Although accurately estimating the life-
+time of vulnerabilities is a useful contribution on its own, the
+real power of a metric comes from the insights derived from
+its application. Vulnerability lifetime, as a metric, is less af-
+fected by the bias of vulnerability-hunting scrutiny, compared
+to metrics based on counting the raw number of discovered
+vulnerabilities1. Therefore, it can provide valuable novel in-
+sights. The main research questions we set off to answer in
+this paper are summarized by the following points:
+– How long do vulnerabilities remain in the code? Do these
+lifetimes differ for different projects or different vulnerabil-
+ity types? How long does it take to find certain portions of
+ultimately discovered vulnerabilities? (e.g. 25/50/75 percent)
+Answering these questions will provide us with insights re-
+garding the duration of the window of exposure for different
+1The futility of software quality arguments based on the raw numbers of
+vulnerability discoveries is well-documented [7, 17].
+projects. Results can aid decisions regarding the amount of
+time a “stable freeze” (only critical patches are applied to the
+software) should last, and for how long investing on dedicated
+long-term security support for a stable version may be neces-
+sary.
+– Are lifetimes increasing or decreasing over time? Are there
+signs of improved quality? Answering these questions will
+help us approach a fundamental question of software security
+from a novel angle:is software getting more secure over time?
+Contributions. We provide the first approach for accurately
+estimating vulnerability lifetimes automatically, going beyond
+estimating lower bounds, which is prevalent in previous work.
+The approach is based on a heuristic that receives as input
+a CVE’s set of fixing commits and produces as output an
+estimate of the CVE’s lifetime, utilizing information available
+in a project’s version control system. We rigorously validate
+our approach on a dataset of 1,171 ground truth mappings
+between CVEs and their VCCs. Then, we perform lifetime
+measurements on a large dataset of 5,914 CVEs, spanning
+11 popular Free and Open Source Software (FOSS) projects
+(selection criteria for the projects are presented in Section 3.2).
+This dataset is, to the best of our knowledge, the largest and
+most complete dataset of mappings between CVEs and their
+fixing commits, in existence.
+Main findings. Vulnerabilities generally remain in the code
+for large periods of time, varying significantly between
+projects. An exponential distribution is a good fit for vulnera-
+bility lifetimes overall, and for individual projects. Overall,
+vulnerability lifetimes increase with time, however the shape
+of their distribution remains exponential. A vulnerability’s
+lifetime does not depend on its type. Lifetimes are closely
+correlated with the general code age of a repository. However,
+vulnerable code lives less than non-vulnerable code. This
+spread (between the age of vulnerable and all code) increases
+over time for some projects.

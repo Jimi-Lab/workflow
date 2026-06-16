@@ -1,0 +1,100 @@
+We established that there is no evidence to support that we
+are introducing (and consequently fixing) significantly fewer
+new vulnerabilities over time. We also made the following
+observations: (a) vulnerability lifetimes are on average lower
+than regular code age, and (b) for some projects this spread
+increases over time.
+Observation (a) shows that vulnerability-fixing has a siz-
+able benefit in reducing the window of exposure to zero-day
+attacks. If this were not the case (if vulnerability lifetimes
+were similar or greater than regular code age), one could say
+that our vulnerability-finding practices would be totally inef-
+fective – fortunately this is not true.
+Observation (b), that for some projects vulnerability life-
+times, on average, increase slower over time compared to code
+age, is more interesting. One explanation could be that we are
+(introducing and) fixing an increasingly large number of new
+vulnerabilities each year, in addition to a few very old ones.
+Figure 8 does not support this explanation, since overall the
+distribution of vulnerability lifetimes does not significantly
+change and remains exponential, slowly stretching towards
+higher means over time. The alternative interpretation would
+be that there are parts of code that mature, i.e. we do not find
+vulnerabilities affecting them anymore, and apart from these
+parts we continue finding a similar ratio of new compared
+to old vulnerabilities. Our data support this interpretation.
+Overall, this interpretation suggests that we could be slowly
+progressing towards a state of relative maturity, where vulner-
+ability lifetimes become stable over time and not correlated to
+code age, even if the latter is increasing. In this state, the older
+parts of the codebase will be hardened, and we will be finding
+vulnerabilities introduced in a possibly large, yet bounded,
+time period. One could challenge this interpretation with the
+argument that vulnerabilities in older parts of the code are
+not found because nobody is looking for them. Although new
+parts of code may come under additional manual scrutiny, we
+do not believe that the vulnerability hunting process is differs
+drastically between old and even-older parts of the code. It
+would be beneficial to repeat the measurement some years
+from now, in order to see whether the predicted behavior of
+a stop to the constant increase of vulnerability lifetimes will
+hold for the projects under question.
+Overall, even though we may not be decreasing the
+number of vulnerabilities in a given codebase, there
+are indications that we could be making progress to-
+wards achieving a notion of maturity, where vulnera-
+bilities will be mostly absent from code older than a
+specific point in the past.
+Are vulnerabilities (in a given project) equal? When test-
+ing for differences in vulnerability lifetimes for all CVEs (all
+projects), we found that there exist statistically significant dif-
+ferences, even when considering our custom categories. This
+result is in line with the observations of Li and Paxson [18].
+They stopped their investigation at this point, however our
+dataset allowed us to explore further and investigate whether
+the relative frequency of different vulnerability types in dif-
+ferent projects is the cause of the observation above. Indeed,
+we found no statistically significant evidence supporting a re-
+lationship between the lifetime of a vulnerability and its type,
+within a project. For example, Category 3 has the highest
+average lifetime in Table 4 (1,760 days for all CVEs) but by
+far the lowest in Table 8 (752 days for Firefox). We attribute
+differences observed in previous studies to differences in the
+ratios of different types in different projects. Therefore, the
+notion that some vulnerability categories are in general harder
+to find than others (e.g. memory bugs are harder to find than
+input validation bugs), is not supported by our findings.
+Different vulnerability categories seem to be equally
+difficult to find (at least post release); overall, our
+results are consistent with the view that all vulnerabil-
+ities in a project are equal, and their order of discovery
+is random.
+Can we compare? Meaningful quantitative security metrics
+are notoriously difficult to arrive at [38]. Metrics that can
+meaningfully be used to compare different products/projects
+are especially rare. Simply comparing vulnerability lifetimes
+or trends in lifetimes between projects is not suitable, as they
+can be heavily correlated to regular code age.
+We put forward the hypothesis that the following two
+metrics may be helpful for comparative studies: (a)
+the spread between overall code age and vulnerability
+lifetime, or alternatively the ratio between average
+vulnerability lifetime and code age; (b) the rate of
+change (increase or decrease) of the spread between
+overall code age and vulnerability lifetime.
+Further investigation of these metrics as comparison instru-
+ments is a very interesting avenue for future research.
+How much fuzzing is enough? Traditionally, security re-
+searchers tend to focus on new, relatively less tested parts
+of the code to test for vulnerabilities. Recently, Zhu and
+Böhme [42] came to the conclusion that with limited re-
+sources, fuzzing code that has recently changed is the best
+vulnerability discovery strategy. Our results support this state-
+ment to an extent, in the sense that the distribution of vulner-
+ability lifetimes can be described by a decreasing function
+(exponential – see Figure 5). However, a significant number
+of vulnerabilities have large lifetimes and fuzzers keep dis-
+covering very old vulnerabilities for years (see Section 5.6).
+Taking into account the well-known asymmetries of computer
+security, finding these vulnerabilities that potentially impact
+many legacy systems, is also important. Furthermore, further

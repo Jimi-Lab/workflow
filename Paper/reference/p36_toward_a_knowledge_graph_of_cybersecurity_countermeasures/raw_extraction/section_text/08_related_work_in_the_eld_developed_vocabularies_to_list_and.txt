@@ -1,0 +1,171 @@
+Related work in the ﬁeld developed vocabularies to list and
+deﬁne common concepts used in cyber defense operations.
+Some limitations of these vocabularies motivated the construc-
+tion of the D3FEND DAO, as these vocabularies were often
+syntactic rather than semantic, included vendor speciﬁc con-
+cepts, and were enumerative versus taxonomical. Furthermore,
+these vocabularies did not specify the relationships between
+concepts. Finally, their purview was security operations and
+incident response versus capability engineering. Therefore, it
+was necessary to develop the D3FEND DAO as more abstract
+semantic constructs, to unify the representation and enable
+vendor-agnostic and inferential reasoning.
+The term artifact was chosen in the archaeological sense
+(e.g., some human put some artifact somewhere). If it does
+not exist in some form within some computer or computer
+network infrastructure, it is out of scope of the ontology. A
+digital artifact need not be observable or accessible, but it must
+possibly exist. An artifact may also comprise other artifacts,
+thus enabling the representation of compound artifacts; see
+Figure 8.
+Digital artifacts also establish the conceptual scope of the
+D3FEND knowledge model. For example, a strong password
+policy is in scope because it directly affects an organization’s
+technology conﬁguration baseline, therefore it involves digital
+artifacts. As a counter-example, many organizations invest in
+employee cybersecurity awareness training programs. Training
+programs do not directly interact with digital artifacts, there-
+fore they are not in scope.
+When an attacker types on his keyboard and performs open-
+source internet research, he produces digital artifacts. When he
+develops software exploits, sends malicious phishing links, or
+operates a remotely controlled host in his target’s environment,
+he creates digital artifacts on both his system, intermediate
+systems, and target systems. Whether the defensive actors can
+observe the attacker’s digital artifacts depends on their vantage
+point and capabilities. Figure 7 illustrates these interactions
+between offensive and defensive techniques in a simpliﬁed
+way.
+
+===== Page 009 =====
+Fig. 8. Mapping via Inference Through the Digital Artifact Ontology
+The cybersecurity analyst needs to know how cyber offense
+is covered by cyber defense and vice versa. Therefore, we need
+a reasonable mechanism to specify in detail the associations
+between these two. Our approach focuses on using the digital
+artifacts as the basis for conceptualizing and instantiating
+the relations. Both offensive and defensive techniques are
+associated with digital artifacts, where associated with is
+a generic relationship type for more speciﬁc relationships
+of produces, executes, analyzes, accesses, and installs. The
+D3FEND knowledge model supports more speciﬁc relation-
+ship types between offensive and defensive techniques as well,
+for example, observes, detects, and counters. The key beneﬁt
+of this layered approach is that we can reason about the
+relationships between offensive and defensive techniques by
+analyzing how each technique is related to digital artifacts.
+This allows us to infer these speciﬁc types of relationships
+without needing to manually or directly relate offensive
+techniques to defensive techniques (Figure 8). Provided we
+accurately represent knowledge about offensive techniques,
+defensive techniques, and digital artifacts—each in isolation—
+we can accrete knowledge and derive additional knowledge
+and insights through inference that otherwise would require
+explicit enumeration.
+Artifacts are deﬁned in hierarchical speciﬁcity via classiﬁ-
+cation, and their subsumption is represented by gold lines in
+Figure 8. For example, a Linux service daemon’s conﬁguration
+ﬁle is a service conﬁguration ﬁle, which is a System Conﬁgura-
+tion File, which is a Conﬁguration File, which is a File— File
+being the highest-order and least speciﬁc concept. This allows
+us to ascertain the artifacts with which a particular defensive
+technique is associated, with as much speciﬁcity as possible,
+while still maintaining the ability to ask general questions
+like, “which defensive techniques are associated with ﬁles?”
+or more speciﬁc questions like “which defensive techniques
+are associated with daemon conﬁguration ﬁles?”
+V. R OAD MAP
+There are three roadmap focus areas for the D3FEND
+project: improve and demonstrate the model utility for practi-
+tioners, deepen and widen the model via analytics, and update
+the model as the industry changes.
+A. Model Utility
+Semantic models are most useful when they are adopted;
+they create a common language. We will use the model in
+real-world use cases with cybersecurity architects and engi-
+neers. Success of the model is practitioner adoption and a
+positive consensus on its usefulness across multiple use cases.
+Garnering adoption will be an iterative process where we
+employ the model, qualitatively assess its usefulness, and make
+improvements.
+One assessment will use the model to differentiate and
+analyze cybersecurity products. Large organizations receive
+many inbound requests from technology vendors. Our hope
+is that D3FEND clariﬁes the speciﬁc functionality a product
+offers and reduces the amount of time spent analyzing vendor
+marketing material. Another assessment will analyze a com-
+puter network’s existing countermeasures and identify which
+defensive techniques are present. We will start by asking a
+cybersecurity architect what technologies they have related to
+the base techniques, as a breadth-ﬁrst analysis. We hope this
+will identify any functionality gaps or overlap.
+As we work through the use cases, we will track how much
+of the model was used and how many new techniques were
+added. Our hypothesis is that semantic reuse will increase over
+time, eventually reducing the frequency of additions to the
+model. We expect to follow-up this preliminary paper shortly
+with one that provides greater detail on the application of
+D3FEND to one or more speciﬁc capability analysis scenarios.
+B. Model Depth, Breadth, and Technology Development
+We must analyze more intellectual property to grow the
+knowledge graph. Due to the size of the ever-growing dataset,
+
+===== Page 010 =====
+we must automate portions of the analysis process. This re-
+quires a system of tools that can assist in extracting knowledge,
+ﬁnding new topics, and tracking old ones. We will explore
+using the system to enable machine-learning algorithms to
+process data in the knowledge graph and develop models
+to characterize the knowledge graph, and potentially new
+instances of knowledge. By automatically tagging new data we
+can expedite the discovery of new concepts and terminology in
+the countermeasures space. Underpinning this, we will develop
+a ﬂexible knowledge graph architecture that ingests public
+data, captures new knowledge, and supports sophisticated
+storage and retrieval mechanisms.
+C. Future Data Sources and the Intellectual Property Gener-
+ation Network
+Intellectual property can be collected from many sources.
+We plan to estimate the potential relevance or value of the
+intellectual property by creating a graph with vertices of
+actors (people, companies, investors), edges of relationships
+between them as seen in Figure 2, and weighting the edges
+with business or inﬂuence metrics. We anticipate applying
+the same methodology found in Section III that we used for
+analyzing patents to additional technical corpora, including
+academic papers, conference presentations, blog posts, and
+engineering journals. These data sources will be reduced to
+text-based representations, to enable accelerated analysis with
+natural language processing techniques.
+D. Updating the Model
+As illustrated by our analysis of the patent application
+submission rates, there is signiﬁcant dynamism and activity in
+the cybersecurity market. As new sources of public intellectual
+property are collected, they must be archived, processed, and
+analyzed. Our knowledge graph tools will discover new digital
+artifacts and new defensive techniques. These discoveries will
+be added to the D3FEND knowledge graph.
+VI. C ONCLUSION
+In D3FEND, we have created a precise semantic model
+of cybersecurity countermeasures that enables practitioners,
+for the ﬁrst time, to assess their defenses and ﬁll gaps
+with engineering-level knowledge of technical capabilities.
+The alpha version of D3FEND (Figure 3) received positive
+feedback from MITRE cybersecurity experts. Successful use
+in countermeasure requirements analysis is required to further
+validate it. We were satisﬁed with the semantic consistency
+of it because it was easy to add new defensive techniques in
+a repeatable fashion. These initial results show good promise,
+and we believe our research has demonstrated the feasibility
+of a countermeasure model built from real-world data sources.
+The next phase of work will focus on fully populating it
+with countermeasures and developing the tools necessary to
+ensure it stays up to date. Automation is required to deal with
+the rate of change in the domain and sustain the D3FEND
+countermeasure knowledge graph over time.
+ACKNOWLEDGMENT
+Thanks to fellow MITRE employees Greg Dunn, Chris
+Thorpe, Jay V ora, Maura Tennor, Joe Patrick, Drew Cannon,
+Chris Magrin, Matt Venhaus, Emily Hopkins, Zach Asher,
+Parker Garrison, Robert Heinemann, Dan Ellis, Steve Luke,
+and Bonnie Martin for their contributions to this work.

@@ -1,0 +1,51 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\Lifetime\Lifetime
+Analysis Mode: static-only
+Runtime Behavior: [EXECUTION NOT REQUESTED]
+
+Repository / File Layout Observed:
+- dir: affected_version
+- dir: tmp
+- dir: vccs_output
+- dir: _core
+- file: 1_lifetime.py (13306 bytes)
+- file: 2_gen_vuln_version.py (3537 bytes)
+- file: bad_case_result.txt (27974 bytes)
+- file: config.py (30 bytes)
+- file: continue_added_block_cve_dict.json (44836 bytes)
+- file: get_continue_block.py (13955 bytes)
+- file: log_generation.py (6891 bytes)
+- file: README.md (11 bytes)
+- file: time.txt (1464 bytes)
+- file: vul_lifetime_run.py (31277 bytes)
+- file: _core\abstract_szz.py (10418 bytes)
+- file: _core\comment_parser.py (7457 bytes)
+
+Primary Files:
+- 1_lifetime.py: lines=336; functions=__init__, _trace_commit, lifetime_trace, find_vcc; imports=_core.abstract_szz, config, git, io, json, ntpath, os, subprocess, time, unidiff
+- 2_gen_vuln_version.py: lines=108; functions=get_commit_tags, cxc_generate_vulnerable_versions_fix_vcc, gen_vulnerable_version; imports=collections, config, json, log_generation, os, time
+- config.py: lines=3; functions=[NEEDS EVIDENCE]; imports=[NEEDS EVIDENCE]
+- get_continue_block.py: lines=354; functions=__init__, _trace_commit, lifetime_trace, find_vcc; imports=_core.abstract_szz, config, git, io, json, ntpath, os, subprocess, time, unidiff
+- log_generation.py: lines=191; functions=wrapper_change_path, is_nosise, inner, __init__, git_tag_contins, git_log, git_tag, git_show, git_diff, git_diff_2, get_commit_time, fetch_tags; imports=git, io, os, subprocess, sys, unidiff
+- vul_lifetime_run.py: lines=[NEEDS EVIDENCE]; functions=[NEEDS EVIDENCE]; imports=[NEEDS EVIDENCE]
+- _core\abstract_szz.py: lines=244; functions=__init__, __del__, repository, repository_path, find_vcc, remove_prefix, _is_comment, _is_function_definition, get_parent_commit, get_fixed_file, _blame, __init__; imports=_core.comment_parser, abc, git, io, logging, ntpath, os, typing, unidiff
+- _core\comment_parser.py: lines=195; functions=parse_comments, parse_function, parse_comments_srcml, js_comment_parser, php_comment_parser, rb_comment_parser, py_comment_parser; imports=collections, logging, os, re, subprocess, tempfile
+
+Key Static Evidence:
+- Python scripts are visible for lifetime analysis, affected-version generation, continued-block discovery, logging, and orchestration.
+- Local data/output directories are visible: affected_version, tmp, vccs_output.
+- README.md is minimal and does not provide full reproduction instructions.
+- JSON/text artifacts are present, including continue_added_block_cve_dict.json, bad_case_result.txt, and time.txt.
+
+Static Consistency Notes:
+- The artifact appears aligned with vulnerability lifetime / affected-version processing by file names and script names.
+- Exact reproduction of paper results is not checked. [EXECUTION NOT REQUESTED]
+- Dataset completeness and mapping to all paper experiments require artifact verification. [NEEDS ARTIFACT]
+
+Observed Local Output / Data Artifacts:
+- bad_case_result.txt (27974 bytes)
+- continue_added_block_cve_dict.json (44836 bytes)
+- time.txt (1464 bytes)
+
+Missing Data / Missing Entrypoints:
+- Full environment/dependency manifest not visible. [NEEDS ARTIFACT]
+- Runtime outputs not regenerated. [EXECUTION NOT REQUESTED]

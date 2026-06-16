@@ -1,0 +1,48 @@
+8 Yu Shi et al.
+4.1.1 Blame Analysis.For each BFC, we extract the set of modified files and execute git blameon
+deleted and modified lines to identify blame commits. These are the commits that last touched the
+lines removed or changed by the fix, serving as initial BIC candidates. For blameless cases where the
+fix only adds code, we apply a fallback strategy that blames the context lines surrounding additions
+(2 lines before and 2 lines after each added hunk) to obtain candidates. Note that LLM4SZZ expands
+context around all modified lines for all cases, whereas our fallback applies only to blameless cases.
+The reason for this key difference is that we rely on ancestor traversal to build the TKG (described
+below), enabling systematic exploration of commit history.
+4.1.2 Commit Traversal.Based on the preliminary study findings (Section 3) that 28% of BICs
+require traversal beyond direct blame commits, we expand the search space through file-history
+traversal in two directions:
+(1) Blame Ancestor traversal: Starting from each blame commit, we walk backward through the
+file history (using git log –follow) to collect commits that previously modified the same
+files. These candidates may have introduced bugs that were later touched but not fixed by the
+blamed commit.
+(2) BFC Ancestor traversal: Starting from the BFC, we walk backward through file history toward
+the blame commits. This captures commits that occurred after the blamed code was introduced
+but before the fix, which may have transformed correct code into buggy code.
+Depth limits (how many ancestor commits to traverse in each direction) and candidate caps
+(maximum number of commits to include in the TKG) are configurable parameters that balance
+coverage against computational cost; we discuss specific settings in Section 5.3.
+4.1.3 Graph Building.The graph contains three node types representing different aspects of the
+commit landscape:
+(1) Commitnodes represent commits, storing commit messages, timestamps, modified files, ex-
+tracted functions, and code diffs. Each commit is labeled with its type:bfc, blame, blame_ancestor,
+or bfc_ancestor. The BFC node additionally storesblame statistics: the total number of blame
+commits, whether a single commit is responsible for all blamed lines, and whether a dominant
+commit accounts for the majority of blamed lines. These statistics enable fast-path decisions
+during agent search.
+(2)Filenodes represent source files modified by commits.
+(3) Functionnodes represent functions in which at least one line was changed by the union of
+identified commit nodes. We extract function names by parsing the hunk headers (i.e., the @@
+lines in git diffoutput that mark each contiguous block of changes and include the enclosing
+function name as context). Each function is associated with its containing file.
+Edges encode both temporal and structural relationships:
+(1)PRECEDES edges connect each commit to the next one by commit date within the TKG, regardless
+of branch structure or DAG parent-child relationships. This date-based linear ordering ignores
+the full DAG structure, but suffices for causality reasoning since a commit can only induce a
+bug if it precedes the fix in time.
+(2)MODIFIES_FILE and MODIFIES_FUNCTION edges connect commits to the code entities they
+changed, enabling structural queries to find commits that touched the same code.
+(3)DEFINED_IN edges link functions to their containing files, enabling hierarchical code structure
+traversal.
+This schema enables the agent to reason about code-level relationships, identifying candidates
+that share modified functions or files with the BFC. Unlike prior works on knowledge graphs in
+software engineering (e.g., for automated program repair) [45], our approach explicitly leverages
+, Vol. 1, No. 1, Article . Publication date: February 2026.

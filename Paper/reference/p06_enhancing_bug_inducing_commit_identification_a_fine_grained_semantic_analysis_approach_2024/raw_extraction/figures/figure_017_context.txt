@@ -1,0 +1,25 @@
+la2, where
+the levenshteinDistance function is used to calculate the
+Levenshtein edit distance[30] of the two strings. Line similarity
+ranges from 0 to 1. Higher values indicate a greater likelihood
+that two code statements share the same semantic meaning.
+L=len(S
+1)+ len(S2) (1)
+S =(L−levenshteinDistance(S1,S2))/L (2)
+To locate the bug-inducing commits, we trace back all buggy
+statements, generating a set of candidate commits. Subse-
+quently, we scrutinize these candidates to identify the earliest
+buggy commit and designate it as the bug-inducing commit,
+which is the same as the model above.
+Fig. 7 illustrates the process o f locating bug-inducing
+commits. After obtaining statements contributing to the bug,
+we first use the git blame tool on the statements and
+obtain two candidates: commit 153bedbac2e and commit
+feb4a51323b. Then we begin to check which commit
+first introduces all buggy statements. We first check the
+earliest commit 153bedbac2e and find that no statement
+has a line similarity over 0.75 with the statement flags
+= atomic_fetch_andnot(IRQ_WORK_PENDING, &
+work-> flags). The most closely related statement is line
+3, but its similarity is still under 0.75. Thus, 153bedbac2e
+is not the bug-inducing commit. Then, we check comm

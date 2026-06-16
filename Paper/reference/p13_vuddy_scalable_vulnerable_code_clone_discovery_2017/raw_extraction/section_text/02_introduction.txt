@@ -1,0 +1,169 @@
+I. I NTRODUCTION
+During the last few years, the number of open source
+software (OSS) programs has increased at a rapid pace. Re-
+search published in literature showed that open source software
+projects have linear to quadratic growth patterns [1], [2], [3].
+In practice, the number of registered open source projects in
+SourceForge [4] increased from 136 K to 430 K between
+October 2009 and March 2014. GitHub [5] announced that
+its 10 millionth repository had been created in December
+2013, with most of the repositories being software projects.
+∗Heejo Lee is the corresponding author.
+Meanwhile, they currently have over 85 million projects, in
+March 2017.
+The considerable increase in the number of OSS programs
+has naturally led to an increase in software vulnerabilities
+caused by code cloning, thereby posing dire threats to the
+security of software systems. Code cloning, the act of copying
+and pasting portions of other software, can be useful if it is
+properly exploited [6], [7]. However, in practice, code cloning
+is often regarded as a bad programming practice because
+it can raise maintenance costs [8], reduce quality [9], [10],
+produce potential legal conﬂicts, and even propagate software
+vulnerabilities [11], [12], [13]. In particular, as OSS programs
+are widely used as codebase in software development, (e.g.,
+libraries), code cloning is becoming one of the major causes
+of software vulnerabilities. For example, the OpenSSL Heart-
+bleed vulnerability (CVE-2014-0160) has affected several
+types of systems (including websites, web servers, operating
+system distributions, and software applications), because the
+affected system either used the whole OpenSSL library or
+cloned some part of the library for use in their systems.
+Moreover, the lifecycle of vulnerabilities exacerbates such
+problems. Even if a vendor were to release a patch imme-
+diately after the discovery of vulnerability in the original
+program, it would take time for the patch to be fully deployed
+through every program that cloned the vulnerable code of
+the original program [14]. For example, in April 2016, the
+“Dogspectus” ransomware was disclosed. This ransomware
+exploits a bug in the Linux kernel named “futex local privilege
+escalation vulnerability” (CVE-2014-3153) to deliver drive-
+by-download malware to the mobile devices that run an
+unpatched Android operating system (versions 4.0.3 to 4.4.4).
+Another example, the Dirty COW vulnerability (CVE-2016-
+5195), which exploits a race condition for privilege escalation,
+was found in the memory subsystem of the Linux kernel in
+October 2016. What makes this vulnerability outrageous is that
+this bug was already ﬁxed in 2005, but the ﬁx was undone
+due to another problem raised by the ﬁx. As shown in the
+examples, old, vulnerable code fragments that are supposed to
+be eliminated, are ceaselessly re-emerging in various locations
+for a variety of reasons.
+Many researchers have proposed code clone detection tech-
+niques to address clone-related problems. However, to our
+surprise, few techniques are suitable for accurately ﬁnding
+vulnerability in a scalable manner. For example, lexical tech-
+2017 IEEE Symposium on Security and Privacy
+© 2017, Seulbae Kim. Under license to IEEE.
+DOI 10.1109/SP.2017.62
+595
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 002 =====
+niques such as CCFinder [15] have the disadvantage of high
+complexity as it uses a sufﬁx tree algorithm to measure the
+similarity between token sequences of programs. In addition,
+its parameter replacement strategy is so aggressive that it
+introduces a signiﬁcant number of false positives. Similarly,
+approaches that transform code into abstract data structures
+(e.g., abstract syntax trees) have to apply expensive tree-
+matching operations or graph mining techniques for similarity
+estimation [16], [17]. Although such an approach would be
+capable of discovering code fragments with similar syntactic
+patterns, this does not guarantee accurate vulnerability de-
+tection because two code fragments with identical abstract
+syntax trees do not necessarily contain the same vulnerability.
+Notable exceptions are ReDeBug [18] and SourcererCC [19].
+ReDeBug aims to achieve both accuracy and scalability by
+applying hash functions to lines of code and later detecting
+clones by comparing hash values. However, as we show in
+this paper, ReDeBug is still not satisfactory both in terms of
+accuracy and scalability when it comes to ﬁnding vulnerable
+code clones in massive code bases. For example, when testing
+an Android smartphone (15 MLoC), ReDeBug requires half
+an hour, and has 17.6 % false positives. SourcererCC uses a
+bag-of-tokens strategy to manage minor to speciﬁc changes in
+clones, which impairs the accuracy from a security perspec-
+tive. For example, SourcererCC detects clones in which the
+sequence of code is changed, or statements are inserted. As
+a result, it misleadingly detects a patched code fragment as a
+clone of an unpatched code fragment.
+In this paper, we present VUDDY (VUlnerable coDe clone
+DiscoverY), a scalable approach for code clone detection. This
+approach is speciﬁcally designed to accurately ﬁnd vulnerabil-
+ities in a massive code base. To achieve the goal of highly
+scalable yet accurate code clone detection from a security
+perspective, we use the functions in a program as a unit for
+code clone detection. Since a function delivers both syntactic
+and symbolic information of the code, we are able to guarantee
+high accuracy in detecting clones with respect to security
+issues. Moreover, by applying carefully designed abstraction
+and normalization schemes to functions, clones with common
+modiﬁcations (e.g., variable names) can be detected, which in
+turn enables VUDDY to identify unknown vulnerabilities, as
+well. In addition, a clever classiﬁcation of functions based on
+the length of a function body considerably reduces the search
+space, and thus enables VUDDY to work scalably even on a
+massive code base. With this design, VUDDY accomplishes an
+unprecedented balance between high scalability and accuracy.
+In addition, we present a detailed explanation of the princi-
+ples and implementation of VUDDY , as well as the application
+of the proposed approach for the detection of vulnerabilities.
+We further propose a method to collect CVE vulnerabilities in
+an automated way. From 9,770 vulnerability patches obtained
+from eight well-known Git repositories (e.g., Google Android),
+we retrieved 5,664 vulnerable functions that address 1,764
+CVEs. Our evaluation involves empirically measuring the per-
+formance of VUDDY and then evaluating the practical merits
+of VUDDY by demonstrating the vulnerabilities detected from
+a pool consisting of real-world open source software. This pool
+includes 25,253 active C/C++ projects collected from GitHub,
+Linux kernels, and the Android OS of a smartphone that
+was released in March 2016. The results show that VUDDY
+preprocesses the 172 M functions (in 13.2 M ﬁles, 8.7 BLoC)
+of the 25,253 projects in 4 days and 7 hours, then identiﬁes
+133,812 vulnerable functions in approximately 1 second for
+each project. VUDDY is twice faster than ReDeBug, while
+having no false positive with Android ﬁrmware. Meanwhile,
+ReDeBug had 17.6 % false positives.
+The contributions of this study include:
+• Scalable clone detection: We propose “VUDDY ,” an
+approach to scalable yet accurate code clone detection,
+which adopts a robust parsing and a novel ﬁngerprinting
+mechanism for functions. VUDDY processes a billion
+lines of code in 14 hours and 17 minutes, which is an
+unprecedented speed.
+• Vulnerability-preserving abstraction:We present an ef-
+fective abstraction scheme optimized for detecting un-
+known vulnerable code clones. This allows VUDDY to
+detect unknown vulnerable code clones, as well as known
+vulnerabilities in a target program. Owing to this design,
+VUDDY detects 24 % more vulnerable clones which are
+unknown variants of known vulnerabilities.
+• Automated vulnerability acquisition:We introduce a fully
+automated method for acquiring known vulnerable func-
+tions from Git repositories, by taking advantage of secu-
+rity patch information.
+• Open service:We have been servicing VUDDY as a form
+of open web service at no charge, since April 2016. In
+practice, VUDDY is being used by many in the open
+source community and by IoT device manufacturers, for
+the purpose of examining their software. In the past 11
+months, 14 billion lines of code have been queried to our
+open service, and 144,496 vulnerable functions have been
+detected. Please see https://iotcube.net/
+The remainder of this paper is organized as follows. Sec-
+tion II clariﬁes the taxonomy and summarizes existing ap-
+proaches concerning code clone detection. Section III presents
+the problem and goal. Section IV describes the principles
+of our proposed approach, VUDDY . In Section V, we ex-
+plain how VUDDY is applied to vulnerability discovery. In
+Section VI, we discuss issues regarding the implementation
+of VUDDY . Then in Section VII, we describe various ex-
+periments conducted for evaluating the scalability, time, and
+accuracy of VUDDY against the most competitive techniques
+on real-world programs. Section VIII compares VUDDY with
+ReDeBug, the most competitive technique, in detail. A quali-
+tative evaluation is given through case studies in Section IX.
+Section X presents a discussion, and Section XI offers the
+conclusion and future work.

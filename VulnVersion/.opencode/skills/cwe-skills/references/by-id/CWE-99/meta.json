@@ -1,0 +1,246 @@
+{
+  "cwe_id": "CWE-99",
+  "name": "Improper Control of Resource Identifiers ('Resource Injection')",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product receives input from an upstream component, but it does not restrict or incorrectly restricts the input before it is used as an identifier for a resource that may be outside the intended sphere of control.",
+  "extended_description": "A resource injection issue occurs when the following two conditions are met: An attacker can specify the identifier used to access a system resource. For example, an attacker might be able to specify part of the name of a file to be opened or a port number to be used. By specifying the resource, the attacker gains a capability that would not otherwise be permitted. For example, the program may give the attacker the ability to overwrite the specified file, run with a configuration controlled by the attacker, or transmit sensitive information to a third-party server. This may enable an attacker to access or modify otherwise protected system resources.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-74",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-706",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Incorrectly-Resolved Name or Reference"
+      },
+      {
+        "cwe_id": "CWE-73",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "External Control of File Name or Path"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product receives input from an upstream component, but it does not restrict or incorrectly restricts the input before it is used as an identifier for a resource that may be outside the intended sphere of control.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "identifier",
+      "injection",
+      "otherwise",
+      "specify"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "identifier",
+      "injection",
+      "otherwise",
+      "specify",
+      "system",
+      "file",
+      "configuration",
+      "identifiers"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following Java code uses input from an HTTP request to create a file name. The programmer has not considered the possibility that an attacker could provide...",
+        "snippet": "String rName = request.getParameter(\"reportName\"); File rFile = new File(\"/usr/local/apfr/reports/\" + rName); ... rFile.delete();"
+      },
+      {
+        "language": "C++",
+        "nature": "Bad",
+        "summary": "The following code uses input from the command line to determine which file to open and echo back to the user. If the program runs with privileges and...",
+        "snippet": "ifstream ifs(argv[0]); string s; ifs >> s; cout << s;"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2013-4787",
+        "description": "chain: mobile OS verifies cryptographic signature of file in an archive, but then installs a different file with the same name that is also listed in the archive.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2013-4787"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,22 @@
+s of the program.
+Here, our slice criterion is based on basic blocks with added
+code statements instead of variables. We do this for two reasons.
+Firstly, there may be many changed statements in a function,
+resulting in many changed variables. Handling them one by one
+is time-consuming. By dealing with changed basic blocks, we
+can address many code statements and variables once at a time.
+Secondly, slicing based on variables may introduce lines far
+from the added lines, which can introduce noise. Instead, by
+slicing only the basic blocks near the changed basic blocks, we
+can avoid this issue.
+Fig. 3 illustrates an example of program slicing, based on the
+function depicted in the motivation example. As depicted in the
+figure, the original function is divided into six basic blocks, with
+line ranges also indicated. The added line number is 15. Thus,
+the basic block d contains the added line and we designate it
+as the interesting point. Here we set N to 3. We begin to search
+its three nearest predecessors (in this case, blocks c, a and
+begin). Subsequently, we explore its three nearest successors.
+Note that each block is visited only once throughout the process.
+Thus, we identify the end block as the only successor. As a
+result, our slicing resul

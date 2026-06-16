@@ -1,0 +1,75 @@
+3. METHODOLOGY
+In this section, we describe how we created a database
+of commits that introduced known vulnerabilities in open-
+source projects and which features we extracted from the
+commits. We will share this database with the research
+community as a baseline to enable a scientific comparison
+428
+
+===== PAGE 004 =====
+
+between competing approaches. We focus on 66 C and
+C++ projects using the version control system Git (see ap-
+pendix A for the list). These 66 projects contain 170,860
+commits and 718 vulnerabilities reported by CVEs.
+3.1 Vulnerability-contributing Commits
+In order to analyze the common features of commits that
+introduce vulnerabilities, we first needed to find out which
+commits actually introduced vulnerabilities. To the best
+of our knowledge, no large-scale database exists that maps
+vulnerabilities as reported by CVEs to commits. Meneely
+et al. and Shin et al. [25, 23, 24] manually created such
+mappings for the Mozilla Firefox Browser, Apache HTTP
+server and parts of the RHEL Linux kernel. We contacted
+the authors to inquire whether they would share this data,
+since we could have used that as a baseline for our larger
+analysis. Unfortunately, this was not possible at the time,
+although the data might be released in the future. To create
+a freely available database for ourselves and the research
+community, we set out to create a method to automatically
+map CVEs to vulnerability-contributing commits. 1
+Since at this point we are only interested in CVEs relating
+to projects hosted on Github, we utilized two data sources
+as starting points for our mapping. As a first source, we
+selected all CVEs containing a link to a commit of one of the
+66 projects fixing a vulnerability as part of the “proof”. As a
+second source for fixing commits, we created a crawler that
+searches commit messages of the 66 projects for mentions of
+CVE IDs. To check the accuracy of our mapping we took a
+random sample of 10 % and manually checked the mapping
+and found no incorrectly mapped CVEs. This gave us a
+list of 718 CVEs. This list is potentially not complete since
+there might be CVEs that do not link to the fixing commit
+and which are also not mentioned in the commit messages.
+However, this does not represent a problem for our approach
+since 718 is a large enough sample to train our classifier.
+We then developed and tested a heuristic to proceed from
+these fixing commits to the vulnerability-contributing com-
+mits (VCCs). Recall that we are operating on Git commits,
+which means that we have access to the whole history of a
+given project. One (appropriately named) Git subcommand
+is git blame, which, given a file, for each line names the
+commit that last changed the line. The heuristic for finding
+the commit that introduced a vulnerability given a commit
+that fixed it is as follows:
+1. Ignore changes in documentation such as release notes
+or change logs.
+2. For each deletion, blame the line that was deleted.
+Rationale: If the fix needed to change the line, that
+often means that it was part of the vulnerability. Note
+that Git diﬀs only know of added and deleted lines. If
+a line was changed, it shows up as a deletion and an
+addition in the diﬀ.
+1We have anonymously uploaded the database
+to https://www.dropbox.com/s/x1shbyw0nmd2x45/
+vcc-database.dump?dl=0 so the reviewers can access
+the raw data during the review process. We will release the
+data to the community together with the paper. The file
+was created using pg_dump and can be read into a database
+using pg_restore. The dump file will create the three
+tables cves, commits and repositories in the schema export.
+3. For every continuous block of code inserted in the fix-
+ing commit, blame the lines before and after the block
+Rationale: Security fixes are often done by adding ex-
+tra checks, often right before an access or after a func-
+tion call.

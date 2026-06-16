@@ -1,0 +1,270 @@
+{
+  "cwe_id": "CWE-89",
+  "name": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+  "abstraction": "Base",
+  "status": "Stable",
+  "description": "The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended SQL command when it is sent to a downstream component. Without sufficient removal or quoting of SQL syntax in user-controllable inputs, the generated SQL query can cause those inputs to be interpreted as SQL instead of ordinary user data.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-943",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements in Data Query Logic"
+      },
+      {
+        "cwe_id": "CWE-74",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific",
+      "SQL"
+    ],
+    "technologies": [
+      "Database Server"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "sql",
+      "command",
+      "component",
+      "elements"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "sql",
+      "command",
+      "component",
+      "elements",
+      "special",
+      "inputs",
+      "externally-influenced",
+      "user-controllable"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C#",
+        "nature": "Bad",
+        "summary": "The following code dynamically constructs and executes a SQL query that searches for items matching a specified name. The query restricts the items displayed...",
+        "snippet": "... string userName = ctx.getAuthenticatedUserName(); string query = \"SELECT * FROM items WHERE owner = '\" + userName + \"' AND itemname = '\" + ItemName.Text + \"'\"; sda = new SqlDataAdapter(query, conn); DataTable dt =..."
+      },
+      {
+        "language": "SQL",
+        "nature": "Bad",
+        "summary": "This example examines the effects of a different malicious value passed to the query constructed and executed in the previous example.",
+        "snippet": "procedure get_item ( itm_cv IN OUT ItmCurTyp, usr in varchar2, itm in varchar2) is open itm_cv for ' SELECT * FROM items WHERE ' || 'owner = '|| usr || ' AND itemname = ' || itm || '; end get_item;"
+      },
+      {
+        "language": "SQL",
+        "nature": "Bad",
+        "summary": "MS SQL has a built in function that enables shell command execution. An SQL injection in such a context could be disastrous. For example, a query of the form:",
+        "snippet": "SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='$user_input' ORDER BY PRICE"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code intends to print a message summary given the message ID.",
+        "snippet": "$id = $_COOKIE[\"mid\"]; mysql_query(\"SELECT MessageID, Subject FROM messages WHERE MessageID = '$id'\");"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "PHP",
+        "nature": "Good",
+        "summary": "This code intends to print a message summary given the message ID.",
+        "snippet": "$id = intval($_COOKIE[\"mid\"]); mysql_query(\"SELECT MessageID, Subject FROM messages WHERE MessageID = '$id'\");"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-6847",
+        "description": "SQL injection in AI chatbot via a conversation message",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-6847"
+      },
+      {
+        "reference": "CVE-2025-26794",
+        "description": "SQL injection in e-mail agent through SQLite integration",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2025-26794"
+      },
+      {
+        "reference": "CVE-2023-32530",
+        "description": "SQL injection in security product dashboard using crafted certificate fields",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2023-32530"
+      },
+      {
+        "reference": "CVE-2021-42258",
+        "description": "SQL injection in time and billing software, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-42258"
+      },
+      {
+        "reference": "CVE-2021-27101",
+        "description": "SQL injection in file-transfer system via a crafted Host header, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-27101"
+      },
+      {
+        "reference": "CVE-2020-12271",
+        "description": "SQL injection in firewall product's admin interface or user portal, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-12271"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

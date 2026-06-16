@@ -1,0 +1,138 @@
+Report Excerpt: APT42 TTP Linkages
+T1547 (Boot or Logon Auto.)
+T1112 (Modify Registry)D
+NEXUS MITRE MANDIANT
+& Others
+T1589 (Gather Victim Iden.)
+T1119 (Automated Collection)C
+MANDIANT
+& OthersNEXUS MITRE
+T1105 (Ingress Tool Transfer)
+T1518 (Software Discovery)B
+MANDIANT
+& OthersNEXUS MITRE
+T1070 (Indicator Removal)
+T1056 (Input Capture)A
+NEXUS MITRE MANDIANT
+& Others
+Summary of Findings
+A{... Clearing Google Chrome browser history after [T1070]
+... APT42 uses custom malware capable of logging keystrokes
+[T1056] and} ... B{include shell command execution, ..., file
+transfer [T1105], ... leverages Windows Management
+Instrumentation (WMI) to query anti-virus products [T1518]} ...
+C{obtaining sensitive information on targets, including movement,
+contacts and personal information [T1589] ... APT42 also uses
+malware capable of taking screenshots and collecting system and
+network information [T1119]} ... D{To maintain their presence in a
+victim’s environment, APT42 relies on custom malware using
+scheduled tasks or Windows registry modifications for persistence
+[T1547, T1112]} ...
+According to MITRE Only:
+   TPs: 20     Precision:  16.53%
+   FPs: 101   Recall:       83.33%
+   FNs: 4       F1-score:   27.59%
+Total Length: ~81 Pages
+After Manual Validation:
+   TPs: 75     Precision:  61.98%
+   FPs: 46     Recall:       94.94%
+   FNs: 4       F1-score: ~75%
+Fig. 24: An example ofNEXUS processing a non-CVE input.
+C. Case Study III: Non-CVE Inputs
+This case study (Figure 24) demonstrates TTP extraction
+from non-CVE sources (APT42 threat reports [84]–[86])
+showing howNEXUS handles long narrative intelligence rather
+than short CVE texts. The yellow box summarizes represen-
+tative excerpts (four parts), while the right panel compares
+NEXUS-derived TTPs with the MITRE ATT&CK ground
+truth [87] and vendor reports [84]–[86]. This is necessary
+because MITRE’s APT42 mappings are derived directly from
+these reports, which together form the most complete ground
+truth.
+Boxes A–D summarize the comparison: (A) TTPs found
+by all sources; (B) TTPs predicted byNEXUS and present in
+Mandiant & Others but missing from MITRE (initial FPs);
+(C) TTPs detected only byNEXUS (also initial FPs); and (D)
+TTPs in MITRE and Mandiant & Others but not predicted by
+NEXUS (FNs). These discrepancies stem from MITRE provid-
+ing only ﬁnalized TTP assignments, vendor reports offering
+richer descriptions, andNEXUS extracting TTPs directly from
+text, meaning each source can miss items others capture.
+To reﬁne the evaluation, we manually review all initial
+FPs and FNs in B–D by re-checking the cited threat reports.
+Cases where MITRE or Mandiant & Others do not tag a
+TTP but describe the same behavior are reclassiﬁed as true
+positives, while four TTPs present in both sources remain
+genuine FNs of NEXUS. In total, NEXUS recover 51 TTPs
+missing from MITRE, many initially marked as FPs. After
+adjustment, NEXUS reaches around 62% precision, 95% recall,
+and 75% F1, matching the APT-report results in Table IV.
+NEXUS predicts across all 208 supported TTPs, ignoring seven
+unsupported ones in MITRE. Enabling model adaptation (Sec-
+tion IV-F) (without APT42-speciﬁc feedback) yields modest
+gains (precision +1.08%, recall +4.17%, F1 +1.74%). Overall,
+NEXUS effectively processes non-CVE threat reports, though
+using multiple reference sources improves completeness.
+D. Possible Uses
+1. Sufﬁciently Good Uses: NEXUSoutputs can be integrated
+into threat-intelligence platforms (e.g., OpenCTI), ATT&CK
+coverage tools (e.g., MITRE Navigator), and vulnerability-
+management systems (e.g., Qualys VMDR). These use cases
+beneﬁt from its stable, scalable CVE–TTP mappings (more
+details in Table XIV in Appendix D).
+2. Uses Requiring Analyst Veriﬁcation/Adjustment:The appli-
+cations in security design (e.g., rule derivation), threat-report
+analysis (e.g., APT reports), and case enrichment (e.g., SOC
+triage) require analyst supervision before applying NEXUS
+(more details in Table XV in Appendix D).
+3. Less Useful Uses:The security operation level applications,
+such as runtime intrusion detection and automated log-to-
+TTP correlation, requires more careful review before applying
+NEXUS, as it requires dynamic telemetry analysis rather
+than static textual inference (more details in Table XVI in
+Appendix D).
+In contrast to NEXUS applications, the existing
+CVE–CWE–CAPEC–TTP mapping (covering 141 TTPs) is
+useful only when it already captures the relevant behavior and
+the CVE is not exploitable via any other TTPs. This applies
+to cases with a few high-impact vulnerabilities, limited
+TTP-coverage needs, clear CERT advisory links, or when
+expert judgment is more reliable than automated inference.
+VII. D
+ISCUSSION AND LIMITATIONS
+Model Selection and Pipeline Flexibility. Preliminary ex-
+periments showed that larger models (e.g., GPT-4o, Llama-
+3.1-70B) offered negligible performance gains for CVE-to-
+TTP mapping and augmentation, while incurring signiﬁ-
+cantly higher costs. We thus adopt GPT-4o-mini and Llama-
+3.1-8B for efﬁciency. The NEXUS pipeline remains model-
+agnostic—substitutions with future LLMs require no archi-
+tectural changes. Our ablation study (Section IV-C) further
+conﬁrms each step’s contribution to system performance and
+coverage.
+Analyst-Aided CVE Exploitation Detection.While NEXUS
+effectively surfaces relevant TTPs and provides Sigma rule
+exemplars, our Case Study 1 (Sec.. VI-A) reveals key lim-
+itations. It does not automate CVE exploitation detection
+but acts as an analyst aid, offering actionable insights and
+contextual guidance. Detecting complex exploits still demands
+human expertise to interpret system-speciﬁc behaviors, adapt
+rules, and ensure accuracy. Thus, NEXUS enhances analyst
+workﬂows, but detection efﬁcacy ultimately depends on expert
+reﬁnement.
+Hierarchical and Multi-View Modeling. We adopt hier-
+archical and multi-view learning to capture the structured,
+interdependent nature of TTPs and attack patterns, which
+ﬂat classiﬁcation overlooks. By modeling label dependencies
+through graphs and hierarchical propagation, our approach
+aligns with analyst workﬂows and enables more accurate,
+context-aware predictions.
+Hierarchical vs. Flat Classiﬁcation. We compared hierar-
+chical modeling with ﬂat classiﬁcation, which treats TTPs as
+independent labels. For complex CVEs with interdependent
+TTPs, the ﬂat model shows higher false positives and misses
+contextually linked TTPs (Section IV-C). Hierarchical mod-
+eling enables contextual label propagation and veriﬁcation,
+reducing errors and annotation noise (Section IV-D and IV-F),
+and better reﬂects real-world analyst decision-making.
+14

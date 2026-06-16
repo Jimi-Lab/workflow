@@ -1,0 +1,110 @@
+1 Introduction
+The problem of identifying bug-introducing commits from fix com-
+mits has seen remarkable interest from the software engineering
+research community, demonstrated by the more than 1300 citations
+of the award-winning paper by Śliwerski, Zimmermann, and Zeller
+(SZZ) [31]. The problem is also highly relevant for practitioners,
+since identifying bug-introducing changes is essential to determine
+which software versions are affected by security-critical bugs [5].
+Even though many new approaches have been released since
+2005 [4, 6, 7, 11, 19, 24, 25], the performance gains remain fairly
+limited [5]. The foundational 2005 SZZ paper [31] already achieves
+0.54 F1-score on a high-quality developer-annotated dataset derived
+from the Linux kernel [18]. On the same dataset, the state-of-the-
+art method from 2025 [25] scores just 10 percentage points higher,
+with an F1-score of 0.64. To break the trend of small incremental
+improvements, entirely new approaches are needed.
+In this paper, we study LLM-based agents for the task of identi-
+fying bug-introducing commits (BICs) from fix commits.
+Part 1: SZZ-Agent.First, we introduceSZZ-Agent, which targets
+fix commits where the original SZZ algorithm struggles: cases
+where SZZ finds no candidate BICs (e.g., because the fix adds code
+rather than removing it), or where its prediction is likely wrong.
+SZZ-Agent collects candidate BICs from the file history and binary
+searches over them, examining the source code at each version to
+determine when the bug first appeared.
+In our evaluation, SZZ-Agent convincingly beats all previous
+approaches, raising the state-of-the-art score by more than 12 per-
+centage points on the three most popular C/C++ and Java datasets.
+Beyond effectiveness, we dive intowhySZZ-Agent works using
+five ablation studies to investigate whether (a) the performance
+comes from data leakage, (b) what context SZZ-Agent relies on, (c)
+whether the performance gain can be explained by a better LLM-
+backbone, (d) what components of SZZ-Agent contribute the most
+to its success, and (e) how a specific hyperparameter, the commit
+selection threshold, controls its performance.
+Part 2: Simple-SZZ-Agent.During our ablation studies, we dis-
+cover that SZZ-Agent can be drastically simplified: skipping binary
+search entirely and letting the agent directly select from all can-
+didates yields the best F1-score at 43% lower LLM token cost (in
+USD) per fix commit. Based on this finding, we propose Simple-
+SZZ-Agent, which collects candidates from the file history and
+directly asks the agent to select the bug-introducing commit—yet it
+outperforms SZZ-Agent. Surprisingly, it is also highly scalable: its
+resource consumption (e.g., tokens) is almost independent of the
+number of candidate commits. To understand why, we investigated
+what the agent actually does.
+This led us to uncoverwhySimple-SZZ-Agent works so well:
+The agent distills the fix commit message and diff into short string
+patterns, greps the candidate set for matches, and then reads and
+evaluates the results, repeating this process until it identifies the
+bug-introducing commit.
+To finalize our study, we propose directions for future work
+based on our findings. The agent’s ability to compress knowledge
+about a bug into short greppable patterns opens avenues beyond
+identifying bug-introducing commits: these patterns could help
+practitioners understand how a bug was introduced, detect similar
+bugs in other code, or provide context for generating fixes.
+Contributions.We make the following key contributions:
+•SZZ-Agent:An agentic workflow that uses binary search
+over source code versions to identify bug-introducing com-
+mits, outperforming all previous approaches by more than
+12 percentage points in F1-score on three popular datasets.
+We conduct five ablation studies to understand why it works.
+•Simple-SZZ-Agent:A simpler agent discovered during our
+ablations that outperforms even SZZ-Agent by directly se-
+lecting the bug-introducing commit from a large candidate
+set. We uncover its strategy: it compresses the fix commit
+into short greppable patterns to efficiently search the candi-
+dates.
+Data Availability.All scripts and data to reproduce our experi-
+ments are publicly available at https://github.com/niklasrisse/agents-
+for-szz.
+arXiv:2603.29378v1  [cs.SE]  31 Mar 2026
+
+===== Page 002 =====
+Preprint, Under Submission, arXiv Risse et al.
+Fix Commit Lines
+deleted?
+Standard
+SZZ
+Candidate
+Commits
+Commit
+Identifier
+BICs
+selected? BICs
+Get Files
+Modified by
+Fix Commit
+Collect File
+Commit
+Histories
+Sort by
+Timestamp
+Select Middle
+Commit File Analysis ≤33 commits
+left?
+Commit
+Identifier BICs
+Stage 1: SZZ-based Identification
+Stage 2: Binary Search
+Yes Yes
+No
+Yes
+No
+Binary Search
+Input Process Agent Call Decision Output
+Figure 1: SZZ-Agent: Stage 1 applies standard SZZ to the deleted lines and uses an agent to select BICs from the candidates.
+Stage 2 activates when Stage 1 fails: it collects file histories, binary searches over commits by having an agent analyze the
+source code at each midpoint, and narrows the search space until the remaining candidates are few enough for direct selection.

@@ -1,0 +1,4 @@
+#!/bin/sh
+#
+# Wrapper to run the actual hook from tools/git_hooks.
+exec "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"/tools/git_hooks/commit-msg "$@"

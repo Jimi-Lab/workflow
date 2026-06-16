@@ -1,0 +1,482 @@
+[
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:001",
+    "block_type": "text",
+    "text": "V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities\nICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA\n",
+    "bbox": [
+      53.57500076293945,
+      61.11920166015625,
+      558.20361328125,
+      69.21601867675781
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:002",
+    "block_type": "text",
+    "text": "2.1\nSZZ algorithms\n",
+    "bbox": [
+      53.798004150390625,
+      82.5872573852539,
+      154.55352783203125,
+      97.22714233398438
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:003",
+    "block_type": "text",
+    "text": "The original SZZ and its variants have been widely used in many\nprevious studies to identify bug-inducing commits based on bug-\nfixing commits [2, 3, 5, 14, 25, 62]. SZZ algorithms assume that\nthe lines of code that are modified by the bug-fixing commits are\nthe same as or evolved from the lines of code that are modified\nby the bug-inducing commits [57]. In our study, we will use the\nfollowing SZZ algorithms to investigate whether they can identify\nVICs for vulnerabilities, which is the same as a prior study [16].\nIn this paper, the implementation of these SZZ algorithms used is\nfrom the replication package of the study of Rosa et al. [45].\n",
+    "bbox": [
+      53.50199890136719,
+      97.26023864746094,
+      295.54608154296875,
+      208.28228759765625
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:004",
+    "block_type": "text",
+    "text": "The original SZZ approach (B-SZZ) was proposed by Sliwerski\net al. [51]. First, B-SZZ identifies bug-fixing changes in issue track-\ning systems based on the description of bug reports and commit\nmessages. Then, it leverages the diff command provided by the\nversion control systems (VCS) to identify the lines of code modified\nby the bug-fixing changes. Finally, B-SZZ traces back through the\ncode history to identify the changes that introduce one or more of\nthe buggy lines by using the annotate command in the VCS.\n",
+    "bbox": [
+      53.50199890136719,
+      209.6842498779297,
+      295.55108642578125,
+      298.78826904296875
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:005",
+    "block_type": "text",
+    "text": "AG-SZZ was proposed by Kim et al. [27] since they observed that B-\nSZZ might consider non-semantic lines, including blank/comment\nlines and those involving format modifications (e.g., modifications\nto the code indentation) to be buggy lines. Kim et al. achieved a more\nprecise result by using the annotation graph that provides more\ncomprehensive information about line moves and modifications\nwithin a file than the annotate command.\n",
+    "bbox": [
+      53.46600341796875,
+      300.19024658203125,
+      295.55206298828125,
+      378.33526611328125
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:006",
+    "block_type": "text",
+    "text": "MA-SZZ was proposed by Da Costa et al. [11] because they noticed\nthat AG-SZZ flags meta-changes as potential bug-inducing changes\ndue to the limitation of the annotation graph. Meta-changes are the\ncommits that do not change source code, including branch changes\n(i.e., changes copying code from one branch to a new branch),\nmerge changes (i.e., changes applying code modifications from one\nbranch to another), and property changes (i.e., changes impacting\nfile properties)\n",
+    "bbox": [
+      53.52899932861328,
+      379.7382507324219,
+      295.0202331542969,
+      468.84124755859375
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:007",
+    "block_type": "text",
+    "text": "RA-SZZ was proposed by Neto et al. [35] since they observed that\nprior SZZ algorithms identify incorrect bug-inducing changes due\nto the impact of refactoring lines. Refactoring lines refer to those\ninvolving refactoring modifications (e.g., modification to a function\nname). There are two versions of RA-SZZ implemented by Neto\net al. [35, 36], which are based on RefDiff [50] and Refactoring\nMiner [54], respectively. In our study, we select the RA-SZZ based\non Refactoring Miner because it is more effective [36]. But RA-SZZ\ncan only work on Java projects since the two refactoring-detection\ntools are only for Java code.\n",
+    "bbox": [
+      53.79800033569336,
+      470.2442321777344,
+      294.0465087890625,
+      581.2652587890625
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:008",
+    "block_type": "text",
+    "text": "2.2\nMotivating Examples\n",
+    "bbox": [
+      53.79800033569336,
+      594.9163208007812,
+      183.6914825439453,
+      609.55615234375
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:009",
+    "block_type": "text",
+    "text": "Nguyen et al. demonstrated that the versions affected by a CVE\nvulnerability might be spurious and could be refined by its fixing\ncommits and inducing commits [38]. Figure 1 depicts a motivating\nexample from CVE-2018-6621. According to its change history,\nwe find that the version information in the CVE description was\nchanged from ‘3.4.1’ to ‘3.2’. This indicates that sometimes it is\ndifficult for developers to determine the correct vulnerable versions.\nWe apply the original SZZ approach to identify the inducing commit\nbased on the fixing commit of this vulnerability. We assume that if\n",
+    "bbox": [
+      53.36777877807617,
+      609.5892944335938,
+      295.41412353515625,
+      709.6512451171875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:010",
+    "block_type": "text",
+    "text": "CVE-2018-6621\nThe decode_frame function in libavcodec/utvideodec.c in FFmpeg through 3.2 \nallows remote attackers to cause a denial of service (out of array read) via a \ncrafted AVI file.\n",
+    "bbox": [
+      322.3023376464844,
+      108.86498260498047,
+      550.3671264648438,
+      140.17613220214844
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:011",
+    "block_type": "text",
+    "text": "Project: FFmpeg\n",
+    "bbox": [
+      322.04595947265625,
+      88.51224517822266,
+      376.3181457519531,
+      96.23634338378906
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:012",
+    "block_type": "text",
+    "text": "Change from 3.4.1 to 3.2\n",
+    "bbox": [
+      463.00189208984375,
+      135.90943908691406,
+      552.9503173828125,
+      144.62083435058594
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:013",
+    "block_type": "text",
+    "text": "Fixing Commit: 118e1b\n",
+    "bbox": [
+      344.674560546875,
+      194.5386962890625,
+      403.078125,
+      200.34628295898438
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:014",
+    "block_type": "text",
+    "text": "Previous Commit: 3ecc59\n",
+    "bbox": [
+      344.7860412597656,
+      156.50387573242188,
+      408.3932800292969,
+      162.31146240234375
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:015",
+    "block_type": "text",
+    "text": "if (slice_end < 0 || slice_end < slice_start ||\n",
+    "bbox": [
+      353.91363525390625,
+      205.7450714111328,
+      449.891357421875,
+      211.08804321289062
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:016",
+    "block_type": "text",
+    "text": "-\nbytestream2_get_bytes_left(&gb) < slice_end) {\n",
+    "bbox": [
+      348.340087890625,
+      212.2670440673828,
+      469.0194091796875,
+      220.9784393310547
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:017",
+    "block_type": "text",
+    "text": "+     bytestream2_get_bytes_left(&gb) < slice_end + 1024LL) \n",
+    "bbox": [
+      348.340087890625,
+      221.9083709716797,
+      488.93927001953125,
+      227.2513427734375
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:018",
+    "block_type": "text",
+    "text": "+ if (slice_end < 0 || slice_end < slice_start ||\n",
+    "bbox": [
+      347.8384704589844,
+      167.26901245117188,
+      448.7116394042969,
+      172.6119842529297
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:019",
+    "block_type": "text",
+    "text": "+     bytestream2_get_bytes_left(&gb) < slice_end) {\n",
+    "bbox": [
+      347.8384704589844,
+      173.78195190429688,
+      468.12158203125,
+      182.5049591064453
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:020",
+    "block_type": "text",
+    "text": "from 3.1 to 3.2.10, \n3.3.x before 3.3.8, \n3.4.x before 3.4.2\n",
+    "bbox": [
+      512.0584106445312,
+      183.81423950195312,
+      559.644775390625,
+      206.34507751464844
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:021",
+    "block_type": "text",
+    "text": "Version tags\nVulnerable Version Tags\nNon-Vulnerable Version Tags\n",
+    "bbox": [
+      330.7183837890625,
+      239.6089324951172,
+      552.943359375,
+      246.40382385253906
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:022",
+    "block_type": "text",
+    "text": "n3.1.x (1≤x≤11)\nn3.1, n3.1.1, …, n3.1.11\n",
+    "bbox": [
+      330.7183837890625,
+      250.31163024902344,
+      455.2733154296875,
+      257.59686279296875
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:023",
+    "block_type": "text",
+    "text": "n3.2.x (1≤x≤15)\nn3.2, n3.2.1, …, n3.2.10\nn3.2-dev\n",
+    "bbox": [
+      330.7183837890625,
+      261.458740234375,
+      455.77545166015625,
+      276.54876708984375
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:024",
+    "block_type": "text",
+    "text": "n3.2.11, n3.2.12, …, n3.2.15\n",
+    "bbox": [
+      465.8211669921875,
+      261.458740234375,
+      547.6156616210938,
+      268.74395751953125
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:025",
+    "block_type": "text",
+    "text": "n3.3.x (1≤x≤9)\nn3.3, n3.3.1, …, n3.3.7\nn3.3-dev\n",
+    "bbox": [
+      330.7183837890625,
+      280.41064453125,
+      452.14971923828125,
+      295.49884033203125
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:026",
+    "block_type": "text",
+    "text": "n3.3.8, n3.3.9\n",
+    "bbox": [
+      465.8211669921875,
+      280.41064453125,
+      505.5418701171875,
+      287.69586181640625
+    ],
+    "reading_order": 26,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:027",
+    "block_type": "text",
+    "text": "n3.4.x (1≤x≤8)\nn3.4, n3.4.1, n3.4-dev\nn3.4.2, n3.4.3, …, n3.4.8\n",
+    "bbox": [
+      330.7183837890625,
+      299.3506164550781,
+      537.251708984375,
+      306.6483154296875
+    ],
+    "reading_order": 27,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:028",
+    "block_type": "text",
+    "text": "Figure 1: The first motivating example from CVE-2018-6621\n",
+    "bbox": [
+      317.9549865722656,
+      321.9394836425781,
+      558.190185546875,
+      333.97186279296875
+    ],
+    "reading_order": 28,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:029",
+    "block_type": "text",
+    "text": "a version contains the vulnerable code, this version is vulnerable;\notherwise, the version is not vulnerable. Thus, the versions between\nthe inducing commit and the fixing commit are vulnerable. Since\na version in a git repository is usually assigned to a tag, we first\nidentify the tags of vulnerable versions (see Figure 1). Then, we\nfind that the vulnerable versions can be summarized into ‘from 3.1\nto 3.2.10, 3.3.x before 3.3.8, and 3.4.x before 3.4.2’, which is different\nfrom the version information in the CVE description. Additionally,\nwe find that several development versions (e.g., 3.2-dev) are also\nvulnerable.\nHowever, the current SZZ algorithms cannot identify the true\ninducing commits for some vulnerabilities. Figure 2 present another\nmotivating example from CVE-2015-1830. For the fixing commit\nof this vulnerability, the SZZ algorithms identify the commit that\nlast modified the vulnerable line as the inducing commit (called\n‘Previous Commit’ in Figure 2). But if we use this previous commit\nto infer the versions affected by this vulnerability, no vulnerable\nversion would be detected. Nevertheless, this vulnerability still\nexists in the version with respect to the previous commit based\non the CVE description and the fixing commit. Thus, we continue\nto identify the commits that modified the vulnerable line (called\n‘Descendants Commits’). As the change in the first descendants\ncommit is just a format change, we regard the second descendants\ncommit as the true inducing commit in which the vulnerable line of\ncode was firstly added4. This vulnerability can be considered to be\nfoundational [39] since it was present in an initial version. Based\non this inducing commit, we infer the vulnerable versions are ‘5.x\nbefore 5.11.2’, which is consistent with the version information in\nthe CVE description.\n",
+    "bbox": [
+      317.2379150390625,
+      341.7022399902344,
+      559.1741333007812,
+      660.9422607421875
+    ],
+    "reading_order": 29,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:030",
+    "block_type": "text",
+    "text": "4This CVE is a directory traversal vulnerability, also known as the ../ (dot dot\nslash) attack. The exploit information in a reference mentions that the vulnerability\ncan be exploited via a traversal path ’/fileserver/../admin/’. The added API ’FileSys-\ntem.getDefault().getPath(String).normalize()’ in the fixing commit removes redundant\nelements in a path including any “.” or “directory/..” occurrences.\n",
+    "bbox": [
+      317.8290100097656,
+      666.4110107421875,
+      559.3863525390625,
+      709.1392822265625
+    ],
+    "reading_order": 30,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:031",
+    "block_type": "text",
+    "text": "2354\n",
+    "bbox": [
+      298.0,
+      746.8159790039062,
+      314.0,
+      755.7440185546875
+    ],
+    "reading_order": 31,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:003:032",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 32,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

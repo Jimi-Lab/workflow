@@ -1,0 +1,106 @@
+CAPEC attack patterns exploit them, and which A TT&CK
+techniques adversaries have used in real-world operations.
+Beyond integration, the graph unlocks advanced analytics.
+Analysts can identify software weaknesses most frequently
+linked to techniques, perform shortest-path traversals across
+heterogeneous entities, or enrich vulnerabilities with contex-
+tual data such as Common Platform Enumerations (CPEs)
+[7], mitigations, and Common V ulnerability Scoring System
+(CVSS) [8] severity . Moreover, through graph-based topology
+analysis, the system anticipates potential future or missing
+connections between entities. In doing so, it elevates CTI
+from disparate feeds into a continuously updated, queryable,
+and comprehensible foundation for proactive defense, threat
+hunting, and cyber risk assessment (detailed in §IV).
+The key contributions of this work are as follows.
+• End-to-end automation: W e develop a fully automated
+pipeline that ingests CVE, CWE, CAPEC, and A TT&CK
+data sources, enabling bidirectional reasoning between vul-
+nerabilities and adversary techniques.
+• Rich extraction of nodes and relationships: W e construct
+a large-scale knowledge graph that captures extensive nodes,
+relationships, and properties, ensuring semantic richness and
+comprehensive cross-domain coverage.
+• Comprehensive A TT&CK framework representation:
+W e provide a ﬁne-grained representation of all A TT&CK
+entities, including techniques, tactics, mitigations, and re-
+lated objects, and thus enabling a structured exploration of
+adversary behaviors.
+• T opology-based link discovery: W e introduce topology-
+based methods that reveal plausible but unobserved relation-
+ships in the graph, demonstrating how structural similarity
+can uncover meaningful connections between weaknesses
+and attack patterns.
+• Neo4j-based querying and analytics: W e deploy the graph
+in Neo4j and leverage the expressive Cypher query lan-
+guage to support advanced analytics, including multi-hop
+reasoning, shortest-path discovery , and pattern analysis.
+II. R E L AT E D WO R K
+Cybersecurity knowledge graphs (KGs) have emerged as a
+powerful paradigm for integrating heterogeneous threat intelli-
+gence, enabling advanced reasoning and decision support. Sev-
+eral efforts have focused on constructing KGs by linking ex-
+isting security standards and repositories such as CVE, CWE,
+CAPEC, A TT&CK, and CPE. One of the earliest systematic
+efforts was the SEPSES Cybersecurity Knowledge Graph,
+which provided vocabularies and a continuously updated KG
+integrating sources such as CVE, CWE, and CAPEC [9].
+Similarly , the CyberGraph framework demonstrated the auto-
+matic construction of a Neo4j-based KG unifying CVE, CWE,
+CAPEC, and CPE, allowing for advanced graph querying and
+visualization [10]. However, these works primarily focus on
+structural integration of a limited subset of sources and do not
+scale to large, enriched graphs with extensive properties.
+Beyond structural integration, several works have leveraged
+KGs for reasoning and predictive tasks. Shi et al. developed
+a threat knowledge graph linking CVE, CWE, and CPE,
+and applied KG completion techniques to uncover previously
+unknown associations, evaluated using ranking metrics such as
+MRR and Hits@N [11]. Ampel et al. proposed CVET , a self-
+distillation model that maps CVEs to MITRE A TT&CK tac-
+tics, thus bridging vulnerability-centric data with adversary be-
+haviors [12]. Das et al. introduced V2W -BER T , a Transformer-
+based hierarchical multi-class classiﬁcation framework for au-
+tomated mapping of CVEs to CWEs, achieving state-of-the-art
+performance even for rare classes [13]. While these approaches
+introduce reasoning capabilities, they often depend on small-
+scale datasets and lack an end-to-end automated pipeline that
+continuously incorporates updates from all relevant threat
+intelligence repositories.
+In parallel, large-scale multi-source integration has also
+been studied. Hemberg et al. introduced the BRON knowledge
+graph, which links A TT&CK, CWE, CAPEC, and CVE,
+supporting bidirectional traversal across tactics, weaknesses,
+and vulnerabilities for cyber threat hunting applications [14].
+Shen et al. explored a similar approach in the industrial control
+systems (ICS) domain, using data-driven extraction and graph
+construction techniques to model ICS-speciﬁc vulnerabilities
+and threats [15]. These works achieve broader coverage, but
+remain domain-speciﬁc, rely on static integration, and do not
+incorporate enriched property sets needed for ﬁne-grained
+reasoning and explainability .
+Beyond vulnerability-centric graphs, countermeasure-
+oriented KGs have also been proposed. The D3FEND
+framework, developed by MITRE, provides a semantically
+rigorous representation of defensive techniques and their
+mapping to A TT&CK TTPs, thereby supporting explainable
+reasoning about mitigation strategies [16]. Recently , retrieval-
+augmented generation (RAG) approaches such as CyKG-RAG
+have integrated KGs with language models, leveraging
+structured cybersecurity knowledge for improved reasoning
+over unstructured CTI reports [17], [18]. These initiatives
+focus either on defensive knowledge or integration with
+language models, but they do not provide a large-scale,
+uniﬁed, and automated knowledge graph that captures both
+vulnerabilities and attack techniques in an explainable manner.
+In contrast to the above works, our approach advances
+the state of the art by delivering a fully automated, end-to-
+end pipeline for constructing large-scale cybersecurity knowl-
+edge graphs. Our KG integrates CVE, CWE, CAPEC, and
+A TT&CK while scaling to more than 300K nodes and 250K
+relationships with 86 property types, offering a semantically
+enriched representation that supports advanced threat intel-
+ligence. W e deploy the KG in Neo4j, enabling powerful
+query capabilities, link discovery based on graph topology ,
+and adversarial activity analytics, thereby addressing both the
+scalability and analytical gaps identiﬁed in prior research.

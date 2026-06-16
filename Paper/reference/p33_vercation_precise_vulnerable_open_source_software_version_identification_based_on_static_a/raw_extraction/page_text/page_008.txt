@@ -1,0 +1,108 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 383
+TABLE I
+SENSITIVE FUNCTIONS FOR SOME VULNERABILITY TYPES
+Vulnerability Type Sensitive Function
+Buffer overﬂow strcpy, strncpy, memcpy, memset, read,
+write, gets, gets_s, strcat
+Integer overﬂow add, multiple, bit-shifting, memcpy
+Null pointer derefrence m alloc, calloc, realloc, strdup
+Pointer out-of-bounds access memcpy, memmove
+Use after free free, malloc, calloc
+Format string sprintf, printf, scanf
+Arbitrary command execution fopen, popen, system
+authors with security expertise: the ﬁrst author proposed the ini-
+tial categorization, which was then independently reviewed and
+validated by the fourth and ﬁfth authors, with any discrepancies
+resolved through discussion. The result is the pre-deﬁned table
+(Table I) of sensitive functions for v arious vulnerability types.
+We analyze each vulnerable statement extracted by the LLM.
+If a statement contains a direct call to any function listed in our
+sensitive function table, it is assigned a higher weight, marking
+it as a probable vulnerability trigger. For instance, in Listing 1,
+Lines 21 and 25 are critical trigger lines.
+Furthermore, we conduct an inter-procedural analysis to
+identify customized functions that serve as variants of canonical
+sensitive functions. For instance, the av_callocfunction on
+Line 21 is a variant of thecallocfunction. To discern whether
+the customized function Fcontains sensitive functions, we ﬁrst
+analyze the deﬁnition and implementation code of function F,
+then check if F’s function body calls any sensitive functions
+from TableI. If such call relationships are found,Fis also iden-
+tiﬁed as a sensitive function. Taking Listing 1 as an example,
+considering this is an overﬂow-type vulnerability, we recognize
+the av_callocin Line 21 and avio_readfunction in line
+25 as sensitive functions.
+Parameters. There are two parameters for the weight allocation
+of statements, i.e., W
+sensitive and Wbase, that could affect the
+effectiveness of V ERCATION:1 ) Wbase is the base weight for
+initializing the weights of all statements. 2) Wsensitive is the
+weight for the statements containing sensitive functions. We set
+Wsensitive =2 ×Wbase, Wbase =1.0, the detailed weighting
+conﬁguration experiment is in Section V-B.
+4) Code Clone Determination: We calculate the sim-
+ilarity_score for each code modiﬁcation of the previous
+commit with the backtrack. We set a threshold ϑ3,i f
+similarity_score<ϑ 3, we determine that there is no code
+clone between the pre-modiﬁcation code of this previous com-
+mit and the vulnerable statements, thus conﬁrming that this
+commit introduced th e vulnerability. Ot herwise, we proceed
+with the commit backtrack process.
+similarity_score = sim_a×Wsensitive +sim_b×Wbase
+a×Wsensitive +b×Wbase
+where, Wsensitive and Wbase are predeﬁned weights assigned
+to different types of statements; a and b are the total counts
+of the statements in Sv corresponding to these weight types;
+sim_a and sim_b are the counts of statements that were found
+to be similar, either through syntactic or structural analysis.
+C. Vulnerable Version Range Determination
+To precisely determine the range of software versions af-
+fected by a vulnerability, we e mploy a methodology based on
+the principle of commit reachability. The core premise is that a
+vulnerability, once introduced in a speciﬁc vic, is propagated to
+all subsequent commits in its lineage until it is ﬁxed by a vfc.
+The basis for our analysis is the concept of reachability,
+where a commitAis considered reachable from another commit
+B, if commit A is an ancestor of commit B in the project’s
+commit graph [17]. As version tags are essentially pointers to
+speciﬁc commits, they inherit the reachability properties of the
+commits they represent. This allows us to map the vulnerabil-
+ity’s presence from the commit level to software versions.
+Our methodology formally deﬁnes the set of vulnerable ver-
+sions (Vv) as follows: First, we identifyVi, the set of all version
+tags reachable from vic. Second, we identify Vf,t h es e to fa l l
+version tags reachable from vfc. The vulnerable version set Vv
+is then derived from the set difference between these two sets:
+Vv =Vi −Vf.
+We illustrate the procedure by the case of CVE-2021-
+20294 in the Binutils project [51]. For this vulnerability,
+the set of versions containing the vic is [ binutils-2_35,
+binutils-2_42], while the set of patched versions con-
+taining the vfc is [ binutils-2_36, binutils-2_42],
+with binutils-2_42being the latest version of the Binutils
+project. Therefore, we consider the version tags [ binutils-
+2_35, binutils-2_36) as vulnerable. This notation sig-
+niﬁes a range that includes binutils-2_35 but excludes
+binutils-2_36.
+IV . EXPERIMENTAL SETUP
+A. Dataset
+With conﬁrmation from the author of V-SZZ, it is established
+that V-SZZ assumes the deleted lines in the vfc as vulnera-
+ble codes and manually labels the ﬁrst introduction of deleted
+lines in a vfc as the vic to construct the dataset. However, as
+mentioned in Section II-C, deleted lines cannot fully capture
+the vulnerability logic. Add itionally, it cannot be guaranteed
+that the identiﬁed software version will necessarily exhibit the
+vulnerability. Meanwhile, V-SZZ excludes the vfcs that only
+contain added lines of code in thei r vulnerability selection, as
+the SZZ algorithm relies on tracking deleted lines of code to
+locate vic and thus cannot handle such cases. Therefore, we
+need to construct a ground-truth dataset with labeled vulnerable
+versions or non-vulnerable versions of OSS, which are veriﬁed
+by a public PoC.
+Vulnerabilities. To build a reliable evaluation dataset, we for-
+mulate four vulnerability selection criteria: 1) The vulnerability
+must be a CVE reported in an OSS project; 2) The vulnerability
+must have publicly available PoCs and patches; 3) The PoC
+must be reproducible across different versions of the OSS and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

@@ -1,0 +1,110 @@
+availability. These data sources are published or made public
+in various formats and venues. The cybersecurity community
+has a diverse group of participants ranging from technicians
+to academics. Intellectual property is developed by the whole
+spectrum of participants. Example data sources are depicted
+in Figure 2. The ﬁgure also illustrates the intellectual property
+development network which produces cybersecurity counter-
+measure technology. We also determined these datasets are
+too large to analyze entirely manually. However, we started
+with a manual analysis process so that we can better develop
+automated means.
+C. Countermeasure Analysis Process
+Our initial approach included some preliminary efforts
+to use natural language processing techniques to organize,
+summarize, and classify the technologies claimed in the docu-
+ments, primarily U.S. patent applications. We experimented
+with unsupervised topic modeling and text summarization
+algorithms. We determined these preliminary methods were
+not sufﬁcient to create a semantic representation that would be
+useful to cybersecurity practitioners at the outset. Supervised
+and semi-supervised machine-learning approaches were not
+tried, as we did not yet have a countermeasure or artifact
+classiﬁcation system or a set of ﬁxed terms and thus were
+unable to provide labeled training data.
+Our early efforts to use existing high-level models and work
+top down to speciﬁc countermeasures, or to propose our own
+high-level models absent the enumeration of countermeasure
+instances, did not prove to be an effective approach to create
+the desired framework of concepts and vocabulary. Our ex-
+perience is that without anchoring the framework to speciﬁc
+instances from the outset, establishing team consensus for the
+vocabulary was difﬁcult and was considered too subjective
+and too biased toward individual contributor’s experience and
+background. Given this experience, we focused on describing
+speciﬁc technologies and built up a hierarchy of semantic
+abstractions which are directly linked to the original references
+to enhance the ﬁdelity of the knowledge graph.
+With a mindset towards automation, we began to manually
+analyze, summarize, and formulate semantics that describe
+the defensive techniques contained in the intellectual property
+documents. We then recorded the analyses in our database,
+creating a new labeled dataset. This resulted in a database with
+a vocabulary of countermeasure techniques, and references
+to source documents where the concepts are described. This
+process relied on our subject matter expertise and was labor
+intensive but necessary to develop an initial semantic model
+of the countermeasure space. In addition, we plan to use these
+analyses to research training algorithms to both reﬁne the
+initial model and expedite the development and recognition
+of new countermeasure techniques.
+The team reviewed over 500 cybersecurity patents selected
+based on multiple criteria, and analyzed those with substantial
+technical detail. We initially focused on “detection” oriented
+vendors because the team had familiarity with the domain. We
+chose vendors from IDC’s Worldwide Cybersecurity Products
+Taxonomy, 2019 [19] and analyzed their patents. Some of
+these technologies do more than just detect unauthorized
+activity. We incorporated these additional techniques and cat-
+egorized them in the D3FEND knowledge graph.
+We approached the problem with a focus on countermeasure
+activity. We drew on two related systems engineering ap-
+proaches to describing and understanding system activity: ac-
+tivity models [38] [39] and uses cases [40]. These approaches
+helped us frame two related sets of questions to capture the
+key aspects of the intellectual property when examining it in
+terms of being a defensive technique. The ﬁrst set aimed to
+capture the core functional activity, and a second set captured
+key user interaction aspects. Both sets are shown in Table I.
+Given the volume of cybersecurity data and potential demands
+for users to stay in or on the decision loops (i.e., monitor
+and handle system alerts), we placed a particular emphasis on
+scaling concerns, both in implementing the basic capability
+and consequent user interactions.
+TABLE I
+TECHNIQUE ELICITATION QUESTIONS
+How does the technology work? Activity model element
+What are the data inputs? Activity Input
+What are the data outputs? Activity Output
+When does the analysis occur? Activity Control
+What are the analytical algorithms? Activity Mechanism
+How does it work at scale? Activity Mechanism
+How can it be circumvented? Activity Mechanism
+How do humans interact with the tech-
+nology?
+Activity model element
+What must the human user do? User Responsibilities
+How does this interaction scale? User-System Relationship
+The team quickly realized that this was too time consuming,
+and in many cases it was not possible to answer every question
+for each intellectual property document. Additionally, many
+technologies solved multiple problems, i.e., they contained
+multiple D3FEND techniques. We then improved our process
+with a new approach.
+We noticed that data input types to the technologies were
+a key factor in understanding how the technology works and
+anchoring them to defensive techniques. Prior work by MITRE
+focused analytic development around an object enumeration,
+though the scope of the enumeration was focused on process
+objects rather than the entire countermeasure space [18]. This
+led us to create the D3FEND Digital Artifact Ontology to
+deﬁne these data input types with a higher degree of speciﬁcity.
+This concept is further discussed in section IV-E.
+The knowledge and facts extracted during these analyses are
+recorded in the D3FEND knowledge graph; where possible
+we answered some of these initial questions for particular
+technologies or D3FEND techniques. The current knowledge
+graph is alpha level; we are adding features and information
+necessary to be useful to a public audience. Our road-map
+section explains our plan for developing a feature–complete
+beta release.

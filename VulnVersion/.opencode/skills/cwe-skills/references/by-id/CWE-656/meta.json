@@ -1,0 +1,251 @@
+{
+  "cwe_id": "CWE-656",
+  "name": "Reliance on Security Through Obscurity",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product uses a protection mechanism whose strength depends heavily on its obscurity, such that knowledge of its algorithms or key data is sufficient to defeat the mechanism.",
+  "extended_description": "This reliance on \"security through obscurity\" can produce resultant weaknesses if an attacker is able to reverse engineer the inner workings of the mechanism. Note that obscurity can be one small part of defense in depth, since it can create more work for an attacker; however, it is a significant risk if used as the primary means of protection.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-657",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Violation of Secure Design Principles"
+      },
+      {
+        "cwe_id": "CWE-693",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Protection Mechanism Failure"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-259",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Hard-coded Password"
+      },
+      {
+        "cwe_id": "CWE-321",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Hard-coded Cryptographic Key"
+      },
+      {
+        "cwe_id": "CWE-472",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "External Control of Assumed-Immutable Web Parameter"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class, but it does not have Base-level children."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a protection mechanism whose strength depends heavily on its obscurity, such that knowledge of its algorithms or key data is sufficient to defeat the mechanism.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "obscurity",
+      "mechanism",
+      "protection",
+      "reliance"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "obscurity",
+      "mechanism",
+      "protection",
+      "reliance",
+      "through",
+      "significant",
+      "algorithms",
+      "sufficient"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2006-6588",
+        "description": "Reliance on hidden form fields in a web application. Many web application vulnerabilities exist because the developer did not consider that \"hidden\" form fields can be processed using a modified client.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-6588"
+      },
+      {
+        "reference": "CVE-2006-7142",
+        "description": "Hard-coded cryptographic key stored in executable program.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-7142"
+      },
+      {
+        "reference": "CVE-2005-4002",
+        "description": "Hard-coded cryptographic key stored in executable program.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-4002"
+      },
+      {
+        "reference": "CVE-2006-4068",
+        "description": "Hard-coded hashed values for username and password contained in client-side script, allowing brute-force offline attacks.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-4068"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

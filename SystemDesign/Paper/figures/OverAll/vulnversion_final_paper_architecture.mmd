@@ -1,0 +1,145 @@
+%% VulnVersion final target paper architecture
+%% Safe Mermaid conventions used here:
+%% - node ids are ASCII letters and digits only
+%% - all labels are quoted
+%% - all label line breaks use <br/>
+%% - solid edges show final main data flow
+%% - dotted edges show runtime support, memory injection, and evolution feedback
+
+flowchart LR
+  classDef input fill:#f7f7f2,stroke:#6b6b60,stroke-width:1px,color:#111111
+  classDef core fill:#e8f2ff,stroke:#2f5f93,stroke-width:1.4px,color:#0b243b
+  classDef det fill:#eaf7ef,stroke:#277146,stroke-width:1.4px,color:#0d2b18
+  classDef agent fill:#fff0e1,stroke:#9a5b14,stroke-width:1.4px,color:#3b2105
+  classDef memory fill:#fff8cc,stroke:#9b7d00,stroke-width:1.4px,color:#2f2600
+  classDef artifact fill:#f0edff,stroke:#6250a5,stroke-width:1.4px,color:#1f174a
+  classDef eval fill:#ffe8ef,stroke:#9c3154,stroke-width:1.4px,color:#3a0e1d
+  classDef rule fill:#ffffff,stroke:#333333,stroke-width:1.2px,stroke-dasharray:6 4,color:#111111
+
+  subgraph InputLayer["Input and Reproducibility Layer"]
+    I1["CVE Record<br/>CVE id and CWE<br/>affected versions ground truth"]:::input
+    I2["Fix Evidence<br/>fix commits<br/>optional vuln commit"]:::input
+    I3["Target Repository<br/>Git history<br/>release tags<br/>source files"]:::input
+    I4["CVE Description<br/>NVD cache<br/>crawler<br/>user text"]:::input
+    I5["Run Configuration<br/>model profile<br/>artifact root<br/>run_inputs.json"]:::input
+  end
+
+  subgraph CoreLayer["VulnVersion Core Pipeline"]
+    S1A["Step1 Diff Extraction<br/>multi commit patch extraction<br/>fix commit deduplication"]:::det
+    S1B["Step1 Chunk Agent<br/>vulnerability chunk recognition<br/>chunk role annotation"]:::agent
+    S1C["patch_semantics.json<br/>all chunks<br/>chunk roles<br/>RCI relevant chunks"]:::artifact
+
+    S2A["Step2 Navigation Context<br/>RepoMaster hints<br/>source context"]:::det
+    S2B["Step2 RCI Agent<br/>root cause<br/>anchor and anchor_at_vuln<br/>vuln predicates<br/>fix predicates<br/>guards"]:::agent
+    S2C["Step2 Deterministic Validation<br/>JSON normalization<br/>RCI schema validation<br/>native git self check"]:::det
+    S2D["rci.json<br/>rci_self_check.json<br/>predicate reliability signals"]:::artifact
+
+    S3A["Step3 Deterministic Tag Planning<br/>release tag universe<br/>release line graph<br/>line_family<br/>line_partition"]:::det
+    S3B["VulnTree Construction<br/>TagNode<br/>LineNode<br/>CommitCluster<br/>LineBoundary"]:::det
+    S3C["FIC and VIC Cluster Logic<br/>multi commit taxonomy<br/>component groups<br/>OR and AND semantics"]:::det
+    S3D["BAPEE Recovery<br/>branch aware patch equivalence<br/>candidate generation<br/>precision gate"]:::det
+    S3E["No FIC Diagnosis<br/>duplicate_expansion_missed<br/>never_fixed_on_this_line<br/>line_not_vulnerable_in_released_tags"]:::det
+    S3F["ASBS Boundary Search<br/>line local search<br/>oldest newest and midpoint probes<br/>ASBS precision guard"]:::det
+    S3G["Evidence Prefetch and Prefilter<br/>Python native git evidence<br/>anchor relocation<br/>static prefilter"]:::det
+    S3H["Step3 Tag Verdict Agent<br/>evidence backed verdict<br/>AFFECTED or NOT_AFFECTED<br/>agent is not tag planner"]:::agent
+    S3I["Interval Inference and Runtime Closure<br/>affected interval inference<br/>certificate id<br/>vuln_tree_runtime.json"]:::det
+  end
+
+  subgraph RuntimeLayer["Backend Agnostic Agent Runtime Layer"]
+    R1["AgentRuntime Interface<br/>create readonly session<br/>run_json<br/>capabilities"]:::agent
+    R2["OpenCodeRuntime<br/>current compatibility backend"]:::agent
+    R3["ClaudeCodeRuntime<br/>future comparison backend"]:::agent
+    R4["CodexRuntime<br/>future comparison backend"]:::agent
+    R5["ReplayRuntime<br/>no API replay<br/>regression tests<br/>prompt memory skill diff"]:::agent
+    R6["Trace Capture<br/>trace schema<br/>raw output<br/>parsed output<br/>tool calls<br/>latency<br/>token usage"]:::artifact
+  end
+
+  subgraph MemoryLayer["VulnMem Agent Layer"]
+    M0["Typed Memory Store<br/>scoped by repo CVE CWE stage tag line backend<br/>evidence backed lifecycle"]:::memory
+    M1["WorkingMemory<br/>current CVE<br/>current tag<br/>current release line"]:::memory
+    M2["EvidenceMemory<br/>git show grep diff facts<br/>localized evidence"]:::memory
+    M3["RepoMemory<br/>tag style<br/>path migration<br/>function aliases<br/>repo adapter facts"]:::memory
+    M4["RCIMemory<br/>RCI templates<br/>predicate reliability<br/>guard risk<br/>Stage3 feedback"]:::memory
+    M5["LineMemory<br/>confirmed paths<br/>frontier risk<br/>boundary probe facts"]:::memory
+    M6["FailureMemory<br/>FP FN UNK TIMEOUT<br/>agent error<br/>boundary violation"]:::memory
+    M7["ProceduralMemory<br/>verified verification trajectories<br/>stage specific procedures"]:::memory
+    M8["SkillMemory<br/>compact prompt rules<br/>verified before injection"]:::memory
+    M9["ArtifactMemory<br/>repo_adapter.json<br/>predicate_repair_rules.json<br/>anchor_relocation_policy.json<br/>verdict_calibration_rules.json"]:::memory
+  end
+
+  subgraph EvolutionLayer["Verifier Gated Self Evolution Loop"]
+    E1["Trace Collection<br/>stage outputs<br/>agent traces<br/>runtime metadata"]:::eval
+    E2["Failure Attribution<br/>anchor drift<br/>predicate overmatch<br/>predicate undermatch<br/>path migration<br/>boundary violation"]:::eval
+    E3["Memory Operation Skills<br/>INSERT<br/>UPDATE<br/>MERGE<br/>DELETE<br/>PROMOTE<br/>SUPPRESS"]:::memory
+    E4["Procedure and Skill Optimization<br/>hard case clustering<br/>procedure extraction<br/>skill proposal"]:::memory
+    E5["Verifier Gate<br/>schema gate<br/>evidence gate<br/>leakage gate<br/>replay gate<br/>validation CVE gate<br/>backend disagreement gate<br/>conflict gate"]:::eval
+    E6["Artifact Compilation<br/>deterministic rule artifacts<br/>repo adapters<br/>calibration rules"]:::memory
+    E7["Controlled Injection<br/>stage specific memory budget<br/>no unverified conflict injection"]:::memory
+  end
+
+  subgraph ArtifactLayer["Artifact and Evaluation Layer"]
+    A1["Planning Artifacts<br/>tag_plan.json<br/>vuln_tree.json<br/>line_boundaries.json<br/>line_families"]:::artifact
+    A2["Verdict Artifacts<br/>per_tag_verdict.jsonl<br/>per_tag_verdict.csv<br/>agent prefilter inferred_interval agent_error buckets"]:::artifact
+    A3["eval.json<br/>confusion matrix<br/>F1 recall precision<br/>CVE precision<br/>version precision"]:::eval
+    A4["Final Experiments<br/>1128 CVE<br/>9 repo evaluation<br/>backend comparison<br/>ablation results"]:::eval
+  end
+
+  subgraph RuleLayer["Design Boundaries"]
+    Q1["Agent Verdict Boundary<br/>Agent only judges a given tag<br/>Agent never selects scan range"]:::rule
+    Q2["Deterministic Planning Boundary<br/>tag planning<br/>line ordering<br/>FIC VIC cluster<br/>ASBS are deterministic"]:::rule
+    Q3["Memory Boundary<br/>typed scoped evidence backed<br/>not raw logs<br/>not generic RAG"]:::rule
+    Q4["Promotion Boundary<br/>procedural memory becomes SkillMemory<br/>stable verified skills become ArtifactMemory"]:::rule
+  end
+
+  I1 --> S1A
+  I2 --> S1A
+  I3 --> S1A
+  I4 --> S1B
+  I5 --> S1B
+  S1A --> S1B --> S1C
+  S1C --> S2A --> S2B --> S2C --> S2D
+  S2D --> S3A --> S3B --> S3C --> S3D --> S3E --> S3F --> S3G --> S3H --> S3I
+  S3I --> A1 --> A2 --> A3 --> A4
+
+  R1 -.-> R2
+  R1 -.-> R3
+  R1 -.-> R4
+  R1 -.-> R5
+  R1 -.-> R6
+  R1 -.-> S1B
+  R1 -.-> S2B
+  R1 -.-> S3H
+
+  S1C -.-> M0
+  S2D -.-> M0
+  S3G -.-> M2
+  S3I -.-> M5
+  A3 -.-> M6
+  R6 -.-> M0
+  M0 -.-> M1
+  M0 -.-> M2
+  M0 -.-> M3
+  M0 -.-> M4
+  M0 -.-> M5
+  M0 -.-> M6
+  M6 -.-> M7 -.-> M8 -.-> M9
+
+  A2 -.-> E1
+  A3 -.-> E1
+  R6 -.-> E1
+  E1 --> E2 --> E3 --> E4 --> E5 --> E6 --> E7
+  E3 -.-> M0
+  E4 -.-> M7
+  E5 -.-> M8
+  E6 -.-> M9
+  E7 -.-> S1B
+  E7 -.-> S2B
+  E7 -.-> S3H
+  M9 -.-> S3A
+  M9 -.-> S3G
+
+  Q1 -.-> S3H
+  Q2 -.-> S3A
+  Q2 -.-> S3F
+  Q3 -.-> M0
+  Q4 -.-> M7

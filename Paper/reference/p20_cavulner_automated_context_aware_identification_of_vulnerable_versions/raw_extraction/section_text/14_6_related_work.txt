@@ -1,0 +1,101 @@
+6 Related Work
+To precisely identify vulnerable versions in OSS, researchers have proposed a variety of solutions
+broadly categorized into dynamic analysis and static analysis.
+6.1 Dynamic Analysis for Vulnerable Version Identification
+Dynamic analysis approaches typically and fundamentally rely on the systematic application of
+fuzzing techniques to empirically confirm and demonstrate the concrete exploitability of a potential
+vulnerability by attempting to trigger its underlying abnormal program behavior under controlled
+execution conditions.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 017 =====
+785
+786
+787
+788
+789
+790
+791
+792
+793
+794
+795
+796
+797
+798
+799
+800
+801
+802
+803
+804
+805
+806
+807
+808
+809
+810
+811
+812
+813
+814
+815
+816
+817
+818
+819
+820
+821
+822
+823
+824
+825
+826
+827
+828
+829
+830
+831
+832
+833
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 17
+For example, SemFuzz [ 47] proposes and develops a methodology fundamentally rooted in
+program semantics, which is precisely architected for the automated synthesis of functional Proof-
+of-Concept (PoC) exploit code, then repurposes the synthetically generated PoCs as seed inputs
+to direct a subsequent, systematic fuzzing campaign, with the objective of triggering and thereby
+uncovering latent vulnerabilities embedded within the target software system. PatchFuzz [ 45]
+begins its operation by first identifying the precise Git commits that are documented as fixes
+for specific security flaws, then proceeds to extract the associated PoC for each fix, and finally
+synthesizes this collected information with the semantic and syntactic details of the patch diff
+to guide focused fuzzing on the modified code regions. TransferFuzz [26] adopts a trace-guided
+fuzzing approach wherein it meticulously records and archives the execution traces from a known
+vulnerable version of the program, subsequently reusing and adapting these historical traces to
+precisely steer and prioritize its fuzzing campaigns when targeting newer, patched, or derivative
+versions, thereby systematically determining whether the propagation of reused code components
+continues to expose the same underlying vulnerability. DeltaFuzz [48] performs an extraction of
+version-difference information and strategically utilizes this to prioritize and guide the generation of
+fuzz inputs along the repair boundary, with the ultimate objective of verifying whether subsequent
+releases or later versions of the software remain susceptible to the original security flaw.
+In addition, Directed Greybox Fuzzing (DGF) plays a crucial role in vulnerable version identifica-
+tion by steering the fuzzer towards specific target sites, such as potentially vulnerable functions.
+AFLGo [11] integrates a distance-based metric into the energy scheduling of the fuzzer, prioritizing
+inputs that execute paths closer to the target vulnerability, thus facilitating the efficient repro-
+duction of known CVEs across different versions. Building on this, Hawkeye [12] optimizes the
+direction mechanism by incorporating static analysis of the call graph and function-level similar-
+ity, addressing the issue of trace explosion in long-path vulnerability verification. More recently,
+WindRanger [17] introduces a deviation-based directed fuzzing approach specifically designed for
+patch analysis. It identifies deviation basic blocks between the vulnerable and patched versions and
+directs the fuzzer to explore these divergences, making it highly effective for verifying whether a
+specific version contains the unpatched logic. To further improve efficiency in large-scale systems,
+Beacon [20] utilizes static analysis to compute reachability preconditions and aggressively prunes
+execution paths that cannot reach the target vulnerability, thereby significantly accelerating the val-
+idation process. Similarly, SelectFuzz [30] enables selective fuzzing of specific code regions within
+complex binaries by isolating the execution of relevant functions, allowing for precise verification
+of vulnerabilities in targeted components without the overhead of whole-system execution.
+While dynamic analysis methods produce no false positives, they inherently and unavoidably
+suffer from the problem of false negatives. This limitation is fundamentally rooted in the stochastic
+nature of fuzzing techniques, which often struggle to achieve sufficient code coverage or satisfy
+complex path constraints required to trigger deeply hidden vulnerabilities. Furthermore, estab-
+lishing, configuring, and maintaining isolated and functionally complete testing environments
+for every distinct library version or dependency encountered in a large-scale system proves to be
+impractical, thereby imposing significant scalability constraints on the broader application of this

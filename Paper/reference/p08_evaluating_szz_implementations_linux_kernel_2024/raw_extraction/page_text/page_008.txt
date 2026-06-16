@@ -1,0 +1,115 @@
+2226
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+IV. STUDY DESIGN
+The purpose of this study is to empirically evaluate the var-
+ious implementations of the SZZ algorithm on the currently
+largest dataset for SZZ evaluation and to investigate patterns
+that cannot be identiﬁed by SZZ (i.e., how to improve the recall
+of the SZZ algorithms), particularly Ghost Commits. To achieve
+these goals, we formulate three research questions:
+RQ1: How well do the different variants of SZZ perform
+in identifying bug-inducing changes?
+In our ﬁrst research question, we aim to examine the per-
+formance of different SZZ variants on our dataset relative to
+a previous study by Rosa et al. [28]. Our study involves a
+dataset with more bug-ﬁxing commits than in previous studies.
+Evaluating SZZ is crucial to ascertain if the prior studies’claims
+remain valid in an updated and more comprehensive dataset
+from a complete software project.
+RQ2: What is the impact of Ghost Commits on the
+behavior of SZZ in a real software project?
+In our second research question, we aim to explore the effects
+of ghost commits on the use of SZZ variants in a real software
+project, We divide RQ2 into two speciﬁc questions: (1) How
+frequently do ghost commits (Remove Mapping Ghost as bug-
+ﬁxing commits, Add Mapping Ghost as bug-inducing commits)
+occur? (2) How do ghost commits impact the SZZ algorithms?
+RQ3: What other situations, besides Ghost Commits,
+are undetectable by SZZ algorithms? In our ﬁnal research
+question, we aim to identify additional situations where the SZZ
+algorithms fail, apart from the Ghost Commit situation. Given
+that SZZ algorithms are founded on the assumption that “a bug-
+inducing change adds lines that are later removed by a ﬁx,”
+we address two speciﬁc questions within RQ3: (1) Do all fail-
+ure cases, besides Ghost Commits, adhere to this assumption?
+(2) Beyond the previously studied situation, what other situa-
+tions prevent SZZ from successfully identifying bug-inducing
+commits?
+A. Algorithm Selection & Data Collection
+We conduct experiments on several variants of the SZZ al-
+gorithm. Speciﬁcally, we adapt the main variants from the prior
+study by Rosa et al. [28] to run on our dataset. Of these, we do
+not use SZZ Unleashed since our commits are not associated
+with an issue tracker; thus there is no issue date. We do not
+use OpenSZZ since it needs a Jira URL as input. RA-SZZ∗
+only works on Java as Refactoring Miner [30] can only detect
+refactoring operations in Java ﬁles. Therefore we do not use
+RA-SZZ∗because the Linux kernel is a C-based project. In
+summary, we use B-SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ,
+and PyDriller (SZZ@PYD). We used the KFC dataset, featur-
+ing the complete set of 76,046 Fixes: annotated bug-ﬁxes.
+B. Data Analysis
+Given the set of bug-inducing commits predicted by the
+tested SZZ algorithms and the collected dataset, we evaluate
+the accuracy of the tested SZZ algorithms using recall and
+precision, two well-known Information Retrieval metrics [51].
+We also use F1 score [52], which calculates the harmonic
+mean of recall and precision. These metrics have been used
+in previous studies to evaluate SZZ performance [28], [46].
+The metrics for a bug-ﬁxing commits are deﬁned as follows,
+where correctci is the ground truth of bug-ﬁxing commit ci,
+i.e., the bug-inducing commits annotated by the original Linux
+kernel developer, identiﬁedci is the bug-inducing commits of
+bug-ﬁxing commit ci identiﬁed by the SZZ algorithms, and N
+is the total number of bug-ﬁxing commits:
+recall = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|correctci|
+precision = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|identiﬁedci|
+cF1 = 2 · recall × precision
+recall + precision
+We also analyze the complementarity of the SZZ variants
+following previous work [28]. Given the set of evaluated SZZ
+variants SZZ eval = {v1, v2, . . . , vn}, we compute their comple-
+mentarity using the following metrics for each vi [53]:
+correctvi∩vj = |correctvi ∩correctvj|
+|correctvi ∪correctvj|
+correctvi\(SZZ exp\vi) = |correctvi \ correct(SZZ exp\vi)|
+|correctvi ∪correct(SZZ exp\vi)|
+correctvi denotes the set of correct bug-inducing commits
+predicted by the SZZ algorithm vi. correct(SZZexp\vi) de-
+notes the correct bug-inducing commits predicted by all eval-
+uated SZZ algorithms except for vi. correctvi∩vj represents
+the overlap between the correct bug-inducing commits identi-
+ﬁed by the SZZ algorithm vi and another SZZ algorithm vj.
+correctvi\(SZZexp\vi), denotes the correct bug-inducing com-
+mits that are only identiﬁed by the SZZ algorithm vi.
+To analyze the frequency of each Remove Mapping Ghost
+and Add Mapping Ghost, we use the same computation as Rezk
+et al. [17]. Remove Mapping Ghost: the percentage of bug-
+ﬁxing commits that do not remove lines and only add lines out
+of all bug-ﬁxing commits. Add Mapping Ghost: the percentage
+of commits that do not add lines and only remove lines out of all
+commits. With respect to Add Mapping Ghost, we also report
+the percentage of bug-inducing commits that do not add lines
+and only remove lines out of the set of bug-inducing commits, as
+these are the only commits that only remove lines that actually
+have an impact on the SZZ results.
+V. TC-SZZ
+The fundamental premise of the SZZ algorithm is that “a bug-
+inducing change adds lines that are later removed by a ﬁx.” In
+other words, for a bug-ﬁxing commit, the SZZ algorithms use
+the git show command to identify deleted or modiﬁed lines, and
+the git blame command to identify the most recent change to
+each such line. However, we discovered that some bug-inducing
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

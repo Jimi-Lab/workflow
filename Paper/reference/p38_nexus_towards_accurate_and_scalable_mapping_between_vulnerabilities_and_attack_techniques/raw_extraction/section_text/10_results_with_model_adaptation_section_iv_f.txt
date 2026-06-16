@@ -1,0 +1,187 @@
+results with Model Adaptation (Section IV-F).
+Table II shows CVE-to-TTP mapping results on D2.NEXUS
+achieves the highest F1-score (89.31%) with full TTP cover-
+age (100%), high Precision (94.71%), and Recall (84.49%).
+Other solutions have lower F1-scores and either limited TTP
+coverage (CVEMap: 67.78%, SMET: 40.86%) or lower Pre-
+cision/Recall despite full coverage(Ladder, AttackSeqBench
+with Llama-3.1-8B, and AttackSeqBench with GPT-4o-mini).
+AttackSeqBench with GPT-4o-mini achieves 100% Recall due
+to its role in Label Adjustment but lower Precision. Figure 15a
+shows NEXUS maintains high TPR with low FPR/FNR, while
+others show higher error rates.
+8
+
+===== Page 009 =====
+(a) Detection metrics for D2 (b) Detection metrics for D3 (c) Detection metrics for D4 (d) Detection metrics for D5
+Fig. 15: Comparison of TPR, FPR, and FNR across evaluation datasets (D2–D5).
+Solution TTP Cov. Precision Recall F1-score
+NEXUS 100% 79.32% 63.41% 70.48%
+CVEMap [6], [16] 65.10% 41.11% 95.90% 57.55%
+SMET [3] 41.14% 29.63% 8.44% 13.13%
+Ladder [9] 100% 30.64% 2.09% 3.92%
+AttacKG [11] 41.14% 26.62% 9.33% 13.82%
+AttackSeqBench [35], [37]
+(with Llama-3.1-8B) 100% 15.03% 61.30% 24.15%
+AttackSeqBench [36], [37]
+(with GPT-4o-mini) 100% 44.35% 100.00% 61.45%
+TABLE III: Comparison ofNEXUS and baselines on D3 with
+stricter evaluation of unseen attack patterns.
+Solution TTP Cov. Precision Recall F1-score
+NEXUS 64.06% 47.15% 96.81% 63.41%
+CVEMap [6], [16] 32.81% 33.77% 65.38% 44.54%
+SMET [3] 36.71% 44.12% 17.24% 24.79%
+Ladder [9] 100% 34.76% 75.10% 47.52%
+AttacKG [11] 36.71% 27.36% 66.67% 38.80%
+AttackSeqBench [35], [37]
+(with Llama-3.1-8B) 100% 24.32% 79.12% 37.20%
+AttackSeqBench [36], [37]
+(with GPT-4o-mini) 100% 41.18% 67.47% 51.14%
+TABLE IV: Performance on the D4 APT report dataset [38],
+showing NEXUS’s generalization beyond CVEs.
+Table III reports results for D3, which tests generalization
+on CVEs without overlap with the training set. Compared
+to D2, D3 is more challenging.NEXUS achieves the highest
+F1-score (70.48%) with full TTP coverage. CVEMap shows
+higher Recall (95.90%) but lower Precision (41.11%) and TTP
+coverage (65.10%), resulting in a lower F1. AttackSeqBench
+with GPT-4o-mini achieves 100% Recall but lower Precision
+than NEXUS. Figure 15b showsNEXUS maintains high TPR
+with low FPR/FNR, while CVEMap and AttackSeqBench with
+GPT-4o-mini have slightly higher FPRs.
+Table IV presents results on the D4 dataset of annotated
+APT reports. AlthoughNEXUS is primarily designed for CVE-
+to-TTP mapping, it achieves the highest F1-score (63.41%),
+demonstrating moderate TTP extraction capabilities on broader
+threat intelligence inputs. Figure 15c shows TPR, FPR, and
+FNR, where NEXUS maintains a balanced proﬁle with high
+TPR and relatively low FPR and FNR, outperforming other
+solutions in handling detailed APT reports.
+Table V shows results on D5, focused on initial exploitation.
+NEXUS’s broader mapping scope explains its lower precision,
+as some false positives are valid under its policy. Nonetheless,
+NEXUS achieves the highest F1-score, demonstrating strong
+generalization. Figure 15d showsNEXUS maintains balanced
+Solution TTP Cov. Precision Recall F1-score
+NEXUS 65.85% 53.80% 89.86% 67.30%
+CVEMap [6], [16] 46.34% 12.32% 18.84% 14.90%
+SMET [3] 97.56% 34.97% 65.62% 45.63%
+Ladder [9] 100% 36.42% 12.33% 18.43%
+AttacKG [11] 97.56% 9.36% 32.81% 14.56%
+AttackSeqBench [35], [37]
+(with Llama-3.1-8B) 100% 15.89% 80.94% 26.56%
+AttackSeqBench [36], [37]
+(with GPT-4o-mini) 100% 16.57% 92.38% 28.09%
+TABLE V: Performance comparison on D5, SMET [75].
+TPR, FPR, and FNR.
+Even though, in Tables II-V generative AI-based works
+achieve high recall, they show substantially lower precision,
+and F1-score compared toNEXUS. This observation is persis-
+tent or even worse with the increase size of the dataset. This
+is why we deliberately design NEXUS as a hybrid solution
+utilizing both traditional NLP and generative-based models.
+D. Ablation Study
+To systematically evaluate the contribution of each core
+NEXUS design, we conduct an ablation study on the D1
+dataset in whichNEXUS’s steps are progressively enabled and
+the CVE-to-TTP mapping accuracy is measured after each
+addition. Speciﬁcally, we assess the impact of Ground Truth
+Building, Attack Pattern Extraction, and Dataset Enhancement
+steps. This ablation demonstrates that each step provides
+measurable improvements in mapping accuracy and coverage
+(in Table VI), validating each design choice quantitatively. The
+Model Adaptation sub-step is also evaluated in Section IV-F.
+Table VI shows RoBERTa-Large ﬁne-tuning results after
+each step. Ground Truth Building achieves 79.38% micro F1
+over 92,632 CVEs and 141 TTPs. Attack Pattern Extraction
+boosts it to 98.42%. Label Adjustment slightly lowers F1
+to 92.63% but expands TTPs to 208, increasing precision
+with ﬁner-grained assignments. CVE Sample Augmentation
+improves generalization, raising F1 to 97.94% and doubling
+CVE coverage to 210,357 without changing the TTP set.
+Figure 16 shows ﬁne-tuning dynamics for NEXUS steps
+using RoBERTa-Large. For the Ground Truth Building (Fig-
+ure 16a–16b), validation loss rises and metrics plateau early
+due to limited data quality. For Attack Pattern Extraction
+(Figure 16c–16d), pattern extraction enables faster conver-
+gence and better validation. Label Adjustment (Figure 16e–
+16f) shows smoother convergence but slower gains due to
+9
+
+===== Page 010 =====
+Step
+(or Sub-steps)
+Micro Average Macro Average CVE
+Coverage
+TTP
+CoveragePrecision Recall F1-score Precision Recall F1-score
+Ground Truth Building 80.33% 78.46% 79.38% 66.96% 62.48% 64.64% 92,632 141
+Attack Pattern Extraction 98.47% 98.38% 98.42% 97.68% 97.24% 97.46% 92,632 141
+Label Adjustment 92.70% 92.56% 92.63% 90.43% 89.37% 89.90% 92,632 208
+CVE Sample Augmentation 97.85% 98.02% 97.94% 98.25% 98.65% 98.45% 210,357 208
+TABLE VI: Impact of training-ﬂow steps and sub-steps on mapping performance and coverage.
+(a) Training and validation loss
+for Ground Truth Building.
+(b) Ground Truth Building: Preci-
+sion, Recall, and F1-score.
+(c) Training and validation loss
+for Attack Pattern Extraction.
+(d) Attack Pattern Extraction: Pre-
+cision, Recall, and F1-score.
+(e) Training and validation loss
+for Label Adjustment.
+(f) Label Adjustment: Precision,
+Recall, and F1-score.
+Fig. 16: Fine-tuning dynamics of RoBERTa-Large after apply-
+ing different training-ﬂow steps.
+(a) Training and validation loss
+over epochs.
+(b) Validation Precision, Recall,
+and F1-score over epochs.
+(c) TP, FP, and FN rates for pos-
+itive and negative classes.
+(d) Precision, Recall and F1-score
+for positive and negative classes.
+Fig. 17: Training dynamics and evaluation metrics of the
+SecureBERT-based APD model.
+ﬁner-grained assignments. CVE Sample Augmentation results
+are shown in Figure 14a–14b.
+1) Attack Pattern Extraction Analysis: To evaluate the
+effectiveness of the Attack Pattern Detector (APD) model, we
+ﬁne-tune six LLM variants on a labeled dataset of 3,000 sam-
+Model Precision Recall F1-score
+BERT-Base-Uncased [41] 93.07% 93.07% 93.07%
+BERT-Large-Uncased [56] 92.51% 92.27% 92.39%
+RoBERTa-Base [42] 94.92% 94.67% 94.79%
+RoBERTa-Large [57] 95.20% 95.20% 95.20%
+SecureBERT [43] 95.99% 95.73% 95.86%
+SecureBERT-Plus [58] 94.13% 94.13% 94.13%
+TABLE VII: Performance comparison of different LLMs ﬁne-
+tuned for attack pattern detection.
+(a) TTP coverage before and after
+label adjustment.
+(b) CVE coverage before and af-
+ter augmentation.
+Fig. 18: Enhanced CVE and TTP coverage achieved through
+the application of the Dataset Enhancement step.
+ples containing both positive and negative instances. Table VII
+presents the results. All models achieve high performance,
+with SecureBERT attaining the highest F1-score (95.86%). As
+APD is a binary classiﬁer, most models report similar precision
+and recall, with slight differences arising when a model misses
+a label. These results suggest that using cybersecurity-adapted
+models improves attack pattern detection accuracy.
+Figure 17 summarizes the SecureBERT-based APD model.
+Figure 17a and 17b show decreasing losses and improving
+validation metrics, conﬁrming stable ﬁne-tuning. Figure 17c
+and 17d report high TPRs (95%+) and low FPR/FNR; despite
+slightly lower negative precision, the model reliably detects
+attack patterns. Additional epoch results are in Appendix B.
+2) Label Adjustment Analysis:Figure 18a shows TTP cov-
+erage improvements across MITRE ATT&CK Tactics after
+Label Adjustment. Initially, 13 of 14 tactics were supported;
+Exﬁltration was later added via one relevant TTP. The to-
+tal TTP count rose from 141 to 208, with some mapped
+to multiple tactics, explaining higher bar totals. Green bars
+highlight gains, especially in Execution, Defense Evasion,
+and Command and Control (C&C). Further generative model

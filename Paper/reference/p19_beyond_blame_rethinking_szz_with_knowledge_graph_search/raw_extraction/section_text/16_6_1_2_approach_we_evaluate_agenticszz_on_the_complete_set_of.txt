@@ -1,0 +1,13 @@
+6.1.2 Approach.We evaluate AgenticSZZ on the complete set of 2,102 bug-fixing cases across
+DS_LINUX (1,500 cases), DS_APACHE (241 cases), and DS_GITHUB (361 cases). DS_GITHUB is
+further split into DS_GITHUB-c (C language, 286 cases) and DS_GITHUB-j (Java, 75 cases) to
+enable language-specific analysis, as Neural-SZZ and RA-SZZ are Java-only baselines. For each
+case, AgenticSZZ constructs a TKG through blame analysis and commit history traversal from
+two starting points, then employs an LLM agent to navigate the graph using the four specialized
+tools described in Section 4.2. We compare against eight baselines (Section 5.1), including six SZZ
+variants, Neural-SZZ, and LLM4SZZ.
+For the controlled comparison (Table 4), both approaches use DeepSeek-V3.2, isolating the
+architectural contribution from LLM selection.
+All approaches are evaluated using Precision, Recall, and F1-score as defined in Section 5.2. We
+use McNemar’s test for paired binary outcomes (correct/incorrect per case) and report Cohen’s 𝑔
+as effect size, where𝑔≥0.15indicates a medium effect and𝑔≥0.25indicates a large effect [6].

@@ -1,0 +1,167 @@
+[
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:001",
+    "block_type": "text",
+    "text": "2222\nIEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024",
+    "bbox": [
+      42.35,
+      32.52,
+      556.42,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:002",
+    "block_type": "text",
+    "text": "II. BACKGROUND AND RELATED WORK",
+    "bbox": [
+      86.99,
+      63.79,
+      248.75,
+      74.91
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:003",
+    "block_type": "text",
+    "text": "In this section, we ﬁrst provide an overview of the original\nSZZ algorithm, outlining its background and highlighting some\nlimitations related to ghost commits. Next, we study the variants\nof the SZZ algorithm that have been proposed to improve its\nprecision and recall. Lastly, we discuss the application and\nsigniﬁcance of the SZZ algorithm and its variants within the\nSoftware Engineering research community.\nWe focus on the eight SZZ algorithms that are considered\nby Rosa et al. [28]: B-SZZ [1], AG-SZZ [2], DJ-SZZ [15],\nL-SZZ [16], R-SZZ [16], MA-SZZ [12], RA-SZZ [13], RA-\nSZZ* [14], as well as some implementation variants: PyDriller\n(SZZ@PYD) [33], SZZ Unleashed [34], and OpenSZZ [35].",
+    "bbox": [
+      42.35,
+      81.73,
+      293.41,
+      224.35
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:004",
+    "block_type": "text",
+    "text": "A. The Original SZZ Algorithm & Ghost Commits",
+    "bbox": [
+      42.34,
+      238.29,
+      249.53,
+      249.25
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:005",
+    "block_type": "text",
+    "text": "SZZ, the name given to the algorithm initially introduced\nby ´sliwerski, Zimmermann, and Zeller [1], was developed to\nidentify changes that induce bugs. In our forthcoming discus-\nsion, we will follow Rosa et al. [28] and refer to this original\nSZZ algorithm as B-SZZ. B-SZZ follows a core structure that\nis shared with its subsequent variants: (1) identifying bug-\nﬁxing commits, followed by a ﬁltering process utilizing two\nconﬁdence levels: syntactic and semantic; (2) mapping bug-\nﬁxing commits to their corresponding potential bug-inducing\ncommits; and (3) eliminating potential bug-inducing commits\nthat are unlikely to be the cause of bugs.\n1) Identifying Bug-ﬁxing Commits:\nIn the initial stage,\nB-SZZ endeavors to establish a relationship between a bug-\nﬁxing commit in the version control system (VCS) and the cor-\nresponding bug reports in the issue-tracking system (ITS). To\naccomplish this, B-SZZ employs two independent conﬁdence\nlevels: a syntactic level, which infers links between a VCS log\nand a bug report, and a semantic level, which validates these\nlinks through bug report data.\nFor most software systems, there is no mandatory or default\nlink between bug reports in the ITS and the VCS. Thus, devel-\nopers may forget to add such links. Rezk et al. [17] deﬁne the\nmissing bug-ﬁxing commits that SZZ implementations fail to\ndetect, where links were omitted, as Ghost Commit 0 (GC 0).\nHerbold et al. [36] also ﬁnd that half of the bug-ﬁxing commits\nidentiﬁed by SZZ are incorrect due to the mislabeled issues\nin the ITS (where developers incorrectly label issues as bugs,\nwhile some are merely improvements, etc.) [37]. Herbold et al.\nalso ﬁnd that SZZ misses about one-ﬁfth of the bug-ﬁxing\ncommits.\nThis paper will not study the limitations of bug-ﬁxing commit\nidentiﬁcation, as: (1) previous work [38], [39], [40] has already\nprovided a comprehensive analysis and proposed tools to re-\ncover GC 0’s missing links, and (2) the Linux kernel repository\nrequires developers to use the “Fixes:” tag along with the ﬁrst\n12 characters of the SHA-1 ID when a patch addresses a bug\nin a speciﬁc commit. Therefore, we can collect a “developer-\ninformed” Linux kernel dataset using the VCS without reliance\non the ITS.\n2) Mapping: Once the bug-ﬁxing commits in the VCS have\nbeen identiﬁed, B-SZZ proceeds to the second step, where it",
+    "bbox": [
+      42.34,
+      255.08,
+      293.41,
+      744.4
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:006",
+    "block_type": "text",
+    "text": "Fig. 2.\nA Remove Mapping Ghost (bug-ﬁxing commit 7fdbc5f).",
+    "bbox": [
+      305.35,
+      152.63,
+      522.87,
+      161.53
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:007",
+    "block_type": "text",
+    "text": "Fig. 3.\nAn Add Mapping Ghost (bug-inducing commit 5a858e7).",
+    "bbox": [
+      305.35,
+      259.61,
+      525.76,
+      268.5
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:008",
+    "block_type": "text",
+    "text": "maps the bug-ﬁxing commits to potential bug-inducing com-\nmits, i.e., the commits that may have caused the bug. To do this,\nB-SZZ ﬁrst employs CVS’s diff command.2 This command\nis analogous to git show, as it identiﬁes the lines that have\nbeen deleted or modiﬁed by a commit. Then, B-SZZ invokes\nthe annotate command (another CVS command, similar to git\nblame, but that does not identify the corresponding lines in\nearlier revisions) for each line to determine the most recent\ncommit that deleted or modiﬁed the line prior to the ﬁx. When\nthere are multiple removed or modiﬁed lines, multiple commits\ncan be mapped as potential bug-inducing commits. This paper\nfocuses on issues in the mapping step.\nTools such as CVS annotate and git blame cannot map bug-\nﬁxing commits that do not modify or remove lines to bug-\ninducing commits. This situation is deﬁned as Mapping Ghost\ntype 1 (MG 1) by Rezk et al. (To give a more meaningful\nnaming for MG 1, we name it Remove Mapping Ghost in\nthis paper.) For example, in Fig. 2, bug-ﬁxing commit 7fdbc5f3",
+    "bbox": [
+      305.35,
+      291.75,
+      556.44,
+      506.1
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:009",
+    "block_type": "text",
+    "text": "does not remove any lines and only added two lines in all the\nchanges.\nSimilarly, if a bug-inducing commit does not add lines, it\ncannot be tracked by using blame on subsequently removed\nlines, as blame can only track previously existing lines. This\nsituation is deﬁned as Mapping Ghost type 2 (MG 2) by\nRezk et al. (To give a more meaningful naming for MG 2, we\nname it Add Mapping Ghost in this paper.) For instance, in\nFig. 3, bug-inducing commit 5a858e74 does not add any lines\nand only removes two lines in all the changes.\n3) Filtering: In the ﬁnal stage, B-SZZ discards the potential\nbug-inducing commits that cannot have caused the bug, such\nas those committed to the VCS after the bug was reported.\nThe potential bug-inducing commits that are not ﬁltered out",
+    "bbox": [
+      305.35,
+      506.94,
+      556.42,
+      673.47
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:010",
+    "block_type": "text",
+    "text": "2When B-SZZ was proposed, the Concurrent Versions System (CVS) was\nwidely used for version control.\n3https://github.com/torvalds/linux/commit/7fdbc5f014c3f71bc44673a2d6c5\nbb2d12d45f25\n4https://github.com/torvalds/linux/commit/5a858e79c911330678b5a9be91a\n24830e94a0dc9",
+    "bbox": [
+      305.35,
+      687.42,
+      556.42,
+      743.96
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:004:011",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

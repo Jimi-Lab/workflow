@@ -1,0 +1,48 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:13
+Table 2. The performance comparisions between all methods in finding c bug-inducing commits
+Method DS_LINUX DS_GITHUB-cPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.452 0.5780.507 0.3610.6560.466
+AG-SZZ 0.448 0.553 0.495 0.410 0.592 0.484
+MA-SZZ 0.421 0.538 0.472 0.335 0.624 0.436
+R-SZZ 0.583 0.448 0.5070.671 0.582 0.620
+L-SZZ 0.560 0.430 0.486 0.486 0.422 0.452
+LLM4SZZ0.6280.5520.588 0.6870.6410.663
+Table 3. The performance comparison between methods in finding java bug-inducing commits
+Method DS_GITHUB-j DS_APACHEPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.285 0.6800.401 0.2510.4350.318
+AG-SZZ 0.421 0.533 0.470 0.328 0.310 0.318
+MA-SZZ 0.239 0.560 0.335 0.307 0.345 0.329
+R-SZZ 0.538 0.467 0.500 0.497 0.288 0.364
+L-SZZ 0.492 0.427 0.457 0.366 0.211 0.267
+RA-SZZ 0.337 0.440 0.382 0.264 0.325 0.293
+Neural-SZZ 0.556 0.486 0.5200.563 0.364 0.442
+LLM4SZZ0.6070.5690.587 0.6100.3980.482
+5.1 RQ1. Effectiveness of LLM4SZZ in Identifying Bug-inducing Commits
+Table 2 and 3 present the results ofLLM4SZZ and baselines in identifying bug-inducing commits in
+C and Java projects, respectively. Since DS_GITHUB consists of both c projects and Java projects, we
+split it into DS_GITHUB-c and DS_GITHUB-j, containing C projects and Java projects, respectively.
+As shown in Table 2, for DS_LINUX, all baselines perform almost the same, mirroring the
+experimental results in the original whole dataset [Lyu et al. 2024]. This suggests that our selected
+dataset has the same statistical patterns as the original dataset. The B-SZZ and R-SZZ algorithms
+achieve the highest F1-scores among all baselines. Specifically, B-SZZ achieves the highest recall,
+while R-SZZ achieves the highest precision. We also analyze why B-SZZ outperforms its variants,
+such as AG-SZZ, MA-SZZ, and L-SZZ in DS_LINUX. B-SZZ outperforms AG-SZZ because Linux
+contains numerous bug-fixing commits related only to comments and configurations. While B-SZZ
+successfully identifies these commits, AG-SZZ filters them out. Similarly, MA-SZZ assumes that
+commits with only meta-changes are not bug-inducing, but DS_LINUX shows that developers
+do label such commits as bug-inducing. L-SZZ, on the other hand, assumes the commit with the
+most changed lines among those identified by AG-SZZ is the bug-inducing commit. However, this
+assumption also often fails, as shown by the dataset. These limitations explain why these variants
+perform worse than the B-SZZ algorithm. In DS_GITHUB-c, the R-SZZ algorithm performs the best,
+significantly outperforming all other baselines, with an F1-score of 0.620. LLM4SZZ achieves the
+highest precision and F1-score across these two datasets. In DS_LINUX, it improves precision by
+7.7% and F1-score by 16.0% compared to the best baseline. In DS_GITHUB-c, it improves precision
+by 2.4% and F1-score by 6.9%, respectively.
+From Table 3, we observe that the NeuralSZZ algorithm performs the best in precision and
+F1-score among all baselines. This suggests that utilizing deep learning to rank code statements
+is an effective way to enhance performance. LLM4SZZ also performs the best in precision and
+F1-score in these two datasets. Specifically, it improves precision by 9.2% in DS_GITHUB-j and
+8.3% in DS_APACHE. Additionally, it enhances the F1-score by 12.9% in DS_GITHUB-j and 9.0%
+in DS_APACHE. This demonstrates the effectiveness of LLM4SZZ in handling large bug-fixing
+commits, as most bug-fixing commits in DS_APACHE are large.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

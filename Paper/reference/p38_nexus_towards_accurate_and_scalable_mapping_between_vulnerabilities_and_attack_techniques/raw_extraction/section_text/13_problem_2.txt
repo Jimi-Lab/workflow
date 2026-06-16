@@ -1,0 +1,209 @@
+Problem
+Inaccurate/incomplete incident report
+Benefit
+More accurate/complete incident report
+Fig. 22: Alert report excerpts with/withoutNEXUS.
+Metrics TTPs Sigma Rules Feedback
+TP, FP, FN, TN (#) 36, 2, 4, 5 671, 61, 34, 49 OffPrec, Rec, F1 (%) 94.74, 90, 92.31 91.67, 95.18, 93.39
+TP, FP, FN, TN (#) 37, 1, 3, 6 681, 48, 24, 62 V1Prec, Rec, F1 (%) 97.37, 92.50, 94.87 93.42, 96.60, 94.98
+TP, FP, FN, TN (#) 39, 1, 1, 6 705, 48, 0, 62 V2Prec, Rec, F1 (%) 97.50, 97.50, 97.50 93.63, 100, 96.71
+TP, FP, FN, TN (#) 40, 0, 0, 6 705, 0, 0, 62 V3Prec, Rec, F1 (%) 100, 100, 100 100, 100, 100
+TABLE XII: Impact of NEXUS FP/FN on the accuracy of
+Sigma rules and improvement byNEXUS feedback step.
+Elastic SIEM applying the respective rules to the event logs
+and generates alerts for investigation:
+Without NEXUS: The analyst’s incident report is based on the
+limited scope of the original rule, typically documenting only
+that druva.exe spawned cmd.exe. Lacking TTP context,
+detection, or mitigation ﬁelds, the report is incomplete and
+more susceptible to false positives.
+With NEXUS: The NEXUS-enriched rule generates a targeted
+alert when PowerShell connects to127.0.0.1:6064 and
+triggers Druva to execute path traversal exploitation. The alert
+automatically reports links to the relevant TTPs, highlights
+the exact suspicious log events (including the crafted com-
+mand and account creation), and references MITRE ATT&CK
+detection and mitigation techniques. As a result, the analyst
+receives a comprehensive, actionable incident report.
+FP and FN Impact on Rule Authoring and Triage.To assess
+the impact of an FP or FN fromNEXUS, we reviewed 47
+TTPs associated with CVE-2020-5752. An FP (T1548.002)
+could trigger unnecessary User Account Control related Sigma
+rules and extra triage, while an FN (T1562.003) could
+omit detection for PowerShell or command-history tamper-
+ing. Still, related defense-evasion TTPs predicted byNEXUS
+(T1070.001) provide partial coverage. Even if analysts
+deployed all Sigma rules for all predicted TTPs, the deviation
+from ideal coverage remains small, indicatingNEXUS’s strong
+operational accuracy despite occasional errors. Table XII (ﬁrst
+row) shows that NEXUS performs well even without model
+adaptation, achieving 95% precision and 90% recall. Exam-
+ining the 815 generated Sigma rules, most are correct (671),
+with few false alarms (61) or misses (34). Rule-level accuracy
+remains high (91–95%), indicating that most automatically
+generated rules are useful, with only minor redundancy/gaps.
+T1505.003 (Web Shell)
+T1102 (Web Service)
+T1071.001 (Web Protocols)
+T1518 (Software Discovery)
+T1119 (Automated Collection)
+T1195 (Supply Chain Compromise)
+T1020 (Automated Exfiltration)
+T1489 (Service Stop)
+...
+Available Linkages
+Missing Linkages
+Description: Vulnerability in the Oracle Concurrent
+Processing product of Oracle E-Business Suite (component:
+BI Publisher Integration). Supported versions that are
+affected are 12.2.3-12.2.14. Easily exploitable vulnerability
+allows unauthenticated attacker with network access via
+HTTP to compromise Oracle Concurrent Processing.
+Successful attacks of this vulnerability can result in takeover
+of Oracle Concurrent Processing.  CVSS 3.1 Base Score 9.8
+(Confidentiality, Integrity and Availability impacts). CVSS
+Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H).
+Discovery of Missing TTP LinkagesRemoval of Ambiguous Descriptions
+Ambiguous Descriptions in CVE-2025-61882
+- Existence of non-actionable (or non-AP) phrases. E.g.,
+     - Vulnerability in the Oracle ... (component: BI Publisher Integration). à Irrelevant to TTPs
+     - CVSS 3.1 Base Score ... à Irrelevant to TTPs
+- Lack of vulnerability class / attack steps definition. E.g.,
+     - "Easily exploitable vulnerability ..." à What kind of flaw? (RCE, improper authentication, etc.)
+     - "... attacker with network access via HTTP ..." à How? (crafted HTTP request, payload, file, etc.)
+Fig. 23: An example ofNEXUS processing ambiguous CVE
+descriptions and missing links.
+Feedback Impact on Rule Authoring and Triage.Table XII
+(last three rows) shows that three rounds (V1-V3) of feed-
+back steadily improve both TTP prediction and Sigma-rule
+accuracy. V1: Using the existing feedback database (Sec-
+tion IV-F), NEXUS ﬁxes one FP (T1059.007) and one FN
+(T1012), raising TTP accuracy to 97.37/92.50/94.87% and
+Sigma accuracy to 93.42/96.60/94.98%. V2: Adding feedback
+from a similar CVE (CVE-2022-42470) corrects remaining
+errors, reaching 97.50/97.50/97.50% at the TTP level and
+93.63/100/96.71% for Sigma rules. V3: Providing the last
+CVE-2020-5752–speciﬁc FP/FN cases enables exact-match
+reuse and removes all remaining errors, achieving 100%
+precision, recall, and F1 for both TTPs and Sigma rules.
+Overall, NEXUS requires only minimal, targeted feedback to
+reach high-quality predictions for a given CVE.
+B. Case Study II: Ambiguous Descriptions and Missing Links
+This case study (Figure 23) shows howNEXUS handles am-
+biguous CVE descriptions and restores important TTPs [23]–
+[26] missing from default CVE-to-TTP links [45]–[48]. The
+chosen CVE, CVE-2025-61882 (Base Score 9.8 / Critical),
+contains vague, non-actionable text (“Vulnerability in the Or-
+acle . . . ”,“CVSS 3.1 Base Score . . . ”) and no clear indication
+of ﬂaw type or exploitation steps (“Easily exploitable . . . ”,
+“attacker with network access via HTTP . . . ”). To address
+this ambiguity, NEXUS applies the attack-pattern extraction
+step from Section III-C, discarding irrelevant phrases (red
+in Figure 23) and retaining only clauses with actual attack
+semantics (green).
+Next, to predict and reﬁne TTPs, NEXUS applies the
+steps in Section III-F to the green-highlighted clauses. From
+these, it infers network-centric TTPs such as T1102 (Web
+Service) and T1071.001 (Web Protocols), along with plau-
+sible follow-on behaviors like T1518 (Software Discov-
+ery), T1020 (Automated Exﬁltration), and T1489 (Service
+Stop), reﬂecting potential post-compromise actions implied
+in the text. We then compare these predictions with de-
+fault CVE–CWE–CAPEC–TTP mappings: green entries (e.g.,
+T1505.003) mark existing public linkages, while red entries
+show additional TTPs discovered byNEXUS.
+13
+
+===== Page 014 =====
+Report Excerpt: APT42 TTP Linkages
+T1547 (Boot or Logon Auto.)
+T1112 (Modify Registry)D
+NEXUS MITRE MANDIANT
+& Others
+T1589 (Gather Victim Iden.)
+T1119 (Automated Collection)C
+MANDIANT
+& OthersNEXUS MITRE
+T1105 (Ingress Tool Transfer)
+T1518 (Software Discovery)B
+MANDIANT
+& OthersNEXUS MITRE
+T1070 (Indicator Removal)
+T1056 (Input Capture)A
+NEXUS MITRE MANDIANT
+& Others
+Summary of Findings
+A{... Clearing Google Chrome browser history after [T1070]
+... APT42 uses custom malware capable of logging keystrokes
+[T1056] and} ... B{include shell command execution, ..., file
+transfer [T1105], ... leverages Windows Management
+Instrumentation (WMI) to query anti-virus products [T1518]} ...
+C{obtaining sensitive information on targets, including movement,
+contacts and personal information [T1589] ... APT42 also uses
+malware capable of taking screenshots and collecting system and
+network information [T1119]} ... D{To maintain their presence in a
+victim’s environment, APT42 relies on custom malware using
+scheduled tasks or Windows registry modifications for persistence
+[T1547, T1112]} ...
+According to MITRE Only:
+   TPs: 20     Precision:  16.53%
+   FPs: 101   Recall:       83.33%
+   FNs: 4       F1-score:   27.59%
+Total Length: ~81 Pages
+After Manual Validation:
+   TPs: 75     Precision:  61.98%
+   FPs: 46     Recall:       94.94%
+   FNs: 4       F1-score: ~75%
+Fig. 24: An example ofNEXUS processing a non-CVE input.
+C. Case Study III: Non-CVE Inputs
+This case study (Figure 24) demonstrates TTP extraction
+from non-CVE sources (APT42 threat reports [84]–[86])
+showing howNEXUS handles long narrative intelligence rather
+than short CVE texts. The yellow box summarizes represen-
+tative excerpts (four parts), while the right panel compares
+NEXUS-derived TTPs with the MITRE ATT&CK ground
+truth [87] and vendor reports [84]–[86]. This is necessary
+because MITRE’s APT42 mappings are derived directly from
+these reports, which together form the most complete ground
+truth.
+Boxes A–D summarize the comparison: (A) TTPs found
+by all sources; (B) TTPs predicted byNEXUS and present in
+Mandiant & Others but missing from MITRE (initial FPs);
+(C) TTPs detected only byNEXUS (also initial FPs); and (D)
+TTPs in MITRE and Mandiant & Others but not predicted by
+NEXUS (FNs). These discrepancies stem from MITRE provid-
+ing only ﬁnalized TTP assignments, vendor reports offering
+richer descriptions, andNEXUS extracting TTPs directly from
+text, meaning each source can miss items others capture.
+To reﬁne the evaluation, we manually review all initial
+FPs and FNs in B–D by re-checking the cited threat reports.
+Cases where MITRE or Mandiant & Others do not tag a
+TTP but describe the same behavior are reclassiﬁed as true
+positives, while four TTPs present in both sources remain
+genuine FNs of NEXUS. In total, NEXUS recover 51 TTPs
+missing from MITRE, many initially marked as FPs. After
+adjustment, NEXUS reaches around 62% precision, 95% recall,
+and 75% F1, matching the APT-report results in Table IV.
+NEXUS predicts across all 208 supported TTPs, ignoring seven
+unsupported ones in MITRE. Enabling model adaptation (Sec-
+tion IV-F) (without APT42-speciﬁc feedback) yields modest
+gains (precision +1.08%, recall +4.17%, F1 +1.74%). Overall,
+NEXUS effectively processes non-CVE threat reports, though
+using multiple reference sources improves completeness.
+D. Possible Uses
+1. Sufﬁciently Good Uses: NEXUSoutputs can be integrated
+into threat-intelligence platforms (e.g., OpenCTI), ATT&CK
+coverage tools (e.g., MITRE Navigator), and vulnerability-
+management systems (e.g., Qualys VMDR). These use cases
+beneﬁt from its stable, scalable CVE–TTP mappings (more
+details in Table XIV in Appendix D).
+2. Uses Requiring Analyst Veriﬁcation/Adjustment:The appli-
+cations in security design (e.g., rule derivation), threat-report
+analysis (e.g., APT reports), and case enrichment (e.g., SOC
+triage) require analyst supervision before applying NEXUS
+(more details in Table XV in Appendix D).
+3. Less Useful Uses:The security operation level applications,
+such as runtime intrusion detection and automated log-to-
+TTP correlation, requires more careful review before applying
+NEXUS, as it requires dynamic telemetry analysis rather
+than static textual inference (more details in Table XVI in

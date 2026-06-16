@@ -1,0 +1,21 @@
+Stated Limitations:
+- For example, LLM4SZZ achieves a recall of only 0.552 on the Linux ker- nel dataset, indicating that nearly half of the bug-inducing commits remain unidentified.
+- Thefundamental limitationis that existing SZZ algorithms rely heavily ongit blameto trace modified lines in bug-fixing com- mits.
+- Several challenges remain: ❶ agents struggle with tool selection, ❷ actions lack domain-specific guidance, and ❸ tool outputs can be large, leading to excessive token consumption, increased latency, and noisy context that may hinder reasoning.
+- These gains are especially pronounced in challenging scenarios such as cross-file and ghost commits, where recall improves by up to 300% and 60%, respectively, highlighting the ability ofAgentSZZto improve the fundamental limitations of blame-based methods.
+Threats to Validity:
+- LLM4SZZ [ 36] further leverages LLMs to assess blame candidates with expanded context, achieving state-of-the-art experiments on three widely used datasets show thatAgentSZZ consistently outperforms state-of-the-art SZZ algorithms across all settings, achieving F1-score gains of up to 27.2% over prior LLM- based approaches.
+Ethical Considerations:
+- [NEEDS EVIDENCE] ethics not detected
+Security / Misuse Discussion:
+- More recently, security code generation benchmarks also rely on SZZ algorithms to identify vulnerability-inducing commits [7].
+Responsible Disclosure:
+- [NEEDS EVIDENCE] responsible disclosure not detected
+Scope Boundaries:
+- RA-SZZ [24] further detects and filters refactoring operations using RefDiff [ 32] and Refactoring Miner [38], though this capability is limited to Java.
+- These tools were implemented as thin wrappers with only essential parameters (e.g., commit hash and file path), which often produced excessive outputs and led to inefficient investiga- tion.
+- To address this, we introduced scoped parameters (e.g., line ranges, file filters, and search bounds) to constrain the search space.
+Writing Pattern:
+- Separate dataset/tool limitations, generalizability, and artifact/reproducibility gaps.
+Relevance to Our Paper:
+- Useful for explicitly bounding affected-version claims and separating static evidence from execution/reproduction evidence.

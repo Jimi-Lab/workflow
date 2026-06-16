@@ -1,0 +1,22 @@
+ this method sometimes fails
+to accurately identify the bug-inducing commits. For instance,
+consider the commit 15273ffd7ef [38], which adds a new
+line ret = 0;. Our method generates two buggy statements:
+if (!ret) and return ret;. However, when locating
+the bug-inducing commit, the method encounters many state-
+ments like if (ret), which exhibit high line similarity but
+have completely different semantic meanings. This can lead to
+incorrect judgments and result in finding false bug-inducing
+commits. This issue is particularly prevalent when the buggy
+statements contain many short statements.
+Fig. 13. An example to show the effectiveness of program slicing.
+Failing to point out buggy statements correctly. Another
+main reason for the failure is that our method fails to point out
+buggy statements correctly. This issue is responsible for most of
+the remaining failing cases. F or instance, while the added line
+may influence the variable’s data flow, analyzing the affected
+variable’s data flow may not yield correct results.
+Consider the commit 072b30642f9[39], illustrated in Fig.12.
+This commit introduces a new code line at line 2, highlighted in
+green, impacting the data flow of the variabledrv. Our method,
+accordingly, compares its data flow with t

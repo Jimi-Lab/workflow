@@ -1,0 +1,254 @@
+{
+  "cwe_id": "CWE-441",
+  "name": "Unintended Proxy or Intermediary ('Confused Deputy')",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product receives a request, message, or directive from an upstream component, but the product does not sufficiently preserve the original source of the request before forwarding the request to an external actor that is outside of the product's control sphere. This causes the product to appear to be the source of the request, leading it to act as a proxy or other intermediary between the upstream component and the external actor.",
+  "extended_description": "If an attacker cannot directly contact a target, but the product has access to the target, then the attacker can send a request to the product and have it be forwarded to the target. The request would appear to be coming from the product's system, not the attacker's system. As a result, the attacker can bypass access controls (such as firewalls) or hide the source of malicious requests, since the requests would not be coming directly from the attacker. Since proxy functionality and message-forwarding often serve a legitimate purpose, this issue only becomes a vulnerability when: The product runs with different privileges or on a different system, or otherwise has different levels of access than the upstream component; The attacker is prevented from making the request directly to the target; and The attacker can create a request that the proxy does not explicitly intend to be forwarded on the behalf of the requester. Such a request might point to an unexpected hostname, port number, hardware IP, or service. Or, the request might be sent to an allowed service, but the request could contain disallowed directives, commands, or resources.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-610",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Externally Controlled Reference to a Resource in Another Sphere"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-668",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Exposure of Resource to Wrong Sphere"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product receives a request, message, or directive from an upstream component, but the product does not sufficiently preserve the original source of the request before forwarding the request to an external actor that...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "request",
+      "target",
+      "proxy",
+      "component"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "request",
+      "target",
+      "proxy",
+      "component",
+      "different",
+      "directly",
+      "upstream",
+      "source"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "A SoC contains a microcontroller (running ring-3 (least trusted ring) code), a Memory Mapped Input Output (MMIO) mapped IP core (containing design-house...",
+        "snippet": "The code in ring-3 (least trusted ring) of the microcontroller attempts to directly read the protected registers in IP core through MMIO transactions. However, this attempt is blocked due to the implemented access..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "A SoC contains a microcontroller (running ring-3 (least trusted ring) code), a Memory Mapped Input Output (MMIO) mapped IP core (containing design-house...",
+        "snippet": "The DMA core forwards this transaction with the identity of the code executing on the microcontroller, which is the original initiator of the end-to-end transaction. Now the transaction is blocked, as a result of..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-1999-0017",
+        "description": "FTP bounce attack. The design of the protocol allows an attacker to modify the PORT command to cause the FTP server to connect to other machines besides the attacker's.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-0017"
+      },
+      {
+        "reference": "CVE-1999-0168",
+        "description": "RPC portmapper could redirect service requests from an attacker to another entity, which thinks the requests came from the portmapper.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-0168"
+      },
+      {
+        "reference": "CVE-2005-0315",
+        "description": "FTP server does not ensure that the IP address in a PORT command is the same as the FTP user's session, allowing port scanning by proxy.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-0315"
+      },
+      {
+        "reference": "CVE-2002-1484",
+        "description": "Web server allows attackers to request a URL from another server, including other ports, which allows proxied scanning.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-1484"
+      },
+      {
+        "reference": "CVE-2004-2061",
+        "description": "CGI script accepts and retrieves incoming URLs.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-2061"
+      },
+      {
+        "reference": "CVE-2001-1484",
+        "description": "Bounce attack allows access to TFTP from trusted side.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1484"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

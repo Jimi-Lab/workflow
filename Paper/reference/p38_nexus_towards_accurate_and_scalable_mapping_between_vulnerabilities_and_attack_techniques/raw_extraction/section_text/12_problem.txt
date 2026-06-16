@@ -1,0 +1,68 @@
+Problem
+Inaccurate/incomplete rules and empty fields
+Benefit
+More accurate/complete rules and less empty fields
+Fig. 21: Analyst’s detection rule before and after reﬁnement
+with NEXUS’s suggestions.
+via crafted PowerShell commands, creating an unauthorized
+administrator account.
+Step 1: CVE Detection and Attack Execution.The attacker
+logs in as a standard user and runs a PowerShell script adapted
+from the public PoC [78], [79], which sends a malicious
+request to the Druva inSync service. The request triggers a
+path traversal, causing Druva to spawn a SYSTEM-level child
+process that executes attacker-controlled commands (creating
+an admin user viacmd.exe). All relevant process, command-
+line, and PowerShell logs are sent to Elasticsearch for analysis.
+Step 2: Deriving Detection Rules (Sigma Rule Generation).
+Figure 21 compares two approaches for deriving detection
+rules:
+Without NEXUS: The analyst drafts a Sigma rule for the
+observed chain (druva.exe → cmd.exe), but it lacks
+context: it omits path-traversal indicators (e.g., ..\..\..
+in arguments), misses alternate vectors such as PowerShell,
+and excludes relevant ATT&CK tags (e.g., T1059 and T1203),
+leaving detection and mitigation ﬁelds incomplete.
+With NEXUS: The analyst uses NEXUS to retrieve relevant
+TTPs (e.g., T1059 and T1203) and example Sigma rules [81]–
+[83]. These outputs highlight the need to monitor path-
+traversal patterns (..\..\..) in Druva arguments and to
+include PowerShell as an additional vector. The reﬁned Sigma
+rule covers bothcmd.exe and powershell.exe, matches
+suspicious command-line content, and incorporates ATT&CK
+tags plus relevant detection and mitigation references.
+Step 3: Alert Generation and Investigation.Figure 22 shows
+12
+
+===== Page 013 =====
+Investigating Alerts
+Alert Report (Excerpt)
+----------------------
+Rule: Suspicious druva.exe spawning cmd.exe
+Findings:
+- Process chain detected: druva.exe -> cmd.exe
+- Related logs: [Generic process creation]
+- No further context (possible false positive: could be
+  admin tool usage)
+- Attack Techniques: [Not specified]
+- Detection: [Not specified]
+- Mitigation: [Not specified]
+Without NEXUS
+Alert Report (Excerpt)
+----------------------
+Rule: Exploitation of Druva inSync CVE-2020-5752 via 
+          path traversal
+Findings:
+- Process chain: 
+     PowerShell à connects to 127.0.0.1:6064 à triggers
+     Druva inSync path traversal to execute cmd.exe
+- Related logs: (highlight key event)
+   * "Execute a Remote Command" via PowerShell
+   * cmd.exe run via path traversal: Druva\inSync4\..\..\..\
+      Windows\System32\cmd.exe /c net user pwnd /add
+   * cmd.exe adds localgroup Administrators
+- Attack Techniques: T1059 (Command & Scripting Interpreter),
+           T1203 (Exploitation for Client Execution), ...
+- Detection: [Link to ATT&CK Detection DS0017, DS0015, ...]
+- Mitigation: [Link to ATT&CK Mitigation M1038, M1048, ...]
+With NEXUS

@@ -1,0 +1,77 @@
+1 Introduction
+Identifying the commit that introduced a bug, known as the Bug-Inducing Commit (BIC), is a
+foundational task in software maintenance. Accurate BIC identification enables understanding when
+and how bugs are introduced [2, 3, 17, 18], supports defect prediction models [11, 15, 27, 34, 44], and
+guides history-aware automated program repair systems [30] toward effective patches by providing
+Authors’ Contact Information: Yu Shi, Queen’s University, Kingston, Canada, y.shi@queensu.ca; Hao Li, Queen’s University,
+Kingston, Canada, hao.li@queensu.ca; Bram Adams, Queen’s University, Kingston, Canada, bram.adams@queensu.ca;
+Ahmed E. Hassan, Queen’s University, Kingston, Canada, hassan@queensu.ca.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee
+provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the
+full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored.
+Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires
+prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM XXXX-XXXX/2026/2-ART
+https://doi.org/10.1145/nnnnnnn.nnnnnnn
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+arXiv:2602.02934v1  [cs.SE]  3 Feb 2026
+
+===== Page 002 =====
+2 Yu Shi et al.
+precise historical context. For two decades, the dominant BIC identification approach has been the
+SZZ algorithm [32] and its variants [7, 8, 19, 24, 35, 36], which trace deleted (and modified) code
+in a bug-fixing commit (BFC) via git blame to identify commits that last modified those lines.
+Presumably, one or more of those commits are the BIC.
+While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify
+the same code elements [42], this assumption does not always hold: prior work has shown that over
+13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain
+only added lines where blame cannot be applied [23]. As the git blamemechanism constrains the
+search space to commits that directly touched the fixed lines, it misses BICs introduced through
+earlier code that was subsequently refactored [ 24, 25], or bugs in related code where the fix
+addresses the issue by adding new functionality. Despite these fundamental limitations, prior work
+has focused primarily on improving precision of the git blame-based approach through filtering
+heuristics [7, 19], refactoring detection [24, 25], deep learning [35], semantic analysis [4, 37], and
+LLM-based reasoning [36], leaving the recall problem unaddressed.
+Our key insight is that BIC identification is not a ranking problem over a static list of
+blame candidates, but a search problem over a temporal graph of the commit history.A
+commit does not exist in isolation; each change builds upon previous code snapshots, forming a
+causal chain where later commits depend on earlier ones. When a blame commit merely reformatted
+code or made cosmetic changes, the actual bug may have been introduced by an earlier commit in
+this chain, or a later one. Identifying such BICs requires traversing the commit history: for example,
+following file modifications preceding or succeeding from a blame commit to find the commit that
+originally introduced the buggy logic. Temporal Knowledge Graphs (TKGs) are well-suited for
+this task because they explicitly encode the temporal dimension alongside structural relationships
+(shared files, functions, authors), enabling principled exploration of the commit history while
+respecting causality constraints. While knowledge graphs have been successfully applied to various
+software engineering tasks such as automated program repair [5, 45], bug localization [21], and
+crash solution recommendation [10], they have not yet been applied to BIC identification.
+To expand the search space beyond direct blame results, we present AgenticSZZ, a novel approach
+that structures the BIC search space using a TKG and navigates it with an LLM agent. AgenticSZZ
+operates in two phases:
+•TKG Construction:Given a bug-fixing commit, we build a graph encoding commits as
+nodes with temporal ordering and code structure connections (shared files and functions).
+Starting from two reference points, we expand the search space by traversing file history
+backward: from blame commits to capture earlier bug introductions, and from the BFC to
+capture commits that may have transformed correct code into buggy code.
+•Agentic BIC Search:An LLM agent navigates the TKG using four specialized tools for
+candidate enumeration, structural traversal, property queries, and causal analysis. The agent
+reasons about which commits could have introduced the bug by examining code changes
+and their relationships.
+We evaluate AgenticSZZ on the same datasets used in prior work [36], comprising 2,102 validated
+BFC-BIC pairs. AgenticSZZ achieves F1-scores of 0.48 to 0.74 across datasets, outperforming the
+eight baselines by up to 27%. Our ablation study demonstrates that both the TKG and agent
+components are essential: TKG-only expansion introduces noise without intelligent filtering, while
+the agent alone (without the TKG) is limited to blame-derived candidates. This paper makes the
+following contributions:
+•A preliminary study characterizing where ground truth BICs are located relative to blame
+commits, revealing that 28% require commit history traversal and 14% are blameless.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 003 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 3
+•AgenticSZZ, the first approach to apply Temporal Knowledge Graphs to software evolution
+analysis, reframing BIC identification as a graph search problem and enabling identification
+of BICs beyond the blame-defined candidate set.
+•Comprehensive evaluation demonstrating state-of-the-art performance, with ablation analysis
+validating the contribution of each component.

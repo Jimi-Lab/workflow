@@ -1,0 +1,413 @@
+5 Evaluation
+In this section, we evaluateMOVERY . Section 5.1 investigates
+how accurately MOVERY discovers VCCs in modified com-
+ponents, compared to existing VCC discovery techniques (i.e.,
+VUDDY [17] and ReDeBug [14]). Section 5.2 and Section
+5.3 compare MOVERY to the recurring vulnerability detection
+technique (i.e., MVP [49]) and the SCA-based technique (i.e.,
+CENTRIS [48]), respectively, We evaluate the speed and scal-
+ability of MOVERY in Section 5.4, and introduce the efficacy
+of the search space reduction in Section 5.5. Finally, Section
+5.6 presents a case study observed in our experiments. We
+ran MOVERY on a machine with Ubuntu 16.04, Intel Xeon
+Processor @ 2.40 GHz, 32GB RAM, and 6TB HDD.
+3044    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 010 =====
+Table 3: Target software overview.
+IDX Name Version #Line ∗ #Comp† Domain
+T1 FreeBSD v12.2.0 14,489,534 47 Operating system
+T2 ReactOS v0.4.13 6,419,855 23 Operating system
+T3 ArangoDB v3.7.9 3,064,973 22 Database
+T4 FFmpeg n4.3.2 1,230,520 4 Multimedia processing
+T5 OpenCV v4.5.1 1,092,317 15 Computer vision
+T6 Emscripten v2.0.15 759,020 11 Compiler
+T7 Crown v0.42.0 723,372 20 Game engine
+T8 Git v2.31.0 293,467 5 Version control system
+T9 OpenMVG v1.6 262,610 8 Image processing
+T10 Redis v5.0.12 212,672 8 Database
+Total - - 28,548,340 190 -
+*: Counting only C/C++ code lines, †: The number of modified OSS components.
+5.1 Accuracy of M OVERY
+Target software selection. We selected target software based
+on the following three criteria to claim the generality of
+MOVERY : they (1) should be popular C/C++ OSS, (2) should
+contain a sufficient number of modified components, and (3)
+should not be biased toward any particular domain.
+We first collected C/C++ repositories from GitHub that
+exhibit more than 1,000 stargazer counts, i.e., a popularity
+indicator on GitHub. We then leveraged CENTRIS [48] to
+rank the collected software based on the number of modified
+OSS components. While examining the ranked software in
+descending order, we selected target software for which one
+or more VCCs were discovered by MOVERY .
+Table 3 summarizes the selected ten target software pro-
+grams. They were selected based on clear criteria, were ob-
+tained from diverse domains and had various code sizes (i.e.,
+ranging from 212,672 to 14,489,534 C/C++ lines of code),
+thus we decided that the selected target software can add gen-
+erality to the experiments. Note that the cumulative code size
+of our dataset is 80 times larger than that used in VUDDY [17],
+and almost the same as the dataset used in MVP [49].
+Methodology. We selected two VCC discovery techniques
+for accuracy comparison: ReDeBug [14] and VUDDY [17].
+We applied MOVERY , ReDeBug, and VUDDY to ten target
+software and evaluated the VCC discovery results. We used
+ReDeBug and VUDDY with their default options by referring
+to their papers [14, 17]. We selected θ as 0.5 in MOVERY
+(related experiments are introduced at the end of this section).
+To evaluate the accuracy, we used the following five met-
+rics: true positives (TP), false positives (FP), false negatives
+(FN), precision ( #TP
+#TP+#FP ), and recall ( #TP
+#TP+#FN ). Because it
+is infeasible to find every vulnerable code in the target soft-
+ware, we cannot easily determine FNs. Therefore, we only
+measure indisputable FNs; for example, FNs of MOVERY are
+the VCCs (i.e., not FPs) detected by VUDDY and ReDeBug
+but not discovered in MOVERY [17, 49]. TPs and FPs are de-
+termined by manual verification performed by two security
+analysts. We manually viewed the discovered VCCs and the
+environment where the vulnerability manifested to determine
+whether the discovered VCC is correct.
+Listing 8: A patch snippet for CVE-2014-9669 in FreeType2.
+1 tt_cmap12_validate (...) {
+2 num_groups = TT_NEXT_ULONG( p );
+3 if ( length > (FT_ULong)( valid->limit - table ) ||
+4 - length < 16 + 12 * num_groups )
+5 + /* length < 16 + 12 * num_groups ? */
+6 + length < 16 ||
+7 + ( length - 16 ) / 12 < num_groups )
+Listing 9: The oldest vulnerable function snippet for CVE-2014-
+9669. Highlighted areas indicate the code parts that differ from
+the disclosed vulnerable function.
+1 // Extracted from FreeType2 v2.1.10 ("./src/sfnt/ttcmap.c").
+2 tt_cmap12_validate (...) {...
+3 num_groups = TT_NEXT_ULONG( p );
+4 if ( table + length > valid->limit || length < 16 + 12 *
+num_groups )
+Overview of accuracy measurement. Table 4 summarizes
+the VCC discovery results of MOVERY , VUDDY , and ReDe-
+Bug. The discovered 434 VCCs were found from 121 CVEs.
+Specifically, CVE vulnerabilities that were discovered in Re-
+actOS contained many vulnerable functions, thus the number
+of discovered VCCs was considerable.
+Owing to the OSS modifications, 396 VCCs (91%) existed
+in a different syntax to the disclosed vulnerable function. Nev-
+ertheless, MOVERY discovered 415 VCCs with 96% preci-
+sion and 96% recall, whereas ReDeBug discovered 163 VCCs
+with 65% precision and 38% recall and VUDDY discovered
+72 VCCs with 77% precision and 17% recall (Appendix A
+presents the modification types and Appendix B provides the
+severity and vulnerability types of the discovered VCCs).
+Notably, the VCC discovery results of MOVERY included
+all VCCs discovered by VUDDY , and covered 144 (88%)
+VCCs discovered by ReDeBug, whereas VUDDY and ReDe-
+Bug were only able to cover 72 (17%) and 144 (35%) VCCs
+discovered by MOVERY , respectively.
+FNs of ReDeBug and VUDDY.Existing techniques failed
+to discover many VCCs owing to the OSS modifications. Re-
+DeBug did not discover 271 VCCs (62.4%) where the code
+lines deleted in the security patch did not exist, or the code
+syntax was modified beyond what ReDeBug could handle.
+VUDDY failed to discover 362 VCCs (83.4%), in which modi-
+fications occurred in code parts other than that VUDDY could
+address (e.g., Type-3 clones). An example is CVE-2014-9669,
+an integer overflow vulnerability that exists in FreeType2 (see
+Listing 8). We confirmed that line #4 in Listing 8 (i.e., defined
+as the vulnerable line by ReDeBug and VUDDY) existed in
+the oldest vulnerable function as a different syntax (i.e., line
+#4 in Listing 9) because of the internal OSS modification,
+resulting in yielding FNs of ReDeBug and VUDDY .
+FPs of ReDeBug and VUDDY.The reasons for FPs in
+ReDeBug were the lack of code normalization and the ex-
+clusion of function semantics. Security patch may contain
+non-security changes (e.g., comments changes). Owing to the
+lack of code normalization, ReDeBug misinterpreted that the
+USENIX Association 31st USENIX Security Symposium    3045
+
+===== PAGE 011 =====
+Table 4: Accuracy of ReDeBug, VUDDY, and MOVERY in vulnerable code clone discovery.
+Target software #Discovered
+VCCs
+ReDeBug VUDDY M OVERY
+#TP #FP #FN Precision Recall #T P #FP #FN Precision Recall #T P #FP #FN Precision Recall
+ReactOS 210 31 9 179 0.78 0.15 8 0 202 1.00 0.04 207 3 3 0.99 0.99
+OpenCV 72 38 15 34 0.72 0.53 26 2 46 0.93 0.36 72 3 0 0.96 1.00
+Emscripten 56 22 8 34 0.73 0.39 9 1 47 0.90 0.16 50 4 6 0.93 0.89
+FreeBSD 33 25 44 8 0.36 0.76 6 16 27 0.27 0.18 27 4 6 0.87 0.82
+Crown 23 22 2 1 0.92 0.96 14 2 9 0.88 0.61 23 2 0 0.92 1.00
+OpenMVG 23 15 5 8 0.75 0.65 4 0 19 1.00 0.17 19 0 4 1.00 0.83
+ArangoDB 6 4 1 2 0.80 0.67 2 0 4 1.00 0.33 6 2 0 0.75 1.00
+FFmpeg 5 2 2 3 0.50 0.40 0 1 5 0.00 0.00 5 1 0 0.83 1.00
+Redis 5 3 0 2 1.00 0.60 3 0 2 1.00 0.60 5 0 0 1.00 1.00
+Git 1 1 1 0 0.50 1.00 0 0 1 N/A 0.00 1 0 0 1.00 1.00
+Total 434 163 87 271 0.65 0.38 72 22 362 0.77 0.17 415 19 19 0.96 0.96
+Table 5: VCCs that are hardly discovered by existing techniques.
+Types Description
+T1 VCCs without code lines deleted in security patches.
+T2 VCCs with various syntaxes derived from fo.
+T3 VCCs with heavy syntax change.
+Listing 10: A patch snippet for CVE-2017-14039 in OpenJPEG.
+1 static OPJ_BOOL opj_j2k_write_sot(opj_j2k_t *p_j2k, ...,
+2 const opj_stream_private_t *p_stream,
+3 opj_event_mgr_t * p_manager){
+4 ...
+5 OPJ_UNUSED(p_stream);
+6 - OPJ_UNUSED(p_manager);
+code to which non-security changes were not applied to be
+vulnerable. In addition, ReDeBug misinterpreted a patched
+function as vulnerable when the last few added code lines are
+the same as the code lines before the added code lines [17,49].
+The FPs of VUDDY were caused by abstraction; if a security
+patch only fixes VUDDY’s abstraction targets (e.g., variable
+names), VUDDY cannot differentiate between vulnerable and
+patched functions, producing FPs.
+The accuracy ofMOVERY . Table 5 summarizes the types
+of VCCs that were discovered by MOVERY but hardly discov-
+ered by ReDeBug and VUDDY . Among the 396 VCCs (TPs)
+discovered by MOVERY , 32 VCCs (8%) belonged to T1, and
+221 VCCs (56%) showed a higher code similarity withfo than
+that with fd (T2); 166 of 221 VCCs exhibited that the code
+similarity with fd was less than 50% (T3). Because MOVERY
+can address the modified OSS reuse, it could discover such
+VCCs. Using selective abstraction, MOVERY could eliminate
+21 out of 22 FPs reported by VUDDY .MOVERY could dis-
+cover 34 Type-2 [34] VCCs that ReDeBug could not discover.
+However, MOVERY produced FPs when the abstraction
+was applied to similar code lines in a function. For example,
+after applying abstraction, both lines #5 and #6 in Listing 10
+are converted to “FCALL(PARAM);”. Hence, even if the patch
+was applied, MOVERY misinterpreted that the vulnerable line
+still existed, producing an FP. Another reason for FPs is syn-
+tactically similar functions. Suppose that security patches p
+and p′ are applied to syntactically similar functions f and f ′,
+respectively. In such rare cases, MOVERY misinterprets that
+p′ (resp. p) is not applied to f (resp. f ′), producing FPs.
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+ReactOS OPENCV EMSCRIPTEN FreeBSD CROWN
+OpenMVG ArangoDB FFmpeg Redis Git
+0.10 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+F1-score
+Threshold
+Figure 3: Experimental results for measuring efficiency of θ.
+MOVERY reported FNs when semantically similar but syn-
+tactically changed code appeared (e.g., for → while), or when
+the similarity between a VCC and the vulnerable function
+was less than θ. However, simply decreasing θ may yield
+more FPs; we believe that the current MOVERY approach
+offers a good balance of precision and recall, as MOVERY
+significantly outperformed existing techniques.
+Threshold sensitivity.We used the θ value as 0.5 in the
+VCC discovery experiments. To measure threshold sensitivity,
+we evaluated each VCC discovery result of MOVERY while
+increasing θ by 0.1 from 0 to 1. Because it is infeasible to
+verify the numerous newly discovered VCCs, we measured
+the precision and recall with each θ based on the previously
+discovered 434 VCCs. In addition, we evaluated each θ by
+measuring the F1-score [45]
+ 2∗precision∗recall
+precision+recall
+
+, as we focused
+on the balance between precision and recall.
+Figure 3 presents the measurement results. We confirmed
+that the F1-score appeared the highest when θ was 0.5. For
+Crown and Emscripten, the F1-score was higher when θ is
+greater than 0.5; this is because the ratio of modified VCCs
+was small and thus FPs decreased at higher θ. Overall, the
+precision drops when θ is less than 0.5, while recall decreases
+when θ is greater than 0.6. Hence, we believe that θ of 0.5
+maintains a good balance between high precision and recall.
+One thing to note is that MOVERY can discover 15 VCCs
+that were not discovered in the previous experiments when it
+utilizes θ less than 0.5. In contrast, MOVERY still produces
+4 FNs and 3 FPs even when θ is 0 and 1, respectively; we
+discuss this issue in Section 6 in detail.
+3046    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 012 =====
+Table 6: VCC discovery results of MVP and CENTRIS .
+Name #VCCs ∗ #TP #FP #FN #Unique† Precision Recall
+MVP 266 220 46 184 8 0.83 0.54
+CENTRIS 553 281 272 152 37 0.51 0.65
+*: #VCCs discovered for ten target software, †: #VCCs not discovered by MOVERY .
+5.2 Comparison with MVP
+We then compare MOVERY with MVP [49], a recurring vul-
+nerability detection technique, to demonstrate that MOVERY
+is more effective in discovering VCCs from modified compo-
+nents. Since MVP is not available owing to the commercial
+issue, we implemented MVP based on their paper [49] with
+their default options.
+Result analysis. When we applied MVP to ten target software,
+it discovered 220 VCCs (i.e., TPs) while reporting 46 FPs and
+184 FNs (see Table 6). It is noteworthy that MVP hardly dis-
+covered VCCs belonging to T1 and T2 (see Table 5), because
+MVP does not consider internal OSS modifications. MVP can
+only discover VCCs that contain all the code lines deleted
+from the security patch, and therefore it failed to discover 32
+VCCs that do not contain such deleted code lines ( T1). In
+addition, MVP failed to discover 142 VCCs with various syn-
+taxes derived from fo (T2). Specifically, variable types and
+caller function names in vulnerable functions are frequently
+changed during internal OSS modifications; MVP does not
+consider such changes, thereby yielding FNs. The remaining
+FNs were caused by semantically similar but syntactically
+changed code and threshold issues, similar to MOVERY .
+MVP produced 46 FPs owing to the (1) syntactically simi-
+lar functions and (2) the abstraction method. MVP misinter-
+preted a safe function as vulnerable when the function has a
+similar syntax to the vulnerable function but is semantically
+different (11 FPs). The remaining 35 FPs were caused by
+the abstraction method: if the security patch only fixes the
+abstraction targets of MVP (e.g., variable names), MVP fails
+to differentiate between a vulnerable function and a patched
+function, producing FPs. Note that MOVERY could eliminate
+31 of 35 FPs by utilizing the selective abstraction method.
+Finally, MVP discovered 8 VCCs that MOVERY misses;
+all of these are VCCs with syntax similarities less than θ to
+the disclosed vulnerable functions; two of these VCCs were
+also not found in VUDDY and ReDeBug.
+Our analysis results affirmed that MVP, which is not ca-
+pable of addressing internal OSS modifications, may not be
+effective in discovering VCCs from modified components as
+it reported much more FNs (i.e., 184 FNs) than MOVERY .
+Threats to validity. Although we implemented MVP based
+on their paper, some functions may not be reproduced per-
+fectly. In addition, the purpose of MVP is to detect recur-
+ring vulnerabilities and not to discover propagated vulnerable
+codes. Our intention is not to deny the effectiveness of MVP,
+but to demonstrate that MOVERY is more efficient in discov-
+ering VCCs from modified components.
+5.3 Comparison with C ENTRIS
+Several existing approaches ( e.g., [9, 48]), including com-
+mercial tools such as Trivy [1] and Black Duck [38], have
+attempted to discover vulnerabilities contained in OSS com-
+ponents by clarifying reused OSS components and their ver-
+sions. However, they do not seem to consider the modified
+OSS reuse, and further, they do not disclose detailed vulnera-
+bility discovery algorithms (even their algorithms frequently
+change). Hence, we decided to compare the VCC discov-
+ery results of MOVERY with CENTRIS [48], a recent SCA
+technique for identifying modified OSS components.
+To investigate the vulnerabilities that affect the identified
+components, we utilized the “product search” and “version
+search” provided by CVE Details [7], i.e., functionalities for
+providing CVEs that affect a given software name and version.
+For every component identified in each target software, we in-
+vestigated CVEs affecting the component and then considered
+them the VCCs discovered by CENTRIS .
+Result analysis. In our experiments, CENTRIS -based ap-
+proach discovered 553 VCCs in ten target software, of which
+272 (49%) VCCs were confirmed to be FPs (see Table 6).
+Such FPs occurred when: (1) the vulnerable code was not
+reused, or (2) the vulnerable code was patched through back-
+porting (an example is introduced in Section 2.2).
+Furthermore, the CENTRIS -based approach failed to dis-
+cover 152 (38%) out of 396 VCCs discovered byMOVERY , es-
+pecially when (1) there is a vulnerability in a component that
+CENTRIS failed to identify, or (2) CENTRIS predicted incor-
+rect version information. Finally, CENTRIS -based approach
+discovered 37 VCCs that were not discovered by MOVERY .
+We observed that all of them were the cases where security
+patches did not be released via Git; if these patches are added
+to our dataset, MOVERY can also discover them.
+Consequently, we confirmed that discovering vulnerabili-
+ties simply based on the component name and version pro-
+duced many false results, especially FPs (i.e., 272 FPs), owing
+to the OSS modifications. This demonstrates that MOVERY
+considerably outperformed the SCA-based approach in terms
+of discovering vulnerabilities from modified components.
+5.4 Speed and scalability of M OVERY
+In this section, we evaluate the speed and scalability of
+MOVERY in VCC discovery. We classify the total time tak-
+ing to discover VCCs into signature generation (i.e., the
+elapsed time for generating signatures), target preprocessing
+(i.e., the elapsed time for analyzing the target software), and
+matching times (i.e., the elapsed time required to discover the
+VCCs). We measured all the times for MOVERY , ReDeBug,
+and VUDDY , and then compared the results.
+Signature generation time. The signature generation time
+using the collected 4,219 security patches (see Table 2) was
+2 h in VUDDY and 32 h in MOVERY ; because ReDeBug
+USENIX Association 31st USENIX Security Symposium    3047
+
+===== PAGE 013 =====
+(a) Target preprocessing times.
+ (b) Matching times.
+ (c) Total times (preprocessing + matching).
+Figure 4: Target preprocessing and matching time spent on target software with various sizes.
+utilized the security patches as they were, there was no need
+for signature generation time. Unlike VUDDY , which simply
+extracts vulnerable functions, MOVERY required more time
+as it needed to reconstruct the oldest vulnerable functions and
+analyze the code line dependencies of functions; note that the
+signature generation is a one-time task.
+Target preprocessing and matching times.Figure 4 shows
+the target preprocessing and matching times for the three tools.
+The results present the following three main observations.
+(1) VUDDY requires the longest target preprocessing time.
+(2) MOVERY requires the longest matching time.
+(3) In total elapsed time,MOVERY requires the least amount
+of time and VUDDY requires the longest time (owing to
+its long preprocessing time).
+To precisely discover VCCs,MOVERY used the finer granular-
+ity (i.e., a set of code lines) that is slower than function units
+in VCC discovery [17], and further considered dependencies
+of code lines in matching, resulting in a longer matching time
+than ReDeBug and VUDDY . Nevertheless, (1) target prepro-
+cessing and matching could be performed within 200 s in
+MOVERY per target software (i.e., the fastest among the three
+tools) and (2) the time was not significantly increased even
+when the lines of code of the target software varied from
+213 K to 14.5 M (see Table 3), suggesting that MOVERY is
+sufficiently fast and scalable for practical use.
+5.5 Efficacy of the search space reduction
+To reduce the VCC search space, MOVERY focuses only on
+the borrowed code parts of the target software. Here we eval-
+uate the efficacy of the search space reduction technique.
+Scalability improvement. The cumulative number of direc-
+tories and code lines in ten target software were 539,781 and
+28,548,340, respectively. When considering only borrowed
+code parts, the number of directories decreases to 375,489
+(70%), and the number of code lines to be scanned was re-
+duced by 15,130,620 (53%), suggesting that MOVERY can
+skip approximately half of the software’s codebase that does
+not need to be scanned, which ensures higher scalability.
+Accuracy enhancement. In addition, we confirmed that fo-
+cusing on borrowed code parts can reduce FPs in VCC discov-
+ery. Existing approaches search VCCs for the entire codebase;
+searching for “propagated” VCCs outside the “reuse” code
+regions makes existing approaches misinterpret a function,
+which has similar syntax but completely different semantics
+with vulnerability signature, as a VCC, thereby producing
+more FPs. Quantitatively, 3 FPs and 24 FPs of VUDDY and
+ReDeBug were discovered outside of the “reuse” code re-
+gions, respectively. MOVERY was able to reduce such FPs by
+considering only the vulnerabilities of the reused OSS and
+the code parts where the OSS exists.
+5.6 Case study: Vulnerability in Git
+MOVERY discovered that the fix for CVE-2019-9169 ( i.e.,
+a heap-based buffer over-read vulnerability existed prior to
+Glibc v2.30) is not applied to the latest version of Git, which
+is one of the most popular version control systems. Since
+Git reused an older version of Glibc earlier than v2.27, the
+syntax of the VCC discovered in Git was quite different (i.e.,
+the syntax similarity was 65%) from that specified in the
+disclosed patch for CVE-2019-9169. Worse, we confirmed
+that this vulnerability can still cause memory leaks in the
+latest version of Git. We responsibly reported this to the Git
+team; they confirmed our report and replied that it will be
+addressed in a later task because they determined that this
+vulnerability does not presently pose a serious threat (we
+discuss responsible vulnerability disclosure in Section 6).

@@ -1,0 +1,69 @@
+results with analyst feedback, without retraining.
+B. Ground Truth Building
+We construct the initial CVE-to-TTP mapping by leveraging
+the structured CVE–CWE–CAPEC–TTP relationships pro-
+vided in the NIST [44] and MITRE [2] knowledge bases. Each
+CVE is ﬁrst linked to its corresponding CWE entries, which
+describe the vulnerability type. These CWEs are then mapped
+to CAPEC attack patterns, which in turn are associated with
+MITRE ATT&CK TTPs [2]. When a CAPEC lacks a direct
+TTP link, we inherit TTPs from its parent CAPECs to maintain
+coverage. All data is collected from the NVD, CWE, CAPEC,
+and ATT&CK repositories [45]–[48] and standardized into
+CSV , JSON, and STIX formats for integration. This entire
+mapping workﬂow runs automatically without any manual an-
+notation. To further improve TTP coverage, we apply the label-
+adjustment sub-step using generative models (Section III-D1),
+which corrects errors and recovers missing techniques.
+Figure 3a and 3b show CVE and TTP distributions across 13
+ATT&CK tactics, with Defense Evasion most common (31.6%
+of CVEs, 25.1% of TTPs), followed by Persistence, Privilege
+(a) Distribution of 92,632 CVEs
+across 13 enterprise tactics.
+(b) Distribution of 141 TTPs
+across 13 enterprise tactics.
+(c) Total supported CVEs per knowledge base by CVE publication
+year (Jan 1999–May 2024).
+Fig. 3: Summary of our initial labelled dataset.
+Escalation, Credential Access, and Discovery. Many CVEs
+and TTPs span multiple tactics, reﬂecting their interconnected
+nature. Figure 3c shows that newer CVEs map to more TTPs
+due to additional CWE and CAPEC associations.
+Example 1. Figure 4 shows the mapping of
+CVE-2024-4985 by matching the corresponding IDs:
+the CVE description indicates the related CWE, CWE-303
+(authentication bypass), the CWE description indicates the
+related CAPEC, CAPEC-114 (authentication abuse), and
+the CAPEC points to the TTP T1548 (Abuse Elevation
+Control Mechanism). This mapping reﬂects the nature of the
+vulnerability itself: an authentication ﬂaw enables privilege
+escalation, which logically aligns with the corresponding
+TTP.
+3
+
+===== Page 004 =====
+Data_Type: CVE
+...
+...
+CVE_Data_Meta:
+ID: cve-2024-4985
+...
+ProblemType:
+...
+Value: CWE-303
+...
+Lang: en
+Description:
+...
+An authentication bypass  vulnerability ...
+allowed an attacker to forge a SAML
+response to ... gain access to a user with
+site administrator privileges ...
+PublishedDate: 
+        2024-10-21T13:15Z
+...
+CVEs
+CWE-ID: 303
+...
+Name: 
+Incorrect

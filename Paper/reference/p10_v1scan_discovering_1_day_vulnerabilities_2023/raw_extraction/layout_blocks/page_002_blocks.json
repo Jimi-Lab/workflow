@@ -1,0 +1,317 @@
+[
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:001",
+    "block_type": "text",
+    "text": "Given a target program, V1SCAN first detects vulnerabili-\nties based on the identified OSS versions. To focus only on\nreused vulnerabilities, V1SCAN uses a reused code classifica-\ntion technique that divides reused OSS functions into three\ngroups: exactly reused, changed, and unused. By filter-\ning out unused and repaired vulnerable functions, V1SCAN\nreduces false alarms of the existing version-based approaches.\nV1SCAN complements vulnerability detection results us-\ning a code-based approach. To expand vulnerability detec-\ntion coverage, V1SCAN first clarifies vulnerability locations\n(function, structure, macro, or variable) using a vul-\nnerable code classification technique, and then detects propa-\ngated vulnerabilities for each location. Here, V1SCAN only\nconsiders the core lines directly related to the vulnerability to\ncounter code changes caused by modified OSS reuse, thereby\naddressing false negatives of existing code-based approaches.\nFinally, V1SCAN confirms the propagated vulnerabilities\nin the target program by consolidating the results of the im-\nproved version- and code-based approaches.",
+    "bbox": [
+      53.67,
+      72.76,
+      295.87,
+      299.96
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:002",
+    "block_type": "text",
+    "text": "Evaluation. For the experiment, we collected 4,612 CVE\npatches from the National Vulnerability Database (NVD) [22]\nand gathered Common Platform Enumeration (CPE) [21] on\n137,892 CVE vulnerabilities. We evaluated V1SCAN using\npopular C/C++ software on GitHub.\nWhen we applied the V1SCAN, MOVERY [34], and\nV0Finder [35] to the selected ten target programs, V1SCAN\ndetected 50% more vulnerabilities (137 vulnerabilities) than\nthe existing approaches, achieving a precision of 96% and\na recall of 91% (see Section 5.1). It is remarkable that\nV1SCAN could reduce the false negative rate of MOVERY and\nV0Finder from 40% and 55% to 9%. Furthermore, V1SCAN\ncould discover more propagated vulnerabilities than the com-\nbined results of existing version- [14] and code-based [36]\napproaches, while reducing the false positive rate from 71%\nto 4% and the false negative rate from 33% to 7% (see Section\n5.2). Moreover, when we applied V1SCAN to 4,434 popular\nC/C++ software (ranging from 1K to 20M lines of code),\nV1SCAN could detect vulnerabilities within 20 seconds for\neach software (excluding preprocessing time), indicating that\nV1SCAN is sufficiently fast for practical use (see Section 5.3).",
+    "bbox": [
+      53.25,
+      303.55,
+      295.86,
+      555.01
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:003",
+    "block_type": "text",
+    "text": "Contributions. We summarize our contributions below.",
+    "bbox": [
+      54.0,
+      561.59,
+      276.88,
+      574.56
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:004",
+    "block_type": "text",
+    "text": "• We propose V1SCAN, a new approach for precisely de-\ntecting 1-day vulnerabilities in a target program. The\nkey technical contribution is the effective integration of\nversion- and code-based approaches by leveraging the\nclassification of reused and vulnerable code.",
+    "bbox": [
+      63.96,
+      575.19,
+      295.78,
+      635.01
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:005",
+    "block_type": "text",
+    "text": "• We examined the manner in which modified OSS reuse\naffects the vulnerability discovery process, and propose\nan effective solution for detecting vulnerabilities in mod-\nified C/C++ OSS components.",
+    "bbox": [
+      63.96,
+      637.01,
+      295.78,
+      684.88
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:006",
+    "block_type": "text",
+    "text": "• V1SCAN discovered 137 vulnerabilities in ten target\nprograms with 96% precision and 91% recall, thereby\noutperforming existing approaches.",
+    "bbox": [
+      63.96,
+      686.88,
+      294.47,
+      722.8
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:007",
+    "block_type": "text",
+    "text": "2\nTerminology and motivation",
+    "bbox": [
+      317.88,
+      70.49,
+      480.6,
+      86.04
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:008",
+    "block_type": "text",
+    "text": "2.1\nBasic terminology",
+    "bbox": [
+      317.88,
+      94.74,
+      436.76,
+      110.3
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:009",
+    "block_type": "text",
+    "text": "We first clarify the following terms used throughout the paper.",
+    "bbox": [
+      317.41,
+      115.7,
+      559.75,
+      127.7
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:010",
+    "block_type": "text",
+    "text": "• OSS reuse. This refers to the process of utilizing all or\nsome of the OSS functions (e.g., copying and pasting of\nfunctions from third-party OSS projects) [9,36].",
+    "bbox": [
+      329.34,
+      130.67,
+      558.17,
+      166.95
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:011",
+    "block_type": "text",
+    "text": "• OSS component. This refers to an entire OSS project or\nsometimes a portion of an OSS codebase that is reused\nin a target program [36].",
+    "bbox": [
+      329.34,
+      168.81,
+      558.17,
+      205.08
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:012",
+    "block_type": "text",
+    "text": "• OSS version. We define that an OSS version follows\nthe three-component semantic versioning notation with\nmajor.minor.patch by default [7].",
+    "bbox": [
+      329.34,
+      206.94,
+      558.0,
+      244.0
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:013",
+    "block_type": "text",
+    "text": "• 1-day (or N-day) vulnerability. This refers to a vul-\nnerability that is known to responsible developers and\nfor which a corresponding security patch has been re-\nleased [9, 38]. These vulnerabilities can propagate to\nother software due to OSS reuse, compromising the se-\ncurity of the entire system.",
+    "bbox": [
+      329.34,
+      245.08,
+      559.66,
+      317.22
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:014",
+    "block_type": "text",
+    "text": "2.2\nCode classification",
+    "bbox": [
+      317.88,
+      334.19,
+      439.43,
+      349.74
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:015",
+    "block_type": "text",
+    "text": "For precise vulnerability detection, we leverage the classifi-\ncation of reused and vulnerable code. This is because false\npositives and negatives may occur in vulnerability discovery\nif various types of reused and vulnerable code are not properly\nclassified and considered (see Section 2.3). Figure 1 depicts\nthe code classification defined in this paper.",
+    "bbox": [
+      317.88,
+      355.14,
+      559.65,
+      426.92
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:016",
+    "block_type": "text",
+    "text": "Reused code classification. When developers reuse an OSS\nproject, they often modify the code of the original OSS\nproject [9, 36]. We classified the types of OSS codes that\nwere reused into the following three categories, according to\nthe extent of modification of the code.",
+    "bbox": [
+      317.52,
+      430.51,
+      558.0,
+      490.7
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:017",
+    "block_type": "text",
+    "text": "• Exactly reused (E): OSS code (e.g., functions or files)\nis reused without any code changes.",
+    "bbox": [
+      327.84,
+      493.67,
+      558.67,
+      517.99
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:018",
+    "block_type": "text",
+    "text": "• Changed (C): OSS code is reused with code changes.\n• Unused (U): OSS code is not reused (not included in\nthe codebase of the target program).",
+    "bbox": [
+      327.84,
+      519.85,
+      557.99,
+      558.39
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:019",
+    "block_type": "text",
+    "text": "Vulnerable code classification. Security vulnerabilities can\nexist in various locations in the source code. Specifically, we\nconsider the following four code locations.",
+    "bbox": [
+      317.52,
+      565.36,
+      558.0,
+      601.64
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:020",
+    "block_type": "text",
+    "text": "• Function (F). e.g., void main (...) {...}\n• Structure (S). e.g., struct oss {...};\n• Macro (M). e.g., #define ...\n• Variable (V). e.g., const int ...;",
+    "bbox": [
+      327.84,
+      604.61,
+      525.39,
+      666.41
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:002:021",
+    "block_type": "text",
+    "text": "When we examined 4,612 C/C++ security patches, code\npatches applied to the selected four code locations accounted\nfor over 97% (see Section 4.3). Therefore, we determined\nthat considering these four code locations could cover C/C++\nsecurity patches comprehensively.",
+    "bbox": [
+      317.88,
+      662.97,
+      559.4,
+      722.8
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

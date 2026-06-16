@@ -1,0 +1,281 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder
+Analysis Mode: static-only
+Runtime Behavior: [EXECUTION NOT REQUESTED]
+
+Repository / File Layout Observed:
+- Total files: 13
+- Extension counts: {'.py': 6, '.pyc': 5, '.txt': 2}
+- Top-level entries:
+  - 1_vccfinder.py
+  - 2_gen_vuln_version.py
+  - __pycache__/
+  - abstract_szz.py
+  - bad_case_result.txt
+  - comment_parser.py
+  - config.py
+  - config.pyc
+  - log_generation.py
+  - time.txt
+
+Primary Files:
+- 1_vccfinder.py
+- 2_gen_vuln_version.py
+- abstract_szz.py
+- comment_parser.py
+- config.py
+- log_generation.py
+- bad_case_result.txt
+- time.txt
+
+README/config inspected: config.py exists; README.md was not found. [NEEDS ARTIFACT]
+Main entrypoints inspected: yes, by filename and static AST symbol inventory
+Key Static Evidence:
+
+1_vccfinder.py excerpt:
+import os
+import git
+import json
+import time
+import ntpath
+import subprocess
+from io import StringIO
+from unidiff import PatchSet
+
+from config import *
+
+from abstract_szz import AbstractSZZ, BlameData
+
+
+class patchCommit:
+    def __init__(self, repository_path, repo_name, patch_commit):
+        self.repository_path = repository_path
+        self._repository = git.Repo(self.repository_path)
+        self.repo = repo_name
+        self.patch_commit = patch_commit
+        self.add_lines = dict() #filename: line_num: code
+        self.delete_lines = dict() #filename: line_num: code
+        self.patch_file = list()
+        self.uni_diff_text = None
+        self.ori_file_commits = dict() # [filename: ori_hash]
+        self.fix_file_commits = dict() # [filename: fix_hash]
+
+    def remove_prefix(self, path: str, prefix: str) -> str:
+        if path.startswith(prefix):
+            return path[len(prefix):] 
+        return path
+
+    def get_parent_commit(self, commit):
+        work_dir = os.getcwd()
+        os.chdir(self.repository_path)
+
+        result = subprocess.run(['git', 'rev-parse', f"{commit}^"], capture_output=True, text=True)
+        par_commit = result.stdout.split('\n')[0].strip()
+
+        os.chdir(work_dir)   
+
+        return par_commit
+        
+
+    def get_commit_content(self):
+        # commit_content = self._repository.git.show(self.patch_commit)
+        par_commit = self.get_parent_commit(self.patch_commit)
+
+        try:
+            self.uni_diff_text = self._repository.git.diff(self.patch_commit+ '~1', self.patch_commit,
+                                            ignore_blank_lines=True, 
+                                            ignore_space_at_eol=True)
+            patches = PatchSet(StringIO(self.uni_diff_text))
+        except Exception as e:
+            s
+
+2_gen_vuln_version.py excerpt:
+import os
+import time
+import json
+from config import *
+from tqdm import tqdm
+from log_generation import GitLog
+from collections import Counter
+
+
+
+def get_commit_tags(repo_path, commit):
+    
+    commit2tag_list = []
+
+    log_str = GitLog().git_tag_contins(repo_path, commit)
+    for line in log_str.split('\n'):
+        if line.strip() != "":
+            commit2tag_list.append(line.strip())
+    return commit2tag_list
+    
+def cxc_generate_vulnerable_versions_fix_vcc(repo_path, patch_commit, introduceing_commit):
+    patch_tags = get_commit_tags(repo_path, patch_commit)
+    introducing_tags = get_commit_tags(repo_path, introduceing_commit)
+    
+    vuln_tags = []
+    for i in introducing_tags:
+        if i not in patch_tags:
+            vuln_tags.append(i)
+
+    return vuln_tags
+
+def gen_vulnerable_version(vccs, repo, fix_commit):
+    if vccs==[]:
+        return []
+
+    counter = Counter(vccs)
+    max_count = max(counter.values())  # 
+
+    # 
+    most_frequent_vcc = [key for key, count in counter.items() if count == max_count]
+
+    if len(most_frequent_vcc) == 1:
+        vcc = most_frequent_vcc[0]
+    else:
+        sorted_szz = sorted(list(most_frequent_vcc), key=lambda k: GitLog().get_commit_time(os.path.join(REPOS_DIR, repo), k))
+        vcc = sorted_szz[0]
+    
+    # vuln_versions=[]
+    try:
+        vuln_versions = cxc_generate_vulnerable_versions_fix_vcc(os.path.join(REPOS_DIR, repo), fix_commit, vcc)
+    except Exception as e:
+        print(e)
+        vuln_versions = []
+
+    return vuln_versions
+
+
+
+if __name__ == "__main__":
+    import time 
+    # time.sleep(18000)
+    repos = ['FFmpeg', 'openssl', 'wireshark', 'curl', 'httpd', 'ImageMagick', 'qemu', 'openjpeg', 'linux']
+    
+    root_workdir = os.getcwd()
+
+    vcc_path = os.path.join(root_workdir, 'output') 
+    
+   
+
+abstract_szz.py excerpt:
+import os
+import ntpath
+import logging as log
+from io import StringIO
+from git import Commit, Repo
+from typing import List, Set
+from unidiff import PatchSet
+from abc import ABC, abstractmethod
+
+from comment_parser import parse_comments
+
+
+
+class AbstractSZZ(ABC):
+    """
+    AbstractSZZ is the base class for SZZ implementations. It has core methods for SZZ
+    like blame and and a diff parsing for impacted files. GitPython is used for base Git
+    commands and PyDriller to parse commit modifications.
+    """
+
+    def __init__(self, repo_name: str, repos_dir: str = None):
+        """
+        Init an abstract SZZ to use as base class for SZZ implementations.
+        AbstractSZZ uses a temp folder to clone and interact with the given git repo, where
+        the name of the repo folder will be the full name having '/' replcaed with '_'.
+        The init method also set the deafult_ignore_regex for modified lines.
+
+        :param str repo_name: full name of the Git repository to clone and interact with
+        :param str repo_url: url of the Git repository to clone
+        :param str repos_dir: temp folder where to clone the given repo
+        """
+        self.repo_name = repo_name
+
+        self._repository_path = os.path.join(repos_dir, repo_name)
+        self._repository = Repo(self._repository_path)
+        self.__temp_dir = 'tmp'
+        # self.ori_file_commits = dict() # [filename: ori_hash]
+        # self.fix_file_commits = dict() # [filename: fix_hash]
+
+    def __del__(self):
+        log.info("cleanup objects...")
+        # self.__cleanup_repo()
+        # self.__clear_gitpython()
+
+    @property
+    def repository(self) -> Repo:
+        """
+         Getter of current GitPython Repo object.
+
+         :returns git.Repo repository
+        """
+        return self._repositor
+
+comment_parser.py excerpt:
+import logging as log
+import os
+import re
+import subprocess
+from collections import namedtuple
+import tempfile
+
+CommentRange = namedtuple('CommentRange', 'start end')
+srcml_file_ext = ['.c', '.h', '.hh', '.hpp', '.hxx', '.cxx', '.cpp', '.cc', '.cs', '.java']
+
+
+def parse_comments(file_str: str, file_name: str, temp_dir: str = tempfile.gettempdir()):
+    if file_name.endswith(".py"):
+        line_comment_ranges = py_comment_parser(file_str, file_name)
+    elif file_name.endswith(".js"):
+        line_comment_ranges = js_comment_parser(file_str, file_name)
+    elif file_name.endswith(".php") or file_name.endswith(".phpt"):
+        line_comment_ranges = php_comment_parser(file_str, file_name)
+    elif file_name.endswith(".rb"):
+        line_comment_ranges = rb_comment_parser(file_str, file_name)
+    else:
+        line_comment_ranges = parse_comments_srcml(file_str, file_name, temp_dir)
+
+    return line_comment_ranges
+
+
+def parse_comments_srcml(file_str: str, file_name: str, temp_folder: str = tempfile.gettempdir()):
+    line_comment_ranges = list()
+
+    if any(file_name.endswith(e) for e in srcml_file_ext):
+        if not os.path.isdir(temp_folder):
+            os.makedirs(temp_folder)
+
+        file_name = os.path.join(temp_folder, 'temp_' + file_name)
+        with open(file_name, 'w', encoding='utf-8', errors='ignore') as temp_file:
+            temp_file.write(file_str)
+
+        process_out = list()
+        p = subprocess.Popen(f'srcml --position {file_name}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            process_out.append(line.decode('utf-8').strip())
+        status = p.wait()
+        
+        if status == 0:
+            for line in process_out:
+                if line.strip().startswith("<comment"):
+  
+
+config.py excerpt:
+REPOS_DIR = ""
+DATA_DIRS = ''
+
+
+Static Consistency Notes:
+- The paper describes VCCFinder as combining code metrics with repository metadata and training an SVM classifier over vulnerable/non-vulnerable commits.
+- The local source root contains vccfinder, vulnerable-version generation, abstract_szz, comment parsing, config, and logging scripts.
+- The local scripts appear to be an adapted baseline package for vulnerable-version/SZZ-style processing, not a complete paper artifact with the CVE-to-GitHub database, model-training data, or web service.
+- No README, dependency file, trained model, or benchmark database was found in the observed source root. [NEEDS ARTIFACT]
+
+Observed Local Output / Data Artifacts:
+- bad_case_result.txt and time.txt exist, but their semantics were not verified by execution. [EXECUTION NOT REQUESTED]
+- __pycache__/ exists and is ignored as generated bytecode.
+
+Missing Data / Missing Entrypoints:
+- CVE-to-GitHub vulnerable commit database, SVM training dataset/model, web-service artifact, and full evaluation artifacts are not present in this local source root. [NEEDS ARTIFACT]
+- Runtime behavior, result regeneration, and model performance were not checked. [EXECUTION NOT REQUESTED]

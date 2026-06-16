@@ -1,0 +1,104 @@
+376 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+VERCATION: Precise Vulnerable Open-Source
+Software Version Identiﬁcation Based on Static
+Analysis and LLM
+Yiran Cheng , Ting Zhang , Lwin Khin Shar , Member, IEEE, Shouguo Yang , Chaopeng Dong ,
+David Lo , Fellow, IEEE, Shichao Lv , Zhiqiang Shi , and Limin Sun
+Abstract—Open-source software (OSS) has experienced a surge
+in popularity, attributed to its collaborative development model
+and cost-effective nature. However, the adoption of speciﬁc
+software versions in development projects may introduce security
+risks when these versions bring along vulnerabilities. Current
+methods of identifying vulnerable versions typically analyze and
+extract the code features involved in vulnerability patches using
+static analysis with pre-deﬁned r ules. They then use code clone
+detection to identify the vulnera ble versions. These methods are
+hindered by imprecision due to (1) the exclusion of vulnerability-
+irrelevant code in the analysis and (2) the inadequacy of code
+clone detection. This paper presents V
+ERCATION, an approach
+designed to identify vulnerable versions of OSS written in C/C++.
+V
+ERCATION combines program slicing with a Large Language
+Model (LLM) to identify vulnerability-relevant code from vulner-
+ability patches. It then backtrack s historical commits to gather
+previous modiﬁcations of identiﬁed vulnerability-relevant code.
+We propose code clone detection based on expanded and normal-
+ized ASTs to compare the differences between pre-modiﬁcation
+and post-modiﬁcation code, thereby locating the vulnerability-
+introducing commit ( vic) and enabling the identiﬁcation of the
+vulnerable versions between the vulnerability-ﬁxing commit and
+the vic. We curate a dataset linking 122 OSS vulnerabilities
+and 1,211 versions to evaluate V
+ERCATION. On this dataset, our
+approach achieves an F1 score of 93.1%, outperforming current
+state-of-the-art methods. More importantly, V
+ERCATION detected
+202 incorrect vulnerable OSS versions in NVD reports.
+Received 1 March 2025; revised 14 July 2025; accepted 13 August 2025.
+Date of publication 19 August 2025; date of current version 13 February 2026.
+This research was supported in part by Beijing Natural Science Foundation
+under Grant L234033, in part by the Nati onal Research Foundation, Singa-
+pore, and in part by the Smart Nation Group’s Translational R&D under
+Grant TRANS2023-TGC02. Recomme nded for acceptance by L. Pasquale.
+(Corresponding authors: Shichao Lv; Ting Zhang)
+Yiran Cheng, Chaopeng Dong, Shich ao Lv, Zhiqiang Shi, and Limin
+Sun are with Institute of Informatio n Engineering, Chinese Academy of
+Sciences, Beijing, 1000852, China, and also with the School of Cyber Security,
+University of Chinese Academ y of Sciences, Beijing, 1014083, China (e-
+mail: chengyiran@iie.ac.cn; dongchaope ng@iie.ac.cn; shizhiqiang@iie.ac.cn;
+lvshichao@iie.ac.cn; sunlimin@iie.ac.cn).
+Ting Zhang was with the School of Computing and Information Systems,
+Singapore Management University, Singapore 178903. She is now with the
+Department of Software Systems and Cybersecurity, Monash University,
+Clayton, VIC 3800, Australia (e-m ail: ting.zhang@monash.edu).
+Lwin Khin Shar and David Lo are with Monash University, Clayton, VIC
+3800, Australia (e-mail: lkshar@smu.edu.sg; davidlo@smu.edu.sg).
+Shouguo Yang is with Zhongguancun Laboratory, Beijing, 100194, China
+(e-mail: yangshouguo@iie.ac.cn).
+Digital Object Identiﬁ er 10.1109/TSE.2025.3599581
+Index Terms—Open-source software security, vulnerable ver-
+sion, large language model.
+I. I NTRODUCTION
+O
+PEN-SOURCE software (OSS) has become increasingly
+popular in recent years, thanks to its collaboration and
+cost-effectiveness. In the rapidly evolving world of OSS, nu-
+merous versions exist due to continuous evolution. While
+OSS plays a pivotal role in e xpediting software development,
+the integration of particular software versions in development
+projects can pose security risks, as these versions may contain
+vulnerabilities. Therefore, having a com prehensive knowledge
+of vulnerable versions of OSS becomes imperative for software
+developers.
+Public vulnerability repositories collect vulnerability reports
+of software products and disseminate information regarding
+the affected versions of the software. The National Vulnera-
+bility Database (NVD) [1], recognized as the largest public
+vulnerability database, employ s the Common Platform Enu-
+meration (CPE) format to store information about vulnerable
+versions. However, the NVD often encompasses all versions
+before the reportedvulnerability or designates only the versions
+mentioned in the report as vulnerable. For instance, CVE-2018-
+5785 reported only version v2.3.0 as vulnerable in CPE[2].Y e t ,
+upon manual validation, it was uncovered that versions v2.1.1
+to v2.3.0 are all susceptible tothe vulnerability. Recent research
+[3], [4], [5], [6] indicates that incomplete and incorrect infor-
+mation about vulnerable versions is prevalent in such reports.
+Therefore, there is a need for an automated method that can
+more accurately identify vulnerable versions of released OSS
+vulnerabilities.
+Two limitations of current approaches. The approaches for
+conﬁrming vulnerabilitie s involve utilizing Proof of Concept
+(PoC) to trigger the vulnerability . PoC triggers vulnerabilities
+through dynamic execution, offering conclusive evidence of
+their existence. However, executing a PoC for each software
+version is a time-intensive process that requires meticulous
+environment setup. Additionally, the PoC input may not be
+universal across all vulnerable versions [7]. Therefore, current
+researches use static analysis to identify vulnerable versions[8],
+[9], [10], [11], [12], [13], [14], [15]. These methods typically
+consist of two steps: extracting vulnerability features from code
+0098-5589 © 2025 IEEE. All rights reserved, includi ng rights for text and data mining, and train ing of artiﬁcial intelligen ce and similar technologi es.
+Personal use is permitted, but republication/redistribution requires IEEE permission. See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

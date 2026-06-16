@@ -1,0 +1,249 @@
+{
+  "cwe_id": "CWE-665",
+  "name": "Improper Initialization",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product does not initialize or incorrectly initializes a resource, which might leave the resource in an unexpected state when it is accessed or used.",
+  "extended_description": "This can have security implications when the associated resource is expected to have certain properties or values, such as a variable that determines whether a user has been authenticated or not.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-664",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Control of a Resource Through its Lifetime"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "This CWE entry is a level-1 Class (i.e., a child of a Pillar). It might have lower-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not initialize or incorrectly initializes a resource, which might leave the resource in an unexpected state when it is accessed or used.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "initialization",
+      "authenticated",
+      "implications",
+      "incorrectly"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "initialization",
+      "authenticated",
+      "implications",
+      "incorrectly",
+      "initializes",
+      "associated",
+      "determines",
+      "initialize"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "Here, a boolean initiailized field is consulted to ensure that initialization tasks are only completed once. However, the field is mistakenly set to true...",
+        "snippet": "private boolean initialized = true; public void someMethod() { if (!initialized) { // perform initialization tasks ... initialized = true; }"
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "The following code intends to limit certain operations to the administrator only.",
+        "snippet": "$username = GetCurrentUser(); $state = GetStateData($username); if (defined($state)) { $uid = ExtractUserID($state); } # do stuff if ($uid == 0) { DoAdminThings(); }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code intends to concatenate a string to a variable and print the string.",
+        "snippet": "char str[20]; strcat(str, \"hello world\"); printf(\"%s\", str);"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2001-1471",
+        "description": "chain: an invalid value prevents a library file from being included, skipping initialization of key variables, leading to resultant eval injection.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1471"
+      },
+      {
+        "reference": "CVE-2008-3637",
+        "description": "Improper error checking in protection mechanism produces an uninitialized variable, allowing security bypass and code execution.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-3637"
+      },
+      {
+        "reference": "CVE-2008-4197",
+        "description": "Use of uninitialized memory may allow code execution.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-4197"
+      },
+      {
+        "reference": "CVE-2008-2934",
+        "description": "Free of an uninitialized pointer leads to crash and possible code execution.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-2934"
+      },
+      {
+        "reference": "CVE-2007-3749",
+        "description": "OS kernel does not reset a port when starting a setuid program, allowing local users to access the port and gain privileges.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-3749"
+      },
+      {
+        "reference": "CVE-2008-0063",
+        "description": "Product does not clear memory contents when generating an error message, leading to information leak.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-0063"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

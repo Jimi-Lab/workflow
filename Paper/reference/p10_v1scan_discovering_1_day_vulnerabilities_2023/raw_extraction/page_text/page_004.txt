@@ -1,0 +1,117 @@
+tween the disclosed vulnerable functions and the vulnerable
+functions that existed in ReactOS, indicated a similarity of
+less than 60% in the six cases. Moreover, because VUDDY
+is not designed to detect vulnerabilities that exist outside func-
+tions, it missed two vulnerabilities.
+Finally, VUDDY produced eight false positives, all of
+which were caused by abstraction. In the case of a security
+patch that changes only its abstraction targets, VUDDY can-
+not distinguish between vulnerable and patched functions,
+thereby producing false positives.
+V1SCAN. V1SCAN discovered 26 vulnerabilities in ReactOS
+while eliminating most false positives and negatives produced
+by the existing approaches. It is noteworthy that V1SCAN
+detected more vulnerabilities with significantly fewer false
+positives than the union results of existing approaches.
+Here we introduce the LibTIFF v4.0.10 case, which is
+reused in ReactOS. V1SCAN could filter out vulnerabilities
+of LibTIFF that were not reused in ReactOS (e.g., CVE-2020-
+35521). In addition, V1SCAN detected the CVE-2018-19210
+vulnerability that was not discovered in the version-based
+approach, because the CPE provides an incorrect version
+(v4.0.9). Moreover, the CVE-2019-14973 vulnerability, in
+which the security patch modified outside functions, was
+not detected by the code-based approach but discovered in
+V1SCAN. Note that the aforementioned vulnerabilities have
+been patched in the latest version of ReactOS.
+3
+Design of V1SCAN
+In this section, we describe the design of V1SCAN, which can
+precisely detect propagated 1-day vulnerabilities.
+3.1
+Overview
+V1SCAN synergistically combines version- and code-based
+approaches to take advantage of their strengths and avoid
+their weaknesses. The key idea of V1SCAN, which is sig-
+nificantly distinguishable from existing version- and code-
+based approaches is that it classifies reused and vulnerable
+codes. Such code classification techniques allow V1SCAN to
+eliminate false positives of version-based approaches while
+addressing false negatives of code-based approaches.
+Figure 2 depicts the workflow of V1SCAN, which com-
+prises three phases: classification (P1), detection
+(P2), and consolidation phase (P3). In P1, V1SCAN clas-
+sifies the reused codes of OSS components and the vulnerable
+code locations in the target program based on code classi-
+fication (see Section 2.2). In P2, V1SCAN detects vulnera-
+bilities contained in the target program by using improved
+version- and code-based approaches with code classification
+techniques. Finally, in P3, V1SCAN examines the two detec-
+tion results and consolidates them to confirm the propagated
+vulnerabilities included in the target program.
+Target 
+program
+INPUT
+OUTPUT
+1-day
+vulnerabilities
+P1. Classification
+P2.Detection
+P3. Consolidation
+Improved version-based approach
+Improved code-based approach
+Reused code
+classification
+Vulnerable code 
+classification
+Vulnerability
+detection
+Filtering
+false alarms
+Vulnerability
+detection
+Figure 2: High-level overview of V1SCAN.
+Design assumption and text preprocessing. We designed
+V1SCAN to detect vulnerabilities at the source code level. Al-
+though V1SCAN can operate with any granularity unit, we fo-
+cus on the function units in the version-based approach, which
+are suitable for identifying reused OSS components [36].
+Subsequently, V1SCAN extracts (1) all functions from ev-
+ery version of the OSS in our dataset (see Section 4.2), and
+(2) all functions of the target program, using a function parser
+(see Section 4.1). V1SCAN then performs text preprocessing
+on all extracted functions to normalize the code; it removes
+comments, linefeed, and whitespace from the function codes.
+Moreover, V1SCAN uses locality sensitive hashing (LSH),
+which hashes similar input items into the same “buckets” with
+high probability [33]; therefore, LSH can be utilized to ad-
+dress code modifications in a flexible manner.
+We applied LSH to all text-preprocessed functions in (1)
+the target program and (2) every version of OSS projects.
+Each LSH algorithm provides a functionality (Φ) to measure
+the distance between two inputs and the cutoff value (i.e.,
+threshold θ). Thus, the relationships in which the two func-
+tions (f1, f2) are identical, similar, or different can be defined
+as follows: let the output of Φ be an integer.
+• Identical: If Φ( f1, f2) = 0, f1 and f2 are identical.
+• Similar: If 0 < Φ(f1, f2) ≤θ, f1 and f2 are similar.
+• Different: If Φ(f1, f2) > θ, f1 and f2 are different.
+3.2
+Classification phase (P1)
+In this phase, V1SCAN classifies reused OSS functions and
+extracts code lines, which belong to the locations defined in
+the vulnerable code classification, from the target program.
+3.2.1
+Improved version-based approach
+Component identification. The first step involved uncover-
+ing the OSS components in the target program, which, how-
+ever, is difficult to precisely accomplish [9,36]. Because the
+identification of components is beyond the scope of this paper,
+we decided to use an existing, well-implemented component
+identification tool. We took advantage of CENTRIS [36] be-
+cause it can precisely identify OSS components that have been
+modified and its source code and dataset are publicly available.
+Using CENTRIS, we extracted the names of OSS components
+included in the target program. Note that CENTRIS is only
+concerned with component identification, and does not di-
+rectly participate in vulnerability detection.

@@ -1,0 +1,257 @@
+[
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:001",
+    "block_type": "text",
+    "text": "CPE database. To construct the CPE database, we extract\nCPEs of all CVEs registered in NVD using the NVD JSON\nfeeds. We stored CPE in a dictionary, in which the vulnerable\nsoftware (with version) as the key and the CVEs contained in\nthe vulnerable software as the value; this dictionary becomes\nthe CPE database. Consequently, we stored a total of 137,892\nCVEs with 75,489 vulnerable software information (a total of\n559,305 versions) in the CPE database (as of August 2022).\nThe issue here is that the names and versions of the OSS\ncomponents detected in V1SCAN follow the form provided\nby GitHub (as with the CENTRIS dataset), whereas CPE uses\nits own form of vulnerable software and version names. For\nexample, Linux kernel v5.15 is referred as “torvalds/linux,\nv5.15” on GitHub and “linux/linux_kernel, 5.15” on CPE. It\nis nearly infeasible and time-consuming to check all the tens\nof thousands of vulnerable software lists and internal versions.\nTherefore, we first examined the following software, and man-\nually match the software and version names of GitHub and\nthose of CPE: (1) OSS that was reused in the target pro-\ngrams selected for the experiments (see Section 5.1) and (2)\nfrequently reused OSS projects mentioned in the CENTRIS\npaper (e.g., Zlib, Lua, and GoogleTest). Information on the\nrest of the software will also be examined.",
+    "bbox": [
+      53.69,
+      72.4,
+      295.87,
+      347.78
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:002",
+    "block_type": "text",
+    "text": "5\nEvaluation",
+    "bbox": [
+      54.0,
+      361.54,
+      127.62,
+      377.09
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:003",
+    "block_type": "text",
+    "text": "In this section, we evaluate V1SCAN based on the following\nthree questions.",
+    "bbox": [
+      54.0,
+      385.08,
+      294.12,
+      409.04
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:004",
+    "block_type": "text",
+    "text": "Q1. Detection accuracy: How precisely does V1SCAN de-\ntect vulnerabilities compared to the state-of-the-art vul-\nnerability detection approaches? (Section 5.1)",
+    "bbox": [
+      53.72,
+      412.25,
+      295.77,
+      448.53
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:005",
+    "block_type": "text",
+    "text": "Q2. Effectiveness: How effective is V1SCAN compared to\nexisting version- and code-based approaches in vulnera-\nbility discovery? (Section 5.2)",
+    "bbox": [
+      53.72,
+      450.43,
+      295.77,
+      486.71
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:006",
+    "block_type": "text",
+    "text": "Q3. Performance and scalability: How fast and scalable is\nV1SCAN in detecting vulnerabilities? (Section 5.3)\nWe ran V1SCAN on a machine with Windows 10, AMD\nRyzen 7 3700X @ 3.60 GHz, 48GB RAM, and 1TB SSD.",
+    "bbox": [
+      53.72,
+      488.62,
+      294.12,
+      539.47
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:007",
+    "block_type": "text",
+    "text": "Target software selection. To demonstrate the generality of\nV1SCAN, we selected target software based on the following\nthree criteria: (1) popular C/C++ software, (2) containing a\nsufficient number of OSS components, and (3) including a\nconsiderable number of CVE vulnerabilities.\nWe examined GitHub [10], which is one of the most popu-\nlar hosting services, as the first criterion. We collected C/C++\nrepositories that exhibited more than 5,000 stargazers (a pop-\nularity indicator) from GitHub and collected approximately\n600 software programs. As a sufficient number of CVEs were\nrequired for accuracy measurement, we selected the version\nof each software that was released last year (closest to January\n2021). For the second criterion, we ranked the 600 collected\nsoftware according to the number of OSS components iden-\ntified by CENTRIS. While examining the ranked software",
+    "bbox": [
+      53.67,
+      543.06,
+      295.78,
+      722.8
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:008",
+    "block_type": "text",
+    "text": "Table 4: Target software overview.",
+    "bbox": [
+      372.33,
+      71.06,
+      503.25,
+      82.73
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:009",
+    "block_type": "text",
+    "text": "IDX\nName\nVersion #CVE† #OSS #C/C++ Line #Star§\nDomain",
+    "bbox": [
+      321.63,
+      84.22,
+      542.06,
+      95.83
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:010",
+    "block_type": "text",
+    "text": "S1\nTuricreate\nv6.4.1\n69\n28\n4,091,413 10.7K Machine learning\nS2\nReactOS\nv0.4.13\n67\n23\n6,419,855 10.8K Operating system\nS3\nTizenRT 3.0_GBM\n62\n22\n2,156,848\n439\nOperating system\nS4\nAseprite\nv1.2.25\n53\n12\n846,500\n17K\nAnimation tool\nS5\nFreeBSD\nv12.2.0\n30\n47\n14,489,534 6.4K Operating system\nS6\nMongoDB\nr4.2.11\n28\n13\n2,822,534 21.5K\nDatabase\nS7\nMAME\n0228\n24\n26\n4,541,014 5.8K\nEmulator\nS8\nFilament\nv1.9.9\n16\n16\n1,295,918 13.8K Rendering engine\nS9\nGodot\nv3.2.2\n16\n21\n1,298,228 48.1K\nGame engine\nS10 ArangoDB\nv3.6.12\n15\n22\n5,465,881 12.2K\nDatabase",
+    "bbox": [
+      322.6,
+      98.46,
+      554.94,
+      182.05
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:011",
+    "block_type": "text",
+    "text": "Total\n-\n-\n380\n230\n43,427,725 147K\n-",
+    "bbox": [
+      320.94,
+      185.73,
+      531.41,
+      194.13
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:012",
+    "block_type": "text",
+    "text": "†: #CVEs discovered by the version-based approach, §: #Stargazers.",
+    "bbox": [
+      329.79,
+      196.14,
+      547.49,
+      205.75
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:013",
+    "block_type": "text",
+    "text": "projects in descending order, we applied a version-based ap-\nproach to each software program, identified the number of\ncontained CVEs (with manual version correction), and se-\nlected the software that contained more than 10 CVEs (for the\nthird criterion). Consequently, nine target software programs\nwere selected. In addition, we included TizenRT1, which con-\ntains many components and can represent industrial software.",
+    "bbox": [
+      317.52,
+      225.42,
+      559.68,
+      309.15
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:014",
+    "block_type": "text",
+    "text": "Table 4 summarizes the ten selected target programs. The\ntarget programs that were selected based on the clear cri-\nteria had various codebase sizes ranging from 846,500 to\n14,489,534 C/C++ lines of code, and were obtained from di-\nverse domains (operating systems, emulators, and databases).\nTherefore, we determined that the selected target programs\ncould provide generality to V1SCAN during evaluation. Note\nthat we chose target programs with a considerable number\nof vulnerabilities for a more impartial accuracy assessment.\nV1SCAN can detect vulnerabilities even in software with few\nvulnerabilities, without any limitations.",
+    "bbox": [
+      317.13,
+      309.1,
+      559.74,
+      440.66
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:015",
+    "block_type": "text",
+    "text": "5.1\nAccuracy measurement",
+    "bbox": [
+      317.88,
+      454.9,
+      465.07,
+      470.46
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:016",
+    "block_type": "text",
+    "text": "Methodology. We compared V1SCAN with the state-of-the-\nart vulnerability discovery approaches: MOVERY [34] and\nV0Finder [35], which are capable of discovering vulnerable\ncodes propagated with code modifications to some extent. We\nused their default settings by referring to their paper.\nTo evaluate accuracy, we used the following five metrics:\ntrue positive (TP), false positive (FP), false negative (FN),\nprecision (P = #TP/(#TP + #FP)), and TP detection rate (R =\n#TP/(#TP + #FN)). Because it is nearly infeasible to detect all\nvulnerabilities in a target program, we cannot easily measure\nthe FNs of the tested approaches. Therefore, we consider\nonly indisputable FNs; for example, FNs in V1SCAN refer\nto the vulnerabilities detected by the other two approaches,\nbut were not discovered by V1SCAN. The TPs and FPs were\ndetermined by manual analysis, and two security analysts\nexamined all vulnerability detection results. We examined\nthe results by referring to (1) the detected vulnerable code,\n(2) the security patch, (3) the NVD description, and (4) issue\ntrackers that denote vulnerability.",
+    "bbox": [
+      317.55,
+      476.51,
+      559.65,
+      704.06
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:009:017",
+    "block_type": "text",
+    "text": "1https://github.com/samsung/tizenrt",
+    "bbox": [
+      328.74,
+      710.92,
+      476.13,
+      722.19
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

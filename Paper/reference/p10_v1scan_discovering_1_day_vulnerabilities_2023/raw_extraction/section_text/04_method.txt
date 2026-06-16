@@ -1,0 +1,617 @@
+===== PAGE 004 =====
+tween the disclosed vulnerable functions and the vulnerable
+functions that existed in ReactOS, indicated a similarity of
+less than 60% in the six cases. Moreover, because VUDDY
+is not designed to detect vulnerabilities that exist outside func-
+tions, it missed two vulnerabilities.
+Finally, VUDDY produced eight false positives, all of
+which were caused by abstraction. In the case of a security
+patch that changes only its abstraction targets, VUDDY can-
+not distinguish between vulnerable and patched functions,
+thereby producing false positives.
+V1SCAN. V1SCAN discovered 26 vulnerabilities in ReactOS
+while eliminating most false positives and negatives produced
+by the existing approaches. It is noteworthy that V1SCAN
+detected more vulnerabilities with significantly fewer false
+positives than the union results of existing approaches.
+Here we introduce the LibTIFF v4.0.10 case, which is
+reused in ReactOS. V1SCAN could filter out vulnerabilities
+of LibTIFF that were not reused in ReactOS (e.g., CVE-2020-
+35521). In addition, V1SCAN detected the CVE-2018-19210
+vulnerability that was not discovered in the version-based
+approach, because the CPE provides an incorrect version
+(v4.0.9). Moreover, the CVE-2019-14973 vulnerability, in
+which the security patch modified outside functions, was
+not detected by the code-based approach but discovered in
+V1SCAN. Note that the aforementioned vulnerabilities have
+been patched in the latest version of ReactOS.
+3
+Design of V1SCAN
+In this section, we describe the design of V1SCAN, which can
+precisely detect propagated 1-day vulnerabilities.
+3.1
+Overview
+V1SCAN synergistically combines version- and code-based
+approaches to take advantage of their strengths and avoid
+their weaknesses. The key idea of V1SCAN, which is sig-
+nificantly distinguishable from existing version- and code-
+based approaches is that it classifies reused and vulnerable
+codes. Such code classification techniques allow V1SCAN to
+eliminate false positives of version-based approaches while
+addressing false negatives of code-based approaches.
+Figure 2 depicts the workflow of V1SCAN, which com-
+prises three phases: classification (P1), detection
+(P2), and consolidation phase (P3). In P1, V1SCAN clas-
+sifies the reused codes of OSS components and the vulnerable
+code locations in the target program based on code classi-
+fication (see Section 2.2). In P2, V1SCAN detects vulnera-
+bilities contained in the target program by using improved
+version- and code-based approaches with code classification
+techniques. Finally, in P3, V1SCAN examines the two detec-
+tion results and consolidates them to confirm the propagated
+vulnerabilities included in the target program.
+Target 
+program
+INPUT
+OUTPUT
+1-day
+vulnerabilities
+P1. Classification
+P2.Detection
+P3. Consolidation
+Improved version-based approach
+Improved code-based approach
+Reused code
+classification
+Vulnerable code 
+classification
+Vulnerability
+detection
+Filtering
+false alarms
+Vulnerability
+detection
+Figure 2: High-level overview of V1SCAN.
+Design assumption and text preprocessing. We designed
+V1SCAN to detect vulnerabilities at the source code level. Al-
+though V1SCAN can operate with any granularity unit, we fo-
+cus on the function units in the version-based approach, which
+are suitable for identifying reused OSS components [36].
+Subsequently, V1SCAN extracts (1) all functions from ev-
+ery version of the OSS in our dataset (see Section 4.2), and
+(2) all functions of the target program, using a function parser
+(see Section 4.1). V1SCAN then performs text preprocessing
+on all extracted functions to normalize the code; it removes
+comments, linefeed, and whitespace from the function codes.
+Moreover, V1SCAN uses locality sensitive hashing (LSH),
+which hashes similar input items into the same “buckets” with
+high probability [33]; therefore, LSH can be utilized to ad-
+dress code modifications in a flexible manner.
+We applied LSH to all text-preprocessed functions in (1)
+the target program and (2) every version of OSS projects.
+Each LSH algorithm provides a functionality (Φ) to measure
+the distance between two inputs and the cutoff value (i.e.,
+threshold θ). Thus, the relationships in which the two func-
+tions (f1, f2) are identical, similar, or different can be defined
+as follows: let the output of Φ be an integer.
+• Identical: If Φ( f1, f2) = 0, f1 and f2 are identical.
+• Similar: If 0 < Φ(f1, f2) ≤θ, f1 and f2 are similar.
+• Different: If Φ(f1, f2) > θ, f1 and f2 are different.
+3.2
+Classification phase (P1)
+In this phase, V1SCAN classifies reused OSS functions and
+extracts code lines, which belong to the locations defined in
+the vulnerable code classification, from the target program.
+3.2.1
+Improved version-based approach
+Component identification. The first step involved uncover-
+ing the OSS components in the target program, which, how-
+ever, is difficult to precisely accomplish [9,36]. Because the
+identification of components is beyond the scope of this paper,
+we decided to use an existing, well-implemented component
+identification tool. We took advantage of CENTRIS [36] be-
+cause it can precisely identify OSS components that have been
+modified and its source code and dataset are publicly available.
+Using CENTRIS, we extracted the names of OSS components
+included in the target program. Note that CENTRIS is only
+concerned with component identification, and does not di-
+rectly participate in vulnerability detection.
+
+
+===== PAGE 005 =====
+Prevalent version identification. We then need to identify
+the version of each reused component. However, precise iden-
+tification of the version to which reused modified OSS com-
+ponents belong is challenging (see Section 2.3). Therefore,
+V1SCAN is designed such that it is not critically affected by
+the correctness of the identified versions.
+Our approach is to first roughly detect vulnerabilities and
+then refine the results. In particular, we define the prevalent
+version of the OSS component as the version to which the
+functions contained in the reused OSS codebase most closely
+correspond. To identify the prevalent version, V1SCAN first
+compares all functions in the target program with those in
+every version of the OSS component. V1SCAN extracts the
+OSS functions that are exactly included in the target program,
+and then verifies the versions to which each extracted function
+belongs. The most frequently identified version is designated
+the prevalent version of the OSS component.
+Reused code classification. Next, V1SCAN classifies func-
+tions reused in OSS components based on the reused code
+classification defined in Section 2.2. Because we consider
+the function unit in the version-based approach, V1SCAN
+classifies reused OSS functions based on code modifications.
+When an OSS is reused in the target program, the functions
+in the original OSS can be in one of three states: (1) exactly
+reused, (2) changed, or (3) unused. Subsequently, V1SCAN
+examines the state of all the functions included in the preva-
+lent version of the OSS component. We consider the function
+relationships defined in Section 3.1.
+• Exactly reused functions. If a function in the prevalent
+version is identical to a certain function in the target
+program, it is considered reused in the target program.
+• Changed functions. If a function f ′ that exists in the
+target program is similar to function f in the prevalent
+version, f is considered a changed function.
+• Unused functions. Among all functions in the prevalent
+version, those that did not belong to the exactly reused
+or changed were included in the unused group.
+The changed functions were further classified according
+to the version to which they belonged. To this end, V1SCAN
+compares f ′ with all functions in every version of the OSS.
+If f ′ belongs to any other version of the OSS and is not the
+prevalent version, f ′ is stored in the group under the name of
+the associated version. In contrast, if f ′ does not belong to
+any version of the OSS, it is stored in the “none” group. OSS
+functions that do not belong to the prevalent version but are
+contained in the target program, as detected in the prevalent
+version identification, are also included in the changed group
+with their respective version names.
+Figure 3 depicts the procedure to classify reused code com-
+pared with OSS identification in existing version-based ap-
+proaches. V1SCAN stores the hash value of each function
+obtained by applying the LSH algorithm (see Section 3.1).
+OSS name, 
+version
+Target program
+OSS
+OSS name = {
+exactly reused : [ f1 ,  f2 ,  … ],
+changed
+: {
+version i
+: [ f3′,  … ], …
+none 
+: [ f5′,  … ]},
+unused
+: [ f6 ,  … ]
+}
+(a) OSS identification in existing
+version-based approaches
+(b) Reused code classification in V1SCAN
+Target program
+OSS
+fi: a function in the prevalent version
+f ′
+i : a function in the target program similar to fi.
+Figure 3: Illustration of the differences between reused code
+classification and OSS identification in existing approaches.
+3.2.2
+Improved code-based approach
+Vulnerable code classification. To increase the vulnerability
+detection scope, V1SCAN classifies the code locations where
+vulnerabilities exist, and then takes an effective vulnerability
+detection approach for each location. We considered the fol-
+lowing four code locations (see Section 2.2): 1 function, 2
+structure, 3 macro, and 4 (global and class) variable.
+Code extraction. Subsequently, V1SCAN extracts the code
+lines belonging to the location in the target program. In fact,
+extracting functions, structures, macros, and variables from
+the target program can easily be performed using an exist-
+ing C/C++ parser (e.g., [5]). For more accurate vulnerability
+detection, V1SCAN further classifies the four locations into
+two groups based on the syntactic similarity: (functions and
+structures) and (macros and variables). Functions and struc-
+tures have in common that multiple code lines are enclosed in
+curly braces, while macros and variables generally consist of
+only one or two code lines. V1SCAN extracts (1) LSH hash
+values (see Section 3.1) and (2) source code lines from all
+functions and structures in every C/C++ source file in the tar-
+get program. We consider both hash values and lines of code
+to reduce false positives in vulnerability discovery (details
+are introduced in Section 3.3.2). For macros and variables,
+V1SCAN extracts only the corresponding source code lines.
+3.3
+Detection phase (P2)
+V1SCAN detects propagated vulnerabilities in the target pro-
+gram, using improved version- and code-based approaches.
+3.3.1
+Improved version-based approach
+Vulnerability detection. V1SCAN detects vulnerabilities in
+the target program by using the prevalent version. We used
+CPE [21] to construct a CPE database that maps the CVEs
+to the affected OSS versions (see Section 4.3). By leveraging
+the CPE database, V1SCAN identifies the CVE vulnerabilities
+included in the prevalent version of the OSS component. For
+example, the CPE of the Heartbleed vulnerability (CVE-2014-
+0160) specifies that the vulnerability exists in OpenSSL 1.0.1
+to 1.0.1f. If OpenSSL is reused in the target program and
+its prevalent version is between 1.0.1 and 1.0.1f, V1SCAN
+determines that this vulnerability exists in the target program.
+
+
+===== PAGE 006 =====
+Collection of vulnerable and patched functions. V1SCAN
+then removes false positives from the version-based vulner-
+ability detection results. To identify the resolved vulnerable
+functions, we refer to the vulnerable and patched functions
+of CVE vulnerabilities. To this end, we first collected the
+security patches for CVEs and then extracted the vulnerable
+and patched functions from these patches (see Section 4.3).
+Thereafter, text preprocessing is applied to all vulnerable and
+patched functions, after which the LSH algorithm is applied
+to generate hash values (see Section 3.1).
+Filtering. Based on the classification of the reused code,
+V1SCAN checks for vulnerable functions and filters out false
+alarms from the vulnerability detection results. We consider
+the four notations listed in Table 2.
+(1) Filtering unused vulnerable functions. The classifica-
+tion of reused code simplifies the filtering of the unused
+vulnerable functions. If fv is included in the “unused”
+group (U), then V1SCAN determines that fv is not reused
+in the target program.
+∀fv | fv ∈U →fv /∈T( fv is unused)
+(2) Filtering resolved vulnerable functions. If developers
+resolve fv by backporting security patches, this function
+has the same (or similar) code syntax as that of fp be-
+longing to the OSS versions that are safe from X. On
+this basis, if fv is not included in “exactly reused” but
+has a similar function f ′
+v in the “changed” group (C),
+V1SCAN determines that fv was either reused with code
+changes (still vulnerable) or resolved by backporting se-
+curity patches. To extract only the latter cases, V1SCAN
+checks the version to which f ′
+v belongs.
+(2-1) If the version is not included in the CPE of X, it can
+be determined that f ′
+v does not contain the vulnera-
+bility. To determine this more thoroughly, V1SCAN
+compares f ′
+v to both fv and fp. If the distance (Φ,
+see Section 3.1) between fv and f ′
+v is greater than
+the distance between fp and f ′
+v (i.e., more similar
+to fp than fv), then V1SCAN considers f ′
+v has been
+resolved. This can be represented as follows; let v
+be the version to which f ′
+v belongs.
+∀f ′
+v ∈C |
+ v /∈CPE(X)
+
+∧
+ Φ( fp, f ′
+v) < Φ( fv, f ′
+v) ≤θ
+
+→
+fv is resolved
+(2-2) If f ′
+v does not belong to any version of OSS, de-
+ciding whether f ′
+v is vulnerable based only on the
+similarity to the vulnerable function and patch func-
+tion may produce a false alarm. Therefore, we put
+it on hold and decide whether to filter this vulner-
+ability through an improved code-based approach
+of V1SCAN (see Section 3.3.2).
+Table 2: Defined notations.
+Notations
+Description
+T
+The target program.
+X
+The vulnerability to be examined.
+fv
+The vulnerable function of X.
+fp
+The patched function of X.
+Here, a CVE vulnerability may (1) contain multiple vulner-
+able functions or (2) not include any vulnerable functions. In
+the former case, the propagation of only one vulnerable func-
+tion may compromise the security of the entire system [12,14].
+Therefore, if more than one vulnerable function remains af-
+ter filtering, V1SCAN determines that CVE vulnerability has
+propagated to the target program. Conversely, in the latter
+case, V1SCAN determines CVE as the correct answer without
+filtering. This may yield false positives; however, this rarely
+occurs (i.e., not found in our dataset) and arises from our de-
+cision that a small number of false positives would be more
+tolerable than missing vulnerabilities. Moreover, a security
+patch may alter the code beyond the scope of a function (e.g.,
+a macro). In this case, we put it on hold and verify it at the
+code level (see Section 3.3.2).
+Finally, the vulnerability detection result of the version-
+based approach in which false positives are removed is ob-
+tained as the output of this phase.
+3.3.2
+Improved code-based approach
+Vulnerability signature generation. V1SCAN generates vul-
+nerability signatures for each collected CVE and uses them
+to detect propagated vulnerabilities. Vulnerability signatures
+are generated after identifying the location to which the code
+lines modified in the security patch belong to. For example,
+Listing 1 shows the patch snippet for CVE-2019-12904 in
+Libgcrypt. The snippet contains a patch for all four types of
+code locations: macro (lines #3 and #4), variable (lines #6 and
+#7), structure (lines #9 and #10), and function (lines #14 and
+#15). The locations of the code modified in the security patch
+are identified using an existing C/C++ parser (see Section 4).
+Thereafter, V1SCAN uses different indexing methods for
+each code location. Listing 2 presents the indexing results for
+the patch code shown in Listing 1. All the code lines added
+and deleted in the security patch were stored. For functions
+and structures, the LSH hash value is also stored, as described
+in Section 3.2.2. We consider hash values for reducing false
+alarms in vulnerability discovery. If we were to detect vulner-
+abilities by considering only the code lines added or deleted
+in a patch, numerous false alarms could occur, particularly
+when short and general codes (e.g., else) are modified in
+the patch [14, 34]. Therefore, we attempted to resolve this
+issue using the hash value of the entire function or struc-
+ture. V1SCAN generates vulnerability signatures for all the
+collected CVE patches.
+
+
+===== PAGE 007 =====
+Listing 1: A patch snippet for CVE-2019-12904 in Libgcrypt.
+1 //libgcrypt/cipher/cipher-gcm.c
+2 ...
+3 + #ifdef HAVE_GCC_ATTRIBUTE_ALIGNED
+4 + # define ATTR_ALIGNED_64 __attribute__ ((aligned (64)))
+5 ...
+6 - static const u16 gcmR[256] = {
+7 - 0x0000, 0x01c2, 0x0384, 0x0246, 0x0708, 0x06ca, 0x048c,
+8 ...
+9 + static struct {
+10 +
+volatile u32 counter_head;
+11 ...
+12
+void prefetch_table(const void *tab, size_t len) {
+13 ...
+14 -
+for (i = 0; i < len; i += 8 * 32)
+15 +
+for (i = 0; len - i >= 8 * 32; i += 8 * 32)
+Function and structure vulnerability detection. V1SCAN
+then detects the vulnerabilities propagated to the target pro-
+gram. To respond flexibly to code changes unrelated to a
+vulnerability, V1SCAN focuses on the core code lines that
+were added or deleted in the security patch [34,37].
+The process of detecting vulnerabilities in functions and
+structures comprises two steps.
+S1. Hash comparison: First, V1SCAN compares the hash
+values of all functions (structures) in vulnerability sig-
+natures with those of the target program. If a hash value
+that belongs to both the signature and target program is
+detected, V1SCAN determines that the vulnerability has
+been propagated to the target program. Otherwise, if a
+similar hash value is discovered, V1SCAN moves to the
+next step, namely, line comparison.
+S2. Line comparison: When a similar function (structure)
+is detected between the vulnerability signature and the
+target program, V1SCAN checks whether code deleted
+from (resp. added to) the patch was included (resp. was
+not included) in the function (structure) of the target
+program. If this is satisfied, V1SCAN determines that
+the target program contains the vulnerability.
+Here, if we only consider the code syntax in the line com-
+parison, as with certain existing approaches (e.g., [35,37]),
+false positives or negatives may arise especially when the code
+modified in the patch is short and general. Assume that the
+code line “else” is added by the patch. This code line may
+exist in the vulnerable function. Hence, even if the vulnerable
+function is not patched, the function may be misinterpreted to
+be safe because it contains the code line added by the patch.
+Therefore, we decided to consider the number of times
+deleted (added) code lines appear in the target function. Sup-
+pose that a security patch deletes the code line ldel and adds
+the code line ladd to the function fv. Let the function after
+applying the patch be fp. V1SCAN counts the number of
+times ldel and ladd appear in fv and fp, respectively. There-
+after, when a function f ′
+v similar to fv is detected through
+hash comparison, V1SCAN counts the number of times ldel
+and ladd appear in f ′
+v. If the result is the same as that of fv but
+differs from that of fp, f ′
+v is considered a vulnerable function.
+Listing 2: Example vulnerability signature for CVE-2019-12904.
+1
+MACRO
+2
++ #ifdef HAVE_GCC_ATTRIBUTE_ALIGNED
+3
++ # define ATTR_ALIGNED_64 __attribute__ ((aligned (64)))
+4
+5
+VARIABLE
+6
+- static const u16 gcmR[256] = {
+7
+- 0x0000, 0x01c2, 0x0384, 0x0246, 0x0708, 0x06ca, 0x048c,
+8
+9
+STRUCTURE (HASH: 3A5F116800...)
+10
++ static struct {
+11
++ volatile u32 counter_head;
+12
+13
+FUNCTION (HASH: BBC0994B88...)
+14
+- for (i = 0; i < len; i += 8 * 32)
+15
++ for (i = 0; len - i >= 8 * 32; i += 8 * 32)
+This method can distinguish between vulnerable and
+patched functions even when both deleted and added code
+lines exist in the target function. Therefore, V1SCAN can de-
+tect vulnerabilities with fewer false positives than existing
+simple code syntax checking approaches.
+V1SCAN can detect exactly reused vulnerable functions
+(structures) with the aid of hash comparison and identify vul-
+nerable functions (structures) whose code syntax has been
+changed using line comparison. This guarantees a higher
+vulnerability detection rate than the existing code-based ap-
+proach that considers only hash comparison (e.g., [14]) and
+lowers the false positive rate compared with the existing ap-
+proach that only considers line comparison (e.g., [12]).
+Macro and variable vulnerability detection. To detect
+vulnerabilities in macros and variables (global and class
+variables), V1SCAN compares the lines of code containing
+macros and variables in vulnerability signatures to those in the
+target program. If all the lines of code containing macros (vari-
+ables) deleted (resp. added) by the patch were included (resp.
+not included) in the target program, V1SCAN determines that
+the target program contains the vulnerability.
+If the security patch did not add any lines of code, then only
+the deleted lines of code are used to check for vulnerability
+propagation. On the other hand, if the patch did not delete
+any lines of code, it would be premature to conclude that the
+vulnerability was propagated by solely relying on the fact that
+the lines of code added by the patch do not exist in the target
+program. Thus, V1SCAN omits the latter case to reduce false
+alarms. This could yield a small number of false negatives;
+however, this decision was made because the addition of lines
+of code containing a macro or variables by a security patch
+without removing any lines of code from all four vulnerable
+code locations rarely occurs.
+The vulnerability detection result of the improved code-
+based approach in which false negatives are covered is ob-
+tained as the output of this phase. Among the vulnerabilities
+held by the version-based approach (e.g., existing outside the
+function), the vulnerabilities detected in the code-based ap-
+proach are included in the detection result as correct answers,
+and all others are considered false positives and filtered out.
+
+
+===== PAGE 008 =====
+3.4
+Consolidation phase (P3)
+By consolidating the vulnerability detection results of the
+improved version- and code-based approaches, V1SCAN de-
+termines vulnerabilities that exist in the target program.
+As explained in P1 and P2, V1SCAN reduces false posi-
+tives and negatives in the version- and code-based approach.
+The false alarms produced by the version-based approach
+were removed through the reuse code classification-based
+filtering, and the false alarms of the code-based approach
+were prevented by using both the hash and line comparisons.
+Moreover, V1SCAN covers the false negatives of version- and
+code-based approaches by combining their results. Vulnera-
+bilities included in less frequently identified versions (i.e., not
+a prevalent version) can be covered by detecting them with
+the code-based approach of V1SCAN. In addition, by leverag-
+ing vulnerable code classification and focusing only on core
+vulnerable code lines, V1SCAN can address false negatives
+of existing code-based approaches. Therefore, we denote the
+union of the detection results of both approaches as the list of
+vulnerabilities contained in the target programs.
+4
+Implementation of V1SCAN
+This section introduces the implementation of V1SCAN, in-
+cluding its architecture and the datasets.
+4.1
+Architecture
+V1SCAN comprises the two modules: a dataset collector and
+a vulnerability detector. The dataset collector constructs the
+OSS and CVE datasets (see Section 4.2 and Section 4.3).
+The vulnerability detector performs vulnerability discovery
+on the target program, which is implemented in approximately
+1,800 lines of Python code excluding external libraries. We
+use CENTRIS [36] to identify the OSS components in the
+target program. For the parser and LSH algorithm, we utilize
+Ctags [5] and TLSH [23,30]. Ctags is a regular expression-
+based parser, and has the advantage of scalability and detec-
+tion accuracy; it can be used to precisely parse C/C++ source
+files without being affected by the code size of the target pro-
+gram. In addition, because Ctags provides the functionality
+to identify functions, structures, macros, and variables from
+source files, it can be effectively used to classify vulnerable
+locations. Next, we selected the TLSH [23,30] as the LSH
+algorithm, which is both accurate and scalable. We used the
+similarity measurement function provided by TLSH as it is,
+and selected the cutoff value of 30 (see Section 3.1), which
+was observed to be the most efficient in their paper [23].
+4.2
+OSS dataset
+The OSS dataset is utilized for identifying OSS components
+in the target program. We leveraged the OSS dataset provided
+by CENTRIS [36], which consists of all versions of the 10,241
+popular C/C++ OSS projects on GitHub.
+Table 3: CVE dataset overview.
+Category
+Count (#)
+• Security patches
+4,612
+- Vulnerable and patched function pairs
+7,675
+- Vulnerable and patched structure pairs
+106
+- Vulnerable and patched macro pairs
+221
+- Vulnerable and patched variable pairs
+598
+• CPE database
+- Contained CVEs
+137,892
+- Collected vulnerable software
+75,489
+- Collected vulnerable versions
+559,305
+Since the dataset of CENTRIS was constructed in April
+2020, we additionally collected versions generated after that
+of each repository (as of April 2022). As a result, the number
+of versions increased from 229,326 to 246,512 in V1SCAN.
+4.3
+CVE dataset
+For each CVE, V1SCAN first collects the security patch, and
+then extracts necessary information (e.g., vulnerable func-
+tions) from the patch. V1SCAN then constructs the CPE
+database, which is used in the improved version-based ap-
+proach. Table 3 summarizes the CVE dataset.
+Collecting security patches. We collected security patches
+of CVE vulnerabilities by leveraging existing approaches [11,
+16, 35, 37]. We examined CVEs in the NVD and checked
+whether a “Git commit” URL was included in the references;
+this URL provides the code-level security patches. Hence, we
+can obtain the security patch commits for CVE vulnerabilities
+by crawling the URLs. As a result, we collected 4,612 C/C++
+security patches from the NVD (as of August 2022).
+Identifying vulnerable locations. Because V1SCAN uses
+vulnerable code classification, it is necessary to identify the
+location to which the code modified by the security patch
+belongs. Each security patch provides (1) a Git index and (2)
+code line numbers that include vulnerable and patched code.
+We access the index to obtain the vulnerable and patched
+source files (e.g., using the “git show” command). We then
+parse the source files using Ctags [5]. Using this output, we
+can obtain the start and end line numbers of each function,
+structure, macro, and variable. Finally, we identify the loca-
+tions that contain the modified code lines in the patch. If
+the modified code lines belong to a function or structure, the
+entire code of the vulnerable and patched function (and struc-
+ture) is extracted. If the modified code lines belong to a macro
+or variable, the exact lines of code are extracted.
+As a result, we collected 7,675 vulnerable and patched
+function pairs, 106 structure pairs, 221 macro pairs, and 598
+variable pairs. Over 97% of the code repaired by the patch was
+included in one of the four locations. The remaining 3% were
+code patches that very rarely appear, such as changing header
+file names. This confirms that considering these four locations
+for vulnerability detection is sufficiently comprehensive.

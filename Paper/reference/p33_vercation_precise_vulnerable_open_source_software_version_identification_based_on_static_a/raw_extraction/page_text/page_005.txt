@@ -1,0 +1,81 @@
+380 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+Fig. 2. V ERCATION Workﬂow.
+In P2, VERCATION retraces historical commits to collect pre-
+vious modiﬁcations of vulnerable statements. For each state-
+ment before and after modiﬁcation, V ERCATION expands the
+functions within the statement, generates ASTs, and normalizes
+them. Then we utilize an in-order traversal algorithm to com-
+pare the AST before and after the modiﬁcation as code similar-
+ity, which determines if the co mmit is the initial introduction
+of the vulnerable statements.
+In P3, V
+ERCATION identiﬁes the affected versions based on
+the CVE’s vfc and the corresponding vic.
+To note, V ERCATION supports patches that span multiple
+functions and ﬁles. In P1, we extract dangerous ﬂows from each
+affected function independently, then combine all extracted
+dangerous ﬂows as input to the LLM for uniﬁed vulnerability
+logic analysis. In P2, we perform a backtrack analysis for vul-
+nerable statements from all affected functions.
+A. Vulnerable Code Extraction
+Taking a vfc as an input, V
+ERCATION identiﬁes and extracts
+program statements related to a vulnerability in three steps, as
+explained in the following subsections respectively.
+1) Dangerous Flow Extraction: Firstly, VERCATION con-
+ducts program slicing [44] on the source code to extract crucial
+program statements t hat may contribute to the vulnerability,
+w h i c hw ec a l ldangerous ﬂow . The slicing is based on the
+following criteria: deleted/added statements and patch-related
+variables. Building upon existing techniques [12], [13], [15],
+we execute program slicing on the program dependency graph
+of the patched function according to the slicing criteria. We
+performed slicing in two directions: backward and forward.
+Backward slicing is used to trace the source of patch-related
+variables and forward slicing is used to ﬁnd the trigger behavior
+that causes the vulnerability. For different statement types, we
+customize different slicing rules:
+• Assignment statement affects the data-ﬂow values of vul-
+nerability behavior. We conduct normal slicing in the as-
+signment statements and the assigned variables should be
+added to the slicing criterion. For example, if we take
+item_num of Line 12 and 13 in Listing1 as slicing criterion
+and perform forward slicing, Line 21 and 24 are included.
+• Conditional statement affects the reaching condition of
+the vulnerability trigger. We aim to slice the condition
+statement that takes the variables of slicing criterion as
+condition check, and the result also includes all the subse-
+quent statements of condition s tatement (e.g., subsequent
+statement Line 14-15 of condition statement Line 13, sub-
+sequent statement Line 23 of condition statement Line 22).
+• Function call statement. If the function call statement’s
+parameters contain patch-related variables included in the
+slicing criterion, we conduct slicing on the statement.
+• Return statement. There is no need for forward slicing
+because there is no dependency between the return value
+and the statements following the return statement. For
+example, there is no need for forward slicing on Line 15
+and 23 in Listing 1.
+2) Dangerous Flow-Based Prompt Construction: Secondly,
+we leverage an LLM to reﬁne these dangerous ﬂows further
+since the dangerous ﬂows extracted in the above step (program
+slicing) may include false positives (unrelated to vulnerability
+logic). We explore prompting strategies to assist LLM in the
+vulnerability comprehension tas k and in reﬁni ng vulnerable
+statements from the dangerous ﬂows extracted through program
+slicing. It is important to note that the LLM’s role is to perform
+code understanding and vulnerability logic analysis rather than
+to recall speciﬁc CVE information from its training data. Most
+vulnerability reports do not provide detailed vulnerability logic
+analysis or identify speciﬁc vulnerable code statements [45],
+where the LLM’s semantic analysis capabilities become essen-
+tial.
+Our method utilizes an LLM that supports interaction with
+system prompts and user prompts. The system prompt sets the
+role and background of the LLM. The user prompt consists of
+speciﬁc instructions issued by the user. At the beginning of the
+system prompt, we assign the role of a security researcher to the
+model with the statement, “You are a security researcher and
+expert in detecting security vul nerabilities,” and indicate that
+we will provide the CVE information and dangerous ﬂow. The
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

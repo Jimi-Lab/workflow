@@ -1,0 +1,242 @@
+{
+  "cwe_id": "CWE-749",
+  "name": "Exposed Dangerous Method or Function",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product provides an Applications Programming Interface (API) or similar interface for interaction with external actors, but the interface includes a dangerous method or function that is not properly restricted.",
+  "extended_description": "This weakness can lead to a wide variety of resultant weaknesses, depending on the behavior of the exposed method. It can apply to any number of technologies and approaches, such as ActiveX controls, Java functions, IOCTLs, and so on. The exposure can occur in a few different ways: The function/method was never intended to be exposed to outside actors. The function/method was only intended to be accessible to a limited set of actors, such as Internet-based access from a single web site.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-284",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Access Control"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Low",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product provides an Applications Programming Interface (API) or similar interface for interaction with external actors, but the interface includes a dangerous method or function that is not properly restricted.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "method",
+      "interface",
+      "exposed",
+      "actors"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "method",
+      "interface",
+      "exposed",
+      "actors",
+      "dangerous",
+      "intended",
+      "was",
+      "internet-based"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java example the method removeDatabase will delete the database with the name specified in the input parameter.",
+        "snippet": "public void removeDatabase(String databaseName) { try { Statement stmt = conn.createStatement(); stmt.execute(\"DROP DATABASE \" + databaseName); } catch (SQLException ex) {...} }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "These Android and iOS applications intercept URL loading within a WebView and perform special actions if a particular URL scheme is used, thus allowing the...",
+        "snippet": "// Android @Override public boolean shouldOverrideUrlLoading(WebView view, String url){ if (url.substring(0,14).equalsIgnoreCase(\"examplescheme:\")){ if(url.substring(14,25).equalsIgnoreCase(\"getUserInfo\")){..."
+      },
+      {
+        "language": "Objective-C",
+        "nature": "Bad",
+        "summary": "These Android and iOS applications intercept URL loading within a WebView and perform special actions if a particular URL scheme is used, thus allowing the...",
+        "snippet": "// iOS -(BOOL) webView:(UIWebView *)exWebView shouldStartLoadWithRequest:(NSURLRequest *)exRequest navigationType:(UIWebViewNavigationType)exNavigationType { NSURL *URL = [exRequest URL]; if ([[URL scheme]..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "This application uses a WebView to display websites, and creates a Javascript interface to a Java object to allow enhanced functionality on a trusted website:",
+        "snippet": "public class WebViewGUI extends Activity { WebView mainWebView; public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); mainWebView = new WebView(this);..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following Java example the method removeDatabase will delete the database with the name specified in the input parameter.",
+        "snippet": "private void removeDatabase(String databaseName) { try { Statement stmt = conn.createStatement(); stmt.execute(\"DROP DATABASE \" + databaseName); } catch (SQLException ex) {...} }"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2007-6382",
+        "description": "arbitrary Java code execution via exposed method",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-6382"
+      },
+      {
+        "reference": "CVE-2007-1112",
+        "description": "security tool ActiveX control allows download or upload of files",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-1112"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,59 @@
+very pair of the group using
+512 CPUs. For the large-sized group, we used 8 KB bit
+vectors. Generation time was 14 minutes on 32 CPUs. Pair-
+wise comparisons took 5 min 30sec using 512 CPUs.
+Figure 8 shows the distribution of function pairs based
+upon their similarity. Most of the function pairs had very
+low similarity below 0.1, which is natural in that different
+packages would be expected to have different functionality.
+However, surprisingly, 694,883,223 pairs of functions had
+more than 0.5 similarity. Among them, 172,360,750 pairs
+were more than 90% similar. This result clearly shows a
+signiﬁcant amount of code copying.
+While performing our experiments, we noticed that the
+SourceForge dataset had more code clones. With Source-
+ 0
+ 10
+ 20
+ 30
+ 40
+ 50
+ 60
+0-10%
+10-20%
+20-30%
+30-40%
+40-50%
+50-60%
+60-70%
+70-80%
+80-90%
+90-100%
+Percentage of files in SourceForge
+Fraction of shared n-grams
+Figure 9: Fraction of shared n-grams
+Forge projects, we normalized and tokenized each ﬁle and
+calculated the total fraction of shared n-tokens in each ﬁle.
+As shown in Figure 9, more than 50% of ﬁles shared more
+than 90% of n-tokens with other ﬁles. Note that 100% of
+shared n-tokens in a ﬁle does not necessarily mean it is
+copied from another ﬁle as a whole. This could also happen
+when a ﬁle consists of small fractions from multiple ﬁles.
+On the contrary, about 30% of ﬁles were almost unique (0-
+10% shared tokens) while 50% of the ﬁles shared more than
+90% of all tokens. This shows that code cloning is active
+and alive within the SourceForge community.
+IV. DISCUSSION
+A. Comparison to Prior Work
+ReDeBug improves scalability with decreased false de-
+tection rate, but may ﬁnd fewer code clones than previous
+code clone detection work. In order to measure the number
+of unpatched code clones that ReDeBug missed, we com-
+pared the number of code clones detected by ReDeBug to
+the number of code clones reported by Deckard [23]. We
+chose Deckard because it claims better code clone detection
+performance than CP-Miner [25] and CloneDR [5].
+Theoretically, the code clones reported by Deckard should
+be the superset of the code clones found by ReDeBug. In
+practice, however, Deckard missed more code clones than
+ReDeBug. We used Dec

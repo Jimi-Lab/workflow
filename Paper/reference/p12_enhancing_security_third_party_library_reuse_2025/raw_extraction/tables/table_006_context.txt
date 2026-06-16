@@ -1,0 +1,42 @@
+iable,
+which can result in inaccuracies. Additionally, the other 4
+false positives arose from the limitations of similarity-based
+detection. If the reused function is significantly modified, the
+Hash(i) and H(j) can’t be identified accurately (IV-B1), lead-
+ing V ULTURE to miss recognizing the actual reused function.
+Nevertheless, these issues are relatively infrequent in real-
+world scenarios.
+D. Reuse and Vulnerability Detection In the Wild
+To ensure the robustness of our evaluation, we tested how
+does VULTURE performs when facing real-world software. The
+target programs selected for this analysis are consistent with
+those listed in Table II. We then conducted a comprehensive
+analysis involving both TPL reuse detection and 1-day vulner-
+ability detection using V ULTURE .
+1) TPL reuse detection: In this experiment, we executed
+VULTURE to detect the reused TPLs in the target programs by
+TABLE VI: TPL Reuse Detection Result of V ULTURE
+Target DBiot DBkwd
+Dtc Cfm P Dtc Cfm P
+AliOS-Things 47 33 0.70 61 20 0.33
+LiteOS 18 12 0.66 19 4 0.21
+Tasmota 66 54 0.82 63 39 0.62
+TizenRT 44 34 0.77 51 20 0.39
+kamailio 7 2 0.29 10 2 0.20
+mbed-os 17 12 0.70 28 10 0.36
+openthread 4 2 0.50 4 1 0.25
+Sming 32 24 0.75 3 3 1.00
+TDengine 3 3 1.00 4 2 0.50
+zephyr 2 2 1.00 5 1 0.20
+Total 240 178 0.74 248 102 0.41
+Dtc: Reuses detected.
+Cfm: Reuses confirmed with manual check.
+utilizing DBiot and DBkwd, respectively.
+Table VI demonstrates the detection results. VULTURE cor-
+rectly detected 178 reused TPLs when using DB iot, achieving
+a precision of 74%; however its precision is only 41% when
+integrating DBkwd. Upon manually inspecting the failed cases,
+we found that 18 out of 62 were caused by the non-library
+projects in the DB iot. These projects, such as LuatOS, are
+not libraries themselves but are still reused by many other
+software, making them difficult to filter out manually. T

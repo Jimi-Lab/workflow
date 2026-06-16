@@ -1,0 +1,68 @@
+  + if (getUsed(bitClrUsed))
+  +     return 1;
+    ...
+}
+METHODDEF(JDIMENSION) get_8bit_row(...){
+    
+  +   int cmaplen = source->cmap_length;
+    ...
+  + if (t >= cmaplen)
+  +    return 1;
+    output++ = colormap[0][t];
+    ...
+  + if (getUsed(bitClrUsed))
+  +    return 1;
+    ...
+}
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+F
+REUSE
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+E
+Fig. 4: Chunk extraction and match
+After processing all potential vulnerabilities for the tar-
+get program through version-based and chunk-based analysis,
+VULTURE will generate a comprehensive vulnerability report.
+This report not only includes the CVE-ID of the vulnerability
+but also provides the patch commit URL from our vulnerability
+segment of the database, along with details of the chunks
+involved in the detection process, to facilitate further patching
+on 1-day vulnerabilities by developers.
+V. E XPERIMENT
+We evaluate the performance of V ULTURE across two
+aspects: the accuracy of TPL reuse detection, and the effec-
+tiveness in detecting 1-day vulnerabilities introduced by the
+reused TPLs.
+A. Experiment Setup
+Although V ULTURE can be applied to any arbitrary plat-
+form for 1-day vulnerability detection, we applied VULTURE to
+IoT projects as a representative in our following experiments.
+In detail, V ULTURE collected all prevalent repositories from
+GitHub, OpenWRT, stm32duino, awesome-cpp, awesome-c,
+and mongoose-os-libs in C/C++, an

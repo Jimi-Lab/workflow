@@ -1,0 +1,30 @@
+# P1-A BAPEE Standalone Evaluation
+
+This report is generated before BAPEE is integrated into Step3.
+
+## Summary
+
+- CVEs selected: `2`
+- CVEs checked: `2`
+- CVEs failed: `0`
+- Structural duplicate_expansion_missed lines: `51`
+- Evaluation target lines with GT fixed suffix: `8`
+- Recovered lines: `4`
+- Operational recall: `0.5`
+- Silver precision: `1.0`
+- High-confidence recovered lines: `4`
+- Manual review cases: `10`
+- FN root causes: `{'multi_commit_semantics_or_missing_component': 2, 'manual_exact_expected_candidate_not_auto_accepted': 2}`
+- Elapsed seconds: `175.1`
+
+## Per-Repo
+
+| repo | cves | structural target | eval target | recovered | op_recall | silver_precision | failures |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| FFmpeg | 2 | 51 | 8 | 4 | 0.5 | 1.0 | 0 |
+
+## Case Dumps
+
+- `false_positive_cases.jsonl`: accepted recovery whose recovered FIC tag appears in mapped affected versions.
+- `false_negative_cases.jsonl`: duplicate_expansion_missed target line not recovered by BAPEE.
+- `manual_review_cases.jsonl`: deterministic signals below auto-accept threshold.

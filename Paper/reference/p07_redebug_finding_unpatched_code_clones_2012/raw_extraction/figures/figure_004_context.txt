@@ -1,0 +1,67 @@
+ 0
+ 0.5
+ 1
+ 1.5
+ 2
+ 2.5
+ 3
+ 3.5
+ 4
+57K
+1M
+   1.1M
+1.6M
+ 1.9M
+5.6M
+Time to query bugs (minutes)
+The number of source files in a DB
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 4: Time to query 1,634 bugs to various sizes of DBs
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 0
+ 200
+ 400
+ 600
+ 800
+ 1000
+ 1200
+ 1400
+ 1600
+Time to query bugs (minutes)
+The number of queried bugs
+Figure 5: Time to query with various number of bugs against
+the entire DB
+Ruby, and PHP. The experiments suggest that the time to
+build a database linearly increases as the size of the source
+code increases. Once ReDeBug has built the initial database,
+incremental update is quickly done by adding/changing only
+the relevant parts of the database.
+The resulting database sizes and the number of projects
+and ﬁles in databases are described in Table III. As a
+reference point, Debian Lenny required 282GB to store
+1,155,594 ﬁles without compression, but only 6.0GB with
+compression in ReDeBug. The large compression factor is
+due to the sparseness of the Bloom ﬁlters.
+Figure 4 depicts the time to query 1,634 security-related
+patches (δ1 and δ2) to each database. As the size of a
+database (the number of ﬁles in a database) grew, the time to
+query bugs increased linearly. Though there was an overhead
+to recover compressed Bloom ﬁlters to perform the set
+membership test, the querying time was fast, e.g., 0.04
+second per bug against about 1 million source ﬁles in the
+case of Debian Lenny.
+Figure 5 shows the time it took to compare a varying
+number of bugs against 

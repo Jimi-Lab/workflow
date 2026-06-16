@@ -1,0 +1,105 @@
+3.2 Included projects
+For our analysis, we want a large representative sample of
+FOSS projects that are compatible with our ground truth
+datasets and provide enough data points for our analysis. As
+starting point, we established the following requirements for
+software projects to be included:
+(a) The project should be free and/or open source with trans-
+parent and consistent security workflows. In fact, all projects
+that were included at the end of this process are distributed
+under Debian11 as free software. Nonetheless, they are widely
+used in other operating systems and make up a good represen-
+tation of FOSS in general.
+(b) The project should have a considerable number of reported
+CVEs. In order to allow a thorough analysis of all projects,
+we limited ourselves to those with at least 100 CVEs to en-
+sure meaningful results (we expect statistical arguments to be
+possible). This condition forced us to discard many projects
+we considered interesting, simply because they did not have
+enough data available in the National Vulnerability Database
+(NVD).
+(c) The project should be mainly written in C or C++. Intu-
+ition suggests that our methodology would provide results of
+similar quality for other programming languages with similar
+syntax and semantics, such as Java. However, we did not have
+enough ground truth data available to empirically prove this
+hypothesis for other programming languages, and therefore
+focus on C/C++.
+(d) Lastly, we require a significant number of a project’s CVEs
+to be linkable to a fixing commit. We had to discard some
+projects because it was not possible to consistently identify
+the fixing commit(s) for the project’s CVEs.
+In the end we created a dataset consisting of 11 different
+projects of various sizes, ages and areas of application. All
+included projects and their respective numbers of CVEs and
+corresponding fixing commits are listed in Table 1. We thor-
+oughly investigated commit messages, bug tracking systems
+and NVD references to ensure the highest possible – to the
+best of our efforts – yield of vulnerability mappings. A general
+description of the process follows in the next section.
+3.3 Linking CVEs to their fixing commits
+Our data collection process is based on information from the
+NVD [25]. The NVD is manually curated and represents one
+of the largest collections of software vulnerabilities. Conse-
+quently, it is frequently used in research on software security,
+having generated valuable insights on various topics. At the
+same time, the NVD has some well-known pitfalls, that the
+process described below tries to mitigate. This issue is fur-
+ther discussed in Section 7. For our work, we relied on the
+CVE-search tool [13] to obtain a local copy of the NVD for
+querying and obtaining data.
+11https://www.debian.org/
+For our analysis of vulnerability lifetimes, we needed to
+link a vulnerability entry in the NVD to one or multiple fixing
+commits resolving the underlying flaw. In order to create as
+large a dataset as we could for our evaluation, we applied and
+combined four different approaches.
+1. CVE-ID in Commit Message. Some fixing commits men-
+tion the related CVE-ID in the commit message, establishing
+a link between CVE and fixing commit. We investigated all
+these mappings using a combination of automated scripts and
+manual effort. First, we deemed correct all mappings that
+mention the CVE-ID in a project-specific syntax (e.g Bug-Id:
+CVE-2017-9992) that clearly denotes a matching CVE. We
+manually analyzed the remaining 176 mappings, and removed
+17 unjustified mappings, corrected 2, and added 212.
+2. Commit in NVD Reference. Entries in the NVD often
+contain references to third party websites that include security
+advisories, bug tracking systems, and also links to commits
+in a project’s version control system. In the cases where a
+reference to a commit in the respective repository was in-
+cluded, we considered this commit to be a fixing commit. We
+manually validated the mappings obtained using this method
+by investigating a random subset of 50 samples. We found
+that all of the sampled commits were indeed fixes for the re-
+spective CVEs.
+3. Common Bug ID. Many software vendors use dedicated
+bug tracking systems in their development process. Each com-
+mit corresponds to a bug identifier that is denoted in the com-
+mit message using a particular syntax. Thus, most commits
+can be linked to a certain bug ID. NVD entries, on the other
+hand, may contain a link to the vendor’s online bug tracking
+system in their references. Using regular expressions, the bug
+ID can be extracted from such links and then matched to corre-
+sponding commits. We assume that the developers mentioned
+the correct bug identifiers in their commit messages and the
+curators of the NVD reference the correct bugs as well. We
+recognize that this is a potential threat to the correctness of
+these mappings (see Section 7), but are confident the errors
+are negligible.
+4. Third party mappings. As the information provided by
+linking vulnerabilities and fixing commits is useful for var-
+ious purposes, fellow researchers and security experts have
+collected similar data for some software projects. In addition
+to our own analysis, we incorporated this data, especially in
+cases where acquiring the information in an automated fash-
+ion proved particularly difficult. We relied on three different
+third party mappings: (a) data provided by the Linux Kernel
+CVEs project [19], (b) mappings that were manually curated
+by Piantadosi et al. [32], (c) information from the Debian
+Security Tracker [12]. We are confident in the quality of data
+obtained from these parties, as they are either curated from
+reliable sources or relied on a data collection methodology
+similar to ours.
+12There were two occasions where a fix belonged to multiple CVEs as
+indicated in the commit message

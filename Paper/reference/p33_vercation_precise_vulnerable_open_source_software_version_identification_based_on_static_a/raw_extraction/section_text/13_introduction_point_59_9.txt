@@ -1,0 +1,104 @@
+introduction point [59], [9].
+VII. R
+ELATED WORK
+A. Vulnerability Fixing Commit Analysis
+Several studies have focused on analyzing vulnerability ﬁx-
+ing commit (VFC) to extract vulnerability features, which can
+be used for various purposes such as vulnerability detection,
+classiﬁcation, and affected version identiﬁcation. VulPecker
+[70] extracts code patterns from VFC to detect similar vul-
+nerabilities in other software versions. SySeVR [71] uses a
+systematic approach to extract syntax- and semantic-based vul-
+nerability features from patches. VulDeePecker [72] leverages
+deep learning t echniques to learn vulnerability patterns from
+code gadgets extracted from vulnerability ﬁxing commits. Most
+existing VFC analysis methods rely heavily on predeﬁned rules
+or patterns, which may not capture the full context of vulner-
+abilities. V
+ERCATION incorporates VFC analysis by leveraging
+LLMs to understand the context of code changes in ﬁxing com-
+mits, potentially capturing more nuanced vulnerability features.
+B. Vulnerable Version Detection for OSS
+Several approaches have been proposed for vulnerable ver-
+sion identiﬁcation. V-SZZ [17] uses the SZZ algorithm to back-
+track vfcs and identify vulnerability-introducing changes. MVP
+[12] employs program slicing to extract vulnerability and patch
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 017 =====
+392 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+signatures, then uses these to identify potentially vulnerable
+functions. V0Finder [16] generates ﬁngerprints for vulnerable
+functions and uses a clone-based technique to detect vulner-
+able versions across different software releases. VCCFinder
+[73] uses machine learning techniques to identify vulnerability-
+contributing commits. VUDDY [74] proposes a scalable ap-
+proach for vulnerable code clone detection in large-scale code
+bases. Existing approaches often rely on predeﬁned patterns
+and syntactic-level analysis, leading to imprecision in vulner-
+ability characterization and code clone detection. V
+ERCATION
+combines static analysis with LLM for code understanding and
+introduces AST-based code clone detection to address the code
+structure modiﬁcation problem.
+C. Code Refactoring Detection
+Some researchers conducted studies on the characteristics of
+code refactoring not altering the code behavior of the code and
+have proposed detection methods. MLRefScanner [75] detects
+refactoring commits in Python projects by analyzing commit
+history and extracting features that represent refactoring activ-
+ities without altering code behavior. Abid et al. [76] perform a
+study outlining different levels ofrefactoring from code level to
+architecture and discuss the importance of maintaining behavior
+during refactoring. Eman et al. [77] focus on how refactor-
+ing is integrated into the code review process while ensuring
+that the original software behavior is preserved. Existing code
+refactoring detection methods primarily focus on high-level
+changes like renaming and method/class moves. Our approach,
+however, targets statement-level changes through ﬁne-grained
+AST expansion and normalization, including inline function
+expansion during AST generation.
+D. Code Clone Detection
+Some SOTA techniques utilize static analysis to conduct code
+clone detection. SCDetector [78] feeds tokens with graph detail
+into a Siamese architecture neural network to train a code clone
+detector. Fang et al.[18] propose a joint code representation that
+applies fusion embedding techniques to learn hidden features
+of source codes, then train a supervised deep learning model
+to detect functional code clones. FCDetection [18] generates
+AST and CFG representations and uses Word2vec to embed
+these features into vectors. Then the fused feature vectors are
+input into a deep neural network model for classiﬁcation of code
+clones.
+VIII. C
+ONCLUSION AND FUTURE WORK
+This paper proposed V ERCATION, an approach designed for
+vulnerable version identiﬁcation of open-source C/C ++ soft-
+ware. Our approach introduces two key innovations: leveraging
+LLMs to enhance the extraction of vulnerability-related state-
+ments and employing code clone detection based on expanded
+and normalized ASTs. Experimental results on our dataset of
+122 CVEs across 12 popular open-source projects validate that
+V
+ERCATION surpasses existing techniques for vulnerable ver-
+sion identiﬁcation, demonstrating notable improvements in both
+precision and recall. V ERCATION’s novelty lies not in individ-
+ual techniques but in the systematic integration of semantic
+analysis and methodological innovations in LLM application.
+The combination creates a qualitatively different approach that
+advances the state-of-the-art in both accuracy and practical
+applicability, opening new research directions for AI-assisted
+software security analysis.
+In the future, we plan to empirically validate V
+ERCATION on
+a broader set of languages (Java, Python, JavaScript, and PHP)
+to conﬁrm its effectiveness. Furthermore, we are interested in
+exploring integrating inter-procedural analysis techniques to
+enhance the detection of cross-functional vulnerability patterns.
+A
+CKNOWLEDGMENT
+We thank the anonymous reviewers for their insightful com-
+ments. Any opinions, ﬁndings and conclusions or recommen-
+dations expressed in this material are those of the author(s)
+and do not reﬂect the views of National Research Foundation,
+Singapore or the Smart Nation Group.

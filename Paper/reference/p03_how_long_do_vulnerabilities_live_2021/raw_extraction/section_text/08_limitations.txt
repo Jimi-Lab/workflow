@@ -1,0 +1,51 @@
+7 Threats to validity
+Dataset. The data in vulnerability databases often experience
+bias from several sources [7].
+– Completeness. Although the NVD is one of the largest col-
+lections of software vulnerabilities, it can not be considered
+complete, since many vulnerabilities may never get a CVE.
+Further research is required to investigate the lifetime of those
+vulnerabilities. Furthermore, although we strove to map as
+many CVEs to their fixing commits as possible, our approach
+is not able to identify a fixing commit for every single CVE
+affecting a program. However, the dataset we gathered is big
+and complete enough to be representative, and we do not
+expect our results on vulnerability lifetimes and their charac-
+teristics to be significantly influenced by some missing data
+points.
+– Correctness. Entries in the NVD are manually curated and
+analyzed, but might still include errors. Additionally, mistakes
+in the commit message when including the bug ID or a CVE-
+ID can lead to incorrect mappings. We corrected these errors
+during our data cleaning process, however, some errors may
+have evaded detection. We expect these to be few and to not
+affect our general observations.
+– Generalization. Although we do not claim validity of our
+results for other projects, apart from the 11 we included in
+our dataset, we believe that the selected projects are a large
+representative sample and the insights gained from our results
+are, to an extent, of general significance.
+Independence. Some of our arguments in the Results section
+rely on the implied assumption that vulnerability lifetimes
+are independent. It has been shown that some vulnerability
+discovery events can be dependent [29], either due to a new
+class of vulnerabilities being discovered, a new tool being
+made available, or a new area of code coming under scrutiny.
+These dependencies manifest themselves as small bursts in
+the vulnerability discovery rate and are a particular problem
+to vulnerability discovery models that try to model the time
+between discoveries. It is difficult to imagine (let alone test)
+how such dependencies would affect the lifetimes of vulner-
+abilities, especially in a large and diverse dataset like ours.
+Also, our empirical results do not indicate the existence of any
+kind of dependency regarding vulnerability lifetimes. There-
+fore, we consider the independence of vulnerability lifetimes
+to be a reasonable assumption. Some points in the Discus-
+sion section also imply an assumption of independence of
+discovery events. Again, small bursts of discoveries may exist
+due to dependent discoveries, however they do not affect the
+arguments being made, which describe large-scale behaviors.
+Heuristic error. Our main findings are consistent over dif-
+ferent projects and over time. Therefore, we do not believe
+the error of our lifetime-estimation heuristic (as discussed in
+Section 4.2) to affect their validity.

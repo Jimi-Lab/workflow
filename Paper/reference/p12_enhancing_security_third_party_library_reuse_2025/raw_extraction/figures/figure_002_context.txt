@@ -1,0 +1,38 @@
+e the
+root causes of a vulnerability for vulnerability identification.
+Considering the TPL reuses in ReactOS (shown in Fig-
+ure 2) as an example, ReactOS originally reused vulnerable
+TPL versions of libjepg-turbo and mbedtls. Then it patches the
+vulnerabilities in a custom way. While the statement contents
+remain the same, the line numbers where the statements are
+located and the format of the statements changed, such alter-
+ation challenges the existing approaches [28] [46] to accurately
+identify the custom patches.
+Conclusion 2: Selecting critical vulnerable features that
+contribute to the generation and mitigation of a vulnera-
+bility can enhance the effectiveness and efficiency of 1-
+day vulnerability detection.
+B. CVE and Commit Analysis
+Software assessment relies on publicly available informa-
+tion on vulnerabilities and security patches, which is typically
+3
+
+===== PAGE 004 =====
+Fig. 2: ReactOS patching of CVE-2018-14498 and CVE-2017-14032. Due to custom reuse, the ReactOS patch differs from the
+official one in statement format and the line numbers where the patches are applied.
+provided by CVE [5] and NVD [8]. However, many vulnerabil-
+ities disclosed by CVE/NVD come with either vague security
+patch information or no patch information whatsoever [45].
+Commit ranking is a common process [20], [40], [41], [45]
+of labeling direct references between security patch-related
+commits and vulnerabilities. To identify the patch commit
+of a vulnerability, specific sets of features related to commit
+candidates and the vulnerabilities (e.g., vulnerability location,
+vulnerability identifier) are collected. Then, a pre-trained rank-
+ing model is used to estimate the relevance between each
+commit and the vulnerability. The most relevant commits
+related to security patches are supposed to be prioritized.
+Nonetheless, the ranking results highly rely on the quality of
+the selected correlation features and the information collected
+from CVE/NVD, which are typically manual processes. Al-
+though the manual effort is a one-time cost, the va

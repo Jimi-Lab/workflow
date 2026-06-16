@@ -1,0 +1,252 @@
+{
+  "cwe_id": "CWE-478",
+  "name": "Missing Default Case in Multiple Condition Expression",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The code does not have a default case in an expression with multiple conditions, such as a switch statement.",
+  "extended_description": "If a multiple-condition expression (such as a switch in C) omits the default case but does not consider or handle all possible values that could occur, then this might lead to complex logical errors and resultant weaknesses. Because of this, further decisions are made based on poor information, and cascading failure results. This cascading failure may result in any number of security issues, and constitutes a significant failure in the system.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1023",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incomplete Comparison with Missing Factors"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++",
+      "Java",
+      "C#",
+      "Python",
+      "JavaScript"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The code does not have a default case in an expression with multiple conditions, such as a switch statement.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "expression",
+      "default",
+      "failure",
+      "case"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "expression",
+      "default",
+      "failure",
+      "case",
+      "cascading",
+      "multiple",
+      "switch",
+      "multiple-condition"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following does not properly check the return code in the case where the security_check function returns a -1 value when an error occurs. If an attacker can...",
+        "snippet": "#define FAILED 0 #define PASSED 1 int result; ... result = security_check(data); switch (result) { case FAILED: printf(\"Security check failed!\\n\"); exit(-1); //Break never reached because of exit() break; case PASSED:..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java example the method getInterestRate retrieves the interest rate for the number of points for a mortgage. The number of points is provided...",
+        "snippet": "public static final String INTEREST_RATE_AT_ZERO_POINTS = \"5.00\"; public static final String INTEREST_RATE_AT_ONE_POINTS = \"4.75\"; public static final String INTEREST_RATE_AT_TWO_POINTS = \"4.50\"; ... public BigDecimal..."
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "In the following Python example the match-case statements (available in Python version 3.10 and later) perform actions based on the result of the...",
+        "snippet": "result = process_data(data) match result: case 0: print(\"Properly handle zero case.\") case 1: print(\"Properly handle one case.\") # program execution continues..."
+      },
+      {
+        "language": "JavaScript",
+        "nature": "Bad",
+        "summary": "In the following JavaScript example the switch-case statements (available in JavaScript version 1.2 and later) are used to process a given step based on the...",
+        "snippet": "let step = input1 + input2; switch(step) { case 1: alert(\"Process step 1.\"); break; case 2: alert(\"Process step 2.\"); break; case 3: alert(\"Process step 3.\"); break; } // program execution continues..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following does not properly check the return code in the case where the security_check function returns a -1 value when an error occurs. If an attacker can...",
+        "snippet": "#define FAILED 0 #define PASSED 1 int result; ... result = security_check(data); switch (result) { case FAILED: printf(\"Security check failed!\\n\"); exit(-1); //Break never reached because of exit() break; case PASSED:..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following Java example the method getInterestRate retrieves the interest rate for the number of points for a mortgage. The number of points is provided...",
+        "snippet": "public static final String INTEREST_RATE_AT_ZERO_POINTS = \"5.00\"; public static final String INTEREST_RATE_AT_ONE_POINTS = \"4.75\"; public static final String INTEREST_RATE_AT_TWO_POINTS = \"4.50\"; ... public BigDecimal..."
+      },
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "In the following Python example the match-case statements (available in Python version 3.10 and later) perform actions based on the result of the...",
+        "snippet": "result = process_data(data) match result: case 0: print(\"Properly handle zero case.\") case 1: print(\"Properly handle one case.\") case _: print(\"Properly handle unexpected condition.\") # program execution continues..."
+      },
+      {
+        "language": "JavaScript",
+        "nature": "Good",
+        "summary": "In the following JavaScript example the switch-case statements (available in JavaScript version 1.2 and later) are used to process a given step based on the...",
+        "snippet": "let step = input1 + input2; switch(step) { case 1: alert(\"Process step 1.\"); break; case 2: alert(\"Process step 2.\"); break; case 3: alert(\"Process step 3.\"); break; default: alert(\"Unexpected step encountered.\"); } //..."
+      }
+    ],
+    "observed_examples": []
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

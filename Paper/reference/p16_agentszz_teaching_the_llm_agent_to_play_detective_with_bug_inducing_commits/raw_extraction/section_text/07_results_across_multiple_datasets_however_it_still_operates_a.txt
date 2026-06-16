@@ -1,0 +1,78 @@
+results across multiple datasets. However, it still operates as a static
+pipeline without iterative investigation.
+2.2 LLM-Based Agents for Software Engineering
+The application of LLMs in SE has evolved from static, single-turn
+code generation to dynamic, autonomous agents [16, 21]. Unlike tra-
+ditional LLM applications that rely solely on internal model weights,
+LLM-based agents are augmented with reasoning frameworks (e.g.,
+ReAct [48]), memory mechanisms, and the ability to interact with
+external environments via tools [43]. This evolution enables agents
+to tackle complex SE tasks across the Software Development Life
+Cycle, shifting from snippet-level synthesis to repository-level rea-
+soning and maintenance [21].
+Recent work on agents designed to navigate large codebases
+and resolve real-world issues, as exemplified by SWE-bench [17].
+Systems such as Devin [9] and OpenHands [41] demonstrate end-to-
+end patch generation, while SWE-agent [47] introduces an Agent-
+Computer Interface (ACI) to bridge LLMs and terminal environ-
+ments by structuring tool interactions. Lightweight variants such as
+mini-SWE-agent (a lightweight variant of SWE-agent) [47] demon-
+strate that minimal bash-based agents can achieve competitive
+performance. Other approaches enhance repository interaction
+through structured search or execution mechanisms, including
+AST-based navigation (AutoCodeRover [50]) and executable action
+spaces (CodeAct [40]). In contrast, pipeline-based methods such as
+Agentless [44] simplify execution by replacing autonomous plan-
+ning with a fixed pipeline. Despite these advances, existing agents
+either rely on general-purpose exploration (e.g., bash-based inter-
+action) or predefined pipelines, lacking task-specific tool design
+
+===== Page 003 =====
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+Tool Execution5
+BFC: Commit xxx
+powercap:intel_rapl:FixlockinginTPMIRAPLTheRAPLframework...
+4flies changed+40 -111Phase 1: PREPROCESSINGBFC
+Search Bound Extraction2
+Fix Info
+DomainKnowledge
+ToolDescriptionsPromptAssembly
+Phase 2: REACT LOOP
+Phase 3: OUTPUTReActInvestigation Loop(Up to T=15turns)
+BIC: <commit_hash>Domain KnowledgeTool Design
+Context Compression
+OutputCompressioncache→format→extract
+6
+ReasoningAnalyze evidence Plan next action4
+CandidateEvaluationFollow domain rules to judge candidates7
+3
+Hash
+ResultParsing
+8Fix DateExtract Fix Date d_fix2021-06-21
+ Hash Normalization9
+ProjectCodebaseActionObservation
+git_blamegit_showgit_log_sgit_log_funcgit_grep
+Retrieve
+Figure 1: Overview ofAgentSZZ, illustrating the end-to-end workflow from preprocessing (1-3), through the ReAct investigation
+loop (4-7), to output generation (8-9). Given a bug-fixing commit (BFC), the agent investigates the repository through tool
+interactions guided by domain knowledge, with context compression, and outputs the identified bug-inducing commit (BIC).
+and domain knowledge for precise bug-inducing commit identi-
+fication.AgentSZZaddresses this gap by combining structured,
+task-specific tools with domain knowledge to enable accurate bug-
+inducing commit identification.
+3AgentSZZApproach
+To address the limitations of existing SZZ algorithms and the chal-
+lenges of applying agent-based approaches to bug-inducing commit
+identification, we proposeAgentSZZ, an agent-based framework
+that leverages LLM-based agents to interact with repositories and
+identify bug-inducing commits, as illustrated in Figure 1.AgentSZZ
+performsadaptive investigationthat more closely resembles how
+developers analyze bugs, in contrast to prior SZZ approaches that
+follow fixed pipelines. Inspired by the ReAct paradigm [ 48], the
+agent dynamically selects investigation strategies based on interme-
+diate findings, enabling flexible repository exploration. Instead of
+relying on syntactic line matching, itreasons about causal rela-
+tionshipsbetween commits and the bug, distinguishing superficial
+changes (e.g., refactorings) from those that introduce faulty logic.
+This enablesAgentSZZto handle challenging scenarios such as
+cross-file cases and refactoring-obscured bugs.

@@ -1,0 +1,52 @@
+10 Yu Shi et al.
+Algorithm 1Agentic BIC Search
+Require:TKG, BFC, top-𝐾limit
+Ensure:BIC prediction with reasoning
+1:// Candidate ranking and retrieval
+2:𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒𝑠←list_candidates(TKG)⊲Returns top-𝐾ranked by fitness
+𝑓𝑖𝑡𝑛𝑒𝑠𝑠(𝑐)=
+ 
+
+1.0blame
+0.6blame_ancestor
+0.3bfc_ancestor
+3:// Agentic exploration loop
+4:𝑠𝑡𝑒𝑝←0;𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠←0;𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛←∅
+5:while𝑠𝑡𝑒𝑝<50and𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛=∅do
+6:𝑎𝑐𝑡𝑖𝑜𝑛←LLM_Reason(𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒𝑠, output)
+7:if𝑎𝑐𝑡𝑖𝑜𝑛=query_node(𝑠ℎ𝑎)then
+8: output←qery_node(TKG,𝑠ℎ𝑎)
+9:else if𝑎𝑐𝑡𝑖𝑜𝑛=read_node_content(𝑠ℎ𝑎)and𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠<3then
+10: output←read_node_content(TKG,𝑠ℎ𝑎)
+11:𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠←𝑑𝑖𝑓𝑓_𝑟𝑒𝑎𝑑𝑠+1
+12:else if𝑎𝑐𝑡𝑖𝑜𝑛=traverse_graph(𝑠ℎ𝑎)then
+13: output←traverse_graph(TKG,𝑠ℎ𝑎)
+14:else if𝑎𝑐𝑡𝑖𝑜𝑛=decide(𝑠ℎ𝑎,𝑟𝑒𝑎𝑠𝑜𝑛)then⊲Agent decision
+15:𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛←(𝑠ℎ𝑎,𝑟𝑒𝑎𝑠𝑜𝑛)
+16:end if
+17:𝑠𝑡𝑒𝑝←𝑠𝑡𝑒𝑝+1
+18:end while
+19:return𝑑𝑒𝑐𝑖𝑠𝑖𝑜𝑛
+diff reads to 3 per case. The agent outputs a structured prediction containing the predicted BIC
+SHA and reasoning chain.
+5 Evaluation Setup
+We use the same three datasets (DS_LINUX, DS_APACHE, and DS_GITHUB) described in Sec-
+tion 3.2.1, comprising 2,102 validated BFC-BIC pairs with 2,272 ground truth BICs.
+5.1 Baselines
+We compare AgenticSZZ against seven SZZ variants and one LLM-based approach, adopting the
+same baselines as LLM4SZZ [36] to enable direct comparison. Since we use identical datasets and
+evaluation methodology, we report baseline results from this prior work where available.1
+All SZZ baseline variants are solely based on git blameover deleted or modified lines in the
+BFC. They differ primarily in their filtering and ranking strategies:B-SZZ[ 32] is the original SZZ
+algorithm that traces deleted lines via git blame and returns all blame commits as candidates.
+AG-SZZ[ 19] extends B-SZZ by filtering cosmetic changes (blank lines, comments) and using
+annotation graphs (which map line origins across revisions, even when lines move due to insertions
+or deletions) for more precise line tracking.MA-SZZ[ 7] further excludes meta-changes (branch
+merges, property changes) that do not affect program behavior.R-SZZandL-SZZ[ 8] select a single
+BIC from AG-SZZ candidates: R-SZZ chooses the most recent commit, while L-SZZ chooses the
+commit with the most changed lines.RA-SZZ[ 24] filters refactoring operations using RefDiff [31]
+and Refactoring Miner [39], but is limited to Java projects.Neural-SZZ[ 35] applies deep learning
+by embedding code changes with CodeBERT [12] and ranking them using a heterogeneous graph
+attention network. It is also limited to Java.
+1Baseline results for B-SZZ, AG-SZZ, MA-SZZ, R-SZZ, L-SZZ, RA-SZZ, and Neural-SZZ are from the LLM4SZZ paper [36].
+, Vol. 1, No. 1, Article . Publication date: February 2026.

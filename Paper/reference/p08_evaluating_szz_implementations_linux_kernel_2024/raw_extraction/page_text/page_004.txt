@@ -1,0 +1,101 @@
+2222
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+II. BACKGROUND AND RELATED WORK
+In this section, we ﬁrst provide an overview of the original
+SZZ algorithm, outlining its background and highlighting some
+limitations related to ghost commits. Next, we study the variants
+of the SZZ algorithm that have been proposed to improve its
+precision and recall. Lastly, we discuss the application and
+signiﬁcance of the SZZ algorithm and its variants within the
+Software Engineering research community.
+We focus on the eight SZZ algorithms that are considered
+by Rosa et al. [28]: B-SZZ [1], AG-SZZ [2], DJ-SZZ [15],
+L-SZZ [16], R-SZZ [16], MA-SZZ [12], RA-SZZ [13], RA-
+SZZ* [14], as well as some implementation variants: PyDriller
+(SZZ@PYD) [33], SZZ Unleashed [34], and OpenSZZ [35].
+A. The Original SZZ Algorithm & Ghost Commits
+SZZ, the name given to the algorithm initially introduced
+by ´sliwerski, Zimmermann, and Zeller [1], was developed to
+identify changes that induce bugs. In our forthcoming discus-
+sion, we will follow Rosa et al. [28] and refer to this original
+SZZ algorithm as B-SZZ. B-SZZ follows a core structure that
+is shared with its subsequent variants: (1) identifying bug-
+ﬁxing commits, followed by a ﬁltering process utilizing two
+conﬁdence levels: syntactic and semantic; (2) mapping bug-
+ﬁxing commits to their corresponding potential bug-inducing
+commits; and (3) eliminating potential bug-inducing commits
+that are unlikely to be the cause of bugs.
+1) Identifying Bug-ﬁxing Commits:
+In the initial stage,
+B-SZZ endeavors to establish a relationship between a bug-
+ﬁxing commit in the version control system (VCS) and the cor-
+responding bug reports in the issue-tracking system (ITS). To
+accomplish this, B-SZZ employs two independent conﬁdence
+levels: a syntactic level, which infers links between a VCS log
+and a bug report, and a semantic level, which validates these
+links through bug report data.
+For most software systems, there is no mandatory or default
+link between bug reports in the ITS and the VCS. Thus, devel-
+opers may forget to add such links. Rezk et al. [17] deﬁne the
+missing bug-ﬁxing commits that SZZ implementations fail to
+detect, where links were omitted, as Ghost Commit 0 (GC 0).
+Herbold et al. [36] also ﬁnd that half of the bug-ﬁxing commits
+identiﬁed by SZZ are incorrect due to the mislabeled issues
+in the ITS (where developers incorrectly label issues as bugs,
+while some are merely improvements, etc.) [37]. Herbold et al.
+also ﬁnd that SZZ misses about one-ﬁfth of the bug-ﬁxing
+commits.
+This paper will not study the limitations of bug-ﬁxing commit
+identiﬁcation, as: (1) previous work [38], [39], [40] has already
+provided a comprehensive analysis and proposed tools to re-
+cover GC 0’s missing links, and (2) the Linux kernel repository
+requires developers to use the “Fixes:” tag along with the ﬁrst
+12 characters of the SHA-1 ID when a patch addresses a bug
+in a speciﬁc commit. Therefore, we can collect a “developer-
+informed” Linux kernel dataset using the VCS without reliance
+on the ITS.
+2) Mapping: Once the bug-ﬁxing commits in the VCS have
+been identiﬁed, B-SZZ proceeds to the second step, where it
+Fig. 2.
+A Remove Mapping Ghost (bug-ﬁxing commit 7fdbc5f).
+Fig. 3.
+An Add Mapping Ghost (bug-inducing commit 5a858e7).
+maps the bug-ﬁxing commits to potential bug-inducing com-
+mits, i.e., the commits that may have caused the bug. To do this,
+B-SZZ ﬁrst employs CVS’s diff command.2 This command
+is analogous to git show, as it identiﬁes the lines that have
+been deleted or modiﬁed by a commit. Then, B-SZZ invokes
+the annotate command (another CVS command, similar to git
+blame, but that does not identify the corresponding lines in
+earlier revisions) for each line to determine the most recent
+commit that deleted or modiﬁed the line prior to the ﬁx. When
+there are multiple removed or modiﬁed lines, multiple commits
+can be mapped as potential bug-inducing commits. This paper
+focuses on issues in the mapping step.
+Tools such as CVS annotate and git blame cannot map bug-
+ﬁxing commits that do not modify or remove lines to bug-
+inducing commits. This situation is deﬁned as Mapping Ghost
+type 1 (MG 1) by Rezk et al. (To give a more meaningful
+naming for MG 1, we name it Remove Mapping Ghost in
+this paper.) For example, in Fig. 2, bug-ﬁxing commit 7fdbc5f3
+does not remove any lines and only added two lines in all the
+changes.
+Similarly, if a bug-inducing commit does not add lines, it
+cannot be tracked by using blame on subsequently removed
+lines, as blame can only track previously existing lines. This
+situation is deﬁned as Mapping Ghost type 2 (MG 2) by
+Rezk et al. (To give a more meaningful naming for MG 2, we
+name it Add Mapping Ghost in this paper.) For instance, in
+Fig. 3, bug-inducing commit 5a858e74 does not add any lines
+and only removes two lines in all the changes.
+3) Filtering: In the ﬁnal stage, B-SZZ discards the potential
+bug-inducing commits that cannot have caused the bug, such
+as those committed to the VCS after the bug was reported.
+The potential bug-inducing commits that are not ﬁltered out
+2When B-SZZ was proposed, the Concurrent Versions System (CVS) was
+widely used for version control.
+3https://github.com/torvalds/linux/commit/7fdbc5f014c3f71bc44673a2d6c5
+bb2d12d45f25
+4https://github.com/torvalds/linux/commit/5a858e79c911330678b5a9be91a
+24830e94a0dc9
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

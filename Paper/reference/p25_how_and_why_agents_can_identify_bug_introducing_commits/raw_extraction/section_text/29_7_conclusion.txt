@@ -1,0 +1,23 @@
+7 Conclusion
+We introduced SZZ-Agent, an agentic approach that uses binary
+search over source code versions to identify bug-introducing com-
+mits, outperforming all previous approaches by at least 12 percent-
+age points in F1-score on three established datasets. Through five
+ablation studies, we established that this improvement stems from
+the agentic approach itself, not from data leakage or a more capable
+LLM backbone.
+During our ablations, we discovered that binary search is un-
+necessary: Simple-SZZ-Agent, which gives a single agent the full
+candidate set, matches or outperforms SZZ-Agent on all datasets.
+It distills the fix commit into short greppable patterns to search the
+candidate set, explaining why cost and performance remain largely
+independent of the candidate set size. Simple-SZZ-Agent general-
+izes across agent frameworks and LLM backbones, and even cheap
+configurations outperform all previous non-agentic approaches.
+Beyond identifying bug-introducing commits, the agent’s abil-
+ity to compress bug knowledge into short patterns opens avenues
+for future work in root cause understanding, bug detection, and
+program repair. We believe that agents, equipped with simple de-
+veloper tools like grep, offer a powerful and general strategy for
+navigating large search spaces in software engineering—and that
+the problems we studied here are only the beginning.

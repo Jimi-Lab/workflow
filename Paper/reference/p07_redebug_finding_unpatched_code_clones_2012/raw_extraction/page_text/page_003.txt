@@ -1,0 +1,109 @@
+II. REDEBUG
+A. The Core System
+Finding all unpatched code clones is tricky and involves
+numerous considerations. For example, how many lines of
+code need to be similar for a case to be reported? Is one
+copied line enough, or are we only interested in multiple
+line matches? Should whitespace matter? Should the order
+of statements matter, and if so, should we only consider
+some syntactic classes? Do we consider the syntactic text,
+tokens, or the parse of ﬁles? For example, in C the order
+of declarations likely does not matter, but the order of
+computation may. What if two segments are equivalent up
+to variable naming? What about semantic equivalence, e.g.,
+one code sequence multiples by 2 while the other performs
+a logical left shift. Are these similar or different?
+These questions all involve trade-offs between accuracy,
+efﬁciency, and how easy it is to implement a robust algo-
+rithm. For example, consider code that is the same up to
+variable names and variable declaration order. A straight
+string match of the ﬁles may ﬁnd virtually no commonality.
+We could certainly address these problems by normalizing
+declaration order, and parse code to determine variable name
+equivalence (so-called α-equivalence) [11]. However, run-
+ning such algorithms require we implement parsing engines
+(which can be fragile) and run additional algorithms that
+cost time, thus reducing overall throughput. If we are not
+careful we may end up subtly analyzing a model of the
+original program that is not right, e.g., declaration order
+matters when looking for buggy code clones of incorrect
+shadow variable declarations.
+ReDeBug’s choices are motivated by the design space
+goals of: (1) focusing on unpatched code clones, (2) scaling
+to large and diverse code bases such as OS distributions, (3)
+minimizing false detection, (4) being modular when possible
+and offer a user choice of parameters, and (5) be language-
+agnostic as much as possible so that we work with the wealth
+of languages found within an OS distribution code base. The
+core of the ReDeBug system accomplishes these goals using
+the following steps:
+1) ReDeBug normalizes each ﬁle. By default ReDeBug
+removes typical language comments, removes all non-
+ASCII characters, removes redundant whitespace ex-
+cept new lines, and converts all characters to lower
+case. We also ignore curly braces if the ﬁle is C, C++,
+Java, or Perl (as identiﬁed by extension or the UNIX
+file command).
+Normalization is modularized so that the exact nor-
+malization steps can easily be changed.
+2) The normalized ﬁle is tokenized based upon new lines
+and regex substrings.
+3) ReDeBug slides a window of length n over the token
+stream. Each n tokens are considered a unit of code
+to compare.
+4) Given two sets fa and fb of n-tokens, we compute the
+amount of code in common. When ﬁnding unpatched
+code clones, if fa is the original buggy code snippet
+we calculate
+CONTAINTMENT(fa, fb) = |fa ∩fb|
+|fa|
+(1)
+When we want to measure the total amount of sim-
+ilarity between ﬁles, we calculate the percentage of
+tokens in common (i.e., the Jaccard index):
+SIMILARITY(fa, fb) = |fa ∩fb|
+|fa ∪fb|
+(2)
+With either calculation it is common to only con-
+sider cases where the similarity or containment is
+greater than or equal to some pre-determined threshold
+θ. In our implementation, we also perform obvious
+optimizations such as when θ = 1 only verifying
+fa ⊆fb instead of calculating an actual ratio for
+CONTAINMENT.
+5) ReDeBug performs an exact match test on the iden-
+tiﬁed unpatched code clones to remove Bloom ﬁlter
+errors. ReDeBug also uses the compiler to identify
+when a code clone is dead code when possible.
+For example, suppose we have two ﬁles A = t1t2t3t4
+and B = t1t3t4t2 where each ti is a token (note to-
+kens are written in the order that they appear in the
+ﬁle). The tokenization is then A = {t1, t2, t3, t4} and
+B = {t1, t3, t4, t2}. When n = 2, there are 3 2-token
+strings in each set: fA = {(t1, t2), (t2, t3), (t3, t4)} and
+fB = {(t1, t3), (t3, t4), (t4, t2)}. The similarity is 1/5 since
+1 out of 5 2-token sets are shared, (t3, t4), even though the
+shared token sequence appears at different places in the ﬁle.
+As a result, ReDeBug works with reordering, insertions, and
+deletions of up to n-tokens.
+ReDeBug is parametrized in two ways: the number of
+consecutive tokens to consider together, n, and the threshold,
+θ. n determines the sensitivity for statement reordering,
+e.g., if n = 1 then statement order does not matter at all,
+n = 2 looks at statement pairs, and so on. θ acts as a
+knob to tell us what is a signiﬁcant amount of copying.
+When θ = 1, two ﬁles must have exactly the same n-tokens
+(after normalization). When θ = 0, any match is considered
+signiﬁcant. Values in between represent thresholds for the
+amount of similarity of interest. There is no “right” value
+for these parameters. In our experiments we show typical
+values that produce meaningful results. For example, n = 4
+works well with existing patches.
+Design point comparison: Our approach is in stark contrast
+with current research trends in code clone detection, such as
+Deckard [23], CP-Miner [25], Deja Vu [21], and others [1,
+24], that focus on minimizing missed code clones at the
+expense of other factors. These approaches also normalize
+the code, but then perform additional steps such as parsing
+50
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

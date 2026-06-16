@@ -1,0 +1,46 @@
+5.3 Implementation
+AgenticSZZ is implemented in Python 3.12 using the following components:
+(1) LLM Backend.We use DeepSeek-V3.2 [ 9] as the agent’s reasoning engine, accessed via the
+official API. The LLM operates with temperature 0 for reproducibility.
+(2) Knowledge Graph.The TKG is stored in Neo4j 2 using the Graphiti framework [28] for temporal
+knowledge graph management. Graphiti provides native support for temporal entity and edge
+management, enabling efficient retrieval of commits and their relationships while maintaining
+chronological ordering. We design the domain-specific schema (commit, file, and function nodes;
+temporal and structural edges) and tool APIs on top of this general-purpose framework.
+(3) TKG Configuration.For commit traversal, we set the maximum file-history depth to 100 commits
+in each direction (BFC ancestor and blame ancestor), with a hard cap of 200 total candidates
+per TKG. These generous upper bounds ensure high coverage (RQ0 shows that 80% of ancestor
+BICs are reachable within depth 24); the actual number of commits collected depends on each
+file’s history length. The agent evaluates the top-𝐾=20 candidates ranked by fitness score; we
+analyze sensitivity to𝐾in Section 8.
+(4) Agent Framework.We implement the search agent using pydantic-ai,3 a Python agent framework
+that provides typed tool interfaces and structured output parsing. The agent receives the BFC
+context (commit message, modified files, extracted functions) and iteratively calls tools until it
+reaches a decision or exhausts the step limit of 50.
+2https://neo4j.com/
+3https://ai.pydantic.dev/
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 012 =====
+12 Yu Shi et al.
+(5) Computational Resources.Experiments were conducted on a 48-core server with 1.5TB RAM. For
+parallel evaluation, each worker runs an isolated Neo4j instance in Docker, enabling concurrent
+processing across multiple cases.
+For the main comparison (Table 2) and controlled comparison (Table 4), we follow the evaluation
+protocol of LLM4SZZ [ 36]: both approaches are run three times independently, and we report
+metrics averaged across runs to reduce variance from LLM non-determinism. For statistical tests, we
+compare the best-performing run from each approach; we additionally test robustness by comparing
+our worst run against baselines’ best. For cost analysis (Table 3), we report the average processing
+time and cost per case across all three runs. For the ablation study and category breakdown analysis
+(RQ2), we report results from a single run, as our RQ1 results showed that performance overall is
+stable across runs (both for AgenticSZZ and LLM4SZZ).
+5.4 Data Leakage Prevention
+Commit messages in real repositories can contain explicit references to the BIC, added by developers
+who manually identified the bug-inducing commit. This is particularly prevalent in the Linux kernel,
+which follows a structured commit message format including Fixes:tags that directly reference
+the bug-inducing commit (this convention is how the DS_LINUX BIC dataset was constructed).
+Since SZZ aims to automate this manual identification process, we must prevent the agent from
+exploiting these ground truth hints during evaluation.
+For this reason, we sanitize all commit messages during TKG construction by removing Fixes:
+lines, Reverts: tags, and replacing inline commit SHA references with placeholder tokens. This
+ensures the agent must reason about code relationships rather than exploiting metadata leakage.

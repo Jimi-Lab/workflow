@@ -1,0 +1,107 @@
+the representation chosen also provides a strong foundation
+for research furthering automation, including machine-learning
+approaches.
+This paper explains how we collected and analyzed data to
+produce the initial version of the model. In the following sec-
+tions we discuss related work, our methodology, the resulting
+knowledge graph of countermeasure techniques, and ﬁnally
+our roadmap for future work.
+II. R ELATED WORK
+Related prior work includes early cybersecurity standards
+and formats, government and commercial cybersecurity threat
+frameworks and knowledge bases, commercial product tax-
+onomies, and formal information modeling in cybersecurity
+and other domains.
+A. MITRE-initiated Cybersecurity Standards and Formats
+Over the past two decades, MITRE has developed standard
+languages and formats to capture cybersecurity information:
+Common Vulnerabilities and Exposures (CVE®) [2], Common
+Weakness Enumeration (CWE™) [3], Open Vulnerability and
+Assessment Language (OV AL®) [4], Common Platform Enu-
+meration (CPE™) [5], Common Event Expression (CEE™)
+[6], Common Attack Pattern Enumeration and Classiﬁcation
+(CAPEC™) [7], Malware Attribute Enumeration and Charac-
+terization (MAEC™) [8], and Cyber Observables (CybOX™)
+[9] languages. These shared vocabularies and disambiguating
+references are useful for cybersecurity practitioners to record
+and exchange cyber threat knowledge. CybOX, MAEC, and
+CAPEC introduced more taxonomic and relational informa-
+tion; their elements have been incorporated into the Structured
+Threat Information eXpression (STIX™) OASIS™ standard
+for Cyber Threat Intelligence (CTI). Together these provide
+references on which we build a detailed, explicit model of
+countermeasures.
+B. Cybersecurity Threat Frameworks
+The National Institute of Standards and Technology (NIST)
+created and updates the Cybersecurity Framework, which
+provides security guidance for organizations to align their
+cybersecurity activities to manage their cybersecurity risk
+around an Identify-Protect-Detect-Respond-Recover paradigm
+[10]. This paradigm is broader than the kill-chain models we
+discuss next, but it is focused on activity and organization
+rather than engineering or technology. NIST also maintains
+the National Vulnerability Database, the U.S. government
+repository of standards-based vulnerability management data
+for security controls enumerated in NIST 800-53 [11]. NIST
+maps these relevant security controls to the activities deﬁned
+in the Cybersecurity Framework.
+Kill-chain oriented and derived threat models have proved
+popular and effective. New models like D3FEND must relate
+to these to ensure rapid uptake by the cyber community and
+easy integration with existing resources. The U.S. Department
+of Defense Cyber Analysis and Review and U.S. Department
+of Homeland Security Cybersecurity Architecture Review
+(.govCAR) frameworks serve as threat-based tools for high-
+level characterization of cyber threats and mitigations, and a
+means to identify gaps in cyber portfolios and architectures
+[12]. The Ofﬁce of the Director of National Intelligence has
+created the Cyber Threat Framework to serve as a shared
+lexicon to characterize and categorize cyber threat events
+[13]. The National Security Agency’s Technical Cyber Threat
+Framework added extensive technical detail [14]. MITRE’s
+ATT&CK has inﬂuenced and been inﬂuenced by these frame-
+works.
+C. ATT&CK
+In “Finding Cyber Threats with ATT&CK-Based Analyt-
+ics,” MITRE created an analytic development methodology
+focused on detecting post-compromise adversary behaviors
+[15]. This revolutionized the language security practitioners
+use to discuss their work. Vendors began to describe what
+speciﬁc adversary behaviors their products were able to detect,
+prevent, or monitor. ATT&CK primarily modeled adversary
+behavior via offensive techniques organized by the tactical
+objectives they support. ATT&CK has since amassed an online
+knowledge base of threat actor techniques [17].
+ATT&CK™ knowledge (also encoded via STIX) is an
+especially critical counterpart to D3FEND. D3FEND focuses
+on countermeasures. The two can be related as explained in
+section IV-E.
+The Cyber Analytics Repository (CAR) was a key product
+of MITRE’s ATT&CK work. CAR identiﬁes objects related
+to key operating system and processing events [18] with its
+CAR Data Model, it also catalogs MITRE developed analytics
+and maps them to speciﬁc ATT&CK techniques they were
+designed to detect. The initial D3FEND release incorporates
+the CAR analytics developed, but whereas CAR modeled data
+from endpoint telemetry software and the associated analytics
+from a Security Operations Center Operator’s perspective,
+D3FEND models the countermeasure space from a hard-
+ware or software engineer’s perspective. Therefore, D3FEND’s
+scope is limited only by the scope of the cybersecurity
+technology space.
+D. Commercial Product Taxonomies
+Commercial product taxonomies tend to organize by form-
+factor or intended buyer rather than function. This is useful
+for understanding which vendors might be relevant but does
+not explain in enough detail how the products work or what
+they do. However, there are implicit sets of features or func-
+tions that each grouping represents. Cybersecurity marketing
+vocabulary changes at such a pace that analyst ﬁrms produce
+new taxonomies each year despite only modest changes in the
+underlying technical functionality [19].
+Patent systems also provide taxonomies of technological
+innovation and assign one or more of these codes to individ-
+ual patents. The International Patent Classiﬁcation system of
+70,000 codes, and its extension, the Cooperative Patent Clas-
+siﬁcation system, are used to curate patents and are managed
+by the European and U.S. patent ofﬁces. In the cybersecurity

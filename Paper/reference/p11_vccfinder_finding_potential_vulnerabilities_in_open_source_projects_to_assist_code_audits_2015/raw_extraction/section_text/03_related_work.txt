@@ -1,0 +1,169 @@
+2. RELATED WORK
+The discovery of vulnerabilities in program code is a fun-
+damental problem of computer security. Consequently, it
+has received much attention in the past. In the following,
+we give a sample of the prior work most closely related to
+our approach.
+Static analysis.
+The set of static analysis tools can be thought of as a spec-
+trum ranging from faster, lightweight approaches to slower
+but more thorough techniques. With VCCFinder being a
+lightweight tool, we compare ourselves to FlawFinder [34],
+a prominent representative of this class of tools. Other
+lightweight approaches include Rats [9], Prefast [8] as well
+as Splint [10], the later requiring manual annotations.
+Regarding more thorough approaches Bandhakavi et al.
+[11] search for vulnerabilities in browser extensions by apply-
+ing static information-flow analysis to the JavaScript code.
+Dahse and Holz [15] introduced a static analyzer for PHP
+that can detect sophisticated attacks against web applica-
+tions. Finally, commercial tools like Coventry [5], Fortify [6],
+CodeSonar [4], and IBM Security AppScan Source (formerly
+Rational) [7] focus on a thorough analysis with configurable
+rulesets and consequently long run times.
+Symbolic execution.
+Cadar et al. [12] present KLEE, a symbolic execution tool,
+which requires manual annotation and modification of the
+source code. Also the runtime grows exponentially with the
+number of paths in the program, which limits the size of
+project which can be tested with KLEE. Thus it is not fea-
+sible to execute KLEE on the same scale as VCCFinder.
+However, it is an interesting area of future work to execute
+KLEE as a second step after VCCFinder. Klee would then
+only be used on the commits flagged by VCCFinder which
+hopefully would significantly reduce the eﬀort needed to run
+KLEE. We see these tools as complementary and separate
+steps in the tool chain.
+Dynamic analysis.
+Cho et al. [14] use a combination of symbolic and con-
+crete execution to build an abstract model of the analyzed
+application and find vulnerabilities in several open-source
+projects. Yamaguchi et al. [37] provide an analysis plat-
+form oﬀering fuzzy parsing of code that generates a graph
+representing code suitable to be mined with graph-database
+queries. This approach allows application-specific vulnera-
+bility patterns to be expressed; however, in contrast to our
+approach, it requires manual specification of these patterns
+by the analyst. Holler et al. [20] used fuzzing on code frag-
+ments to find vulnerabilities in the Mozilla JavaScript inter-
+preter and the PHP interpreter.
+427
+
+===== PAGE 003 =====
+
+Software metrics.
+Several authors have proposed to employ software met-
+rics to home in on regions of code more likely to contain
+vulnerabilities. For example, Zimmermann et al. [38] per-
+form a large-scale empirical study on Windows Vista, indi-
+cating that metrics such as code churn, code complexity [see
+22, 19] and organizational measures allow vulnerabilities to
+be detected with high precision at low recall rates, while
+code dependency measures achieve low precision at high re-
+call rates. However, Graylin et al. [18] point out that many
+of these metrics may be highly correlated with lines of code.
+In particular, they show empirically that the relation be-
+tween cyclomatic complexity and lines of code is near-linear,
+meaning that no reduction in the amount of code to read is
+achieved in this way.
+Repository analysis.
+There is a range of research work looking at software repo-
+sitories in relation to software vulnerabilities. The most rel-
+evant with respect to our project can be divided into two
+groups: those that look at code metrics and those that look
+at metadata.
+Neuhaus et al. [26] use the vulnerability database of the
+Mozilla project to extract which software components have
+had vulnerabilities in the past and which imports and func-
+tion calls were involved. They use this to predict which soft-
+ware components of the Mozilla Internet suite are most likely
+to contain more vulnerabilities. Unlike our approach, they
+do not use any metadata in their analysis and the results
+flag entire software components rather than single commits.
+The results are thus more generic in the sense that they can
+say only that one set of software components is more worth
+checking than others.
+On the other side, work conducted by Meneely et al. and
+Shin et al. analyzes diﬀerent code repository metadata in
+relation to CVEs [25, 23, 24]. Specifically, they check how
+features such as code churn, lines of code, or the number of
+reviewers from a project’s repository and review system data
+correlate to reported vulnerabilities. They do this manually
+for the Mozilla Firefox Browser, Apache HTTP server and
+an excerpt of the RHEL Linux kernel. Unlike the work above
+and our work, they do not use this data to predict vulnera-
+bilities; moreover, unlike our work, they do not combine the
+features but look at each separately.
+Sadeghi et al. [28] aim to reduce the number of rules used
+by static analysis software. For this they looked at “catego-
+rized software repositories” (i.e. the Google Play Store) and
+evaluated how knowledge of the app’s category can reduce
+the number of static analysis rules needed to still retain full
+coverage. For this, they compared Java programs on Source-
+Forge (without a framework) to Android apps on F-Droid
+(written with an application development framework). From
+the app’s category they were able to build a predictor that
+helps pick a subset of static analyzer rules to apply; therefore
+reducing the time the static analyzer needs. Their method
+works especially well with apps using a framework, such as
+Android apps. In contrast, while this work reduces the num-
+ber of rules used for analysis, we prioritize the code needed
+to be analysed. These approaches are complementary.
+Wijayasekara et al. [35] used bug-trackers to study bugs
+that afterwards have been identified as vulnerabilities. The
+work does not deal with finding unknown vulnerabilities.
+While this does not directly relate to our work, bug-trackers
+are an interesting additional source of information.
+Kim et al. [21] mined logs of a project’s SCM repository for
+bug-introducing changes using fixed keywords (such as “fix”
+or “bug”). They then extracted features from these commits
+and trained an SVM. Our approach diﬀers from the authors’
+in three ways: first, we use as a base of our research the much
+smaller and thus harder set of critical vulnerabilities mined
+from the CVE database; second, we use additional features
+gathered from the SCM history such as past/future diﬀerent
+authors; third we use a historical split to evaluate our system
+opposed to a (random) ten-fold cross validation. The later
+is important since it guarantees that our system was not
+trained on future commits to decide if some past commit
+introduced a bug. Unfortunately neither the code base nor
+the data is available so a direct comparison is not possible.
+We re-ran our experiments using random cross validation
+and found that it increased the precision for around 15 %
+with a recall between 0.4 and 0.6.
+´Sliwerski et al. [32] present preliminary results on a sta-
+tistical analysis of the Eclipse and Mozilla projects. They
+mined the Eclipse project’s bug database for fix-inducing
+changes. Then, they do a statistical analysis on their data,
+showing that most bugs were committed on Fridays. Our
+work goes beyond these results in several ways. The sta-
+tistical analysis is more extensive, is done on a much larger
+dataset and is only the first step in our system. Based on
+the results we train a SVM and create an adaptable system
+to predict vulnerability inducing commits.
+Thus, our work goes beyond the above approaches in sev-
+eral ways. We combine both code metrics as well as meta-
+data in our analysis and use a machine-learning approach
+to extract and combine relevant features as well as to cre-
+ate a classification engine to predict which commits are more
+likely to be vulnerable. In contrast to the work above, we do
+this for a large set of projects in an automated way instead
+of hand-picking features and analyzing single projects.
+Machine-learning techniques.
+Machine-learning and data-mining approaches have been
+proposed by several authors for finding vulnerabilities. For
+example, Scandariato et al. [31] train a classifier on textual
+features extracted from source code to determine vulnera-
+ble software components. Moreover, several unsupervised
+machine-learning approaches have been presented to assist
+in the discovery of vulnerabilities. For example, Yamaguchi
+et al. [36] introduce a method to expose missing checks in
+C source code by combining static tainting and techniques
+for anomaly detection. Similarly, Chang et al. [13] present
+a data-mining approach to reveal neglected conditions and
+discover implicit conditional rules and their violations.
+However, in order to identify vulnerabilities, these ap-
+proaches concentrate only on features extracted from source
+code. In contrast, we show that additional meta informa-
+tion, such as the experience of a developer, are valuable
+features that improve detection performance.

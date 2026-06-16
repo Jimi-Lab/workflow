@@ -1,0 +1,362 @@
+[
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:001",
+    "block_type": "text",
+    "text": "Clone Detection\nReal Clones\nFalse Detection\nMissed\n",
+    "bbox": [
+      62.105098724365234,
+      75.6477279663086,
+      283.5251159667969,
+      86.34366607666016
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:002",
+    "block_type": "text",
+    "text": "ReDeBug\n180\n0\n15\n",
+    "bbox": [
+      74.01280212402344,
+      92.2173080444336,
+      275.1421813964844,
+      102.91324615478516
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:003",
+    "block_type": "text",
+    "text": "Deckard\n96\n183\n99\n",
+    "bbox": [
+      76.48173522949219,
+      106.0259017944336,
+      275.1421813964844,
+      116.72476959228516
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:004",
+    "block_type": "text",
+    "text": "Table VI: Code clone detection performance\n",
+    "bbox": [
+      86.34429931640625,
+      122.27543640136719,
+      266.60784912109375,
+      134.1608428955078
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:005",
+    "block_type": "text",
+    "text": "wise comparisons Deckard consumed more than 20 GB of\nmemory in less than 2 minutes, after which we killed the\nprocess. Instead of the entire OS, we ran Deckard on each\npackage at a time with 28 randomly selected C code ﬁles\nwhich contain security bugs. We report only code clones\nwhich match with the buggy code regions. Deckard took\nmore than 12 hours to complete the code clone detection\nin Debian Lenny, utilizing 8 threads to process 8 packages\nat the same time. While Deckard processed only the source\ncode written in C (Deckard can process one language at\na time), ReDeBug processed a wealth of languages (e.g.,\nC/C++, Java, Shell, Python, Perl, Ruby, and PHP) in 6 hours.\nTable VI shows the code clone detection results of\nDeckard and ReDeBug. As expected, ReDeBug had no false\ndetections, and surprisingly, missed 6 times as few code\nclones compared to Deckard. The code clones that ReDeBug\nmissed came from the use of different variable names or\ntypes.\nDeckard faired worse than ReDeBug despite using a more\nsophisticated strategy. We investigated the causes, and found\nthat 38 out of 99 of the cases were due to parse failures\nin Deckard, with the remainder just being missed due to\nthe algorithm for detecting code clones. This result lends\nsupport that parsing code is hard and can be a limiting factor\nin practice, and that ReDeBug’s relatively simpler approach\ncan be valuable in such circumstances.\n",
+    "bbox": [
+      56.18202209472656,
+      157.78367614746094,
+      296.7701110839844,
+      465.571044921875
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:006",
+    "block_type": "text",
+    "text": "B. Unpatched code clones that are not vulnerable\n",
+    "bbox": [
+      56.18202590942383,
+      472.1795349121094,
+      260.0486755371094,
+      483.9564208984375
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:007",
+    "block_type": "text",
+    "text": "Since ReDeBug gets rid of Bloom ﬁlter errors and dead\ncode, a metric for false positives is the number of unpatched\ncode clones that were not vulnerable for some other reason.\nWe have identiﬁed two other causes for this type of false\npositive. First, normalization may be too aggressive in some\ncircumstances and thus the identiﬁed code clone is not\nreally a code clone. Second, we may ﬁnd real unpatched\ncode clones, but other code modiﬁcations may prevent the\nunpatched code from being called in an exploitable context.\nNormalization reduces the false negative rate, but may\nincrease the false positive rate. For example, imagine two\ncode sequences that are equivalent but one is performed on\nan unsigned integer “A” and the other on a signed integer\n“a”. If the bug relates to signedness, only the latter code is\nvulnerable. However, normalization converts all variables to\nlower-case, thus we would mistakenly report the former as\nalso buggy.\nListing 10 shows an example of an unpatched code clone\nthat is present but not vulnerable. The patch ﬁxes an integer\n",
+    "bbox": [
+      56.18202590942383,
+      487.1225891113281,
+      296.76409912109375,
+      712.057373046875
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:008",
+    "block_type": "text",
+    "text": "signedness bug in various BSD kernels. NetBSD contains the\nsame vulnerable code, but ﬁxed the problem by changing the\ntype of crom_buf->len from signed integer to unsigned\ninteger instead of using the shown patch.\n",
+    "bbox": [
+      314.57354736328125,
+      70.65031433105469,
+      555.1616821289062,
+      118.04389190673828
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:009",
+    "block_type": "text",
+    "text": "- if (crom_buf->len < len)\n+ if (crom_buf->len < len && crom_buf->len > 0)\n",
+    "bbox": [
+      319.31781005859375,
+      136.34481811523438,
+      533.0569458007812,
+      153.58106994628906
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:010",
+    "block_type": "text",
+    "text": "Listing 10: CVE-2006-6013\n",
+    "bbox": [
+      380.4905090332031,
+      159.4882049560547,
+      489.2423095703125,
+      170.90533447265625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:011",
+    "block_type": "text",
+    "text": "An unpatched code clone was detected in the ircd-ratbox\npackage from the patch shown in Listing 11. The package\nmaintainer informed us that the vulnerability was ﬁxed in\na different location, i.e., adding a separate error checking\nroutine if (len<=1) break; ahead of the vulnerable\ncode.\n",
+    "bbox": [
+      314.5779113769531,
+      180.50743103027344,
+      555.1563720703125,
+      251.57313537597656
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:012",
+    "block_type": "text",
+    "text": "else\n",
+    "bbox": [
+      337.5096130371094,
+      271.28753662109375,
+      355.7004089355469,
+      279.9963684082031
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:013",
+    "block_type": "text",
+    "text": "*d++ = *src;\n",
+    "bbox": [
+      346.60589599609375,
+      280.26922607421875,
+      401.17828369140625,
+      289.5389709472656
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:014",
+    "block_type": "text",
+    "text": "-\n++src;\n",
+    "bbox": [
+      319.3190002441406,
+      288.796630859375,
+      364.7959899902344,
+      296.7399597167969
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:015",
+    "block_type": "text",
+    "text": "-\n--len;\n",
+    "bbox": [
+      319.3190002441406,
+      297.3232421875,
+      364.7959899902344,
+      305.2665710449219
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:016",
+    "block_type": "text",
+    "text": "+\nif (len > 0) {\n",
+    "bbox": [
+      319.3190002441406,
+      305.39605712890625,
+      401.1775817871094,
+      314.1048889160156
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:017",
+    "block_type": "text",
+    "text": "+\n++src, --len;\n",
+    "bbox": [
+      319.3190002441406,
+      314.3775329589844,
+      396.6298828125,
+      322.32086181640625
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:018",
+    "block_type": "text",
+    "text": "+\n}\n",
+    "bbox": [
+      319.3190002441406,
+      322.9051208496094,
+      342.0574951171875,
+      330.84844970703125
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:019",
+    "block_type": "text",
+    "text": "}\n*d = ’\\0’;\nreturn dest;\n",
+    "bbox": [
+      328.414306640625,
+      331.4317321777344,
+      382.9866943359375,
+      356.7400817871094
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:020",
+    "block_type": "text",
+    "text": "Listing 11: CVE-2009-4016\n",
+    "bbox": [
+      380.4919128417969,
+      362.6480712890625,
+      489.24371337890625,
+      374.0652160644531
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:021",
+    "block_type": "text",
+    "text": "V. RELATED WORK\n",
+    "bbox": [
+      392.951904296875,
+      391.7230224609375,
+      476.7800598144531,
+      403.6087951660156
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:022",
+    "block_type": "text",
+    "text": "MOSS [28] is a well-known similarity detection tool\nusing n-tokens. MOSS is based upon an algorithm called\nwinnowing [28], a fuzzy hashing technique that selects a\nsubset of n-tokens to ﬁnd similar code. The main difference\nis that ReDeBug uses feature hashing to encode n-tokens\nin a bitvector, which allows ReDeBug to perform similarity\ncomparison in a cache-efﬁcient way. We swap out winnow-\ning for feature hashing for improved speed. This decision\nwas based upon the work by Jang et al. [22]. Furthermore,\nin order to ﬁnd unpatched code clones we use the insight\nof only looking for code clones of patched bugs to scale to\nlarge OS distributions.\nMost recent work in academia has focused on detecting\nall code clones (i.e., reducing the number of missed code\nclones, but having more false detections of clones). Exam-\nples include Deckard [23], CCFinder [24], CP-Miner [25]\nand Deja Vu [21]. Detecting all code clones is a harder\nproblem than just searching for copies of patched code in\nthat the former potentially requires comparison of all code\npairs, while the latter is a single sweep over the data set.\nThis line of research uses a variety of matching heuristics\nbased upon high-level code representations such as CFGs\nand parse trees. For example, CCFinder uses lexing and\nthen performs transformations based upon rules to determine\nwhether code is similar [24]. The transformation rules are\n",
+    "bbox": [
+      314.5790710449219,
+      406.66522216796875,
+      555.1672973632812,
+      702.6165771484375
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:023",
+    "block_type": "text",
+    "text": "60\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:013:024",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

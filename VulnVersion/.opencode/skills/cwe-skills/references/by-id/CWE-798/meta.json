@@ -1,0 +1,285 @@
+{
+  "cwe_id": "CWE-798",
+  "name": "Use of Hard-coded Credentials",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+  "extended_description": "There are two main variations: Inbound: the product contains an authentication mechanism that checks the input credentials against a hard-coded set of credentials. In this variant, a default administration account is created, and a simple password is hard-coded into the product and associated with that account. This hard-coded password is the same for each installation of the product, and it usually cannot be changed or disabled by system administrators without manually modifying the program, or otherwise patching the product. It can also be difficult for the administrator to detect. Outbound: the product connects to another system or component, and it contains hard-coded credentials for connecting to that component. This variant applies to front-end systems that authenticate with a back-end service. The back-end service may require a fixed password that can be easily discovered. The programmer may simply hard-code those back-end credentials into the front-end product.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1391",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Use of Weak Credentials"
+      },
+      {
+        "cwe_id": "CWE-287",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Authentication"
+      },
+      {
+        "cwe_id": "CWE-344",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Invariant Value in Dynamically Changing Context"
+      },
+      {
+        "cwe_id": "CWE-671",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Lack of Administrator Control over Security"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-257",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Storing Passwords in a Recoverable Format"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Mobile",
+      "ICS/OT"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "While this entry is at a Base level of abstraction, it has lower-level children that cover specific kinds of credentials."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "credentials",
+      "hard-coded",
+      "password",
+      "back-end"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "credentials",
+      "hard-coded",
+      "password",
+      "back-end",
+      "contains",
+      "component",
+      "front-end",
+      "account"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code uses a hard-coded password to connect to a database:",
+        "snippet": "... DriverManager.getConnection(url, \"scott\", \"tiger\"); ..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code is an example of an internal hard-coded password in the back-end:",
+        "snippet": "int VerifyAdmin(char *password) { if (strcmp(password, \"Mew!\")) { printf(\"Incorrect Password!\\n\"); return(0) } printf(\"Entering Diagnostic Mode...\\n\"); return(1); }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code is an example of an internal hard-coded password in the back-end:",
+        "snippet": "int VerifyAdmin(String password) { if (!password.equals(\"Mew!\")) { return(0) } //Diagnostic Mode return(1); }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code examples attempt to verify a password using a hard-coded cryptographic key.",
+        "snippet": "int VerifyAdmin(char *password) { if (strcmp(password,\"68af404b513073584c4b6f22b6c63e6b\")) { printf(\"Incorrect Password!\\n\"); return(0); } printf(\"Entering Diagnostic Mode...\\n\"); return(1); }"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-40263",
+        "description": "Software for biological cell analysus has hard-coded credentials, leading to leak of Protected Health Information (PHI)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-40263"
+      },
+      {
+        "reference": "CVE-2022-29953",
+        "description": "Condition Monitor firmware has a maintenance interface with hard-coded credentials",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29953"
+      },
+      {
+        "reference": "CVE-2022-29960",
+        "description": "Engineering Workstation uses hard-coded cryptographic keys that could allow for unathorized filesystem access and privilege escalation",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29960"
+      },
+      {
+        "reference": "CVE-2022-29964",
+        "description": "Distributed Control System (DCS) has hard-coded passwords for local shell access",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29964"
+      },
+      {
+        "reference": "CVE-2022-30997",
+        "description": "Programmable Logic Controller (PLC) has a maintenance service that uses undocumented, hard-coded credentials",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30997"
+      },
+      {
+        "reference": "CVE-2022-30314",
+        "description": "Firmware for a Safety Instrumented System (SIS) has hard-coded credentials for access to boot configuration",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30314"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

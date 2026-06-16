@@ -1,0 +1,122 @@
+1 Introduction
+Having been proposed in 2005, the SZZ algorithm [Śliwerski et al. 2005] and its variants have been
+widely used in finding bug-inducing commits from bug-fixing commits. The original SZZ algorithm
+assumes that the deleted lines in the bug-fixing commit cause the bug. It first locates the deleted
+lines in the bug-fixing commit. Then, it uses the annotate command from the version control
+system to trace back the commits that most recently added or modified these lines. Finally, it marks
+the identified commits as bug-inducing commits. Many downstream tasks can be performed based
+on bug-inducing commits, such as analyzing why the bugs occur [Aman et al. 2019; Bavota and
+Russo 2015], predicting defects [Fan et al. 2019; Hata et al. 2012; Yan et al. 2020], and measuring the
+factors that influence software quality [Chen and Jiang 2019; Tufano et al. 2017].
+Although the SZZ algorithm has achieved great success, it still suffers from low precision.
+Consequently, many variants have been proposed [Da Costa et al. 2016; Davies et al. 2014; Kim
+et al. 2006; Neto et al. 2018; Tang et al. 2023] to address this problem. Some methods [Da Costa
+et al. 2016; Kim et al. 2006; Neto et al. 2018] attempted to improve precision by removing noise
+in bug-fixing commits using static analysis. Noise refers to changes that do not influence the
+program’s behavior, such as blank lines, comments, or refactoring operations. These irrelevant
+changes are unrelated to the bug, and tracing them back can lead to false positives in the output.
+Other methods [Davies et al. 2014] try to improve precision by treating the commits identified by the
+original SZZ algorithm as candidates and selecting the final bug-inducing commit from them. They
+choose the final bug-inducing commit by considering factors such as commit dates or the number
+of changed lines. To further improve precision, Tang et al. [Tang et al. 2023] introduced a deep
+learning method that embeds changed lines based on their semantic meanings and relationships,
+training a ranking model to identify the deleted lines most likely to cause the bug. However, this
+approach significantly sacrifices recall.
+Although previous studies have made some advancements, several limitations still exist. Limi-
+tation 1: These methods overlook the commit message of the bug-fixing commit. Typically, the
+commit message contains essential information on why the changes were made [Mockus and Votta
+2000; Yan et al. 2016] and many of these messages describe how the bug occurs and how the commit
+fixes it. This information is vital for understanding the commit and accurately locating buggy
+statements. Limitation 2: These methods assume that only deleted lines cause bugs [Kim et al.
+2006; Śliwerski et al. 2005; Tang et al. 2023], making them inapplicable to bug-fixing commits that
+contain only added lines. Limitation 3: These methods focus solely on changed lines, ignoring the
+context of the entire patch. Previous studies have shown that the context, including unmodified
+lines near the changes, can provide crucial information for the model to understand the code [Chen
+et al. 2019; Xia et al. 2023]. Sometimes, it might be the unmodified lines themselves that lead to the
+bug, rather than the changed lines [Rosa et al. 2021]. Limitation 4: Methods that select the final
+bug-inducing commit from a set of candidates often rely on heuristic assumptions [Davies et al.
+2014], such as commit dates or the number of changed lines. These assumptions may not work in
+all scenarios [Bao et al. 2022]. Ideally, we should determine the final bug-inducing commit based
+on the root cause of the bug and the content of the candidate commit.
+The emergence of Large Language Models (LLMs) presents an opportunity to address the
+aforementioned limitations. Previous studies indicate that LLMs can effectively understand code
+changes and commit messages [Li et al. 2024b; Xue et al. 2024]. One fundamental improvement is
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 003 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:3
+to utilize the LLM to analyze the root cause of the bug and identify buggy statements based on code
+changes and the commit message. This process leverages the commit message, addressing limitation
+1. When identifying buggy statements, the LLM can detect not only deleted lines but also unchanged
+lines, addressing limitation 2. The enhanced approach then traces these buggy statements to obtain
+a set of candidate commits and requires the LLM to select the bug-inducing commits from this set,
+addressing limitation 4. Furthermore, we can provide the LLM with more context which solves
+limitation 3. At first glance, this simple approach seems to address all the problems. However, several
+challenges remain in this simple method. Challenge 1: LLMs struggle with complex bug-fixing
+commits that involve numerous changes across multiple files and functions. These commits often
+contain significant noise unrelated to the bug fix, undermining LLM’s performance. Challenge
+2: We need to provide more information to help the LLM determine whether the bug exists. The
+root cause of the bug and the content of the commit are often insufficient (see Section 3.2 and
+Section 5.2). Challenge 3: When asking the LLM to determine whether a commit contains a bug, we
+must carefully consider the context provided. An overly long context can degrade performance [Li
+et al. 2023a], while a too-short context may omit crucial information necessary for the LLM to
+understand the code [Chen et al. 2019; Xia et al. 2023]. Challenge 4: Many types of bugs remain
+beyond the LLM’s understanding [Bouzenia et al. 2024; Parasaram et al. 2024], making it difficult
+for LLMs to ascertain their presence in a commit. Treating these bugs the same way as those the
+LLM can comprehend will adversely affect overall performance. For instance, if we determine that
+the LLM can understand the bug and identify its presence in a commit, we can use it to select the
+final bug-inducing commit from a set of candidates; otherwise, we cannot. Further details will be
+discussed in Section 5.2. Therefore, a better approach is needed to solve those challenges to fully
+leverage the potential of LLMs.
+In this paper, we propose an LLM-based approach called LLM4SZZ. In the preparation phase,
+we summarize the root cause of the bug and filter out irrelevant files based on the patch content
+and the commit message. This step helps eliminate noise when handling large bug-fixing commits,
+addressing challenge 1. Next, we assess the LLM’s ability to understand the bug and the ability
+to determine whether it exists in the commit. Instead of directly asking the LLM to determine
+whether a commit contains a bug, we employed a more complex strategy, consisting of several
+parts. This approach is taken because we find that direct judgments are ineffective, see Section 5.2.
+To evaluate this ability, we first provide the LLM with expanded context and require it to generate
+a hint indicating whether the bug is present, addressing challenge 2. Before asking the LLM to
+determine whether the bug exists, we refine the context to address challenge 3. We then present
+the LLM with the root cause of the bug, the hint, and refined contexts for two versions of the
+program: one buggy and one correct. If the LLM can accurately distinguish between the two
+versions, we consider it capable; otherwise, it is not. Based on this ability assessment, we developed
+two approaches: context-enhanced identification and rank-based identification, which resolves
+challenge 4. In context-enhanced identification, we provide the LLM with more context and require
+it to select the bug-inducing commit from a set of candidates. In rank-based identification, we
+follow the methodology outlined in the previous study [Tang et al. 2023], asking the LLM to identify
+buggy statements from the bug-fixing commit and rank them based on their relevance to the root
+cause. To evaluate our method, we use three high-quality, developer-annotated datasets, ensuring
+their accuracy. We assess our proposed method by answering the following questions:
+RQ1: How effective is LLM4SZZ in identifying bug-inducing commits from bug-fixing
+commits compared to baselines?
+In this RQ, we compare LLM4SZZ with all baselines across three datasets to determine whether
+LLM4SZZ can outperform the baselines in identifying bug-inducing commits. The experimental
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 004 =====
+ISSTA016:4 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+results demonstrate that LLM4SZZ surpasses all other baselines in F1-score, with a notable improve-
+ment ranging from 6.9% to 16.0%. Furthermore, LLM4SZZ enhances both precision and F1-score
+without significantly sacrificing recall.
+RQ2: How effective are the key components of LLM4SZZ ?
+We also conduct an ablation experiment to ensure that all key components of LLM4SZZ, namely
+the context-enhanced assessment, the context-enhanced identification, and the rank-based identifi-
+cation, contribute to its performance. Additionally, we demonstrate that utilizing LLMs directly on
+the SZZ algorithm cannot yield satisfactory results.
+RQ3: How effective is LLM4SZZ if we apply it on other open-source large language models?
+In this RQ, we aim to examine whether the core ideas of LLM4SZZ can be applied to other
+open-source large language models. We implement LLM4SZZ using llama3-8b and llama3-70b. The
+experimental results show that LLM4SZZ can be effectively applied to other LLMs, and better LLMs
+can enhance its performance.
+In summary, we make the following contributions:
+•We provide insights into how large language models (LLMs) can enhance the performance of the
+SZZ algorithm while also highlighting the limitations in this task.
+•Based on these insights, we propose a novel approach to fully leverage the LLM’s capabilities,
+which consists of two methods for locating bug-inducing commits, with the choice of method
+being adaptive to the LLM’s ability to comprehend the bug.
+•We implement LLM4SZZ on two popular programming languages and evaluate it on three
+developer-annotated datasets. The experimental results show that LLM4SZZ outperforms all
+other baselines across the datasets.

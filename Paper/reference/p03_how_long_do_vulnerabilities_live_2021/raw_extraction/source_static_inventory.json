@@ -1,0 +1,248 @@
+{
+  "source_path": "E:\\AI\\Agent\\workflow\\Replication\\BaseLine(Vulnerability-affected versions identification How far are we)\\Direct_Comparison_Papers(Baseline_Paper+Code)\\Lifetime\\Lifetime",
+  "directories": [
+    "affected_version",
+    "tmp",
+    "vccs_output",
+    "_core"
+  ],
+  "files": [
+    {
+      "path": "1_lifetime.py",
+      "size": 13306,
+      "ext": ".py"
+    },
+    {
+      "path": "2_gen_vuln_version.py",
+      "size": 3537,
+      "ext": ".py"
+    },
+    {
+      "path": "bad_case_result.txt",
+      "size": 27974,
+      "ext": ".txt"
+    },
+    {
+      "path": "config.py",
+      "size": 30,
+      "ext": ".py"
+    },
+    {
+      "path": "continue_added_block_cve_dict.json",
+      "size": 44836,
+      "ext": ".json"
+    },
+    {
+      "path": "get_continue_block.py",
+      "size": 13955,
+      "ext": ".py"
+    },
+    {
+      "path": "log_generation.py",
+      "size": 6891,
+      "ext": ".py"
+    },
+    {
+      "path": "README.md",
+      "size": 11,
+      "ext": ".md"
+    },
+    {
+      "path": "time.txt",
+      "size": 1464,
+      "ext": ".txt"
+    },
+    {
+      "path": "vul_lifetime_run.py",
+      "size": 31277,
+      "ext": ".py"
+    },
+    {
+      "path": "_core\\abstract_szz.py",
+      "size": 10418,
+      "ext": ".py"
+    },
+    {
+      "path": "_core\\comment_parser.py",
+      "size": 7457,
+      "ext": ".py"
+    }
+  ],
+  "python": [
+    {
+      "path": "1_lifetime.py",
+      "functions": [
+        "__init__",
+        "_trace_commit",
+        "lifetime_trace",
+        "find_vcc"
+      ],
+      "classes": [
+        "Lifetime"
+      ],
+      "imports": [
+        "_core.abstract_szz",
+        "config",
+        "git",
+        "io",
+        "json",
+        "ntpath",
+        "os",
+        "subprocess",
+        "time",
+        "unidiff"
+      ],
+      "lines": 336
+    },
+    {
+      "path": "2_gen_vuln_version.py",
+      "functions": [
+        "get_commit_tags",
+        "cxc_generate_vulnerable_versions_fix_vcc",
+        "gen_vulnerable_version"
+      ],
+      "classes": [],
+      "imports": [
+        "collections",
+        "config",
+        "json",
+        "log_generation",
+        "os",
+        "time"
+      ],
+      "lines": 108
+    },
+    {
+      "path": "config.py",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "lines": 3
+    },
+    {
+      "path": "get_continue_block.py",
+      "functions": [
+        "__init__",
+        "_trace_commit",
+        "lifetime_trace",
+        "find_vcc"
+      ],
+      "classes": [
+        "Lifetime"
+      ],
+      "imports": [
+        "_core.abstract_szz",
+        "config",
+        "git",
+        "io",
+        "json",
+        "ntpath",
+        "os",
+        "subprocess",
+        "time",
+        "unidiff"
+      ],
+      "lines": 354
+    },
+    {
+      "path": "log_generation.py",
+      "functions": [
+        "wrapper_change_path",
+        "is_nosise",
+        "inner",
+        "__init__",
+        "git_tag_contins",
+        "git_log",
+        "git_tag",
+        "git_show",
+        "git_diff",
+        "git_diff_2",
+        "get_commit_time",
+        "fetch_tags",
+        "get_tags",
+        "get_commits_range",
+        "get_commits_from"
+      ],
+      "classes": [
+        "GitLog"
+      ],
+      "imports": [
+        "git",
+        "io",
+        "os",
+        "subprocess",
+        "sys",
+        "unidiff"
+      ],
+      "lines": 191
+    },
+    {
+      "path": "vul_lifetime_run.py",
+      "parse_error": "Missing parentheses in call to 'print'. Did you mean print(...)? (<unknown>, line 225)"
+    },
+    {
+      "path": "_core\\abstract_szz.py",
+      "functions": [
+        "__init__",
+        "__del__",
+        "repository",
+        "repository_path",
+        "find_vcc",
+        "remove_prefix",
+        "_is_comment",
+        "_is_function_definition",
+        "get_parent_commit",
+        "get_fixed_file",
+        "_blame",
+        "__init__",
+        "__str__",
+        "__eq__",
+        "__hash__"
+      ],
+      "classes": [
+        "AbstractSZZ",
+        "BlameData"
+      ],
+      "imports": [
+        "_core.comment_parser",
+        "abc",
+        "git",
+        "io",
+        "logging",
+        "ntpath",
+        "os",
+        "typing",
+        "unidiff"
+      ],
+      "lines": 244
+    },
+    {
+      "path": "_core\\comment_parser.py",
+      "functions": [
+        "parse_comments",
+        "parse_function",
+        "parse_comments_srcml",
+        "js_comment_parser",
+        "php_comment_parser",
+        "rb_comment_parser",
+        "py_comment_parser"
+      ],
+      "classes": [],
+      "imports": [
+        "collections",
+        "logging",
+        "os",
+        "re",
+        "subprocess",
+        "tempfile"
+      ],
+      "lines": 195
+    }
+  ],
+  "samples": {
+    "README.md": "# lifetime\n",
+    "config.py": "REPOS_DIR = \"\"\nDATA_DIRS = ''\n",
+    "time.txt": "step3 gen vul versions: FFmpeg\nrepo: FFmpeg\nStart time: 2025-01-24 09:26:53\nEnd time: 2025-01-24 09:35:12\nStep3-gen_vul_versions: Execution time: 499.24 seconds\n\nstep3 gen vul versions: openssl\nrepo: openssl\nStart time: 2025-01-24 09:35:12\nEnd time: 2025-01-24 09:35:52\nStep3-gen_vul_versions: Execution time: 40.21 seconds\n\nstep3 gen vul versions: wireshark\nrepo: wireshark\nStart time: 2025-01-24 09:35:52\nEnd time: 2025-01-24 09:37:34\nStep3-gen_vul_versions: Execution time: 101.77 seconds\n\nstep3 gen vul versions: curl\nrepo: curl\nStart time: 2025-01-24 09:37:34\nEnd time: 2025-01-24 09:38:13\nStep3-gen_vul_versions: Execution time: 39.32 seconds\n\nstep3 gen vul versions: httpd\nrepo: httpd\nStart time: 2025-01-24 09:38:13\nEnd time: 2025-01-24 09:38:52\nStep3-gen_vul_versions: Execution time: 38.09 seconds\n\nstep3 gen vul versions: ImageMagick\nrepo: ImageMagick\nStart time: 2025-01-24 09:38:52\nEnd time: 2025-01-24 09:39:13\nStep3-gen_vul_versions: Execution time: 21.88 seconds\n\nstep3 gen vul versions: qemu\nrepo: qemu\nStart time: 2025-01-24 09:39:13\nEnd time: 2025-01-24 09:41:11\nStep3-gen_vul_versions: Execution time: 117.56 seconds\n\nstep3 gen vul versions: openjpeg\nrepo: openjpeg\nStart time: 2025-01-24 09:41:11\nEnd time: 2025-01-24 09:41:12\nStep3-gen_vul_versions: Execution time: 1.47 seconds\n\nstep3 gen vul versions: linux\nrepo: linux\nStart time: 2025-01-24 09:41:12\nEnd time: 2025-01-24 14:56:17\nStep3-gen_vul_versions: Execution time: 18904.38 seconds\n\n",
+    "bad_case_result.txt": "---FFmpeg_CVE-2020-22041_c6fdee52746eb1aa2a74fc4adb368bf4a376ddf2---\n---FFmpeg_CVE-2020-22031_e103a2cb9cd970f2c24525336057bccb2f3fcca3---\n---FFmpeg_CVE-2020-22019_cea03683b93c1569b33611d71233235933b3cbce---\n---FFmpeg_CVE-2020-22041_5b4100cbaedfea847a10c689c0dc75313972c350---\n---FFmpeg_CVE-2020-20451_0c949b6ebfcee1b23a5fe33a3bc8af167956ea1e---\n---FFmpeg_CVE-2020-22042_a23078a721682268caf03fc6d24a6ab202d309ae---\n---FFmpeg_CVE-2020-22041_4f566654e744c7810f4afdd91fe00fdd1ef46646---\n---FFmpeg_CVE-2020-22031_da58e7fb9ed7223a555d97bb03b05745644812fb---\n---FFmpeg_CVE-2020-22041_a0307736e70b2f02f0886bc7864f604692aac401---\n---FFmpeg_CVE-2020-22019_a6a041676796668d3798665f2d8797df99af3453---\n---FFmpeg_CVE-2022-1475_fa2e4afe8d0a23fac37392ef6506cfc9841f8d3d---\n---FFmpeg_CVE-2020-22031_da3d6068f3fbbe89c57b6c68c178a54dee168d95---\n---FFmpeg_CVE-2020-20451_a43a89a08918aefa9dfcf7e6d4dae804c6a48577---\n---FFmpeg_CVE-2020-22019_82ad1b76751bcfad5005440db48c46a4de5d6f02---\n---FFmpeg_CVE-2020-22031_0e68e8c93f9068596484ec8ba725586860e06fc8---\n---FFmpeg_CVE-2020-12284_1812352d767ccf5431aa440123e2e260a4db2726---\n---FFmpeg_CVE-2020-22031_1a4d18820d551bedcfa03b7e8ca72df87d4b5cfa---\n---FFmpeg_CVE-2020-20448_55279d699fa64d8eb1185d8db04ab4ed92e8dea2---\n---FFmpeg_CVE-2020-12284_838105153a579ff0cea0794afc0275c19c51d3a7---\n---FFmpeg_CVE-2020-22051_673fce6d40d9a594fb7a0ea17d296b7d3d9ea856---\n---FFmpeg_CVE-2020-22019_c2ae30188823e6c25183283607495c3bc1584a8e---\n---FFmpeg_CVE-2020-22019_c7da0dad1f17856a12c98135eae9824f771e8f3a---\n---FFmpeg_CVE-2020-20451_6f6036146d5808f4663d7e6e1b614ea23b8f2592---\n---FFmpeg_CVE-2020-20451_ee92ee3b5a80e3a0c12567efc9761343d0155c21---\n---FFmpeg_CVE-2020-20451_2ce253708826fb41922da963d395160a1522b770---\n---FFmpeg_CVE-2020-12284_a3a3730b5456ca00587455004d40c047f7b20a99---\n---FFmpeg_CVE-2020-22031_fd8b08ebbb27e841fd5527e4b800ab3738216e9d---\n---FFmpeg_CVE-2020-22054_6f2a3958cfac135c60b509a61a4fd39432d8f9a9---\n---FFmpeg_CVE-2020-22041_ac6c213c4eb1132f53d401099dc5e7df32705609---\n---FFmpeg_CVE-2020-22041_3488e0977c671568731afa12b811adce9d4d807f---\n---FFmpeg_CVE-2020-22019_e6b5c7a5fccf7237b2aceb4334dec53f181e0149---\n---FFmpeg_CVE-2022-1475_757da974b21833529cc41bdcc9684c29660cdfa8---\n---FFmpeg_CVE-2020-20451_21265f42ecb265debe9fec1dbfd0cb7de5a8aefb---\n---FFmpeg_CVE-2020-22042_426c16d61a9b5056a157a1a2a057a4e4d13eef84---\n---openssl_CVE-2023-1255_bc2f61ad70971869b242fc1cb445b98bad50074a---\n---openssl_CVE-2022-2068_2c9c35870601b4a44d86ddbf512b38df38285cfa---\n---openssl_CVE-2022-2274_4d8a88c134df634ba610ff8db1eb8478ac5fd345---\n---openssl_CVE-2021-4160_3bf7b73ea7123045b8f972badc67ed6878e6c37f---\n---openssl_CVE-2023-5363_5f69f5c65e483928c4b28ed16af6e5742929f1ee---\n---openssl_CVE-2021-3449_fb9fa6b51defd48157eeb207f52181f735d96148---\n---openssl_CVE-2022-1473_64c85430f95200b6b51fe9475bd5203f7c19daf1---\n---openssl_CVE-2022-1292_1ad73b4d27bd8c1b369a3cd453681d3a4f1bb9b2---\n---openssl_CVE-2021-23839_30919ab80a478f2d81f2e9acdcca3fa4740cd547---\n---openssl_CVE-2021-23841_122a19ab48091c657f7cb1fb3af9fc07bd557bbf---\n---openssl_CVE-2020-1968_258aa8181ec01ae2e955318385d1bdd99d37a848---\n---openssl_CVE-2022-2097_a98f339ddd7e8f487d6e0088d4a9a42324885a93---\n---openssl_CVE-2023-0466_fc814a30fc4f0bc54fcea7d9a7462f5457aab061---\n---openssl_CVE-2023-2650_db779b0e10b047f2585615e0b8f2acdf21f8544a---\n---openssl_CVE-2023-6129_5b139f95c9a47a55a0c54100f3837b1eee942b04---\n---openssl_CVE-2023-4807_4bfac4471f53c4f74c8d81020beb938f92d84ca5---\n---wireshark_CVE-2020-11647_6f56fc9496db158218243ea87e3660c874a0bab0---\n---wireshark_CVE-2021-22174_785e291c1be04beebae3f3603752f5737dc1694d---\n---wireshark_CVE-2021-22222_0137c24d60934f131b25506a88c9464e4dc827de---\n---curl_CVE-2022-32221_a64e3e59938abd7d667e4470a18072a24d7e9de9---\n---curl_CVE-2021-22947_8ef147c43646e91fdaad5d0e7b60351f842e5c68---\n---curl_CVE-2020-8284_ec9cc725d598ac77de7b6df8afeec292b3c8ad46---\n---curl_CVE-2021-22945_43157490a5054bd24256fe12876931e8abc9df49---\n---curl_CVE-2023-27533_538b1e79a6e7b0bb829ab4cecc828d32105d0684---\n"
+  }
+}

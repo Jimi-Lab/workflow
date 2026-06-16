@@ -1,0 +1,47 @@
+ms when detect-
+ing 1-day vulnerabilities introduced by the reused TPLs. We
+compared V ULTURE with the state-of-the-art work, V1SCAN.
+The other tools were excluded because of various constraints.
+In detail, OSSFP is not available as open-source, and SNYK
+requires information on copyright and license, which is incom-
+patible with our benchmark.
+Vulnerability benchmark. To the best of our knowledge, there
+is no existing benchmark specifically for 1-day vulnerabilities
+in C/C++ programs. Therefore, we manually constructed a
+ground truth vulnerability benchmark. The benchmark com-
+prises 200 vulnerable function reuse cases sourced from var-
+ious repositories with more than 100 stars on GitHub. These
+200 cases cover the reuse of 66 CVEs. Among these cases,
+45% have patched the CVE they reused, while 55% have
+not. Additionally, 64% of these cases involve custom reuse,
+11
+
+===== PAGE 012 =====
+TABLE V: Vulnerability Detection Result on Ground Truth
+Scheme Item Reuse Type Total
+Custom Reuse Exact Reuse
+VULTURE
+Dtc-P 72 19 91
+Cfm-P 65 19 84
+Dtc-N 87 22 109
+Cfm-N 78 22 100
+V1SCAN
+Dtc-P 51 10 61
+Cfm-P 35 10 45
+Dtc-N 66 14 80
+Cfm-N 42 13 55
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+P: Results on patched vulnerabilities.
+N: Results on non-patched vulnerabilities.
+including function name modification, statement modification,
+and operation modification.
+Scrutinize of results. The results are shown in Table V.
+We compared V ULTURE with V1SCAN. For custom reuse,
+VULTURE successfully identified 65 patched and 78 unpatched
+cases, with only four false negatives and 12 false positives.
+In contrast, V1SCAN identified 35 patched and 42 unpatched
+cases. For exact reuse, V ULTURE identified 19 patched and 22
+unpatched cases without any false negatives or false positives,
+whereas V1SCAN detected 10 patched and 13 unpatched
+cases with one false positive. 

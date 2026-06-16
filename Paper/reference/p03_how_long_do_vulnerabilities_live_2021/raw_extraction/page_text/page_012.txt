@@ -1,0 +1,91 @@
+2006 2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age
+(a) Firefox
+2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age (b) Chromium
+2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age
+(c) Linux
+2000 2002 2004 2006 2008 2010 2012 2014 2016 2018
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Vul lifetime
+Regular code age (d) Httpd
+Figure 9: Age of vulnerable code vs. all code, along with linear fits, for Firefox, Chromium, Linux (kernel) and Httpd. For Httpd, vulnerability
+lifetimes are calculated in 4 or 5-year intervals to guarantee confidence in the estimation.
+rency categories are self-explanatory. Others is the category
+that includes all CWEs that could not be matched to any
+of the five aforementioned categories. The exact mapping
+between CWE identifiers and our categories is available in
+Appendix A.1. The average vulnerability lifetime per category
+is shown in Table 4.
+ID Name Mean Median
+5 Others 1,345.64 984.0
+2 Input Validation and Sanitization 1,354.07 944.5
+4 Security Measures 1,384.05 996.5
+6 Concurrency 1,604.10 1,296.0
+1 Memory and Resource Management 1,633.60 1,129.0
+3 Code Development Quality 1,760.96 1,333.0
+Table 4: Vulnerability categories and their mean and median life-
+times (in days) for all CVEs
+Analysis of the data for all CVEs indicates a significant19
+difference in distribution, agreeing with previous results [18].
+More thorough analysis, however, reveals that this can
+be attributed to differences in the prevalence of different
+types in different projects, rather than some deeper relation
+(an instance of Simpson’s paradox). Specifically, for Linux,
+Chromium, and Firefox, no significant difference can be statis-
+tically observed20. As an example, the figures for Chromium
+19Kruskal-Wallis-H test with p-value of 2-91e-07 and 40% of pairwise
+comparisons sign. different (α = 0.05), even with Bonferroni correction.
+20Kruskal-Wallis-H test with p-values 0.492 (Chromium), 0.075 (Firefox)
+and 0.525 (Linux).
+are given in Table 5.
+ID Name Mean Median
+6 Concurrency 597.43 543.0
+3 Code Development Quality 647.36 700.0
+2 Input Validation and Sanitization 687.92 525.0
+5 Others 706.71 576.0
+1 Memory and Resource Management 770.25 618.0
+4 Security Measures 736.49 545.0
+Table 5: Vulnerability categories of Chromium, mean and median
+lifetimes in days
+5.6 Case study on impact of fuzzing
+To show the utility of vulnerability lifetime as a metric to
+study issues with practical implications, we investigate the
+effect of automated tools (esp. fuzzing tools) on vulnerabil-
+ity lifetimes. Although fuzz testing in general is not a new
+idea, “modern” coverage-guided fuzzing with fuzzers like
+AFL(++)21, libFuzzer22 and Honggfuzz23 (syzkaller24 for the
+kernel), combined with sanitizers (e.g. (K)ASan [35], MSan25,
+21https://github.com/google/AFL, https://github.com/
+AFLplusplus/AFLplusplus
+22https://llvm.org/docs/LibFuzzer.html
+23https://github.com/google/honggfuzz
+24https://github.com/google/syzkaller
+25https://clang.llvm.org/docs/MemorySanitizer.html

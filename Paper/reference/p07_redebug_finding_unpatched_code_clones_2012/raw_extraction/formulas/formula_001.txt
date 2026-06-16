@@ -1,0 +1,196 @@
+Page 1: false detection rate, and is language agnostic. We evaluated
+Page 1: 700,000 LoC/min to build a source code database, then found
+Page 1: while (ptr != end) {
+Page 2: • High false detection rate: The advanced heuristics
+Page 2: used to ﬁnd more code clones introduce a high false
+Page 2: detection rate, i.e., a large number of false code clones
+Page 2: are false code clones. That’s 2 out of every 3 reports.
+Page 2: LoC/min on a commodity desktop. This database of
+Page 2: • Lower false detection rate: ReDeBug focuses on de-
+Page 2: creasing false detection rate by using a close-to-exact
+Page 2: false positives due to mis-matches. ReDeBug has false
+Page 2: approaches have similar sources of false detection, plus
+Page 2: 25]. As a result, Deja Vu had a false detection rate
+Page 2: the major source of false positives found in previous
+Page 2: speed, and false detection rate. In particular, the design
+Page 3: minimizing false detection, (4) being modular when possible
+Page 3: CONTAINTMENT(fa, fb) = |fa ∩fb|
+Page 3: SIMILARITY(fa, fb) = |fa ∩fb|
+Page 3: optimizations such as when θ = 1 only verifying
+Page 3: tiﬁed unpatched code clones to remove Bloom ﬁlter
+Page 3: For example, suppose we have two ﬁles A = t1t2t3t4
+Page 3: and B = t1t3t4t2 where each ti is a token (note to-
+Page 3: ﬁle). The tokenization is then A = {t1, t2, t3, t4} and
+Page 3: B = {t1, t3, t4, t2}. When n = 2, there are 3 2-token
+Page 3: strings in each set: fA = {(t1, t2), (t2, t3), (t3, t4)} and
+Page 3: fB = {(t1, t3), (t3, t4), (t4, t2)}. The similarity is 1/5 since
+Page 3: e.g., if n = 1 then statement order does not matter at all,
+Page 3: n = 2 looks at statement pairs, and so on. θ acts as a
+Page 3: When θ = 1, two ﬁles must have exactly the same n-tokens
+Page 3: (after normalization). When θ = 0, any match is considered
+Page 3: values that produce meaningful results. For example, n = 4
+Page 4: may report more false code clones, which require signiﬁcant
+Page 4: Our techniques may miss some clones, but minimize false
+Page 4: hashed into a Bloom ﬁlter.
+Page 4: 3) Stores the Bloom ﬁlter for each source ﬁle in
+Page 4: a raw data format. ReDeBug compresses Bloom
+Page 4: tation, we also concatenate per-ﬁle Bloom ﬁlters for
+Page 4: Bloom ﬁlter is much quicker than loading a bunch of
+Page 4: small Bloom ﬁlters on our machines.
+Page 5: (Bloom filter
+Page 5: Hash n-tokens
+Page 5: into Bloom filters
+Page 5: Feature hashing
+Page 5: 3) Hashes the n-token window into a set of hashes
+Page 5: 4) Performs a Bloom ﬁlter set membership test
+Page 5: on each hashed n-token window. We report an
+Page 5: MENT(fp, f) ≥θ.
+Page 5: 1) Performs an exact-matching test to remove Bloom
+Page 5: We use Bloom ﬁlters [8] because they are a space efﬁcient
+Page 5: n-tokens. A Bloom ﬁlter represents set S as a vector of m
+Page 5: Bloom ﬁlter we ﬁrst apply k independent hash functions of
+Page 5: range {1..m}. For each hash h(x) = i, we set the i’th bit
+Page 5: of the bit vector to 1. In a Bloom ﬁlter, to test if an element
+Page 5: of y ∈S, we again apply the k hash functions and check
+Page 5: if all the bits are 1. If at least one of the hashed bits is 0,
+Page 5: Bloom ﬁlters have one-sided error for set membership
+Page 5: tests. A false positive occurs when the set membership test
+Page 5: returns x ∈S when x is not really in S. False positives occur
+Page 5: because of collisions in hash functions. The false positive
+Page 5: rate of the Bloom ﬁlter depends on the size of the bit array
+Page 5: (m), the number of hash functions (k), and the number of
+Page 5: elements in S (N). The probability of a false positive can be
+Page 5: Bloom ﬁlters have no false negatives. In our setting, the
+Page 5: as described above, i.e., θ = 1. This is a conservative
+Page 6: However, the Bloom ﬁlters we described above are designed
+Page 6: noticed that as the number of hash functions used in a Bloom
+Page 6: solution is to use a single hash function when creating the
+Page 6: bitvectors for SIMILARITY, not multiple hash functions. A
+Page 6: single hash function approach is called feature hashing. Jang
+Page 6: et al. [22] show that feature hashing well approximates the
+Page 6: hash is faster than multiple hashes used in typical Bloom
+Page 6: ture hashing. ReDeBug then calculates the distance using
+Page 6: SIMILARITYbv(va, vb) = S(va ∧vb)
+Page 6: 3) For each n-length token sequence i, compute h(i) = d
+Page 6: The second difference is that we use Bloom ﬁlters for un-
+Page 6: patched code clone detection, while we used feature hashing
+Page 6: if we had based our similarity metric on Bloom ﬁlters with
+Page 6: multiple hash functions, we would have a larger error rate
+Page 6: than with feature hashing due to extra collisions from the
+Page 6: extra hash functions. If we had used feature hashing instead
+Page 6: of Bloom ﬁlters, we would again have lower accuracy when
+Page 6: also back up the difference between feature hashing and
+Page 6: Bloom ﬁlters [22, 29].
+Page 6: Luckily, the internals of implementing both feature hash-
+Page 6: ing and Bloom ﬁlters is almost identical. In one case we use
+Page 6: a single hash function and have a distance metric interface,
+Page 6: and in the other we use multiple hash functions and export
+Page 7: is 3 lines of code. Unless otherwise noted, we set n = 4.
+Page 7: n = 4 when the amount of context c = 3 guarantees that
+Page 7: code clones we set θ = 1, e.g., with the default parameters
+Page 7: the size of a Bloom ﬁlter and N is the number of n-tokens
+Page 7: to be hashed into a Bloom ﬁlter. ReDeBug used 256KB-
+Page 7: sized Bloom ﬁlters where the m/N ratio was always at least
+Page 7: greater than 32. ReDeBug took advantage of 3 fast hash
+Page 7: time to read in ﬁles, normalize, tokenize, put into the Bloom
+Page 8: due to the sparseness of the Bloom ﬁlters.
+Page 8: to recover compressed Bloom ﬁlters to perform the set
+Page 8: 12,791 using the default parameters of n = 4 and c = 3.
+Page 9: to 7, ReDeBug hashes every 7 consecutive tokens and each
+Page 9: n = 4
+Page 9: n = 5
+Page 9: n = 7
+Page 9: A key question is, what is the false detection rate of Re-
+Page 9: this is the Bloom ﬁlter tests. The Bloom ﬁlter tests have no
+Page 9: false negatives, but may have false positives. We performed
+Page 9: overall we had a 0.3% false positive rate in the Bloom ﬁlters.
+Page 10: es = -1;
+Page 10: N = 1;
+Page 10: if (N >= 2*1024*1024) RETURN(←
+Page 10: if (nextSym == BZ_RUNA) es = es + (0+1) *←
+Page 10: if (nextSym == BZ_RUNB) es = es + (1+1) *←
+Page 10: N = N * 2;
+Page 10: ret = bdrv_file_open(&s->hd, filename, flags)←
+Page 10: ret = bdrv_file_open(&s->hd, filename, flags ←
+Page 10: header)) != sizeof(header))
+Page 10: i = 0;
+Page 10: - while(lenMsg > 0 && *p2parse != ’:’ && *←
+Page 10: p2parse != ’ ’ && i < CONF_TAG_MAXSIZE) {
+Page 10: + while(lenMsg > 0 && *p2parse != ’:’ && *←
+Page 10: p2parse != ’ ’ && i < CONF_TAG_MAXSIZE - 2) ←
+Page 10: bufParseTAG[i++] = *p2parse++;
+Page 10: if (code >= max_code)
+Page 10: if (code == max_code)
+Page 10: *sp++ = firstcode;
+Page 10: *sp++ = firstcode;
+Page 10: code = oldcode;
+Page 10: while (code >= clear_code)
+Page 10: while (code >= clear_code && sp < &(stack←
+Page 10: *sp++ = table[1][code];
+Page 10: if (code == table[0][code])
+Page 10: RETURN_FALSE;
+Page 11: = "*" | absoluteURI | ←
+Page 11: +if (r->method_number != M_CONNECT
+Page 11: + && uri[0] != ’/’
+Page 11: + && !(uri[0] == ’*’ && uri[1] == ’\0’)) {
+Page 11: + r->args = NULL;
+Page 11: + r->hostname = NULL;
+Page 11: + r->status = HTTP_BAD_REQUEST;
+Page 11: + r->uri = apr_pstrdup(r->pool, uri);
+Page 11: r->assbackwards = 0;
+Page 11: pro = ll;
+Page 11: -def sign(hostname, cert_type = :server, ←
+Page 11: self_signing_csr = nil)
+Page 11: +def sign(hostname, allow_dns_alt_names = false,←
+Page 11: self_signing_csr = nil)
+Page 11: csr = self_signing_csr
+Page 11: cert_type = :ca
+Page 11: issuer = csr.content
+Page 11: allow_dns_alt_names = true if hostname == ←
+Page 11: unless csr = Puppet::SSL::←
+Page 11: cert_type = :server
+Page 11: issuer = host.certificate.content
+Page 11: cert = Puppet::SSL::Certificate.new(hostname)
+Page 11: cert.content = Puppet::SSL::←
+Page 11: cert.content = Puppet::SSL::←
+Page 12: ReDeBug improves scalability with decreased false de-
+Page 12: of tokens required for clones) = 30 and stride (size of
+Page 12: the sliding window) = 2 for their conservative results, and
+Page 12: Similarity = 1 to minimize their false detection. This
+Page 13: False Detection
+Page 13: Deckard and ReDeBug. As expected, ReDeBug had no false
+Page 13: Since ReDeBug gets rid of Bloom ﬁlter errors and dead
+Page 13: code, a metric for false positives is the number of unpatched
+Page 13: We have identiﬁed two other causes for this type of false
+Page 13: Normalization reduces the false negative rate, but may
+Page 13: increase the false positive rate. For example, imagine two
+Page 13: routine if (len<=1) break; ahead of the vulnerable
+Page 13: *d++ = *src;
+Page 13: *d = ’\0’;
+Page 13: winnowing [28], a fuzzy hashing technique that selects a
+Page 13: is that ReDeBug uses feature hashing to encode n-tokens
+Page 13: ing for feature hashing for improved speed. This decision
+Page 13: clones, but having more false detections of clones). Exam-
+Page 14: only for C and C++. It then hashes these tokens and assigns
+Page 14: highest false positive rate for reported errors among the code
+Page 14: the number of falsely detected clones would also scale up
+Page 14: Deckard and Deja Vu use locality sensitive hashing (LSH)
+Page 14: feature hashing. Theoretical analysis shows feature hashing
+Page 14: duplicates which are then compared using feature hashing
+Page 14: ability to handle real code, and minimizing false detec-
+Page 14: http://www.cse.yorku.ca/∼oz/hash.
+Page 15: [8] Burton H. Bloom.
+Page 15: Space/Time trade-offs in hash
+Page 15: applications of bloom ﬁlters: A survey. Internet Math-
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: http://web.nvd.nist.gov/view/vuln/detail?vulnId=
+Page 15: man. BitShred: feature hashing malware for scalable
+Page 15: ford, Alex Smola, and S.V.N. Vishwanathan. Hash ker-
+
+[NEEDS FORMULA REPAIR]

@@ -1,0 +1,116 @@
+niques such as CCFinder [15] have the disadvantage of high
+complexity as it uses a sufﬁx tree algorithm to measure the
+similarity between token sequences of programs. In addition,
+its parameter replacement strategy is so aggressive that it
+introduces a signiﬁcant number of false positives. Similarly,
+approaches that transform code into abstract data structures
+(e.g., abstract syntax trees) have to apply expensive tree-
+matching operations or graph mining techniques for similarity
+estimation [16], [17]. Although such an approach would be
+capable of discovering code fragments with similar syntactic
+patterns, this does not guarantee accurate vulnerability de-
+tection because two code fragments with identical abstract
+syntax trees do not necessarily contain the same vulnerability.
+Notable exceptions are ReDeBug [18] and SourcererCC [19].
+ReDeBug aims to achieve both accuracy and scalability by
+applying hash functions to lines of code and later detecting
+clones by comparing hash values. However, as we show in
+this paper, ReDeBug is still not satisfactory both in terms of
+accuracy and scalability when it comes to ﬁnding vulnerable
+code clones in massive code bases. For example, when testing
+an Android smartphone (15 MLoC), ReDeBug requires half
+an hour, and has 17.6 % false positives. SourcererCC uses a
+bag-of-tokens strategy to manage minor to speciﬁc changes in
+clones, which impairs the accuracy from a security perspec-
+tive. For example, SourcererCC detects clones in which the
+sequence of code is changed, or statements are inserted. As
+a result, it misleadingly detects a patched code fragment as a
+clone of an unpatched code fragment.
+In this paper, we present VUDDY (VUlnerable coDe clone
+DiscoverY), a scalable approach for code clone detection. This
+approach is speciﬁcally designed to accurately ﬁnd vulnerabil-
+ities in a massive code base. To achieve the goal of highly
+scalable yet accurate code clone detection from a security
+perspective, we use the functions in a program as a unit for
+code clone detection. Since a function delivers both syntactic
+and symbolic information of the code, we are able to guarantee
+high accuracy in detecting clones with respect to security
+issues. Moreover, by applying carefully designed abstraction
+and normalization schemes to functions, clones with common
+modiﬁcations (e.g., variable names) can be detected, which in
+turn enables VUDDY to identify unknown vulnerabilities, as
+well. In addition, a clever classiﬁcation of functions based on
+the length of a function body considerably reduces the search
+space, and thus enables VUDDY to work scalably even on a
+massive code base. With this design, VUDDY accomplishes an
+unprecedented balance between high scalability and accuracy.
+In addition, we present a detailed explanation of the princi-
+ples and implementation of VUDDY , as well as the application
+of the proposed approach for the detection of vulnerabilities.
+We further propose a method to collect CVE vulnerabilities in
+an automated way. From 9,770 vulnerability patches obtained
+from eight well-known Git repositories (e.g., Google Android),
+we retrieved 5,664 vulnerable functions that address 1,764
+CVEs. Our evaluation involves empirically measuring the per-
+formance of VUDDY and then evaluating the practical merits
+of VUDDY by demonstrating the vulnerabilities detected from
+a pool consisting of real-world open source software. This pool
+includes 25,253 active C/C++ projects collected from GitHub,
+Linux kernels, and the Android OS of a smartphone that
+was released in March 2016. The results show that VUDDY
+preprocesses the 172 M functions (in 13.2 M ﬁles, 8.7 BLoC)
+of the 25,253 projects in 4 days and 7 hours, then identiﬁes
+133,812 vulnerable functions in approximately 1 second for
+each project. VUDDY is twice faster than ReDeBug, while
+having no false positive with Android ﬁrmware. Meanwhile,
+ReDeBug had 17.6 % false positives.
+The contributions of this study include:
+• Scalable clone detection: We propose “VUDDY ,” an
+approach to scalable yet accurate code clone detection,
+which adopts a robust parsing and a novel ﬁngerprinting
+mechanism for functions. VUDDY processes a billion
+lines of code in 14 hours and 17 minutes, which is an
+unprecedented speed.
+• Vulnerability-preserving abstraction:We present an ef-
+fective abstraction scheme optimized for detecting un-
+known vulnerable code clones. This allows VUDDY to
+detect unknown vulnerable code clones, as well as known
+vulnerabilities in a target program. Owing to this design,
+VUDDY detects 24 % more vulnerable clones which are
+unknown variants of known vulnerabilities.
+• Automated vulnerability acquisition:We introduce a fully
+automated method for acquiring known vulnerable func-
+tions from Git repositories, by taking advantage of secu-
+rity patch information.
+• Open service:We have been servicing VUDDY as a form
+of open web service at no charge, since April 2016. In
+practice, VUDDY is being used by many in the open
+source community and by IoT device manufacturers, for
+the purpose of examining their software. In the past 11
+months, 14 billion lines of code have been queried to our
+open service, and 144,496 vulnerable functions have been
+detected. Please see https://iotcube.net/
+The remainder of this paper is organized as follows. Sec-
+tion II clariﬁes the taxonomy and summarizes existing ap-
+proaches concerning code clone detection. Section III presents
+the problem and goal. Section IV describes the principles
+of our proposed approach, VUDDY . In Section V, we ex-
+plain how VUDDY is applied to vulnerability discovery. In
+Section VI, we discuss issues regarding the implementation
+of VUDDY . Then in Section VII, we describe various ex-
+periments conducted for evaluating the scalability, time, and
+accuracy of VUDDY against the most competitive techniques
+on real-world programs. Section VIII compares VUDDY with
+ReDeBug, the most competitive technique, in detail. A quali-
+tative evaluation is given through case studies in Section IX.
+Section X presents a discussion, and Section XI offers the
+conclusion and future work.
+II. TAXONOMY AND RELA TEDWORK
+A. Taxonomy
+To avoid confusion concerning the various taxonomies
+adopted in other research, we use the following well accepted
+([20], [21], [22], [23]) deﬁnitions of the types of code clones.
+• Type-1: Exact clones.These code fragments are dupli-
+cated without any change, i.e., are unmodiﬁed.
+596
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,74 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 9. Background linking example, to automatically link alerts detected by the 
+threat detection module to external background knowledge (e.g. ATT&CK-KG). 
+cuted as a new process ( :file1 :isExecutedBy :process2 ) 
+and reads another conﬁdential ﬁle ( ?file1 :reads ?file2 ). 
+Next, the process sends the conﬁdential ﬁle to another socket 
+( process :sends ?socket2 ). We can use the FILTER syntax 
+(i.e. FILTER (?fit < 0.5) ) to focus on conﬁdential ﬁles (i.e., 
+with a tag value ( ?file2 rule:confTag ?fit ) lower than 
+0.5). 28 
+To reconstruct the resulting attack graph, we used SPARQL 
+CONSTRUCT queries to generate new triples in RDF. The generated 
+attack graph can be shared and reused – e.g., for further threat 
+hunting activities and analysis. 
+6.4. Contextualization & linking 
+Security-related events are typically highly context-speciﬁc and 
+hence, their interpretation requires extensive background knowl- 
+edge ( Ekelhart et al., 2018 ). Such knowledge plays an important 
+role in our approach and can enrich and provide additional infor- 
+mation – e.g., to identify high-level attack steps in the generated 
+attack graph. 
+In particular, we link results to our previously developed SEPSES 
+CSKG ( Kiesling et al., 2019 ), a continuously updated cybersecu- 
+rity knowledge graph that integrates data from various publicly 
+available sources, including CAPEC, CPE, CVE, CVSS, and CWE. Fur- 
+thermore, we extend the SEPSES CSKG with attack patterns from 
+MITRE ATT&CK that consist of 665 attack techniques and 14 attack 
+tactics (ATT&CK-KG Kurniawan et al., 2021 ). 
+Figure 9 illustrates this background knowledge link- 
+ing. The example relation :isExecutedBy between a ﬁle 
+:/home/admin/clean and a process :Clean can be linked to 
+attack techniques and tactics in the background knowledge: in this 
+case, the technique “exploitation for client execution ”, identiﬁed by 
+node :T1203 ) from the MITRE ATT&CK matrix 29 ( Kurniawan et al., 
+2021 ). Since node :T1203 also provides links to additional infor- 
+mation (tactics, mitigations, etc.), we can use this node to abstract 
+from concrete indicators to a higher-level conceptualization of 
+attacks and their techniques, tactics, procedures. 
+Listing 9 shows an excerpt of background linking dur- 
+ing forward chaining via SPARQL query federation. We mod- 
+iﬁed the query from Listing 7 and introduced additional 
+28 Recall that semantic reasoning infers the type (i.e. Class ) of system objects auto- 
+matically based on their relations (i.e., rdfs2 & rdfs3 ), hence, we can deﬁne attack 
+patterns based on their relations only. 
+29 https://attack.mitre.org/techniques/T1203/ 
+Listing 9. Contextualization and linking through semantic query federation 
+(SPARQL Service). 
+Fig. 10. Implementation Setup. 
+query patterns such as SERVICE followed by an endpoint e.g. 
+http://w3id.org/sepses/repositories/knowledge which references exter- 
+nal background knowledge. This links a detected rule with a cor- 
+responding attack technique in the background knowledge (iden- 
+tiﬁed by the triple pattern ?r rule:hasAttackTechnique 
+?tech ). Finally, we also link the identiﬁed technique to a tactic 
+(identiﬁed by ?tech at:accomplishesTactic ?tt ). This il- 
+lustrates how the SPARQL federation mechanism makes it possible 
+to query and link an entity to additional resources, such as mitiga- 
+tion techniques, impacts, etc. 
+7. Implementation & application scenarios 
+In this section, we describe the implementation of our frame- 
+work and demonstrate its feasibility in several scenarios. 
+7.1. Implementation 
+Figure 10 visualizes the implementation architecture of our ap- 
+proach. We developed a Java-based log processing tool called the 
+KRYSTAL engine 30 that consumes log data from three different log 
+sources, i.e., Linux auditd , FreeBSD DTrace 31 , and Windows ETW . 
+We used the KRYSTAL Ontology to parse and map log data into 
+an RDF-based provenance graph. By means of the Jena 32 reason- 
+ing engine, we can infer new knowledge during provenance graph 
+building. 
+30 https://github.com/sepses/SimpleLogProvenance 
+31 https://wiki.freebsd.org/DTrace/ 
+32 https://jena.apache.org/documentation/inference/ 
+11

@@ -1,0 +1,50 @@
+ vulnerabilities in the
+modified OSS components. Suppose that a vulnerability is
+introduced in an OSS and is then patched. Let fd be the dis-
+closed vulnerable function (e.g., through public vulnerability
+databases), fp be the patched function, and fo be the vulnera-
+ble function contained in an older version of the OSS, which
+has a different code syntax from fd (see Figure 1).
+3038    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 004 =====
+…
+Patched
+function
+Disclosed
+vulnerable function
+Initial
+function
+Vulnerability
+patchfd fp
+Vulnerability
+introduction update
+Oldest
+vulnerable function
+fo
+update
+Figure 1: Depiction of the vulnerability fix flow from the vulner-
+ability introduction to the vulnerability patch.
+Using these terms, we can classify the propagation of vul-
+nerability caused by vulnerable OSS reuse into the following
+four categories (C1 to C4, see Table 1):
+Table 1: Classification of vulnerable function propagation.
+Category Description
+C1 fd is reused without code modification.
+C2 fd is reused with code modification.
+C3 fo is reused without code modification.
+C4 fo is reused with code modification.
+Regardless of the category, all propagated vulnerable func-
+tions should be discovered and patched.
+Technical challenges. The main technical challenge is ad-
+dressing the syntax diversity of vulnerable code, mostly arises
+for the following two reasons: internal and external modifi-
+cation of the OSS. As the source code of an OSS frequently
+changes during OSS version updates (i.e., internal modifica-
+tions of OSS), the syntax of a vulnerable function can also
+be changed ( i.e., C3 and C4). Moreover, developers often
+apply their own code patches to OSS components (i.e., exter-
+nal modifications of OSS), and thus, a propagated vulnerable
+function can exist with various syntaxes (i.e., C2 and C4).
+Such syntax diversity significantly impairs the accuracy
+of VCC discovery

@@ -1,0 +1,32 @@
+paper_id: p37_krystal_knowledge_graph_based_framework_for_tactical_attack_discovery_in_audit_data
+artifact_type: Type A - paper with local source code and data/artifact material
+pdf_path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\RelatedWork_VulnVersionValidation\AttackPerspective\Krystal-main\KRYSTAL：Knowledge graph-based framework for tactical attack discovery in audit data.pdf
+source_path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\RelatedWork_VulnVersionValidation\AttackPerspective\Krystal-main\Krystal-main
+static_only_boundary: [EXECUTION NOT REQUESTED] code was not compiled, dependencies were not installed, scripts were not run, GraphDB was not started, and DARPA scenarios were not reproduced.
+
+Detected source/artifact layout:
+- Java/Maven project: pom.xml, .classpath, .project, src/main/java/sepses/krystal/*.java, src/main/resources/log4j.properties.
+- Entrypoint and configuration: src/main/java/sepses/krystal/Main.java reads config.yaml; config.yaml declares input-dir, output-dir, triplestore, SPARQL endpoint, ontology path, OS platform, tag propagation, attenuation/decay, policy rules, signature rules, confidential directories, and field filters.
+- Provenance parsing and RDF lifting: JsonRDFReader.java reads JSON audit logs and dispatches to LogParserWin, LogParserUbuntu12, LogParserUbuntu14, LogParserLinux20, and LogParserFreeBSD.
+- Threat detection modules: AlertRule.java constructs alert triples using SPARQL CONSTRUCT; PropagationRule.java and AttackConstruction.java implement tag propagation/attenuation and backward-forward attack construction patterns in SPARQL/Jena code.
+- Storage/query dependencies: helper/GraphDBStorage.java, helper/Storage.java, helper/Utility.java signal GraphDB/Jena/RDF/HDT style data movement, but runtime behavior was not executed.
+- Ontology/rule artifacts: experiment/ontology/*.ttl, *.owl; experiment/rule/*.ttl; experiment/rule_win/*.ttl; experiment/query/*.sparql.
+- Data artifacts: experiment/input/{cadets,fivedirections,theia,trace}/*.json include large DARPA Transparent Computing-style audit log samples; experiment/output/*.ttl includes generated RDF/alert outputs.
+- Visual/document artifacts: README.md, architecture-latest3.png, cadets_03.png.
+
+Static reproducibility notes:
+- README states KRYSTAL is a modular framework for tactical attack discovery in audit data and requires JVM plus an RDF graph database/SPARQL engine such as GraphDB.
+- README includes BibTeX for the Computers & Security 2022 article and lists public repository URL, but official metadata still needs independent verification before final BibTeX use: [NEEDS CITATION VERIFICATION].
+- Local source materially supports the paper claims about RDF provenance graph building, declarative SPARQL policies, Sigma-rule translation, GraphDB use, and DARPA-TC sample processing.
+- Runtime metrics, detection counts, and scalability claims remain paper-evidence only because execution was explicitly not requested: [EXECUTION NOT REQUESTED].
+
+Useful for VulnVersion:
+- Strong design analogue for a multi-dimensional graph serving downstream reasoning: heterogeneous low-level evidence is normalized into a typed RDF knowledge graph, then detection/reconstruction is expressed as reusable queries/rules.
+- Transferable architecture pattern: evidence ingestion -> ontology normalization -> declarative query/rule layer -> external knowledge linking -> scenario reconstruction.
+- Not directly transferable as an affected-version evaluator because KRYSTAL analyzes audit/provenance logs rather than CVE patch/version histories.
+
+Known gaps:
+- [NEEDS TABLE REPAIR] evaluation tables were extracted but exact cell-level values need manual repair before citing numeric metrics.
+- [NEEDS FIGURE EXTRACTION] figures are page crops/captions and should be manually checked before visual-detail claims.
+- [NEEDS CITATION VERIFICATION] publication metadata and repository URL should be checked against official publisher/repository records before camera-ready BibTeX.
+- [EXECUTION NOT REQUESTED] source behavior and artifact outputs were not reproduced.

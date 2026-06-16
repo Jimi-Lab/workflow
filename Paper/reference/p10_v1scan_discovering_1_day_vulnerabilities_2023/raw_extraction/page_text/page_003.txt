@@ -1,0 +1,141 @@
+Vulnerable source file
+Function
+(F)
+Target program
+OSS codebase
+Reused
+Exact (E)
+Unused (U)
+Changed (C)
+(a) Reused code classification
+(b) Vulnerable code classification
+Structure
+(S)
+Variable 
+(V)
+Macro 
+(M)
+Figure 1: Depiction of the code classification.
+2.3
+Problem statement
+In this paper, we focus on the problem in which existing
+version- and code-based approaches fail to precisely detect
+1-day vulnerabilities in target software, leaving threats un-
+mitigated and making the vulnerability management process
+ineffective. Two main issues with the existing version- and
+code-based approaches are summarized as follows.
+• Version-based approaches produce many false positives
+because they do not consider the modification of reused
+vulnerable code.
+• Code-based approaches report many false negatives be-
+cause they do not consider code locations in which vul-
+nerabilities exist.
+First, although 57% of the C/C++ OSS codebase is changed
+or excluded from OSS reuse in practice [36], existing version-
+based approaches (e.g., [9,36,40]) fail to consider the impact
+of modified reuse on vulnerability propagation. Even if the
+vulnerable code is excluded during OSS reuse, or is repaired
+by backporting the security patch, existing version-based ap-
+proaches fail to filter out this and produce false alarms.
+Moreover, version-based approaches can produce false re-
+sults when component versions are misidentified. Because
+OSS codes often undergo modifications during the reuse pro-
+cess, it is challenging to map one version to the entire code-
+base of the reused component (e.g., code from multiple OSS
+versions can be mixed) [36]. Leveraging a Software Bill of
+Materials (SBoM) [29] also presents challenges, as the cur-
+rent SBoM for C/C++ mostly lacks consideration for modified
+reuse; it maps a single version to an OSS component and can
+thus produce false results in vulnerability discovery.
+On the other hand, existing code-based approaches (e.g.,
+[12, 14, 34, 37]) report many false negatives because they
+mainly focus on detecting propagated vulnerabilities within a
+specific granularity (e.g., function units). Furthermore, they
+do not precisely identify propagated vulnerable code with
+various syntaxes (e.g., propagated with code changes).
+2.4
+Motivating example
+We attempted to discover 1-day vulnerabilities in ReactOS
+v0.4.13, which is a free Windows-compatible operating sys-
+tem. We used V1SCAN, version-based, and code-based ap-
+proaches and then examined each vulnerability detection re-
+sult. Table 1 summarizes the vulnerability detection results.
+Table 1: Vulnerability detection results for ReactOS using the
+V1SCAN, version-based, and code-based approaches. We mea-
+sured FNs by considering all TPs discovered in the three ap-
+proaches as the ground truth.
+Approach
+#TP∗#FP† #FN‡ Precision R§
+Version-based approach (V)
+5
+47
+22
+10%
+19%
+Version-based approach
+(manually correcting versions)
+20
+29
+7
+41%
+74%
+Code-based approach (C)
+13
+8
+14
+62%
+48%
+Union of the version- and
+code-base approaches (V ∪C)
+15
+55
+12
+21%
+56%
+V1SCAN
+26
+1
+1
+96%
+96%
+#TP∗: #True positives, #FP†: #False positives, #FN‡: #False negatives,
+R§: TP detection rate (#TP / (#TP + #FN)).
+Version-based approach. We used CENTRIS [36], a recent
+approach for precisely identifying modified OSS components.
+CENTRIS identified 23 C/C++ OSS components and versions
+thereof in ReactOS. Subsequently, we investigated the CVE
+vulnerabilities contained in the components using the CPE
+of NVD [21], which specifies the software affected by each
+CVE (details are introduced in Section 3.3).
+Consequently, 10 components, including LibTIFF and
+MbedTLS, were identified as vulnerable, with 52 CVE vul-
+nerabilities. However, when we manually examined these 52
+CVEs, we observed that the version-based approach produced
+many false positives: 47 CVEs (90%) were false positives,
+whereas only five CVEs were identified correctly. Most false
+positives were the result of incorrect predictions of the com-
+ponent version (see Section 2.3).
+Despite our attempt to rectify the problem by manually cor-
+recting the component versions, the version-based approach
+still produced 29 false positives. This is because the version-
+based approach misinterprets that the target program still
+contains unused vulnerable code or vulnerable code repaired
+by backporting security patches. For example, the ReactOS
+team resolved three CVE vulnerabilities contained in Libtirpc
+v0.1.11 by backporting the security patches, instead of up-
+dating the entire Libtirpc to a safe version. However, the
+version-based approach failed to filter out the resolved vul-
+nerabilities, misconfirming that the three CVEs were still
+included in ReactOS (i.e., producing false positives).
+Code-based approach. We used VUDDY [14], a function-
+based vulnerable code detection approach that was specifi-
+cally developed for the discovery of 1-day vulnerabilities. We
+tested VUDDY using 4,612 CVE patches (see Section 4.3)
+in abstraction mode, which makes VUDDY robust to changes
+in parameters, local variables, and called function names.
+When we applied VUDDY to ReactOS, we confirmed that
+VUDDY reported many false negatives, which we attributed
+to the syntax diversity of the vulnerable code. VUDDY could
+discover only 13 (48%) of 27 vulnerabilities and failed to de-
+tect 14 vulnerable functions. Our measurement of the Jaccard
+similarity [32] (considering a function as a set of lines) be-

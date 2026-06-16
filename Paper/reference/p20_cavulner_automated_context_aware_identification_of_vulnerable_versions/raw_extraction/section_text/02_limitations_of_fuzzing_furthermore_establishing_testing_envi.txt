@@ -1,0 +1,125 @@
+limitations of fuzzing. Furthermore, establishing testing environments for every library proves im-
+practical, imposing significant scalability constraints. Static analysis approaches primarily comprise
+version-controlled commit tracing [9, 14, 24, 32] and code similarity matching [28, 42, 49]. However,
+they heavily rely on the lines of changes in fix commits to trace the introduction of vulnerable
+code, while vulnerable code may not always be covered in fix commit diffs [36]. Furthermore, none
+of them analyze the nature of the vulnerability and the semantics of the code and are unable to
+distinguish between security fixes and non-security fixes.
+Specifically, the SZZ algorithm based approaches are widely used in the identification of bug
+inducing commits (BIC) [14, 24, 32, 43], researchers also borrowed this algorithm for the identi-
+fication of vulnerability inducing commits (VIC) [ 9]. However, vulnerabilities differ from bugs.
+While bugs are often introduced by recent commits, vulnerabilities are typically rooted in much
+earlier code. For example, Nikolaos et al. [5] found that the average lifetime of a vulnerability is
+approximately four years, indicating that vulnerabilities tend to remain latent for long periods
+before detection. Moreover, relying solely on patch content and commit messages is often insuffi-
+cient for LLMs to fully capture the semantics of vulnerabilities. As a result, LLM4SZZ is unable to
+accurately identify vulnerable versions of OSS. The severity of these limitations was highlighted by
+the latest comprehensive empirical study [13] on this topic. After evaluating 12 state-of-the-art
+tools (including both tracing and matching-based methods) on over 1,000 vulnerabilities, the study
+revealed that no existing tool achieves an accuracy above 45.0%, largely due to their inability to
+handle complex patch patterns and lack of deep semantic understanding.
+In summary, existing approaches face two key challenges. Challenge 1: How to distinguish
+security fixes from non-security fixes within a fix commit and accurately identify the vulnerability-
+introducing code. Challenge 2: How to effectively trace back to earlier vulnerable versions con-
+taining equivalent vulnerable code, given that traditional code similarity analysis and AST-based
+line mapping algorithms often fail due to code evolution over time.
+To overcome these challenges, we propose a novel approach named CaVulner, which integrates
+multi-source context and leverages the capabilities of LLMs for vulnerability analysis and code
+understanding to identify vulnerable versions within the Java ecosystem. For Challenge 1, we
+develop a two-stage LLM-based module that leverages contextual cues while minimizing noise.
+The first stage focuses on coarse-grained localization by narrowing down candidate methods based
+on fix commit change patterns, such as whether a method contains only deletions, only additions,
+or both, and by incorporating relevant vulnerability information from CVE descriptions and CWE
+classifications. This guides the LLM to focus on methods most likely to contain the root cause. The
+second stage performs fine-grained reasoning by prompting the LLM to analyze semantic differences
+between the pre- and post-fix code within the selected method to identify the precise code fragment
+responsible for the vulnerability. For Challenge 2, we trace the origin of each vulnerable code
+block using a combination of git blame and LLM reasoning. We handle complexities such as cherry-
+picks, merges, and duplicated commits by computing hunk hashes to detect semantically identical
+changes across different commit hashes. All tags pointing to the inducing commits are collected,
+and the difference between these and the fix commit tags is computed. The resulting tag set is then
+normalized into standardized version ranges, representing the vulnerable versions.
+Our experiments demonstrate the effectiveness of CaVulner on 176 real-world CVEs spanning
+43 Java open-source projects, covering a total of 8,730 versions. Compared to state-of-the-art
+approaches, CaVulner improves at least 35.80% in accuracy at the CVE level. At the version level,
+precision increases by at least 10.40%, recall by 14.59% and F1-score by 23.94%. However, the cost of
+using the LLM remains low. On average, the LLM cost per vulnerability is only around $0.06.
+In summary, we make the following contributions.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 003 =====
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 3
+•We propose a novel LLM-driven vulnerable version identification approach, CaVulner, which
+integrates multi-source context and leverages the capabilities of LLMs in vulnerability analysis
+and code understanding. The evaluation results demonstrate that CaVulner significantly outper-
+forms state-of-the-art methods including V-SZZ, VERJava and LLM4SZZ. It achieves at least a
+35.80% improvement in accuracy at the CVE level. At the version level, precision increases by at
+least 10.40%, recall by 14.59% and F1-score by 23.94%.
+•We manually audited all 176 CVEs and identified the vulnerable versions, constructing a high-
+quality ground truth dataset containing 17,436 of these.
+•We have releasedCaVulner and related experiment datasets on our website [1] to facilitate further
+research.
+2 Preliminaries
+In this section, we introduce the concepts of vulnerability-inducing commit, and a motivating
+example.
+2.1 Vulnerability-Inducing Commit
+The concept of Vulnerability-Inducing Commit (VIC) is conceptually derived from the well-
+established and widely studied notion of Bug-Inducing Commit (BIC) [ 39], which is formally
+defined as the commit in a version control system where a software defect is first introduced.
+Building on this foundational premise, a considerable number of researchers have dedicated ef-
+forts to proposing and refining improved techniques for identifying BICs, most notably through
+the development and refinement of various SZZ-based algorithms [14, 24, 32]. The original SZZ
+algorithm fundamentally operates by systematically tracing backward through the version control
+history starting from a known bug-fixing commit, with the objective of precisely identifying and
+isolating the specific earlier commits that were responsible for introducing the particular lines
+of code that were later modified or deleted in that fix, a process typically and effectively using
+built-in version control annotation or blame mechanisms. These subsequent variants of the SZZ

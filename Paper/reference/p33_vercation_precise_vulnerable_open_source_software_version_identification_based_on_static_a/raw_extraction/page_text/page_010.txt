@@ -1,0 +1,117 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 385
+DeepSeek-V3 [32] for vulnerable code extraction. We use the
+public API developed by OpenAI to perform the experiment in
+GPT-4. The API version is GPT-4-0613 published in 2023.
+CodeLlama was created through further ﬁne-tuning of Llama 2
+on speciﬁc code datasets. We selected the 13B parameter model
+(codellama/CodeLlama-13b-hf) from the CodeLlama
+model series. The API of DeepSeek-V3 was published in July
+2024. We set the temperature parameter to 1.0. To account for
+the stochastic nature of LLM outputs, we generate 10 inde-
+pendent responses for each CVE [55]. We employ a majority
+voting strategy where statements appearing in ≥ 6 out of 10
+runs are included in the ﬁnal vulnerable statement set for eval-
+uation. The maximum size of tokens is 1,024. We deployed
+the Codellama model on our server with four NVIDIA RTX
+A5000 GPUs. Similar to GPT-4, the temperature parameter is
+set to 1.0, and the maximum size of tokens is set to 1,024.
+Subsequently, we apply weight allocation strategies to extract
+vulnerable statements using Python scripts. For threshold se-
+lection, we used θ
+1 = 0.9, θ2 = 0.8 and θ3 = 0.7 based on
+grid search optimization described in our sensitivity analysis. In
+the code change detection, we utilize the Clang 10.0.0 tool for
+function expansion (inline optimization) and AST generation
+of C/C ++ code. Speciﬁcally, we use the -fsyntax-only option
+to perform syntax checking without actual compilation. We
+then develop Python scripts to achieve AST normalization and
+similarity comparison. Overall, we constructed our system with
+6K LoC in Python.
+V. E
+VALUATION
+In this section, we evaluate the performance of the proposed
+VERCATION by answering the following research questions
+(RQs).
+• RQ1. Overall Effectiveness: How does the overall per-
+formance of V ERCATION compare against state-of-the-art
+vulnerable version identiﬁcation methods?
+• RQ2. Architectural Contribution: H o wd ot h ek e ya r -
+chitectural choices in V ERCATION—the use of an LLM,
+static analysis, and statement weighting—contribute to its
+performance?
+• RQ3. Component Robustness: How accurate and robust is
+VERCATION’s statement-level code clone detection?
+• RQ4. Real-World Application: What are the effects of
+applying VERCATION in the real world scenarios?
+A. RQ1: Overall Effectiveness
+We ﬁrst compare V ERCATION against the NVD and SOTA
+methods. Table III shows the vulnerable version identiﬁcation
+results of NVD, SZZ algorithms, V0Finder, V1SCAN, VER-
+Java, Vision, and V ERCATION. Note that some CVEs do not
+provide vulnerable versions in NVD, such as CVE-2021-30499
+[56]. SZZ algorithms cannot work on the vfcs containing solely
+added lines (i.e., 11 cases), so we exclude these cases in ap-
+proaches using the SZZ algorithm.
+1) Comparison with NVD: The NVD achieves a precision
+of 66.8% and a recall of 41.8%. False positives often occur
+because NVD may broadly ﬂag all versions preceding a patch as
+TABLE III
+COMPARISON WITH NVD DATABASE AND SOTA WORKS
+Type Methods Precision Recall F1 Score
+- NVD Database 0 .668 0.418 0.514
+SZZ
+Algorithm
+AG-SZZ [59] 0.372 0.625 0.466
+B-SZZ [54] 0.378 0.543 0.446
+V-SZZ [17] 0.756 0.851 0.801
+Clone-based
+Approach
+V0Finder [16] 0.829 0.745 0.785
+V1SCAN [27] 0.863 0.724 0.788
+VERJava [28] 0.891 0.247 0.386
+Vision [29] 0.842 0.881 0.861
+-V ERCATION 0.918 0.945 0.931
+vulnerable without speciﬁc analysis. This situation exists in 18
+CVEs (15%) of the ground truth. For instance, security experts
+found a buffer overﬂow risk exists in Libtiff 4.4.0,b u t
+NVD simply reported the versions of Libtiff<4.4.0were
+exposed in vulnerability. In reality, the vulnerable version range
+is Libtiff<4.4.0 and ≥4.0.0.
+The reason for low recall in NVD can be summarized into
+two types: (i) NVD only reported the version in which vulner-
+abilities were found. For e xample, CVE-2017-14152 [57] was
+found in OpenJPEG 2.2.0, then NVD reported the affected
+version was only 2.2.0, whereas the real vulnerable version
+range was 2.2.0-2.2.1. The problem exists in 57 CVEs (47%) of
+the ground truth. (ii) Some vulnerabilities are not ﬁxed promptly
+after disclosure but are addressed after several versions have
+been released. These vulnerable versions can be overlooked if
+NVD does not update the version information. For example,
+CVE-2021-33815 [58] was discovered in FFmpeg4.4 but was
+ﬁxed in version 5.0. Due to the lack of timely tracking of
+the ﬁx information, NVD overlooked the vulnerable versions
+4.4.1-4.4.4.
+2) Comparison with SZZ-based Methods: The basic idea of
+SZZ algorithms is to backtrack the commit history to locate
+the earliest commit that introduces the deletion lines removed
+by patches. Regarding F1-score, V
+ERCATION improves the best-
+performing baseline V-SZZ by 16.2%. And the difference be-
+tween the F1 of B-SZZ and AG-SZZ is small (0.446 vs. 0.466).
+We afﬁrmed that there are two main causes of false alarms in
+these approaches:
+(i) The line mapping algorithm based on edit distance does
+not consider the behavior of the source code. As shown in
+Listing 2, The deleted lines were encapsulated within the
+added functions, and in fact, they have the same behavior.
+Line mapping algorithms failed in these cases, unable to
+identify the true vic.
+(ii) The SZZ algorithm treats each deleted line as an inde-
+pendent origin for backtracking, resulting in multiple vic
+being identiﬁed. For example, the security patch of CVE-
+2020-35965 [60] from FFmpeghas 5 deleted lines. The
+true vulnerability logic lies in the lack of checking the size
+of ymax before executing the memset zero operation,
+potentially resulting in out -of-bounds writes to memory.
+Our method utilizes a weight ed allocation approach to
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

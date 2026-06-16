@@ -1,0 +1,257 @@
+[
+  {
+    "page": 7,
+    "block_id": "page_007:block_001",
+    "block_type": "text",
+    "text": "AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv",
+    "bbox": [
+      53.582000732421875,
+      61.119380950927734,
+      558.19921875,
+      69.2159652709961
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_002",
+    "block_type": "text",
+    "text": "framework that supports multi-step reasoning and tool use, mak- ing it suitable for complex repository analysis tasks. Overall, we compare AgentSZZ against eleven baselines.",
+    "bbox": [
+      53.79800033569336,
+      83.56178283691406,
+      295.5593566894531,
+      117.87138366699219
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_003",
+    "block_type": "text",
+    "text": "4.4 Evaluation Metrics",
+    "bbox": [
+      53.79800033569336,
+      126.65521240234375,
+      171.84536743164062,
+      141.29522705078125
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_004",
+    "block_type": "text",
+    "text": "Following prior work on SZZ evaluation [ 36 ], we adopt precision, recall, and F1-score to measure bug-inducing commit identification accuracy. Let GT ( 𝑐 𝑖 ) and Pred ( 𝑐 𝑖 ) denote the ground-truth and predicted bug-inducing commit sets for bug-fixing commit 𝑐 𝑖 . We compute metrics over all commits as follows:",
+    "bbox": [
+      53.79800033569336,
+      141.3288116455078,
+      295.0348815917969,
+      197.5553436279297
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_005",
+    "block_type": "text",
+    "text": "Precision = Í 𝑖 | GT ( 𝑐 𝑖 ) ∩ Pred ( 𝑐 𝑖 )| Í 𝑖 | Pred ( 𝑐 𝑖 )| (1)",
+    "bbox": [
+      111.1300048828125,
+      196.21255493164062,
+      294.5823669433594,
+      247.94557189941406
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_006",
+    "block_type": "text",
+    "text": "Recall = Í 𝑖 | GT ( 𝑐 𝑖 ) ∩ Pred ( 𝑐 𝑖 )| Í 𝑖 | GT ( 𝑐 𝑖 )| (2)",
+    "bbox": [
+      116.07099914550781,
+      226.29556274414062,
+      294.5823669433594,
+      278.0285339355469
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_007",
+    "block_type": "text",
+    "text": "𝐹 1 = 2 · Precision × Recall",
+    "bbox": [
+      126.18499755859375,
+      267.5060119628906,
+      220.05686950683594,
+      290.04730224609375
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_008",
+    "block_type": "text",
+    "text": "Precision + Recall (3)",
+    "bbox": [
+      157.58799743652344,
+      271.4958190917969,
+      294.5833740234375,
+      296.19830322265625
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_009",
+    "block_type": "text",
+    "text": "4.5 Implementation",
+    "bbox": [
+      53.798004150390625,
+      294.7521667480469,
+      159.1798858642578,
+      309.3921813964844
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_010",
+    "block_type": "text",
+    "text": "Using state-of-the-art code LLMs (e.g., Claude Opus 4.6 [ 2 ]) is im- practical for large-scale evaluation due to their high cost. A single evaluation run on our three datasets would cost approximately $400, making such models unsuitable for our study. While prior work [ 36 ] adopts GPT-4o-mini [ 25 ], we instead use GPT-5-mini [ 26 ], which provides stronger support for tool use and reasoning while remaining cost-effective. All experiments are conducted on a server equipped with an AMD EPYC 7763 64-core processor and 252 GB of RAM. We access LLM APIs via OpenRouter. 2 We do not set the temperature to 0, as GPT-5 series models do not support temperature control [ 3 ]. The agent is limited to a maximum of 15 interaction turns. For the mini-SWE-agent (v2.2.5) baseline [ 47 ], we repurpose its bash-based repository interaction environment for BIC tracing instead of its default software repair workflow. The agent uses GPT-5-mini via OpenRouter and is run with a 300-second timeout per case. To ensure a fair comparison, it is provided with the same fix-side evidence as AgentSZZ: the repository path, the fix commit hash, and a filtered fix context derived from the fixing commit, with metadata trailers (e.g., Fixes: ) removed. The agent is prompted to trace the origin of the bug using read-only git commands and to output the final BIC in a structured format.",
+    "bbox": [
+      53.46699905395508,
+      309.4258117675781,
+      295.55657958984375,
+      551.9544067382812
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_011",
+    "block_type": "text",
+    "text": "5 Results 5.1 RQ1: Effectiveness of AgentSZZ",
+    "bbox": [
+      53.79800033569336,
+      560.7381591796875,
+      239.9835968017578,
+      591.0691528320312
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_012",
+    "block_type": "text",
+    "text": "Table 2 presents the results across three datasets. Following prior work [ 36 ], we further split the GitHub dataset into C and Java subsets to analyze language-specific performance. This results in four datasets: DS_LINUX (Linux), DS_GITHUB-c (GitHub-C), DS_GITHUB-j (GitHub-J), and DS_APACHE (Apache). To ensure a fair comparison, we run AgentSZZ, LLM4SZZ, and LLM4SZZ (5- mini) three times and report the average results. Due to its high cost and low performance, mini-swe-agent is evaluated with a single run on each dataset.",
+    "bbox": [
+      53.46699905395508,
+      591.102783203125,
+      295.5587158203125,
+      691.1654052734375
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_013",
+    "block_type": "text",
+    "text": "2 https://openrouter.ai",
+    "bbox": [
+      53.79800033569336,
+      698.5426025390625,
+      115.44483184814453,
+      709.1392211914062
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_014",
+    "block_type": "text",
+    "text": "AgentSZZ achieves the highest recall and F1-score across all four datasets among eleven baselines. Compared to the prior state- of-the-art LLM4SZZ [ 36 ], it improves F1 by 27.2%, 22.9%, 25.2%, and 15.4% on Linux, GitHub-C, GitHub-J, and Apache, respectively. It also achieves strong precision (0.788, 0.830, 0.750, and 0.724), corre- sponding to relative improvements of 25.5%, 20.8%, 23.6%, and 18.7% over LLM4SZZ. Although AgentSZZ has slightly lower precision, the extremely low recall of mini-swe-agent leads to misleadingly high precision due to its limited number of correct predictions. Using the same backbone model (LLM4SZZ with GPT-5-mini), AgentSZZ improves F1 by 26.1%, 21.1%, 19.3%, and 13.9%, indicating that the gains stem from the agent design and domain knowledge rather than the choice of LLM. In contrast, mini-swe-agent [ 47 ] performs poorly across all datasets (F1: 0.123, 0.123, 0.123, 0.011), largely due to unfocused exploration. While it retrieves many re- lated commits using general-purpose tools (e.g., git show , git log , git grep ), it rarely forms a stable tracing process toward the true BIC. Successful cases involve short tool chains and early convergence, whereas failures exhibit long exploratory sequences with repeated inspection but limited progress. Occasional command construction errors further degrade performance. We compare our results with both LLM4SZZ through static anal- ysis, as all run three times and the results show that AgentSZZ consistently outperforms both LLM4SZZ with significant and effec- tive size.p < 0.001 AgentSZZ also substantially improves recall. Compared to B- SZZ, recall increases by 23.0%, 22.0%, 5.9%, and 3.9% on Linux, GitHub-C, GitHub-J, and Apache, respectively, while maintaining high precision. The smaller gain on Apache is due to its higher average number of bug-inducing commits per fix (1.46 vs. 1.04 for Linux), where AgentSZZ tends to identify a single bug-inducing commit, limiting recall in multi-bug-inducing commits cases. AgentSZZ further demonstrates strong consistency and gen- eralizability. Despite being designed based on Linux, it achieves substantial improvements on GitHub and Apache, and generalizes across both C and Java without dataset-specific tuning.",
+    "bbox": [
+      317.62298583984375,
+      83.56178283691406,
+      559.7210083007812,
+      479.51434326171875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_015",
+    "block_type": "text",
+    "text": "Answers to RQ1 : AgentSZZ outperforms state-of-the-art meth- ods in precision, recall, and F1-score across all datasets, achiev- ing F1 improvements of 14.5%-27.2%. It consistently outperforms LLM4SZZ under the same backbone, while mini-swe-agent per- forms poorly due to unfocused exploration. AgentSZZ also generalizes well across datasets and programming languages.",
+    "bbox": [
+      323.2929992675781,
+      501.5737609863281,
+      554.05029296875,
+      568.7593383789062
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_016",
+    "block_type": "text",
+    "text": "5.2 RQ2. Efficiency of AgentSZZ",
+    "bbox": [
+      317.9549865722656,
+      594.9161987304688,
+      487.9406433105469,
+      609.5562133789062
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 7,
+    "block_id": "page_007:block_017",
+    "block_type": "text",
+    "text": "Table 3 compares the efficiency of four LLM-based approaches in terms of runtime, token consumption, interaction turns, and monetary cost. All API calls are made via OpenRouter to ensure a fair comparison, and all values are averaged over three datasets. AgentSZZ achieves a strong balance between efficiency and effectiveness. Compared to LLM4SZZ, it incurs a modest increase in runtime (39.1s vs. 26.2s) and token usage (34,657 vs. 17,690), but requires substantially fewer interaction turns (5.7 vs. 11.2), re- sulting in a much higher per-turn information density (6,080 vs.",
+    "bbox": [
+      317.6860046386719,
+      609.5888061523438,
+      559.7129516601562,
+      709.6513671875
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

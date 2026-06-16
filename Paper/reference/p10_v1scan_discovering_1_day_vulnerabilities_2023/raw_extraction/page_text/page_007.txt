@@ -1,0 +1,131 @@
+Listing 1: A patch snippet for CVE-2019-12904 in Libgcrypt.
+1 //libgcrypt/cipher/cipher-gcm.c
+2 ...
+3 + #ifdef HAVE_GCC_ATTRIBUTE_ALIGNED
+4 + # define ATTR_ALIGNED_64 __attribute__ ((aligned (64)))
+5 ...
+6 - static const u16 gcmR[256] = {
+7 - 0x0000, 0x01c2, 0x0384, 0x0246, 0x0708, 0x06ca, 0x048c,
+8 ...
+9 + static struct {
+10 +
+volatile u32 counter_head;
+11 ...
+12
+void prefetch_table(const void *tab, size_t len) {
+13 ...
+14 -
+for (i = 0; i < len; i += 8 * 32)
+15 +
+for (i = 0; len - i >= 8 * 32; i += 8 * 32)
+Function and structure vulnerability detection. V1SCAN
+then detects the vulnerabilities propagated to the target pro-
+gram. To respond flexibly to code changes unrelated to a
+vulnerability, V1SCAN focuses on the core code lines that
+were added or deleted in the security patch [34,37].
+The process of detecting vulnerabilities in functions and
+structures comprises two steps.
+S1. Hash comparison: First, V1SCAN compares the hash
+values of all functions (structures) in vulnerability sig-
+natures with those of the target program. If a hash value
+that belongs to both the signature and target program is
+detected, V1SCAN determines that the vulnerability has
+been propagated to the target program. Otherwise, if a
+similar hash value is discovered, V1SCAN moves to the
+next step, namely, line comparison.
+S2. Line comparison: When a similar function (structure)
+is detected between the vulnerability signature and the
+target program, V1SCAN checks whether code deleted
+from (resp. added to) the patch was included (resp. was
+not included) in the function (structure) of the target
+program. If this is satisfied, V1SCAN determines that
+the target program contains the vulnerability.
+Here, if we only consider the code syntax in the line com-
+parison, as with certain existing approaches (e.g., [35,37]),
+false positives or negatives may arise especially when the code
+modified in the patch is short and general. Assume that the
+code line “else” is added by the patch. This code line may
+exist in the vulnerable function. Hence, even if the vulnerable
+function is not patched, the function may be misinterpreted to
+be safe because it contains the code line added by the patch.
+Therefore, we decided to consider the number of times
+deleted (added) code lines appear in the target function. Sup-
+pose that a security patch deletes the code line ldel and adds
+the code line ladd to the function fv. Let the function after
+applying the patch be fp. V1SCAN counts the number of
+times ldel and ladd appear in fv and fp, respectively. There-
+after, when a function f ′
+v similar to fv is detected through
+hash comparison, V1SCAN counts the number of times ldel
+and ladd appear in f ′
+v. If the result is the same as that of fv but
+differs from that of fp, f ′
+v is considered a vulnerable function.
+Listing 2: Example vulnerability signature for CVE-2019-12904.
+1
+MACRO
+2
++ #ifdef HAVE_GCC_ATTRIBUTE_ALIGNED
+3
++ # define ATTR_ALIGNED_64 __attribute__ ((aligned (64)))
+4
+5
+VARIABLE
+6
+- static const u16 gcmR[256] = {
+7
+- 0x0000, 0x01c2, 0x0384, 0x0246, 0x0708, 0x06ca, 0x048c,
+8
+9
+STRUCTURE (HASH: 3A5F116800...)
+10
++ static struct {
+11
++ volatile u32 counter_head;
+12
+13
+FUNCTION (HASH: BBC0994B88...)
+14
+- for (i = 0; i < len; i += 8 * 32)
+15
++ for (i = 0; len - i >= 8 * 32; i += 8 * 32)
+This method can distinguish between vulnerable and
+patched functions even when both deleted and added code
+lines exist in the target function. Therefore, V1SCAN can de-
+tect vulnerabilities with fewer false positives than existing
+simple code syntax checking approaches.
+V1SCAN can detect exactly reused vulnerable functions
+(structures) with the aid of hash comparison and identify vul-
+nerable functions (structures) whose code syntax has been
+changed using line comparison. This guarantees a higher
+vulnerability detection rate than the existing code-based ap-
+proach that considers only hash comparison (e.g., [14]) and
+lowers the false positive rate compared with the existing ap-
+proach that only considers line comparison (e.g., [12]).
+Macro and variable vulnerability detection. To detect
+vulnerabilities in macros and variables (global and class
+variables), V1SCAN compares the lines of code containing
+macros and variables in vulnerability signatures to those in the
+target program. If all the lines of code containing macros (vari-
+ables) deleted (resp. added) by the patch were included (resp.
+not included) in the target program, V1SCAN determines that
+the target program contains the vulnerability.
+If the security patch did not add any lines of code, then only
+the deleted lines of code are used to check for vulnerability
+propagation. On the other hand, if the patch did not delete
+any lines of code, it would be premature to conclude that the
+vulnerability was propagated by solely relying on the fact that
+the lines of code added by the patch do not exist in the target
+program. Thus, V1SCAN omits the latter case to reduce false
+alarms. This could yield a small number of false negatives;
+however, this decision was made because the addition of lines
+of code containing a macro or variables by a security patch
+without removing any lines of code from all four vulnerable
+code locations rarely occurs.
+The vulnerability detection result of the improved code-
+based approach in which false negatives are covered is ob-
+tained as the output of this phase. Among the vulnerabilities
+held by the version-based approach (e.g., existing outside the
+function), the vulnerabilities detected in the code-based ap-
+proach are included in the detection result as correct answers,
+and all others are considered false positives and filtered out.

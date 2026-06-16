@@ -1,0 +1,255 @@
+{
+  "cwe_id": "CWE-126",
+  "name": "Buffer Over-read",
+  "abstraction": "Variant",
+  "status": "Draft",
+  "description": "The product reads from a buffer using buffer access mechanisms such as indexes or pointers that reference memory locations after the targeted buffer.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-125",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Out-of-bounds Read"
+      },
+      {
+        "cwe_id": "CWE-788",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Access of Memory Location After End of Buffer"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Variant level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product reads from a buffer using buffer access mechanisms such as indexes or pointers that reference memory locations after the targeted buffer.",
+    "typical_preconditions": [
+      "external length/index value",
+      "loop bound from untrusted field",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "loop bound from untrusted field"
+    ],
+    "typical_sinks": [
+      "read/copy-out sink",
+      "array/pointer read"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "limit read length",
+      "validate header/body size relation"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "read sink + unchecked range",
+      "loop bound exceeds container size",
+      "mechanisms",
+      "locations",
+      "over-read",
+      "reference"
+    ],
+    "fix_search_patterns": [
+      "if (off + len > size)",
+      "reject truncated input",
+      "cap loop bound"
+    ],
+    "guard_patterns": [
+      "same data structure scope",
+      "read target and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "mechanisms",
+      "locations",
+      "over-read",
+      "reference",
+      "pointers",
+      "targeted",
+      "indexes",
+      "reads"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same data structure scope",
+      "read target and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "read sink + unchecked range",
+      "loop bound exceeds container size",
+      "if (off + len > size)",
+      "reject truncated input",
+      "cap loop bound"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "read sink + unchecked range",
+        "loop bound exceeds container size",
+        "if (off + len > size)",
+        "reject truncated input"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "read sink + unchecked range",
+        "loop bound exceeds container size",
+        "same data structure scope",
+        "read target and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (off + len > size)",
+        "reject truncated input",
+        "read sink + unchecked range",
+        "loop bound exceeds container size"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following C/C++ example the method processMessageFromSocket() will get a message from a socket, placed into a buffer, and will parse the contents of the...",
+        "snippet": "int processMessageFromSocket(int socket) { int success; char buffer[BUFFER_SIZE]; char message[MESSAGE_SIZE]; // get message from socket and store into buffer //Ignoring possibliity that buffer > BUFFER_SIZE if..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following C/C++ example demonstrates a buffer over-read due to a missing NULL terminator. The main method of a pattern matching utility that looks for a...",
+        "snippet": "int main(int argc, char **argv) { char Filename[256]; char Pattern[32]; /* Validate number of parameters and ensure valid content */ ... /* copy filename parameter to variable, may cause off-by-one overflow */..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following C/C++ example demonstrates a buffer over-read due to a missing NULL terminator. The main method of a pattern matching utility that looks for a...",
+        "snippet": "/* copy filename parameter to variable, no off-by-one overflow */ strncpy(Filename, argv[2], sizeof(Filename)-1); Filename[255]='\\0'; /* copy pattern parameter to variable, no off-by-one overflow */ strncpy(Pattern,..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-1733",
+        "description": "Text editor has out-of-bounds read past end of line while indenting C code",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-1733"
+      },
+      {
+        "reference": "CVE-2014-0160",
+        "description": "Chain: \"Heartbleed\" bug receives an inconsistent length parameter (CWE-130) enabling an out-of-bounds read (CWE-126), returning memory that could include private cryptographic keys and other sensitive data.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2014-0160"
+      },
+      {
+        "reference": "CVE-2009-2523",
+        "description": "Chain: product does not handle when an input string is not NULL terminated, leading to buffer over-read or heap-based buffer overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2523"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

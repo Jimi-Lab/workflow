@@ -1,0 +1,241 @@
+{
+  "cwe_id": "CWE-1204",
+  "name": "Generation of Weak Initialization Vector (IV)",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product uses a cryptographic primitive that uses an Initialization Vector (IV), but the product does not generate IVs that are sufficiently unpredictable or unique according to the expected cryptographic requirements for that primitive.",
+  "extended_description": "By design, some cryptographic primitives (such as block ciphers) require that IVs must have certain properties for the uniqueness and/or unpredictability of an IV. Primitives may vary in how important these properties are. If these properties are not maintained, e.g. by a bug in the code, then the cryptography may be weakened or broken by attacking the IVs themselves.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-330",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Use of Insufficiently Random Values"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a cryptographic primitive that uses an Initialization Vector (IV), but the product does not generate IVs that are sufficiently unpredictable or unique according to the expected cryptographic...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "cryptographic",
+      "properties",
+      "are",
+      "ivs"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "cryptographic",
+      "properties",
+      "are",
+      "ivs",
+      "initialization",
+      "primitives",
+      "primitive",
+      "vector"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following examples, CBC mode is used when encrypting data:",
+        "snippet": "EVP_CIPHER_CTX ctx; char key[EVP_MAX_KEY_LENGTH]; char iv[EVP_MAX_IV_LENGTH]; RAND_bytes(key, b); memset(iv,0,EVP_MAX_IV_LENGTH); EVP_EncryptInit(&ctx,EVP_bf_cbc(), key,iv);"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following examples, CBC mode is used when encrypting data:",
+        "snippet": "public class SymmetricCipherTest { public static void main() { byte[] text =\"Secret\".getBytes(); byte[] iv ={ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 }; KeyGenerator kg = KeyGenerator.getInstance(\"DES\"); kg.init(56);..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2020-1472",
+        "description": "ZeroLogon vulnerability - use of a static IV of all zeroes in AES-CFB8 mode",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-1472"
+      },
+      {
+        "reference": "CVE-2011-3389",
+        "description": "BEAST attack in SSL 3.0 / TLS 1.0. In CBC mode, chained initialization vectors are non-random, allowing decryption of HTTPS traffic using a chosen plaintext attack.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2011-3389"
+      },
+      {
+        "reference": "CVE-2001-0161",
+        "description": "wireless router does not use 6 of the 24 bits for WEP encryption, making it easier for attackers to decrypt traffic",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0161"
+      },
+      {
+        "reference": "CVE-2001-0160",
+        "description": "WEP card generates predictable IV values, making it easier for attackers to decrypt traffic",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0160"
+      },
+      {
+        "reference": "CVE-2017-3225",
+        "description": "device bootloader uses a zero initialization vector during AES-CBC",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2017-3225"
+      },
+      {
+        "reference": "CVE-2016-6485",
+        "description": "crypto framework uses PHP rand function - which is not cryptographically secure - for an initialization vector",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2016-6485"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

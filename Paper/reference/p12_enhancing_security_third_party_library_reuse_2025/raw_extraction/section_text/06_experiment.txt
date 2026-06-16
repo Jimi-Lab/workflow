@@ -1,0 +1,474 @@
+V. E XPERIMENT
+We evaluate the performance of V ULTURE across two
+aspects: the accuracy of TPL reuse detection, and the effec-
+tiveness in detecting 1-day vulnerabilities introduced by the
+reused TPLs.
+A. Experiment Setup
+Although V ULTURE can be applied to any arbitrary plat-
+form for 1-day vulnerability detection, we applied VULTURE to
+IoT projects as a representative in our following experiments.
+In detail, V ULTURE collected all prevalent repositories from
+GitHub, OpenWRT, stm32duino, awesome-cpp, awesome-c,
+and mongoose-os-libs in C/C++, and then conducted TPL
+selection to choose the specific TPLs. After filtering the
+repositories via keywords, 19,057 libraries were left. These
+libraries were consolidated into a database named DB kwd.
+After identifying the dependent libraries and only retaining
+the parent TPLs, V ULTURE eventually built a TPL database
+DBiot containing 1,872 IoT-specific TPLs, which include TPL
+names, all TPL versions, hash values, and birth times of
+functions within the TPL to store as the component segment
+within DB iot. According to the collected TPLs, V ULTURE
+explored 5,114 CVE reports, of which, 1,717 CVEs have
+GitHub patches available. These CVE reports and patches are
+stored as the vulnerability segment within DB iot.
+We evaluated the performance of each component in V UL-
+TURE against corresponding state-of-the-art works. To evaluate
+the database quality, (Section V-B), we selected Centris, SNYK
+and VFCFinder [20]. For vulnerability detection (Section V-C),
+we chose V1SCAN, TPLite [27], and SNYK. Although MVP is
+also a 1-day vulnerability detection tool, was excluded due to
+its lower reported performance compared to V1SCAN. Each
+tool was implemented by using its latest version as of April
+2024, following the instructions provided by developers.
+We ran V ULTURE on a machine with Debian GNU/Linux
+12, 32GB RAM and 1TB SSD. For patch commit collection,
+we set the search slice size k at 20. For similarity comparison,
+we set THhash = 30 and THsim = 10% after manual testing
+to achieve optimal detection results.
+B. Database Evaluation
+We evaluated the two segments (i.e., component segment
+and vulnerability segment) within the database, DB iot, respec-
+tively.
+1) Component Segment Evaluation: A suitable database
+for TPL reuse detection must be comprehensive, specific, and
+maintainable (refer to Section II); thus we conducted two
+experiments to evaluate whether DB iot adheres to these char-
+acteristics while ensuring the database size remains relatively
+small:
+9
+
+===== PAGE 010 =====
+• Characteristic comparison. We compared DB iot with
+the prevalent library database published recently [48]
+[27].
+• Database integration. We integrated DB iot with the
+state-of-the-art TPL reuse detection tool, Centris, to verify
+if its detection performance is enhanced.
+Characteristic Comparison. We compared DB iot with
+DBkwd and the databases constructed by Centris (i.e.,
+DBcentris) and TPLite (i.e., DB tplite) from three aspects:
+storage consumption, efficiency and maintainability.
+The comparison results are listed in Table I. In total, DB iot
+includes only 1,872 libraries related to IoT, requiring 3.5 GB
+of storage, but DB kwd and DBcentris consume ten times more
+storage because they include many irrelevant libraries through
+random TPL selection. In contrast, TPLF ILTER effectively
+filters out most irrelevant libraries when constructing DB iot.
+When processing each TPL, although DB iot, DBkwd, and
+DBcentris cost the same time to clone one TPL repository
+and calculate function hash values within it, DB centris needs
+115.1s on average to eliminate the redundant functions within
+each TPL whereas DB iot only needs 0.1s to remove the
+redundancy. As most detection tools adapt similarity com-
+parisons to identify the reused TPLs, the database accuracy
+significantly affects the search space and detection efficiency.
+Specifically, the search space of DB iot is smaller than both
+DBkwd and DBcentris, indicating that when using DBiot, much
+fewer similarity comparisons are needed to identify one TPL
+reuse. With frequent updates to TPLs, databases for TPL
+reuse detection need to be updated and maintained easily.
+However, the time needed to update DB centris is more than
+100 hours. On the contrary, DBiot requires only a few minutes
+to update, supported by hashing-index based elimination to
+remove redundancy. Although TPLite also creates a database
+for TPL reuse detection, its database creation requires large
+storage to store excessive library details, including all function
+details. Its storage capacity became overwhelmed when only
+processing 1,000 TPLs, indicating that using TPLite to build a
+database for TPLite is impractical.
+Database Integration. To test how DB iot performs when in-
+tegrate with state-of-the-art tools, we compared DB iot, DBkwd
+and DB centris in detecting TPL reuses on the Top-10 IoT
+projects in C/C++ from GitHub as the target programs. Details
+of these projects are listed in Appendix B.
+Table II shows the results when integrating Centris with the
+three different databases. When using DB centris, Centris only
+identified 71 TPL reuses; however, its performance improved
+significantly, detecting 174 and 112 TPL reuses when leverag-
+ing DB iot and DB kwd, respectively. Notably, although DB iot
+has the smallest size, its comprehensiveness and specification
+enabled Centris to detect more reuses than the other two larger
+databases.
+2) Vulnerability Segment Evaluation: We compared V UL-
+TURE against the state-of-the-art CVE patch mapping tool
+VFCFinder, commonly employed schemes Link Matching
+(directly collect patch information from CVE/NVD refer-
+ences) [46] and SNYK Database Retrieval [12], assessing their
+mapping accuracy, time cost, and space cost, respectively. The
+patch commits can be directly collected from CVE/NVD and
+are assumed available for all the solutions.
+We exclude PatchScout [41] and VCMatch [45] from the
+comparison because both schemes demonstrably underperform
+compared to VFCFinder [20], as discussed and evaluated in the
+study.
+Commit benchmark. We randomly selected 200 CVEs and
+manually identified the corresponding patch commits using
+information from the NVD website and project commits.
+Overall, 158 (out of 200) CVEs have been labeled with the
+corresponding patch commits and the other 42 (out of 200)
+CVEs are labeled with “None” whose patch commits cannot
+be found within the given CPE scope manually (from the last
+vulnerable version to the fixed version).
+Mapping accuracy. We quantified the number of patch com-
+mits identified by each of the three methods and manually
+validated the results. Table III presents the number of patch
+commits identified by each method ( Detected) and the num-
+ber of correctly identified patches confirmed through manual
+verification (Confirmed). Additionally, to quantify the overall
+performance of each method, we also considered their ability
+to handle cases labeled with “None” and calculated the F1
+score ( F1). As shown in the table, V ULTURE successfully
+identified the highest number of validated patch commits
+(124) while generating zero false alarms. For the 34 patch
+commits that were not identified, we found that 33 were due
+to the absence of any information related to the vulnerable
+elements (files, functions, variables) in the CVE descriptions
+for revealing vulnerability details. For instance, the description
+of CVE-2007-0457 3 in the NVD is “ Unspecified vulnerability
+in the IEEE 802.11 dissector ... ” , which provides no useful
+information about the vulnerable elements. The one remaining
+failed case occurred because the LLM ( GPT -4) was unable to
+accurately identify the patch commit among the candidates in
+Step 4 (IV-A3). Instances of this kind of failure are relatively
+rare. In general, in terms of the F1 score, V ULTURE achieved
+the highest F1 score among all approaches with a significant
+advantage.
+To prevent data bias and ensure even data distribution, we
+divided the dataset into five groups and performed 5-fold group
+validation to verify the performance of V ULTURE . V ULTURE
+achieved F1 scores of 87.5%, 88.9%, 88.51%, 88.50%, and
+86.11% in each validation round, respectively, demonstrating
+its effectiveness.
+Time and space cost. We compared the time and space
+overhead of V ULTURE and VFCFinder. To evaluate the time
+overhead performance, we randomly selected 50 CVEs that
+all the two methods could successfully identify the patch
+commits. For space overhead, we calculated the average space
+expenditure required to match each CVE directly on the ground
+truth dataset. The experimental results are shown in Table IV.
+As indicated, V ULTURE exhibited the lowest time overhead
+(in both average and median values) and the smallest space
+overhead. In terms of space overhead, VFCFinder requires
+cloning the GitHub repository locally to obtain candidate com-
+mits, which results in significant additional space overhead. In
+contrast, VULTURE accesses candidate commits via the GitHub
+3https://nvd.nist.gov/vuln/detail/CVE-2007-0457
+10
+
+===== PAGE 011 =====
+TABLE I: Maintainability of Each Database
+Database TPL Number Time Cost Per TPL Processing Storage Total(GB) Frequency of Comparisons Detection Time
+Clone (s) Elimination (s) Exact (s) Similarity
+DBiot 1,872 50.5 0.1 3.5 9,207.1 2.2 256.4
+DBkwd 19,057 50.5 0.1 37.4 10,657.5 5.1 301.7
+DBcentris 10,288 50.5 115.1 20.0 1,508,924.7 4.4 -
+TABLE II: TPL Reuse Detection Result of Centris
+Target DBcentris DBiot DBkwd
+Dtc Cfm Dtc Cfm Dtc Cfm
+AliOS-Things 22 15 81 36 78 21
+LiteOS 15 6 26 9 23 4
+Tasmota 28 17 93 55 85 41
+TizenRT 31 22 72 37 78 22
+kamailio 3 1 9 2 11 2
+mbed-os 7 3 22 10 35 11
+openthread 2 2 5 2 7 1
+Sming 5 3 48 18 10 5
+TDengine 3 1 4 3 9 4
+zephyr 1 1 3 2 8 1
+Total 117 71 363 174 334 112
+Dtc: Reuses detected.
+Cfm: Reuses confirmed with manual check.
+TABLE III: Performance of Security Patch Mapping
+Scheme Detected Confirmed F1 (%)
+Link Matching 47 47 45.86
+Snyk Database Retrieval 60 60 55.05
+VFCFinder (Top-1) 158 79 61.69
+VFCFinder (Top-5) 158 98 71.53
+VULTURE 124 124 87.94
+API and only needs to use commits at runtime as temporary
+variables, incurring no additional space overhead.
+The Impact of Search Space on Time Cost. The time cost
+required for identifying patch commits is directly related to
+the number of candidate commits due to the difference in
+search space. We developed an empirical study on the 158
+CVEs which are labeled with patch commits in the ground
+truth dataset. This study aimed to reveal how the time cost of
+different methods varies with the distribution of the number of
+candidate commits.
+Here, we categorized the distribution of candidate commit
+numbers N into three ranges: ❶ 100 > N > 0, ❷ 1000 >
+N ≥ 100, and ❸ N ≥ 1000. Among the total 158 labeled
+CVEs, the distribution of the number of commits is as follows:
+❶ 96, ❷ 54, and ❸ 8. Furthermore, we selected a total of 9
+CVEs covering the three candidate commit number ranges to
+analyze the time cost of different approaches and evaluate their
+usability. As shown in Figure 5, the horizontal axis represents
+the CVE ID with the number of candidate commits in the
+brackets; the vertical axis denotes the time overhead, measured
+in seconds. As observed, the time overhead of each approach
+positively correlates with the number of candidate commits.
+Besides, with the number of candidate commits increases, the
+time overhead of VFCFinder becomes substantially large; in
+contrast, even when the number of candidate commits reaches
+TABLE IV: Time and Space Cost of Security Patch Mapping
+Scheme Time Cost (s) Space Cost (MB)
+Mean Median Mean
+VFCFinder 285.92 71.90 337.94
+VULTURE 84.68 42.31 0.00
+CVE-2011-1764 (30)CVE-2016-1897 (42)CVE-2019-10899 (48)CVE-2016-6306 (221)CVE-2019-9183 (294)CVE-2021-28135 (387)CVE-2022-23094 (934)CVE-2007-6441 (1,407)CVE-2012-5360 (3,831)
+CVE-ID (Number of Candidate Commits)
+0
+1000
+2000
+3000
+4000Time Cost (s)
+VFCFinder
+Vulture
+Fig. 5: Correlation between the number of candidate commits
+and the time cost
+thousands, V ULTURE can still keep the time overhead within
+a few hundred seconds.
+C. Benchmark Vulnerability Detection
+We further assessed how V ULTURE performs when detect-
+ing 1-day vulnerabilities introduced by the reused TPLs. We
+compared V ULTURE with the state-of-the-art work, V1SCAN.
+The other tools were excluded because of various constraints.
+In detail, OSSFP is not available as open-source, and SNYK
+requires information on copyright and license, which is incom-
+patible with our benchmark.
+Vulnerability benchmark. To the best of our knowledge, there
+is no existing benchmark specifically for 1-day vulnerabilities
+in C/C++ programs. Therefore, we manually constructed a
+ground truth vulnerability benchmark. The benchmark com-
+prises 200 vulnerable function reuse cases sourced from var-
+ious repositories with more than 100 stars on GitHub. These
+200 cases cover the reuse of 66 CVEs. Among these cases,
+45% have patched the CVE they reused, while 55% have
+not. Additionally, 64% of these cases involve custom reuse,
+11
+
+===== PAGE 012 =====
+TABLE V: Vulnerability Detection Result on Ground Truth
+Scheme Item Reuse Type Total
+Custom Reuse Exact Reuse
+VULTURE
+Dtc-P 72 19 91
+Cfm-P 65 19 84
+Dtc-N 87 22 109
+Cfm-N 78 22 100
+V1SCAN
+Dtc-P 51 10 61
+Cfm-P 35 10 45
+Dtc-N 66 14 80
+Cfm-N 42 13 55
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+P: Results on patched vulnerabilities.
+N: Results on non-patched vulnerabilities.
+including function name modification, statement modification,
+and operation modification.
+Scrutinize of results. The results are shown in Table V.
+We compared V ULTURE with V1SCAN. For custom reuse,
+VULTURE successfully identified 65 patched and 78 unpatched
+cases, with only four false negatives and 12 false positives.
+In contrast, V1SCAN identified 35 patched and 42 unpatched
+cases. For exact reuse, V ULTURE identified 19 patched and 22
+unpatched cases without any false negatives or false positives,
+whereas V1SCAN detected 10 patched and 13 unpatched
+cases with one false positive. Overall, V ULTURE achieved a
+95.8% F1 score, significantly outperforming V1SCAN, which
+achieved only a 66.7% F1 score.
+After manually being confirmed by three PhD students
+from computer science majors, we observed that V1SCAN
+produced a significant number of false negatives due to the
+limited comprehensiveness of its database. Additionally, it
+generated many false positives, which stemmed from inherent
+design flaws in its detection algorithm, as detailed in two
+motivational examples. V ULTURE reported 4 false negatives
+and 12 false positives in total. Out of these, 4 false negatives
+and 8 false positives were a result of the limitations inherent in
+chunk-based detection methods. Chunk-based method allows
+us to pinpoint modified code lines only within their respective
+control statements. If a modified line is not associated with any
+control statement, its precise location remains unidentifiable,
+which can result in inaccuracies. Additionally, the other 4
+false positives arose from the limitations of similarity-based
+detection. If the reused function is significantly modified, the
+Hash(i) and H(j) can’t be identified accurately (IV-B1), lead-
+ing V ULTURE to miss recognizing the actual reused function.
+Nevertheless, these issues are relatively infrequent in real-
+world scenarios.
+D. Reuse and Vulnerability Detection In the Wild
+To ensure the robustness of our evaluation, we tested how
+does VULTURE performs when facing real-world software. The
+target programs selected for this analysis are consistent with
+those listed in Table II. We then conducted a comprehensive
+analysis involving both TPL reuse detection and 1-day vulner-
+ability detection using V ULTURE .
+1) TPL reuse detection: In this experiment, we executed
+VULTURE to detect the reused TPLs in the target programs by
+TABLE VI: TPL Reuse Detection Result of V ULTURE
+Target DBiot DBkwd
+Dtc Cfm P Dtc Cfm P
+AliOS-Things 47 33 0.70 61 20 0.33
+LiteOS 18 12 0.66 19 4 0.21
+Tasmota 66 54 0.82 63 39 0.62
+TizenRT 44 34 0.77 51 20 0.39
+kamailio 7 2 0.29 10 2 0.20
+mbed-os 17 12 0.70 28 10 0.36
+openthread 4 2 0.50 4 1 0.25
+Sming 32 24 0.75 3 3 1.00
+TDengine 3 3 1.00 4 2 0.50
+zephyr 2 2 1.00 5 1 0.20
+Total 240 178 0.74 248 102 0.41
+Dtc: Reuses detected.
+Cfm: Reuses confirmed with manual check.
+utilizing DBiot and DBkwd, respectively.
+Table VI demonstrates the detection results. VULTURE cor-
+rectly detected 178 reused TPLs when using DB iot, achieving
+a precision of 74%; however its precision is only 41% when
+integrating DBkwd. Upon manually inspecting the failed cases,
+we found that 18 out of 62 were caused by the non-library
+projects in the DB iot. These projects, such as LuatOS, are
+not libraries themselves but are still reused by many other
+software, making them difficult to filter out manually. These
+non-library projects affect the specification of the database and
+cause V ULTURE to mistakenly identify them as the reused
+TPL instead of the actual parent libraries. Nine failed cases
+are caused by 9 TPLs which are filtered out by V ULTURE
+because these libraries are not prevalent on GitHub with a few
+stars (< 100 stars). Due to the preset thresholds, THhash and
+THsim, 29 cases failed as a result of overestimating similarity.
+Unfortunately, adjusting the thresholds could potentially result
+in additional failed or missed cases. The final six failed cases
+were due to the reuse of prevalent functions by many TPLs,
+which prevented V ULTURE from accurately identifying the
+actual TPL being reused. Such prevalent functions can be
+categorized into cryptographic functions (e.g., md5Update,
+parse_hex4), utility functions (e.g., hammingDistance),
+and common functions (e.g., strcpy).
+The disparity in the detection results between using DB iot
+and DB kwd arises because DB kwd contains many non-IoT-
+specific libraries. This lack of specificity results in incorrect
+identification of parent TPL reuse as child TPL reuse, leading
+to a high number of false positives. In contrast, DB iot, as a
+curated subset focused on IoT-related libraries, minimizes such
+misidentifications and achieves higher specificity. We did not
+incorporate VULTURE with DBcentris due to its lack of critical
+information (e.g., birth time, file path information) required by
+VULTURE .
+2) 1-day vulnerability detection: Here, we applied V UL-
+TURE , V1SCAN and SNYK to identify real-world 1-day vul-
+nerabilities. Table VII only highlights the top 5 target pro-
+grams with the highest number of detected vulnerabilities.
+The remaining 5 target programs were found to have no
+vulnerabilities according to the detection results.
+Table VII shows that V ULTURE is the most effective tool,
+identifying 175 vulnerabilities, and consistently outperforms
+SNYK and V1SCAN across all test targets. In comparison,
+12
+
+===== PAGE 013 =====
+TABLE VII: Vulnerability Detection Result in Wild Software
+Target VULTURE SNYK V1SCAN
+Dtc Cfm Dtc Confm Dtc Cfm
+AliOS-Things 93 89 105 84 8 2
+LiteOS 19 19 22 16 3 3
+TizenRT 68 66 16 10 11 8
+Tasmota 1 1 2 0 0 0
+TDengine 0 0 3 1 0 0
+Total 181 175 148 111 22 13
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+TABLE VIII: Time cost of TPL reuse and 1-day vulnerability
+detection across different tools (in seconds)
+Target VULTURE V1SCAN
+TPL reuse 1-day TPL reuse 1-day
+AliOS-Things 20.1 3.0 23.5 11.8
+LiteOS 14.1 3.9 28.1 8.7
+Tasmota 5.5 129.9 7.1 -
+TizenRT 9.2 2.1 8.1 8.8
+TDengine 37.2 - 59.4 -
+The values in the table represent the average time (in seconds) required
+to detect a single TPL reuse or a single 1-day vulnerability. A dash (”-”)
+indicates that no reuses or vulnerabilities were identified.
+SNYK detected 111 vulnerabilities, and V1SCAN detected
+only 13. Furthermore, V ULTURE also pinpointed the exact
+locations and specific code statements that required to be
+patched, and provided 154 GitHub patch commit URLs for
+the identified vulnerabilities. However, SNYK only reported the
+CVE ID and provided 59 GitHub patch commit URLs, without
+offering further detailed information about the specific code
+requiring patching, and V1SCAN provided only 13 GitHub
+patch commits and limited information about vulnerabilities,
+such as the vulnerable file and function names,
+While manually verifying the missed cases, we observed
+that SNYK heavily relies on version information maintained by
+the target program. When a program does not maintain such
+information well, such as TizenRT, SNYK will miss numerous
+vulnerabilities. When analyzing 87 vulnerabilities missed by
+V1SCAN, we found that 64 were caused by its limited database
+and others resulted from its coarse-grained line-matching ap-
+proach. Besides, SNYK and V1SCAN incorrectly reported 37
+and 9 vulnerabilities, respectively. Our manual checks revealed
+that these inaccuracies stemmed from SNYK’s reliance on
+version-based detection and V1SCAN’s coarse-grained line-
+matching methods.
+While analyzing the six vulnerabilities missed by V UL-
+TURE , but detected by SNYK and V1SCAN, three of them
+were missed due to the absence of patch commits which are
+mandatory for V ULTURE to locate patches. The remaining
+cases involved extensive code modifications, which caused
+VULTURE to fail in pairing the reused functions.
+3) Time cost: We assessed the time cost of V ULTURE and
+V1SCAN in detecting TPL reuse and 1-day vulnerabilities.
+Table VIII illustrates the time cost. Typically, V ULTURE costs
+no more than 25s to recognize all TPL reuses and less than
+5s to identify a 1-day vulnerability even when handling large
+programs like AliOS-Things. In contrast. V1SCAN usually takes
+more than 25s to locate a reuse and more than 5s to report a
+1-day vulnerability. When analyzing programs with extensive
+TPL reuses (e.g., Tasmota), VULTURE takes longer to identify
+a single 1-day vulnerability, but V1SCAN times out without
+reporting any.
+E. Limitation
+Database Accuracy. The performance of V ULTURE heavily
+relies on the database quality. Since V ULTURE uses vulnerable
+elements and patched code to identify 1-day vulnerabilities,
+poor quality or inconsistent formats in the data provided
+by NVD significantly impact the performance of V ULTURE .
+Furthermore, V ULTURE utilizes LLM to capture vulnerable
+elements for patch identification, which makes V ULTURE
+highly dependent on the performance of LLM. Although LLM
+performs well generally when processing natural language
+contexts, manual verification might still be necessary to ensure
+the accuracy of patch mapping. Otherwise, the performance of
+the vulnerability detection can be negatively affected.
+Similarity Comparison Limitation. Although V ULTURE
+avoids using function or line matching to identify custom
+reuses, the employed LSH comparison can still bring inac-
+curacies when processing custom reuses that involve extensive
+modifications. The settings of similarity thresholds THhash
+need to be adjusted to match various databases and accommo-
+date different application scenarios.
+Dataflow Restrictions in Chunk-based Analysis. As V UL-
+TURE generates chunks by analyzing code diff and the in-
+volved variables, it may cause incomplete data flows within
+chunks, leading to certain information loss. Consequently,
+VULTURE performs poorly when analyzing target programs
+with extensive code modifications. In addition, the accuracy
+of chunk generation also depends on the recognition results
+of vulnerable elements extracted from each CVE description.
+Correspondingly, chunk-based analysis is also affected the
+capability of LLM in processing natural language descriptions.

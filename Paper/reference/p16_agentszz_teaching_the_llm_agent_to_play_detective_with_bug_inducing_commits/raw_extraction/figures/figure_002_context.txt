@@ -1,0 +1,103 @@
+Page: 4
+Caption: Figure 2: Prompt for AgentSZZ, encoding domain knowl-
+
+Page text context:
+Preprint, Under Submission, Arxiv
+Lyu et al.
+Table 1: Task-specific tools provided to the AgentSZZ agent.
+Parameters marked with * are required. These tools are de-
+signed to cover the key operations involved in tracing bug-
+inducing commits.
+Tool
+Parameters
+git_show
+commit*, file_filter, stat_only, context_lines
+git_blame
+file_path*, commit, line_start, line_end
+git_log_s
+search_string*, path, after, before
+git_log_func
+function_name*, file_path*, after, before
+git_grep
+search_string*, commit, path
+bound for all subsequent search operations 2 . Finally, fix informa-
+tion, tool descriptions, domain knowledge, and search constraints
+are assembled into the initial context for the LLM agent 3 .
+ReAct Investigation Loop. The agent then enters a multi-turn
+investigation loop following the ReAct paradigm [48]. This iter-
+ative observe–reason–act cycle enables adaptive exploration of
+the repository, with observations and intermediate reasoning ac-
+cumulated across turns. We set a maximum of 15 turns, following
+prior agent-based approaches [22, 37, 45]. Given the initial con-
+text, the agent first analyzes the available information and plans
+the next action based on domain knowledge 4 . It then invokes
+one of the task-specific tools to interact with the repository and
+gather observations 5 . The tool output is subsequently processed
+by the context compression module to reduce token consumption
+6 . Based on the compressed observations, the agent evaluates
+candidate commits according to domain knowledge and updates
+its belief about the BIC 7 . This process repeats until the agent
+identifies a BIC candidate with sufficient evidence or reaches the
+turn limit, allowing it to iteratively refine its search and adapt its
+strategy when initial approaches prove unfruitful.
+Output. Once the agent identifies a BIC candidate or reaches the
+turn limit, it produces a structured output containing the predicted
+BIC hash, confidence level, and supporting reasoning. AgentSZZ
+then parses this output 8 and normalizes the commit hash 9 . The
+extracted hash is sanitized to remove non-hexadecimal characters
+and verified against the repository using git rev-parse. If the
+full hash cannot be resolved (e.g., due to hallucination), If no valid
+commit can be resolved, the prediction is discarded.
+3.3
+Task-Specific Tools
+Table 1 summarizes the five tools provided to the agent. Instead
+of exposing raw git commands, we design a task-specific interface
+that constrains the agent’s action space to operations relevant to
+bug-inducing commit identification.
+Tool Abstraction. An unrestricted git interface exposes hun-
+dreds of subcommands and flag combinations, many of which are ir-
+relevant to bug-inducing commit identification. We distill this space
+into five tools, each supporting a distinct operation in the investi-
+gation process (Section 3.1). git_blame traces line-level ownership
+to identify the commit that last modified a given line. git_show re-
+trieves the commit message and diff for semantic classification (e.g.,
+distinguishing refactoring from bug inducing). git_log_s (pickaxe
+search) and git_log_func (function-level history) support tracing
+code origins across file renames and structural changes. git_grep
+AgentSZZ Prompt
+## Tools
+## Workflow
+## Tool Rules
+You are an expert at identifying Bug-Introducing Commits (BICs) in the software
+repositories. Given a fix commit, find the commit that originally introduced the bug.
+### Step 1: git_blame at fix~1
+<Trace the changed lines to their last modifier>
+### Step 2: Evaluate Blame Results
+<Classify: refactor → penetrate | introduction → BICambiguous → counterfactual test>
+### Step 3: Report
+<Confirm causal link, output BIC with evidence>
+<r>
+BIC: <full_commit_hash>
+confidence: <high|medium|low>
+type: <introduction|omission|cross_file|refactor_penetration>
+reasoning: <brief explanation>
+</r> (The full workflow prompt is available in our replication package.)
+- git_log_s: include a path when possible; broaden only if empty. Use the fix commit
+date as the `before` upper bound — the BIC must predate the fix.
+- git_show on large commits: use file_filter.
+- Do not git_show the same commit more than twice.
+- Timeout →retry with narrower parameters.
+- file_filter returns "no changes" →file was at a different path in that commit. Try
+git_show WITHOUT file_filter to see the actual paths, or blame at commit~1.
+1. **git_show(commit, context_lines, stat_only, file_filter)** — View commit message
+and diff. Use file_filter for one file's changes in large commits.
+2. **git_blame(file_path, commit, line_start, line_end)** — Show which commit last
+modified each line.
+3. **git_log_s(search_string, path, after, before, use_regex, max_commits)** — Search
+commits by added/removed string (-S) or diff pattern (-G).
+4. **git_log_func(function_name, file_path, after, before, max_commits)** — Track
+function body change history.
+5. **git_grep(search_string, commit, path)** — Search codebase at a commit snapshot.
+Figure 2: Pr
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

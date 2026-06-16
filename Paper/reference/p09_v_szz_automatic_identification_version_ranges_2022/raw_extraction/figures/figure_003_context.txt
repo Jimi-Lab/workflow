@@ -1,0 +1,56 @@
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+Fixing commit
+line1
+git blame
+line1
+…
+linen
+Previous commits / 
+Descendants commits
+linei
+Line Mapping
+Change 
+Type
+linei
+’
+Vulnerable 
+Versions Tags
+Duplicated 
+Change Detection
+Fixing commits
+Inducing commits
+Vulnerable version
+Common commits
+Branch 1
+Branch 2
+Duplicated fixing commit
+Non-vulnerable version
+Inserted /
+New File /
+Init Commit
+Vulnerable Version Detection
+SZZ for Vulnerability
+Figure 3: The proposed approach
+561cbe
+715feb
+Figure 4: Two commits in the project OpenSSL with the same
+change
+inducing commit, some vulnerable versions would be considered
+as not vulnerable.
+To detect the cherry-picked commits for a commit, we can search
+its commit id in the commit message because a sentence with the
+following pattern is automatically generated in the commit mes-
+sage: “cherry picked from commit xxx”. However, some commits can
+be copied to another branch without explicit information in the
+commit message. For example, Figure 4 present two commits with
+the same change from the project OpenSSL. The below commit in
+the figure is copied from the above commit for an upgrade. We use
+a hash-based duplicated change detection method to identify the
+commits copied to other branches without explicit messages. We
+first hash the hunks of all commits in a project repository. Given a
+commit, we search for the commits that contain all the hashes in it.
+Vulnerable version detection. In this step, we want to identify
+the versions affected by a vulnerability based on a set of fixing com-
+mits and their corresponding inducing commits. In a Git workflow,
+project maintainers usually assign a tag to a commit for a r

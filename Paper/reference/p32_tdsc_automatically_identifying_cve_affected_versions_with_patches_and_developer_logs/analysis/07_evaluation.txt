@@ -1,0 +1,42 @@
+Main Results:
+- In addition, we compare our tool with two vulnerability detection tools and show that our tool could achieve high detection accuracy.
+- Indeed, previous work has pointed out the inaccuracy of NVD information.
+- However, the previous work mostly pointed out the inaccuracy of the NVD, with the following question largely remaining unanswered:which vulnerable versions are exactly affected by a CVE-ID?
+- The methods based on code similarity[20], [25] are difﬁcult to detect vulnerabilities that are not caused by code duplication, and the programs with similar vulnerable code are not necessarily vulnerable, which leads to inaccurate results.
+- Accordingly, we design methods to identify the partial matching source code and provide more reliable results for the vulnerabilities.
+- We can leverage the version tree to improve the accuracy and efﬁciency of our tool.
+- By contrast, previous tools check each software version separately, which is hard to verify the detection results when they conﬂict with each other.
+- Our results show that these tools could not achieve high detection accuracy while our tool achieved 94.3% precision and 95.6% recall.
+Per-RQ Findings:
+- [NEEDS EVIDENCE] per-RQ findings not cleanly extracted
+Ablation:
+- [NEEDS EVIDENCE] ablation not detected
+Sensitivity Analysis:
+- [NEEDS EVIDENCE] sensitivity analysis not detected
+Case Study:
+- Taking Linux kernel as an example, after the ﬁnal screening, there are 1,367 CVE ﬁles in our database, including many vul- nerability types such as buffer overﬂow, integer overﬂow, SQL injection, use-after-free and many others.
+- We collected Linux kernel vulnerabilities released from January 2003 to September 2020 from the NVD, which resulted in 2,576 CVE -IDs in total.
+- The rest correspond to the secondary development versions based on the Linux kernel, and their patches might not exist or were scattered on various third-party websites, so these CVE-IDs are not within our consideration.
+- Accuracy Evaluation We scan 1,367 CVE-IDs of Linux kernel against its 3,086 open-source versions to detect all vulnerable versions in the three directions (R1, R2 and R3).
+- For our dataset, we manually verify the reported boundary of vulnerable versions in the version tree for each CVE-ID.
+- Therefore, for R1 and R2, we sample 100 CVE-IDs for manual inspection to calculate the recall of our tool.
+Efficiency:
+- Because different CVE-IDs may correspond to different source code fragmentsSFs in the same version, a vulnerable version may be counted more than one time.
+- To evaluate our partial matching algorithm and obtain the accurateV from for each CVE-ID, we need to check at least 532 times, and we spent about 3.3 hours to verity the partial matching code.
+- Since the partial matching code is similar to the CVE patch, we can determine that the code has a potential vulnerability, but whether it has a real vulnerability or not needs to be conﬁrmed through context-based dynamic analysis and POC construction, which requires huge investment and cost.
+- At the same time, the number of false positives is 172 versions, and the corresponding number of true positives is 4610 versions, so the correct rate of this tool is 96.4%.
+Error Analysis:
+- However, for FNs, since there are a great number of software versions(we do not regard the versions reported by NVD as the ground truth because it has many errors, as presented in the next subsection), we cannot directly report the FN rate or recall.
+- Manual veriﬁcation shows that the reported vulnerable versions has no false positive, and the precision reaches 100%.
+- The incomplete patches and errors in git logs are possible causes behind these false negative cases.
+- The reasons for the false negatives are as above.
+- Therefore, theV from under our exact matching method has no false negative.
+Statistical / Validity Notes:
+- [NEEDS CITATION VERIFICATION]
+How Claims Are Supported:
+- Claims are supported by extracted paper text and caption-level table/figure evidence only. Exact numeric claims are blocked until [NEEDS TABLE REPAIR] is addressed.
+Unsupported or Weakly Supported Claims:
+- Any claim about reproduced performance, local runtime behavior, or artifact completeness is unsupported. [EXECUTION NOT REQUESTED]; [NEEDS ARTIFACT]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Keep result claims tied to RQs and avoid transferring their metric numbers to our paper.

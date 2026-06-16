@@ -1,0 +1,43 @@
+Problem:
+- 1 Introduction The problem of identifying bug-introducing commits from fix com- mits has seen remarkable interest from the software engineering research community, demonstrated by the more than 1300 citations of the award-winning paper by Śliwerski, Zimmermann, and Zeller (SZZ) [31].
+- The problem is also highly relevant for practitioners, since identifying bug-introducing changes is essential to determine which software versions are affected by security-critical bugs [5].
+- In this paper, we study LLM-based agents for the task of identi- fying bug-introducing commits (BICs) from fix commits.
+- Part 1: SZZ-Agent.First, we introduceSZZ-Agent, which targets fix commits where the original SZZ algorithm struggles: cases where SZZ finds no candidate BICs (e.g., because the fix adds code rather than removing it), or where its prediction is likely wrong.
+- Beyond effectiveness, we dive intowhySZZ-Agent works using five ablation studies to investigate whether (a) the performance comes from data leakage, (b) what context SZZ-Agent relies on, (c) whether the performance gain can be explained by a better LLM- backbone, (d) what components of SZZ-Agent contribute the most to its success, and (e) how a specific hyperparameter, the commit selection threshold, controls its performance.
+Gap:
+- [NEEDS EVIDENCE]
+Core Idea:
+- method (0.54) and the previous SOTA (0.64).
+- We also uncoverwhy agents are so successful: They derive shortgreppablepatterns from the fix commit diff and message and use them to effectively search and find bug-introducing commits in large candidate sets.
+- Their paper from 2005 served as the foundation for a wide array of approaches aimed at identifying bug-introducing changes (or commits) from fix commits in software repositories.
+- But even after two decades of progress, the best-performing approach from 2025 yields a modest increase of 10 percentage points in F1-score on the most popular Linux kernel dataset.
+- In this paper, we uncover how and why LLM-based agents can substantially advance the state-of-the-art in identifying bug- introducing commits from fix commits.
+- We propose a simple agentic workflow based on searching a set of candidate commits and find that it raises the F1-score from 0.64 to 0.81 on the most popular Linux kernel dataset, a bigger jump than between the original 2005
+Method:
+- method (0.54) and the previous SOTA (0.64).
+- We also uncoverwhy agents are so successful: They derive shortgreppablepatterns from the fix commit diff and message and use them to effectively search and find bug-introducing commits in large candidate sets.
+- Their paper from 2005 served as the foundation for a wide array of approaches aimed at identifying bug-introducing changes (or commits) from fix commits in software repositories.
+- But even after two decades of progress, the best-performing approach from 2025 yields a modest increase of 10 percentage points in F1-score on the most popular Linux kernel dataset.
+- In this paper, we uncover how and why LLM-based agents can substantially advance the state-of-the-art in identifying bug- introducing commits from fix commits.
+- We propose a simple agentic workflow based on searching a set of candidate commits and find that it raises the F1-score from 0.64 to 0.81 on the most popular Linux kernel dataset, a bigger jump than between the original 2005
+Evaluation Setup:
+- 3.3 Experiments 3.3.1 RQ1: Effectiveness.We evaluate whether SZZ-Agent outper- forms existing SZZ variants.
+- Table 3: RQ2b: LLM4SZZ with different LLM backbones vs.
+Main Results:
+- But even after two decades of progress, the best-performing approach from 2025 yields a modest increase of 10 percentage points in F1-score on the most popular Linux kernel dataset.
+- We propose a simple agentic workflow based on searching a set of candidate commits and find that it raises the F1-score from 0.64 to 0.81 on the most popular Linux kernel dataset, a bigger jump than between the original 2005 3.3 Experiments 3.3.1 RQ1: Effectiveness.We evaluate whether SZZ-Agent outper- forms existing SZZ variants.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- 5 Discussion We discuss directions for future work motivated by our findings.
+- Second, the 4 cases where the bug-introducing commit is not in the candidate set reveal a limitation of the current candidate collection strategy: Simple-SZZ-Agent only searches the commit histories of files modified by the fix, so when the bug was introduced in a different file, the correct commit is never considered.
+- How to expand the candidate set beyond the files touched by the fix without introducing prohibitive infrastructure costs is an open question that we leave for future work.
+- This compression itself may have value beyond identifying the bug-introducing commit: it captures, in a concise form, what made the code buggy.
+- Our context ablation (§3.3.4) showed that the agent achieves 0.73 F1-score with only the diff and no commit message, demonstrating that it can extract the essential characteristics of a bug from code changes alone.
+- Whether these patterns can be used to generate useful explanations of how a bug was introduced— especially when the fix commit message is uninformative—is an open question for future work.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

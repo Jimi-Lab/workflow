@@ -1,0 +1,48 @@
+ 100000
+ 1e+06
+ 1e+07
+ 1e+08
+ 1e+09
+ 1e+10
+ 1e+11
+ 1e+12
+ 1e+13
+0.0-0.1
+0.1-0.2
+0.2-0.3
+0.3-0.4
+0.4-0.5
+0.5-0.6
+0.6-0.7
+0.7-0.8
+0.8-0.9
+0.9-1.0
+The number of function pairs
+Similarity among functions
+Figure 8: Similarity among functions
+For non-C/C++ code we normalized as described in § II-C.
+For C/C++ code, we also did experiments where we roughly
+identiﬁed functions within C/C++ ﬁles using the following
+Perl regular expression:
+/ˆ
+\w+?\s[ˆ;]*? \( [ˆ;]*?\)\s*({ ←
+(?:[ˆ{}]++|(?1))*})/xgsm
+The regex isn’t perfect to recognize all functions since that
+would require a complete parser. However, in our experience
+it is sufﬁcient and allowed us to provide an estimate of
+similarity and code clones at the function level.
+We identiﬁed 3,230,554 functions containing at least
+4 tokens. We split identiﬁed functions into two groups
+based upon the function size. “The small-sized” group had
+3,144,998 functions which had less than 114 tokens. “The
+large-sized” group had 85,556 functions. Overall, we mea-
+sured pair-wise distance in each group using SIMILARITYbv,
+which required 4,949,164,509,293 pairwise comparisons.
+For the small-sized group, we used 32 byte bit vectors.
+Total bitvector generation time was 6 min using 32 CPUs.
+It took 19 min to compare every pair of the group using
+512 CPUs. For the large-sized group, we used 8 KB bit
+vectors. Generation time was 14 minutes on 32 CPUs. Pair-
+wise comparisons took 5 min 30sec using 512 CPUs.
+Figure 8 shows the distribution of function pairs based
+upon their similarity. Most of

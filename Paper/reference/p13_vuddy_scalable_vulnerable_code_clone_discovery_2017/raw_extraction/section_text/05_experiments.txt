@@ -1,0 +1,235 @@
+VII. E V ALUA TION
+We proceed to evaluate the efﬁcacy and effectiveness of
+VUDDY in two aspects: scalability and accuracy, by compar-
+ing VUDDY with other state-of-the-art techniques.
+A. Experimental setup and dataset
+System environment:We evaluated the execution and detec-
+tion performance of VUDDY by conducting experiments on a
+machine running Ubuntu 16.04, with a 2.40 GHz Intel Zeon
+processor, 32 GB RAM, and 6 TB HDD.
+Dataset: We collected our target C/C++ programs from
+GitHub. These programs had at least one star and were pushed
+at least during the period from January 1st, 2016 to July
+28, 2016. Repositories that are starred (i.e., bookmarked by
+GitHub users) are popular and inﬂuential repositories. The
+existence of a push record during the ﬁrst half of 2016 implies
+that the repository is active. The repository cloning process
+required 7 weeks to ﬁnish, gathering 25,253 Git repositories
+which satisfy the aforementioned two conditions. In addition
+602
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 009 =====
+TABLE I: Scalability and time comparison for varying input size. The average time was computed after iterating each experiment
+ﬁve times.
+LoC VUDDY SourcererCC ReDeBug CCFinderX DECKARD
+1K 0.44 s 2.3 s 35.6 s 6 s 1 s
+10 K 0.81 s 3.1 s 35.6 s 10 s 3 s
+100 K 5.17 s 50.7 s 42 s 50 s 13 s
+1M 55 s 1m4 4s 1m4 3s 6m4 4s 2m2 0s
+10 M 1 2m4 3s 2 4m3 8s 1 8m3 2s 1h3 6m 1 2 h3 0m
+100 M 1h3 2m 9h4 2m 2h3 2m 1 2h4 4m Memory ERROR
+1B 1 4h1 7m 2 5d3h 1d3h File I/O ERROR –
+TABLE II: Conﬁgurations for experiments.
+Technique Conﬁguration
+SourcererCC Min length 6 lines, min similarity 70 %.
+ReDeBug n-gram size 4, 10 context lines.
+DECKARD Min length 50 tokens, similarity 85 %, 2 token stride.
+CCFinderX Min length 50 tokens, min token types 12.
+to the Github projects, we downloaded the ﬁrmware of several
+Android smartphones.
+B. Scalability evaluation
+First, we evaluated the scalability of VUDDY , against four
+publicly available and competitive techniques (SourcererCC,
+ReDeBug, DECKARD, and CCFinderX) in terms of varying
+target program size. Note that as Wang et al. [44] pointed
+out, the conﬁguration choices have a signiﬁcant impact on the
+behavior of the tools that are compared. As a remedy, we
+referenced the optimal conﬁguration of each technique found
+by [44], [45], and [19] to conduct a sufﬁciently fair evaluation.
+The conﬁguration can be found in Table II.
+To focus on the scalability of tools when handling real-
+world programs, we generated target sets of varying sizes,
+from 1 KLoC to 1 BLoC, by randomly selecting projects from
+the 25,253 Git projects we collected. All experiments were
+iterated ﬁve times each (except for SourcererCC, with which
+we iterated twice), to ensure that the results are reliable.
+As described in Table I, VUDDY overwhelmed other tech-
+niques. DECKARD had the least scalability, failing to process
+100 MLoC target because of a memory error. In the case of
+CCFinderX, a ﬁle I/O error occurred after 3 days of execution
+for a 1 BLoC target. VUDDY ﬁnished generating ﬁngerprints
+and detecting clones of the 1 BLoC target in only 14 hour
+and 17 minutes. Although SourcererCC and ReDeBug also
+scaled to 1 BLoC, their execution is considerably slower than
+that of VUDDY . ReDeBug required more than a day, and
+SourcererCC required 25 days to ﬁnish detecting clones from
+the same 1 BLoC target. Fig. 6 displays a graph depicting the
+results in Table I. We can clearly see that the execution time of
+the other state-of-the-art techniques explodes as the target size
+grows. In fact, VUDDY scales even to the size of all 25,253
+repositories consisting of 8.7 BLoC with ease, requiring only
+4 days and 7 hours.
+C. Accuracy evaluation
+Now we evaluate the accuracy of VUDDY by comparing
+the number of false positives produced by each tool, given a
+set of vulnerabilities and a target program. In this subsection,
+0
+500
+1000
+1500
+2000
+1 K 10 K 100 K 1 M 10 M 100 M 1 B
+Time (in minutes)
+Size of target (LoC, logscaled)
+VUDDY
+• ••• • •
+•
+•
+ReDeBug
+▲ ▲▲▲ ▲
+▲
+▲
+▲
+SourcererCC
+2 222 2
+2
+2
+CCFinderX
+◦ ◦◦ ◦ ◦
+◦
+◦
+Deckard
+△ △△△
+△
+△
+Fig. 6: Execution time when varying size of target programs
+were given to VUDDY , SourcererCC, ReDeBug, DECKARD,
+and CCFinderX. DECKARD and CCFinderX scaled up to 10
+MLoC and 100 MLoC, respectively, then failed to execute.
+Although ReDeBug and SourcererCC scales to 1 BLoC, their
+growth rates of time are much steeper than that of VUDDY .
+we focus on comparing the accuracy of VUDDY and other
+clone detection techniques: SourcererCC, DECKARD, and
+CCFinderX. These techniques are not aimed at detecting
+“vulnerable” clones, and thus are not accurate when ﬁnding
+security vulnerabilities. On the other hand, ReDeBug is de-
+signed for detecting vulnerable code clones. Thus, we compare
+VUDDY with ReDeBug in detail in section VIII.
+To evaluate accuracy on the most equitable basis possible,
+we decided to conduct clone detection using each technique,
+then manually inspect every reported clones. The result of
+clone detection between our vulnerability database and Apache
+HTTPD 2.4.23 (352 KLoC) is shown in Table III. As it is
+very challenging to ﬁnd literally every vulnerability (including
+unknown vulnerabilities) in the target program, we cannot
+easily determine false negatives of tested techniques. To be
+clear, values of the FN column in Table III only accounts for
+indisputable false negatives. For example, FN of VUDDY is
+the number of code clones detected by the other techniques
+that are not false positives, but not detected by VUDDY . We
+reused the conﬁgurations of Table II except for the minimum
+similarity threshold settings.
+VUDDY reported 9 code clones in 22 seconds, and all of the
+ﬁndings were unpatched vulnerable clones in Apache HTTPD
+2.4.23. SourcererCC with 100 % similarity setting also had
+precision of 1.0, but reported only one true positive case. It
+missed 8 vulnerable clones which VUDDY detected, because
+603
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 010 =====
+TABLE III: Accuracy of VUDDY , SourcererCC, DECKARD,
+and CCFinderX when detecting clones between the vulnera-
+bility database and Apache HTTPD 2.4.23.
+Technique Time Rep † TP FP FN Precision
+VUDDY 22 s 9 9 0 2 1.000
+SourcererCC (100)∗ 122 s 1 1 0 8 1.000
+SourcererCC (70)∗ 125 s 56 2 54 7 0.036
+DECKARD (100)∗ 58 s 57 3 54 8 0.053
+DECKARD (85)∗ 234 s 462 4 458 8 0.009
+CCFinderX 1201 s 74 11 63 1 0.147
+∗ The values between parentheses denote minimum similarity threshold
+conﬁguration in percent
+† Denotes the number of clones each technique reported
+of its ﬁltering heuristics. We lowered the minimum similarity
+threshold to 70 %, expecting that SourcererCC might detect
+more true positive cases. However, it ended up detecting only
+two legitimate vulnerable clones, whereas introducing 54 false
+positives. DECKARD with minimum similarity set to 100 %
+reported 57 clones, and 54 cases were conﬁrmed to be false
+positives. This shows that two perfectly matching abstract
+syntax trees are not necessarily generated from the same
+code fragments. Furthermore, when the minimum similarity
+threshold was set to 85 %, DECKARD detected only 4 true
+positive clones, with 458 false positives. This result accords
+with the observation of Jiang, et al. [29] which claims that
+DECKARD has 90 % false positive. CCFinderX was the only
+technique that reported more true positive cases than those of
+VUDDY . However, 63 out of 74 reported clones were false
+positives, and CCFinderX required the most time to complete.
+We analyzed the false positive cases of each tool, and
+discovered a fatal ﬂaw of the compared techniques. In most
+of the false positive cases, SourcererCC, DECKARD, and
+CCFinderX falsely identiﬁed patched functions in the target as
+clones of unpatched functions in the vulnerability database. We
+present one case in which patched benign function is identiﬁed
+as a clone of old, vulnerable version of the function, by all
+techniques but VUDDY . In Listing 3, we can observe that the
+statements removed and added by the patch are quite similar.
+Eventually, the unpatched function and patched function have
+so similar structure and tokens that SourcererCC, DECKARD,
+and CCFinderX misleadingly report them as a clone pair.
+We also analyzed the false negative cases. VUDDY did not
+detect two vulnerable functions that both SourcererCC (70 %
+similarity threshold) and DECKARD detected. The sole reason
+is that some lines of code, other than the vulnerable spot ad-
+dressed by security patches, were modiﬁed in the function. We
+currently have vulnerable functions of the repository snapshots
+right before the security patches are applied. However, this is a
+trivial issue that can be easily resolved, because we can retrieve
+every different versions of a vulnerable function and add them
+in our database. For example, a command “git log -p
+filename” retrieves the entire change history of the queried
+ﬁle. Older snapshots of vulnerable functions are naturally
+obtained from the change history, and we can insert these
+into our vulnerability database. From a different standpoint,
+it is very surprising that SourcererCC and DECKARD have
+more false negatives than VUDDY has. For these cases they
+failed to identify two identical functions as clones, implying
+that these techniques are not complete (see Equation 2).
+Listing 3: Snippet of the patch for CVE-2015-3183 which
+is already applied in request.c of Apache HTTPD 2.4.23.
+1 - if (access_status == OK) {
+2 - ap_log_rerror(APLOG_MARK, APLOG_TRACE3, 0, r,
+3 - "request authorized without authentication by "
+4 - "access_checker_ex hook: %s", r->uri);
+5 -}
+6 - else if (access_status != DECLINED) {
+7 - return decl_die(access_status, "check access", r);
+8 ...
+9 + else if (access_status == OK) {
+10 + ap_log_rerror(APLOG_MARK, APLOG_TRACE3, 0, r,
+11 + "request authorized without authentication by "
+12 + "access_checker_ex hook: %s", r->uri);
+13 +}
+14 + else {
+15 + return decl_die(access_status, "check access", r);
+In summary, although Apache HTTPD is a moderately-sized
+project consisting of 350 KLoC, a lot of false positive cases
+are reported by techniques other than VUDDY . It is only
+logical that the bigger a target program is, the more false
+alarms are generated. Therefore, we conﬁdently conclude that
+SourcererCC, DECKARD, and CCFinderX are not suitable for
+detecting vulnerable clones from large code bases, as they will
+report so many false positive cases which cannot be handled by
+restricted manpower. Moreover, SourcererCC and DECKARD
+had more false negatives than VUDDY had.
+D. Exact-matching vs Abstract matching
+Our abstraction scheme enables VUDDY to detect variants
+of known vulnerabilities. We tested VUDDY with an Android
+ﬁrmware (14.9 MLoC). VUDDY reported 166 vulnerable
+clones without abstraction and 206 clones with abstraction.
+This means that VUDDY detects 24 % more clones with
+abstraction, which are unknown vulnerabilities. We manually
+inspected the clones, and identiﬁed no false positive.

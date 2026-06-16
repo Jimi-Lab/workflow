@@ -1,0 +1,190 @@
+ChallengesOur Ideas
+CVEs
+CWEs
+Capecs
+TTPs
+ New
+Dataset
+>92K CVEs
+141 TTPs
+Predicted
+TTPs
+CVE
+Analyst
+NEXUS FPs FNs
+Feedback
+Start
+Fixes FPs and
+FNs for future
+similar CVEs
+T1027: 2,699 CVEsImbalance
+Important
+Missed
+TTPs
+E.g., Top 10 TTPs
+in 2022 and 2024
+T1190: 427 CVEs
+Original
+Dataset
+Label
+Adjustment
+Data
+Augmentation
+Important Missed TTPs
+Less
+Imbalanced
+and Supports
+67 more TTPs
+New
+Dataset
+Generate Large-
+Scale Dataset
+Extract TTP Details More
+Accurately Enhance Dataset Utilize Analyst Feedback
+Limited Availability of 
+Large-Scale Datasets
+1
+Difficulty in Accurately Mapping 
+CVE Details to TTPs
+2
+Data Imbalance and Limited
+TTP Coverage in Dataset
+3
+Lack of Adaptive Learning for
+Continuous Improvement
+4
+CVE
+Description
+ LLM
+CVE-specific
+attack patterns
+3000
+samples
+Irrelevant
+Information
+Attack
+Patterns
+Limitations of Existing Solutions
+Low Accuracy in Mapping CVEs to TTPs Low TTP Coverage
+<~8K CVEs
+<52 TTPs Not CVE Specific
+Limited Entities
+Predefined Keywords Unable to fix
+wrong
+predictions
+[4]–[8],
+[15], [16]
+[3],
+[9]–[11],
+[13]
+[16]
+[23],
+[24]
+[3], [5]–[9],
+[11]–[13],
+[28], [29]
+Fig. 1: Motivation and our ideas.
+proaches in capturing the full threat landscape.
+Challenge 4: Lack of Adaptive Learning for Continuous Im-
+provement. The lack of adaptive learning limits models’ ability
+to improve over time based on new data or feedback [27].
+In CVE-to-TTP mapping, this means models cannot update
+predictions in response to emerging threats or analyst input.
+Once trained, they require manual intervention or retraining to
+correct errors or adapt to new attack techniques.
+Our Ideas. To tackle these challenges, we introduce
+NEXUS, an automated CVE-to-TTP mapping tool. Speciﬁ-
+cally, to address Challenge 1
+, we automate the CVE-to-TTP
+annotation process to minimize reliance on expert annota-
+tors while maintaining accuracy and consistency. Using four
+structured, expert-curated sources, CVE [30], CWE [31],
+CAPEC [32], and MITRE ATT&CK [2],NEXUS generates
+mappings without manual input, producing an initial dataset
+linking over 92K CVEs to 141 ATT&CK techniques, thereby
+enabling broader TTP coverage. To address Challenge 2
+,
+NEXUS handles unstructured, human-written security text
+by fully automating pre-processing and pattern extraction.
+It uses a Semantic Role Labeling (SRL) model [33], [34]
+to parse CVE descriptions and ﬁne-tunes a cybersecurity-
+focused language model [19] on a CVE-speciﬁc dataset to
+extract attack patterns without predeﬁned rules. The pipeline
+from cleaning to extraction requires no manual intervention
+and scales effectively to diverse, real-world CVE reports.
+To address Challenge 3
+, NEXUS leverages Llama-3.1-8B [35]
+to automatically generate 117,725 paraphrased CVE descrip-
+tions, augmenting the original 92,632 samples and enhancing
+dataset diversity. To expand TTP coverage, 67 additional
+techniques identiﬁed from real-world reports [23]–[26] are
+automatically mapped to CVEs using GPT-4o-mini [36], with-
+out manual annotation. This fully automated pipeline reduces
+expert dependence and ensures scalable, reproducible label
+generation. To address Challenge 4
+, NEXUS integrates an op-
+tional adaptive learning mechanism that reﬁnes predictions
+using analyst feedback. While corrections (e.g., false posi-
+tives/negatives) can improve future precision, high mapping
+accuracy is achieved even without intervention. Thus, feedback
+serves as an enhancement, not a reliance on expert input. The
+main contributions of this paper are as follows:
+• We introduceNEXUS, a framework to automatically map
+CVE descriptions to MITRE ATT&CK techniques. Un-
+like previous works [3], [6], [9], [11], [37], our framework
+enables fully automated enrichment, coverage expansion
+for important missing TTPs, label correction using LLMs,
+and an adaptive feedback mechanism, which all of them
+are validated across diverse, real-world security datasets
+(e.g., [3], [38]) at a scale not previously attempted.
+• We build the ﬁrst large-scale CVE-to-TTP dataset
+by mapping 92K CVEs to 141 TTPs through the
+CVE–CWE–CAPEC–TTP chain. To improve coverage,
+we generate 117K+ augmented CVEs and recover 67
+missing TTPs from real-world reports [23]–[26], assign-
+ing them to attack patterns using GPT-4o-mini [36].
+The ﬁnal dataset spans 210K+ CVEs and 208 TTPs,
+substantially exceeding prior work [3], [6], [11], [16].
+• We implementNEXUS and evaluate it using ﬁve distinct
+datasets, including three variants of our dataset along
+with two publicly available benchmarks, i.e., SMET [3]
+and MITRE ATT&CK APT and threat reports [38]. Our
+experiments show that NEXUS achieves an F1-score of
+up to 97.94%, compared to existing solutions [3], [6], [9],
+[11], [16], [37], which achieve a maximum of 67.68%.
+II. S
+COPE AND ASSUMPTIONS
+This work primarily focuses on ﬁnding MITRE ATT&CK
+TTPs from a CVE description. Our focus is on predicting
+the potential TTPs that could be associated with a given
+vulnerability, based on its description, rather than detecting
+an exploit. We assume the initial ground truth, including
+CVE–CWE–CAPEC–TTP mappings, is sufﬁciently accurate
+for training, and that meaningful attack patterns can be reliably
+extracted from CVE descriptions. We also assume that human
+analysts can correctly ﬂag false positives and false negatives
+during feedback collection [39].
+The mappings of CVE-to-TTP can be utilized in several
+security applications [3], [4], [10], [11], [13], [40], including
+threat intelligence, cyber operations, and risk assessment.
+For those applications, we assume attackers use existing
+attack techniques from the MITRE ATT&CK framework [2]
+to exploit vulnerabilities documented in the NVD knowl-
+edge base [30]. To demonstrate the practical applicability
+of NEXUS, Section VI presents three complementary case
+studies, an end-to-end operational scenario, an analysis of am-
+biguous CVE descriptions, and an evaluation on unstructured
+non-CVE threat-intelligence inputs, followed by additional
+possible uses ofNEXUS. Collectively, these examples illustrate
+how NEXUS integrates into analyst workﬂows, enriches TTP
+coverage under diverse input conditions, and helps bridge the
+gap between low-level system evidence and high-level security
+intelligence.
+III. M
+ETHODOLOGY
+A. Overview
+NEXUS (Figure 2) uses a modular hybrid framework com-
+bining ﬁne-tuned transformers (BERT [41], RoBERTa [42],
+SecureBERT [43]) with LLMs (GPT-4o-mini [36], Llama-3.1-
+8B [35]). LLMs handle label adjustment, data augmentation,
+2

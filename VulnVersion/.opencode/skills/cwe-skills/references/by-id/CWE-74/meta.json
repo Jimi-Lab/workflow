@@ -1,0 +1,272 @@
+{
+  "cwe_id": "CWE-74",
+  "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify how it is parsed or interpreted when it is sent to a downstream component.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-707",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "CWE-74 is high-level and often misused when lower-level weaknesses are more appropriate."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product constructs all or part of a command, data structure, or record using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "component",
+      "downstream",
+      "elements",
+      "special"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "component",
+      "downstream",
+      "elements",
+      "special",
+      "externally-influenced",
+      "neutralization",
+      "incorrectly",
+      "interpreted"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This example code intends to take the name of a user and list the contents of that user's home directory. It is subject to the first variant of OS command...",
+        "snippet": "$userName = $_POST[\"user\"]; $command = 'ls -l /home/' . $userName; system($command);"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code segment reads the name of the author of a weblog entry, author, from an HTTP request and sets it in a cookie header of an HTTP response.",
+        "snippet": "String author = request.getParameter(AUTHOR_PARAM); ... Cookie cookie = new Cookie(\"author\", author); cookie.setMaxAge(cookieExpiration); response.addCookie(cookie);"
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "Consider the following program. It intends to perform an \"ls -l\" on an input filename. The validate_name() subroutine performs validation on the input to make...",
+        "snippet": "my $arg = GetArgument(\"filename\"); do_listing($arg); sub do_listing { my($fname) = @_; if (! validate_name($fname)) { print \"Error: name is not well-formed!\\n\"; return; } # build command my $cmd = \"/bin/ls -l $fname\";..."
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "Consider a \"CWE Differentiator\" application that uses an an LLM generative AI based \"chatbot\" to explain the difference between two weaknesses. As input, it...",
+        "snippet": "prompt = \"Explain the difference between {} and {}\".format(arg1, arg2) result = invokeChatbot(prompt) resultHTML = encodeForHTML(result) print resultHTML"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Perl",
+        "nature": "Good",
+        "summary": "Consider the following program. It intends to perform an \"ls -l\" on an input filename. The validate_name() subroutine performs validation on the input to make...",
+        "snippet": "if ($name =~ /^\\w[\\w\\-]+$/) ..."
+      },
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "Consider a \"CWE Differentiator\" application that uses an an LLM generative AI based \"chatbot\" to explain the difference between two weaknesses. As input, it...",
+        "snippet": "cweRegex = re.compile(\"^CWE-\\d+$\") match1 = cweRegex.search(arg1) match2 = cweRegex.search(arg2) if match1 is None or match2 is None: # throw exception, generate error, etc. prompt = \"Explain the difference between {}..."
+      },
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "The following code is a workflow job written using YAML. The code attempts to download pull request artifacts, unzip from the artifact called pr.zip and...",
+        "snippet": "The code could be modified to validate that the NR file only contains a numeric value, or the code could retrieve the PR number from a more trusted source."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-5184",
+        "description": "API service using a large generative AI model allows direct prompt injection to leak hard-coded system prompts or execute other prompts.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-5184"
+      },
+      {
+        "reference": "CVE-2022-36069",
+        "description": "Python-based dependency management tool avoids OS command injection when generating Git commands but allows injection of optional arguments with input beginning with a dash (CWE-88), potentially allowing for code...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-36069"
+      },
+      {
+        "reference": "CVE-1999-0067",
+        "description": "Canonical example of OS command injection. CGI program does not neutralize \"|\" metacharacter when invoking a phonebook program.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-0067"
+      },
+      {
+        "reference": "CVE-2022-1509",
+        "description": "injection of sed script syntax (\"sed injection\")",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-1509"
+      },
+      {
+        "reference": "CVE-2020-9054",
+        "description": "Chain: improper input validation (CWE-20) in username parameter, leading to OS command injection (CWE-78), as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-9054"
+      },
+      {
+        "reference": "CVE-2021-44228",
+        "description": "Product does not neutralize ${xyz} style expressions, allowing remote code execution. (log4shell vulnerability)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-44228"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

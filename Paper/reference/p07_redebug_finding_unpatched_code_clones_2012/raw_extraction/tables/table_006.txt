@@ -1,0 +1,45 @@
+Table ID: table_006
+Page: 13
+Caption: Table VI: Code clone detection performance
+Extraction Confidence: partial
+Structured CSV: no [NEEDS TABLE REPAIR]
+Notes: caption/nearby text only.
+
+Raw Neighbor Text:
+Clone Detection
+Real Clones
+False Detection
+Missed
+ReDeBug
+180
+0
+15
+Deckard
+96
+183
+99
+Table VI: Code clone detection performance
+wise comparisons Deckard consumed more than 20 GB of
+memory in less than 2 minutes, after which we killed the
+process. Instead of the entire OS, we ran Deckard on each
+package at a time with 28 randomly selected C code ﬁles
+which contain security bugs. We report only code clones
+which match with the buggy code regions. Deckard took
+more than 12 hours to complete the code clone detection
+in Debian Lenny, utilizing 8 threads to process 8 packages
+at the same time. While Deckard processed only the source
+code written in C (Deckard can process one language at
+a time), ReDeBug processed a wealth of languages (e.g.,
+C/C++, Java, Shell, Python, Perl, Ruby, and PHP) in 6 hours.
+Table VI shows the code clone detection results of
+Deckard and ReDeBug. As expected, ReDeBug had no false
+detections, and surprisingly, missed 6 times as few code
+clones compared to Deckard. The code clones that ReDeBug
+missed came from the use of different variable names or
+types.
+Deckard faired worse than ReDeBug despite using a more
+sophisticated strategy. We investigated the causes, and found
+that 38 out of 99 of the cases were due to parse failures
+in Deckard, with the remainder just being missed due to
+the algorithm for detecting code clones. This result lends
+support that parsing code is hard and can be a 

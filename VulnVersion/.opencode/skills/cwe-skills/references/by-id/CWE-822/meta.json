@@ -1,0 +1,259 @@
+{
+  "cwe_id": "CWE-822",
+  "name": "Untrusted Pointer Dereference",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product obtains a value from an untrusted source, converts this value to a pointer, and dereferences the resulting pointer.",
+  "extended_description": "An attacker can supply a pointer for memory locations that the product is not expecting. If the pointer is dereferenced for a write operation, the attack might allow modification of critical state variables, cause a crash, or execute code. If the dereferencing operation is for a read, then the attack might allow reading of sensitive data, cause a crash, or set a variable to an unexpected value (since the value will be read from an unexpected memory location). There are several variants of this weakness, including but not necessarily limited to: The untrusted value is directly invoked as a function call. In OS kernels or drivers where there is a boundary between \"userland\" and privileged memory spaces, an untrusted pointer might enter through an API or system call (see CWE-781 for one such example). Inadvertently accepting the value from an untrusted control sphere when it did not have to be accepted as input at all. This might occur when the code was originally developed to be run by a single user in a non-networked environment, and the code is then ported to or otherwise exposed to a networked environment.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-125",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Out-of-bounds Read"
+      },
+      {
+        "cwe_id": "CWE-787",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Out-of-bounds Write"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product obtains a value from an untrusted source, converts this value to a pointer, and dereferences the resulting pointer.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "untrusted",
+      "might",
+      "environment",
+      "unexpected"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "untrusted",
+      "might",
+      "environment",
+      "unexpected",
+      "operation",
+      "attack",
+      "cause",
+      "crash"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2007-5655",
+        "description": "message-passing framework interprets values in packets as pointers, causing a crash.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-5655"
+      },
+      {
+        "reference": "CVE-2010-2299",
+        "description": "labeled as a \"type confusion\" issue, also referred to as a \"stale pointer.\" However, the bug ID says \"contents are simply interpreted as a pointer... renderer ordinarily doesn't supply this pointer directly\". The...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-2299"
+      },
+      {
+        "reference": "CVE-2009-1719",
+        "description": "Untrusted dereference using undocumented constructor.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1719"
+      },
+      {
+        "reference": "CVE-2009-1250",
+        "description": "An error code is incorrectly checked and interpreted as a pointer, leading to a crash.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1250"
+      },
+      {
+        "reference": "CVE-2009-0311",
+        "description": "An untrusted value is obtained from a packet and directly called as a function pointer, leading to code execution.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0311"
+      },
+      {
+        "reference": "CVE-2010-1818",
+        "description": "Undocumented attribute in multimedia software allows \"unmarshaling\" of an untrusted pointer.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-1818"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

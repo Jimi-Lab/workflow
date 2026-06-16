@@ -1,0 +1,117 @@
+in Appendix A.
+B. TPL Reuse Identification
+To determine what TPLs are reused in each target pro-
+gram, V ULTURE takes as input the component segment of
+the database to check whether these TPLs are invoked. It first
+employs an LSH algorithm to generate a list of TPL candidates
+that the target program may use. Subsequently, it refines the
+identification process by incorporating additional information
+for further confirmation.
+1) Candidate Library Detection: As TPLs may be reused
+either exactly or in a custom manner, relying solely on match-
+ing function names and code statements may overlook such
+custom cases. Hence, V ULTURE leverages the LSH algorithm
+to conduct code similarity analysis.
+Specifically, V ULTURE first extracts all files along with
+their paths from the target program and then proceeds with
+these files one by one. Then, VULTURE divides each file within
+the target program into target function snippets based on the
+declared functions. Given each function snippet, it uses Python
+TLSH, an LSH-based fuzzy matching library, to generate a
+unique hash value, Each target function snippet i can be rep-
+resented by a 2-tuple: ft(i) =< Hash(i), Func path(i) >,
+where Hash is the hash value of the target function snippet
+i and Func path represents the file path where the function
+snippet i is defined. V ULTURE then computes the similarity
+between the target function snippets and TPL functions in
+the component segment. For each target function snippet i,
+VULTURE compares it with each function j from the TPL
+iteratively. In particular, it takes as input Hash(i) and H(j)
+and leverages TLSH to calculate a similarity score between
+functions i and j. If the similarity score falls below a hash
+threshold THhash, the function pair of i and j is consid-
+ered similar. After all target function snippets are analyzed,
+VULTURE calculates the total number of similar function
+pairs. When the total number exceeds a similarity threshold
+THsim, it represents that the corresponding TPL may be
+used. Since different versions of a TPL may vary significantly,
+VULTURE identifies the version with the highest number of
+similar function pairs as a TPL prevalent version and then
+captures the information of the TPL (i.e., TPL name, hash
+value of the function in the TPL, TPL version, and the file path
+where the TPL is reused in the target program) to store in the
+candidate TPL list. It is important to note that when multiple
+TPL versions have the same number of similar function pairs,
+VULTURE randomly selects one version as the TPL prevalent
+version. V ULTURE iteratively analyzes all functions in the
+target program and collects a list of candidate TPLs that are
+potentially reused.
+2) Identification Optimization: The common similarity-
+based approaches, such as Centris, may produce a signifi-
+cant number of false positives because 1) TPLs with similar
+functionalities may employ the same functions; 2) the inter-
+dependencies among TPLs may result in a high degree of
+function overlap between TPLs. To accurately select which
+TPL is reused, V ULTURE leverages auxiliary information, i.e.,
+file paths and birth time, to optimize the candidate list.
+Some existing approaches (e.g., SNYK [12]) use TPL
+licenses to identify reuses because the target program must
+declare a TPL license either in a LICENSE file or through
+an annotation when reusing. However, we observed that these
+TPL licenses are usually written inconsistently and informally,
+without adhering to standards. V ULTURE may overlook the
+declared TPLs when using such information. Hence, VULTURE
+examines file paths illustrating where TPLs are reused in the
+target program and the birth time of each TPL as the indicators.
+Generally, the target program places code that reuses TPLs
+under a separate directory and then names the directory with
+a title similar to the TPL name. The birth time is used to
+pinpoint the first invocation of the reused function, thereby
+eliminating the redundant TPL dependencies involved during
+function comparison.
+To confirm the reused TPLs, V ULTURE first groups TPL
+candidates together when they share the same file path in the
+target program. For the TPL candidates in the same group,
+a path tokenizer is used to divide each file path into tokens
+based on the separators (e.g., space, backslash, and colon).
+Then V ULTURE compares each token with the name of each
+TPL candidate and calculates a Jaccard similarity score [34],
+and selects the TPL candidate(s) with the highest Jaccard
+similarity score as the confirmed reused TPL. Note that a
+file may invoke functions from multiple TPLs, thus several
+TPLs can have the same Jaccard similarity score. V ULTURE
+further addresses the inheritance cases where several TPLs
+share the same score to locate the confirmed reused TPL. First,
+VULTURE gathers the remaining TPL candidates sharing the
+same hash value H into a group, indicating that these TPLs
+are related. Within each group, V ULTURE compares the birth
+time of each TPL and identifies the one with the earliest birth
+time as the parent TPL of the group (i.e., the confirmed TPL of
+the target program). All the remaining TPL candidates in the
+group are then removed. For each target program, V ULTURE
+eventually generates a TPL reuse report containing all the
+confirmed reused TPLs.
+C. 1-day Vulnerability Detection
+When the TPL reuse report discloses that a vulnerable
+version of TPL has been reused, V ULTURE then determines
+whether any vulnerable functions are being invoked exactly
+or in a custom way. Hence, V ULTURE implements a dual
+analysis strategy at the function level, utilizing version-based
+and chunk-based analyses to distinguish exact and custom
+reuses, respectively.
+1) Version-based analysis: By inspecting the reused TPLs,
+we found that some developers may reuse a vulnerable TPL
+version, but patch the vulnerable code snippets themselves.
+Therefore, V ULTURE utilizes a diff-inspired version-based
+analysis to examine a TPL reuse from three aspects: 1) whether
+reuse is exact or customized in terms of TPL reuses; 2) whether
+the reused TPL version is vulnerable; and 3) whether the
+exploited vulnerabilities are patched.
+In detail, VULTURE first takes the TPL reuse report as input
+to extract the reused TPL and its version. According to the
+TPL name and the version, it queries the vulnerability segment
+of the database to verify if the reused version of the TPL
+was linked to any CVE report. If a CVE report is identified,
+VULTURE extracts the vulnerable and patched version of the
+code related to the CVE, and then utilizes diff to locate the
+7

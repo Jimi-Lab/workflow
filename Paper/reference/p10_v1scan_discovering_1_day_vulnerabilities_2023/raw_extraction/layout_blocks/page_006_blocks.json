@@ -1,0 +1,227 @@
+[
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:001",
+    "block_type": "text",
+    "text": "Collection of vulnerable and patched functions. V1SCAN\nthen removes false positives from the version-based vulner-\nability detection results. To identify the resolved vulnerable\nfunctions, we refer to the vulnerable and patched functions\nof CVE vulnerabilities. To this end, we first collected the\nsecurity patches for CVEs and then extracted the vulnerable\nand patched functions from these patches (see Section 4.3).\nThereafter, text preprocessing is applied to all vulnerable and\npatched functions, after which the LSH algorithm is applied\nto generate hash values (see Section 3.1).",
+    "bbox": [
+      53.69,
+      72.4,
+      295.86,
+      192.36
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:002",
+    "block_type": "text",
+    "text": "Filtering. Based on the classification of the reused code,\nV1SCAN checks for vulnerable functions and filters out false\nalarms from the vulnerability detection results. We consider\nthe four notations listed in Table 2.",
+    "bbox": [
+      53.86,
+      195.95,
+      295.37,
+      244.18
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:003",
+    "block_type": "text",
+    "text": "(1) Filtering unused vulnerable functions. The classifica-\ntion of reused code simplifies the filtering of the unused\nvulnerable functions. If fv is included in the “unused”\ngroup (U), then V1SCAN determines that fv is not reused\nin the target program.",
+    "bbox": [
+      57.33,
+      252.28,
+      295.9,
+      312.46
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:004",
+    "block_type": "text",
+    "text": "∀fv | fv ∈U →fv /∈T( fv is unused)",
+    "bbox": [
+      120.0,
+      323.36,
+      248.75,
+      341.6
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:005",
+    "block_type": "text",
+    "text": "(2) Filtering resolved vulnerable functions. If developers\nresolve fv by backporting security patches, this function\nhas the same (or similar) code syntax as that of fp be-\nlonging to the OSS versions that are safe from X. On\nthis basis, if fv is not included in “exactly reused” but\nhas a similar function f ′\nv in the “changed” group (C),\nV1SCAN determines that fv was either reused with code\nchanges (still vulnerable) or resolved by backporting se-\ncurity patches. To extract only the latter cases, V1SCAN\nchecks the version to which f ′\nv belongs.",
+    "bbox": [
+      57.33,
+      354.51,
+      295.78,
+      478.75
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:006",
+    "block_type": "text",
+    "text": "(2-1) If the version is not included in the CPE of X, it can\nbe determined that f ′\nv does not contain the vulnera-\nbility. To determine this more thoroughly, V1SCAN\ncompares f ′\nv to both fv and fp. If the distance (Φ,\nsee Section 3.1) between fv and f ′\nv is greater than\nthe distance between fp and f ′\nv (i.e., more similar\nto fp than fv), then V1SCAN considers f ′\nv has been\nresolved. This can be represented as follows; let v\nbe the version to which f ′\nv belongs.",
+    "bbox": [
+      70.95,
+      483.15,
+      295.78,
+      595.44
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:007",
+    "block_type": "text",
+    "text": "∀f ′\nv ∈C |\n\u0000\nv /∈CPE(X)\n\u0001\n∧\n\u0000\nΦ( fp, f ′\nv) < Φ( fv, f ′\nv) ≤θ\n\u0001",
+    "bbox": [
+      106.68,
+      597.99,
+      284.12,
+      627.73
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:008",
+    "block_type": "text",
+    "text": "→\nfv is resolved",
+    "bbox": [
+      166.29,
+      612.7,
+      222.52,
+      627.72
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:009",
+    "block_type": "text",
+    "text": "(2-2) If f ′\nv does not belong to any version of OSS, de-\nciding whether f ′\nv is vulnerable based only on the\nsimilarity to the vulnerable function and patch func-\ntion may produce a false alarm. Therefore, we put\nit on hold and decide whether to filter this vulner-\nability through an improved code-based approach\nof V1SCAN (see Section 3.3.2).",
+    "bbox": [
+      70.95,
+      638.7,
+      295.78,
+      722.8
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:010",
+    "block_type": "text",
+    "text": "Table 2: Defined notations.",
+    "bbox": [
+      386.64,
+      71.06,
+      488.94,
+      82.73
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:011",
+    "block_type": "text",
+    "text": "Notations\nDescription",
+    "bbox": [
+      354.4,
+      91.6,
+      483.07,
+      103.26
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:012",
+    "block_type": "text",
+    "text": "T\nThe target program.\nX\nThe vulnerability to be examined.\nfv\nThe vulnerable function of X.\nfp\nThe patched function of X.",
+    "bbox": [
+      369.67,
+      106.87,
+      521.48,
+      151.26
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:013",
+    "block_type": "text",
+    "text": "Here, a CVE vulnerability may (1) contain multiple vulner-\nable functions or (2) not include any vulnerable functions. In\nthe former case, the propagation of only one vulnerable func-\ntion may compromise the security of the entire system [12,14].\nTherefore, if more than one vulnerable function remains af-\nter filtering, V1SCAN determines that CVE vulnerability has\npropagated to the target program. Conversely, in the latter\ncase, V1SCAN determines CVE as the correct answer without\nfiltering. This may yield false positives; however, this rarely\noccurs (i.e., not found in our dataset) and arises from our de-\ncision that a small number of false positives would be more\ntolerable than missing vulnerabilities. Moreover, a security\npatch may alter the code beyond the scope of a function (e.g.,\na macro). In this case, we put it on hold and verify it at the\ncode level (see Section 3.3.2).\nFinally, the vulnerability detection result of the version-\nbased approach in which false positives are removed is ob-\ntained as the output of this phase.",
+    "bbox": [
+      317.57,
+      171.46,
+      559.75,
+      386.7
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:014",
+    "block_type": "text",
+    "text": "3.3.2\nImproved code-based approach",
+    "bbox": [
+      317.88,
+      400.83,
+      481.71,
+      413.79
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 6,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:006:015",
+    "block_type": "text",
+    "text": "Vulnerability signature generation. V1SCAN generates vul-\nnerability signatures for each collected CVE and uses them\nto detect propagated vulnerabilities. Vulnerability signatures\nare generated after identifying the location to which the code\nlines modified in the security patch belong to. For example,\nListing 1 shows the patch snippet for CVE-2019-12904 in\nLibgcrypt. The snippet contains a patch for all four types of\ncode locations: macro (lines #3 and #4), variable (lines #6 and\n#7), structure (lines #9 and #10), and function (lines #14 and\n#15). The locations of the code modified in the security patch\nare identified using an existing C/C++ parser (see Section 4).\nThereafter, V1SCAN uses different indexing methods for\neach code location. Listing 2 presents the indexing results for\nthe patch code shown in Listing 1. All the code lines added\nand deleted in the security patch were stored. For functions\nand structures, the LSH hash value is also stored, as described\nin Section 3.2.2. We consider hash values for reducing false\nalarms in vulnerability discovery. If we were to detect vulner-\nabilities by considering only the code lines added or deleted\nin a patch, numerous false alarms could occur, particularly\nwhen short and general codes (e.g., else) are modified in\nthe patch [14, 34]. Therefore, we attempted to resolve this\nissue using the hash value of the entire function or struc-\nture. V1SCAN generates vulnerability signatures for all the\ncollected CVE patches.",
+    "bbox": [
+      317.52,
+      423.51,
+      559.74,
+      722.8
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

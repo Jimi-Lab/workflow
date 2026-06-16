@@ -1,0 +1,427 @@
+3 Dataset creation
+In this section we describe the data collection and cleaning
+process. This process allowed us to create the largest and
+most complete, to the best of our knowledge, datasets of (a)
+mappings between a CVE and its VCC(s), and (b) mappings
+between a CVE and its fixing commit(s). We therefore con-
+sider the dataset to be a valuable contribution in itself and
+will make it publicly available for other researchers to use9.
+3.1 Linking CVEs to their VCCs
+An integral part of our dataset are mappings from CVEs to
+their VCCs to create a “ground truth” dataset. These map-
+pings come from manually curated datasets of researchers
+and project maintainers and enable us to evaluate and validate
+methods that automatically estimate lifetimes of vulnerabili-
+ties for which no such ground truth data are available.
+The largest source we identified for such mappings, is the
+Ubuntu CVE Tracker [6]. In this project, the Ubuntu Security
+Team gathers and curates several data points on vulnerabilities
+affecting the Linux kernel, often including their fixing com-
+mits and VCCs. Note that we exclude some of the mappings
+in the project from our dataset as their corresponding VCC
+refers to the initial git commit of the Linux kernel, leaving us
+with 1,202 mappings between 885 CVEs and their VCCs. Our
+reasoning is that vulnerabilities found in this commit were
+introduced before the beginning of the git era and thus using
+the timestamp of the initial git commit would let their lifetime
+appear shorter than it actually is.
+Additionally, we found 436 ground truth mappings for
+Chromium10 (226 CVEs), and 163 for the Apache HTTP
+Server (httpd) (60 CVEs) in the Vulnerability History
+Project [21]. The project also contains a few additional data
+points for repositories, other than Chromium and httpd, how-
+ever these repositories do not use C/C++ as their main pro-
+gramming language. Since the quantity of those mappings
+for other programming languages was too low to validate the
+accuracy of our methodology on them, we decided to limit
+our dataset to C/C++ repositories. Overall we were able to
+map 1,171 CVEs to one or more VCCs, from high-quality
+sources.
+9dataset available at https://figshare.com/s/
+4dd1130c336f43f6e18c
+10Chromium is a web browser on its own right, but its codebase is also
+used as a basis for Google Chrome, as well as other web browsers.
+
+===== PAGE 005 =====
+3.2 Included projects
+For our analysis, we want a large representative sample of
+FOSS projects that are compatible with our ground truth
+datasets and provide enough data points for our analysis. As
+starting point, we established the following requirements for
+software projects to be included:
+(a) The project should be free and/or open source with trans-
+parent and consistent security workflows. In fact, all projects
+that were included at the end of this process are distributed
+under Debian11 as free software. Nonetheless, they are widely
+used in other operating systems and make up a good represen-
+tation of FOSS in general.
+(b) The project should have a considerable number of reported
+CVEs. In order to allow a thorough analysis of all projects,
+we limited ourselves to those with at least 100 CVEs to en-
+sure meaningful results (we expect statistical arguments to be
+possible). This condition forced us to discard many projects
+we considered interesting, simply because they did not have
+enough data available in the National Vulnerability Database
+(NVD).
+(c) The project should be mainly written in C or C++. Intu-
+ition suggests that our methodology would provide results of
+similar quality for other programming languages with similar
+syntax and semantics, such as Java. However, we did not have
+enough ground truth data available to empirically prove this
+hypothesis for other programming languages, and therefore
+focus on C/C++.
+(d) Lastly, we require a significant number of a project’s CVEs
+to be linkable to a fixing commit. We had to discard some
+projects because it was not possible to consistently identify
+the fixing commit(s) for the project’s CVEs.
+In the end we created a dataset consisting of 11 different
+projects of various sizes, ages and areas of application. All
+included projects and their respective numbers of CVEs and
+corresponding fixing commits are listed in Table 1. We thor-
+oughly investigated commit messages, bug tracking systems
+and NVD references to ensure the highest possible – to the
+best of our efforts – yield of vulnerability mappings. A general
+description of the process follows in the next section.
+3.3 Linking CVEs to their fixing commits
+Our data collection process is based on information from the
+NVD [25]. The NVD is manually curated and represents one
+of the largest collections of software vulnerabilities. Conse-
+quently, it is frequently used in research on software security,
+having generated valuable insights on various topics. At the
+same time, the NVD has some well-known pitfalls, that the
+process described below tries to mitigate. This issue is fur-
+ther discussed in Section 7. For our work, we relied on the
+CVE-search tool [13] to obtain a local copy of the NVD for
+querying and obtaining data.
+11https://www.debian.org/
+For our analysis of vulnerability lifetimes, we needed to
+link a vulnerability entry in the NVD to one or multiple fixing
+commits resolving the underlying flaw. In order to create as
+large a dataset as we could for our evaluation, we applied and
+combined four different approaches.
+1. CVE-ID in Commit Message. Some fixing commits men-
+tion the related CVE-ID in the commit message, establishing
+a link between CVE and fixing commit. We investigated all
+these mappings using a combination of automated scripts and
+manual effort. First, we deemed correct all mappings that
+mention the CVE-ID in a project-specific syntax (e.g Bug-Id:
+CVE-2017-9992) that clearly denotes a matching CVE. We
+manually analyzed the remaining 176 mappings, and removed
+17 unjustified mappings, corrected 2, and added 212.
+2. Commit in NVD Reference. Entries in the NVD often
+contain references to third party websites that include security
+advisories, bug tracking systems, and also links to commits
+in a project’s version control system. In the cases where a
+reference to a commit in the respective repository was in-
+cluded, we considered this commit to be a fixing commit. We
+manually validated the mappings obtained using this method
+by investigating a random subset of 50 samples. We found
+that all of the sampled commits were indeed fixes for the re-
+spective CVEs.
+3. Common Bug ID. Many software vendors use dedicated
+bug tracking systems in their development process. Each com-
+mit corresponds to a bug identifier that is denoted in the com-
+mit message using a particular syntax. Thus, most commits
+can be linked to a certain bug ID. NVD entries, on the other
+hand, may contain a link to the vendor’s online bug tracking
+system in their references. Using regular expressions, the bug
+ID can be extracted from such links and then matched to corre-
+sponding commits. We assume that the developers mentioned
+the correct bug identifiers in their commit messages and the
+curators of the NVD reference the correct bugs as well. We
+recognize that this is a potential threat to the correctness of
+these mappings (see Section 7), but are confident the errors
+are negligible.
+4. Third party mappings. As the information provided by
+linking vulnerabilities and fixing commits is useful for var-
+ious purposes, fellow researchers and security experts have
+collected similar data for some software projects. In addition
+to our own analysis, we incorporated this data, especially in
+cases where acquiring the information in an automated fash-
+ion proved particularly difficult. We relied on three different
+third party mappings: (a) data provided by the Linux Kernel
+CVEs project [19], (b) mappings that were manually curated
+by Piantadosi et al. [32], (c) information from the Debian
+Security Tracker [12]. We are confident in the quality of data
+obtained from these parties, as they are either curated from
+reliable sources or relied on a data collection methodology
+similar to ours.
+12There were two occasions where a fix belonged to multiple CVEs as
+indicated in the commit message
+
+===== PAGE 006 =====
+These efforts resulted in a dataset of 5,914 CVEs across 11
+projects that can be linked to one or more fixing commits. The
+corresponding numbers of CVEs as well as the resulting num-
+ber of mappings from this process are listed in Table 1. CVEs
+with associated fixing commits are a subset of all of the CVEs
+in the NVD. For the calculation of vulnerability lifetime we
+could only consider those CVEs, where an associated fixing
+commit could be identified in the code repository. Rather
+than being a limitation of the approach, this addresses an im-
+portant problem with the NVD regarding the reliability of
+information on vulnerable products and versions (highlighted
+in previous research [23, 24]). Contrary to Li and Paxson [18]
+Project CVEs w/ fix. com. # fix. com.
+Linux (kernel) 4,302 1,473 1,528
+Firefox 2,179 1,498 3,751
+Chromium 2,781 1, 580 2,820
+Wireshark 600 314 343
+Php 663 281 932
+Ffmpeg 326 277 373
+Openssl 214 144 259
+Httpd 248 132 476
+Tcpdump 167 115 128
+Qemu 340 213 290
+Postgres 139 76 141
+Total 11,959 5,914 11,041
+Table 1: Number of CVEs and mappings per project. First column
+gives the total number of CVEs returned from a search of the NVD.
+Second column gives the number of those CVEs for which at least
+one fixing commit was found in the project repository. Third column
+gives the total number of fixing commits found per project.
+we focused our efforts on a smaller set of projects with a
+significant number of NVD entries available. We dedicated
+considerable efforts towards achieving the highest mapping
+rate that we could for these projects. In order to do that we
+made sure to identify all potential syntaxes for denoting bug
+IDs, all websites and corresponding hyperlinks belonging to
+the same bug tracking system as well as combining multiple
+of the introduced techniques. Consequently, we believe our
+dataset to be the most complete mapping for the included
+projects. Additionally, we also consider it to be more diverse
+than the one used in Li and Paxson’s work, as over 40% of
+their data originates from the Linux kernel or an operating
+system based on it.
+4 Lifetime estimation
+In this section, we describe our methodology for automated
+lifetime estimation from vulnerability fixing commits. We
+start off by evaluating a lower-bound approach used in previ-
+ous work [18]. To the best of our knowledge, we are the first
+to evaluate this approach against ground truth data.
+4.1 Lifetime estimation in previous work
+Calculating the lifetime of a vulnerability is a non-trivial task,
+as finding VCCs can be very difficult [20]. One approach used
+before is manually identifying VCCs via thorough analysis of
+the fixing commits of a vulnerability [28]. While this method
+likely yields the most accurate results, it is unsuitable for
+large scale studies. Therefore, Li and Paxson [18] opted for
+an automated approach to the problem. They approximated
+a lower bound of a vulnerability’s lifetime by using the git
+blame command. Git blame finds which commit last changed
+a specific line in a given file, and so can be used to trace a vul-
+nerability back to its origin. Li and Paxson’s approach was to
+run the command on every deleted or modified line of a given
+fixing commit; this process usually returns multiple candidate
+VCCs. They then picked the most recent of the commit dates
+of those VCCs as their vulnerability introduction date, going
+for a lower bound approach.
+Although our empirical evaluation showed that this ap-
+proach is indeed correct for getting a lower bound on the
+lifetime of a vulnerability, we found it too conservative for
+our needs. To be precise, we found that it underestimates the
+average lifetime for vulnerabilities in our ground truth dataset
+by 346.88 days. Due to the large underestimation of average
+lifetime, we deem this approach unsuitable for our study.
+A heuristic similar to Li and Paxson’s was used by Perl et
+al. in VCCFinder [31], albeit for a different goal. Their git
+blame-based heuristic aims to pinpoint the exact VCC, with
+the goal of creating a dataset suitable for training a classifier
+that can flag risky commits. Contrary to the Li and Paxson
+approach (that only blames lines that were deleted or modified
+in the fixing commit), the VCCFinder heuristic also takes into
+account lines added by the fixing commit. The commit that is
+blamed the most often is then marked as the VCC.
+In VCCFinder, the accuracy of the heuristic is calculated
+at 96%. This figure was derived by the authors by taking a
+15% sample of VCCs (96 in total) that the heuristic identi-
+fied, and manually checking them. Naturally, simply applying
+this heuristic seemed like a good fit for our use-case. Un-
+fortunately, in our evaluation of the heuristic against ground
+truth data, we could not observe similar accuracy (accuracy
+~40%). We attribute the optimistic evaluation of the heuristic
+by Perl et al. to the difficulty of pinpointing VCCs manually.
+Our results seem sensible considering the fact that software
+developers put a significant amount of manual effort13 into
+regression trackingwhich includes identifying VCCs. Thus,
+it seems likely that the accuracy of a relatively simple heuris-
+tic like this, is limited. However, for the purpose of training
+a classifier that pinpoints “risky” commits, with the aim to
+13https://lore.kernel.org/lkml/3519198.TemPj1OATJ@vostro.
+rjw.lan/
+https://yarchive.net/comp/linux/regression_tracking.html
+
+===== PAGE 007 =====
+drastically reduce the search space for subsequent manual
+auditing, such accuracy is perfectly acceptable. Indeed, the
+authors of VCCFinder showed that it is successful in find-
+ing previously unflagged vulnerabilities and outperformed
+existing approaches.
+4.2 Our approach
+A key observation is that we donot need to pinpoint the exact
+VCCs for our purposes. It is sufficient to approximate the
+point in time when a vulnerability was introduced. We found
+that we can estimate this the closest by repurposing the VC-
+CFinder heuristic with some slight modifications (similar to
+the ones by Yang et al. [41]). We modify the heuristic in such
+a way that it returns an approximation (in days) of how long
+the code was vulnerable instead of the exact VCC. This is
+done by averaging multiple possible dates when the vulner-
+ability could have been introduced, and assigning different
+weights corresponding to how often each individual commit
+was blamed. Our approach is as follows:
+1) We use git blame -w14 to map every “interesting” change
+of a fixing commit to potential VCCs:
+– Ignore changes to tests, comments, empty lines and non
+C/C++ files.
+– Blame every line that was removed.
+– Blame before and after every added block of code (two or
+more lines) if it is not a function definition as these can be
+inserted arbitrarily.
+– Blame before and after each single line the fixing commit
+added if it contains at least one of these keywords ("if", "else",
+"goto", "return", "sizeof", "break", "NULL") or is a function
+call. This approach was shown to perform well in blaming
+actual VCCs by Yang et al. [41].
+2) We then calculate our estimated introduction date dh from
+the list of blamed commits. For n commits we have:
+dh = dre f + 1
+∑n
+i=1 bi
+n
+∑
+i=1
+bi(di −dre f) (1)
+where bi is determined by the number of blames the commit
+i received and di is the respective commit date. For easier
+calculation, the dates are represented as difference in days to
+a static reference date dre f (January 1, 1900).
+Using this heuristic, we decrease the mean error on our
+ground truth set by 66% compared to using the lower-bound
+blaming heuristic of Li & Paxson, effectively overestimat-
+ing the actual average lifetime by 117 days (see Table 2).
+However, having a low error on the ground truth dataset does
+not necessarily mean that the approach is suitable for our
+needs. We have to address some additional important points
+regarding the robustness of the approach.
+14All projects that we investigated either used git or offered a git mirror of
+their repositories. However, the approach is generalizable, as other version
+control systems offer similar commands (e.g. svn blame or hg annotate).
+−2000 −1500 −1000 −500 0 500 1000 1500 2000
+Heuristic error (days)
+0.0000
+0.0002
+0.0004
+0.0006
+0.0008
+0.0010
+0.0012
+0.0014
+0.0016Density
+Figure 2: Distribution of heuristic errors in days (excluding data
+points with no error for readability). Equally sized bins.
+How many data points are needed? A standard deviation
+of more than 900 days means that individual measurements
+are generally not reliable. Therefore, we need to rely on mea-
+surements of the mean over larger sample sizes. Treating the
+errors as independent random variables sampled from the
+error distribution of Figure 2, we can compute the standard
+deviation of the sample mean for a given sample size with the
+Bienaymé formula. According to the Central Limit Theorem,
+the distribution of the sample mean will be normal for a large
+enough number of samples. We empirically conclude that
+at least for 20 or more samples, this holds for the distribu-
+tion of the errors. Therefore, we can compute bounds for the
+sample mean using normal distribution tables. For example,
+for a sample size of 20 and a confidence level of 95%, the
+sample mean will lie in the interval [117-395, 117+395] days.
+Making the simplification that the mean error is 0 (necessary
+for generalization), we can say that for a confidence level of
+95%, the margin of error will be ±395 days for 20 samples,
+±250 days for 50 samples, and ±176 days for 100 samples
+(compared to an average lifetime of almost 1150 days, cal-
+culated from the ground truth data). We consider the margin
+of error for 20 samples as the maximum tolerable error for
+our study, and set the minimum number of data points for a
+measurement to 20. We, therefore study means of at least 20
+CVE samples, although for most of our analysis (e.g. average
+lifetimes per project, vulnerability types), we consider means
+of 60 or more samples. Note that the calculations above are
+approximate and their aim is to get a lower bound for the
+number of samples required for meaningful estimation.
+Does the weighted average heuristic generalize (over time
+and between projects)? Although we have a limited number
+of data points in our ground truth dataset, we can see that the
+performance of our heuristic is similar for the three different
+projects (see Table 2). Another source of confidence in the
+robustness of our heuristic is that its error is symmetrically
+(nearly normally) distributed around a low mean value (that
+can be assumed to be zero), as can be seen in Figure 2. In-
+
+===== PAGE 008 =====
+Project CVEs Li & Paxson our approach (VCCFinder) our approach (w. average) Lifetime
+Mean error St. dev Mean error St. dev Mean error St. dev Mean
+Linux (kernel) 885 -323.74 1,033.27 157.51 1,127.60 163.11 994.01 1,330.85
+Chromium 226 -370.32 747.51 -15.54 754.19 -38.44 633.45 754.22
+Httpd 60 -599.80 1,160.05 257.45 915.81 22.40 868.91 1,890.23
+All CVEs 1,171 -346.88 993.72 129.24 1,057.9 117.00 932.52 1,248.22
+Table 2: Comparison of heuristic performance for the lower-bound approach of Li&Paxson, our approach based on a repurposed version of the
+VCCFinder heuristic [31], and our optimized heuristic (weighted average). All against ground truth data and measured in days.
+tuitively, this means that the errors “automatically” cancel
+out. For example, an alternative approach to have more ac-
+curate estimations of the lifetime would be to find a suitable
+“perfect constant” to add to the lower bound estimation as
+computed by the Li & Paxson approach. However, we found
+that depending on the data sampled, a perfect constant gen-
+erally performs worse than our weighted average approach.
+Taking Chromium as an example, calculating a constant up
+to some date X and then adding it to the output of the lower
+bound estimation approach, does not provide a good estimate
+compared to the weighted average heuristic. For example, as-
+sume the available data for Chromium is split into two subsets
+with fixing commits before 2014, and with fixing commits
+in 2014 and after. Calculating a perfect constant on the first
+dataset and applying it to the second, results in an average
+underestimation of 228.58 days, while the weighted average
+heuristic underestimates the correct lifetime by 33.56 days.
+Also, the calculated constants between the Linux kernel and
+Chromium differ drastically (the kernel constant would be up
+to 6 times larger), which shows that this approach cannot be
+transferred between different projects, whereas our approach
+does not require tuning and provides good results for all three
+projects with ground truth data that are available.
+Can we use the heuristic to assess trends and distri-
+butions? Figure 3 shows the (ground truth) lifetimes of
+Linux kernel15 vulnerabilities in our ground truth dataset (867
+CVEs), per year from 2011 to 2020. For the same CVEs, it
+also shows the estimate by our weighted average heuristic, in
+addition to the best linear fits for the trend in each case. Visual
+inspection of the plot as well as the relatively small difference
+in the calculated best linear fits (gradient of 163 days/year
+for heuristic, 155 days/year for ground truth) supports the as-
+sertion that the heuristic can be used to study lifetime trends
+over time.
+To assess whether the heuristic is also suitable for estimat-
+ing the distribution of vulnerability lifetimes, we plot and
+compare the histograms of the ground truth data and the out-
+put of the heuristic for the same CVEs (Figure 4). The his-
+tograms showcase similar characteristics and the exponential
+15We use the Linux kernel for this investigation, since it is the project with
+the most data points in our ground truth dataset (see Table 2). However, the
+same conclusion can be made by using the ground truth data for Chromium.
+2011 2012 2013 2014 2015 2016 2017 2018 2019 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Heuristic Lifetime
+Groundtruth lifetime
+Figure 3: Comparison of heuristic vs ground truth values for historic
+trend of vulnerability lifetimes in the linux kernel. Linear OLS fit.
+distribution appears to be a good fit to both the heuristic and
+ground truth data for most of the data range (see Q-Q plots in
+Figure 4). Overall, our experiments support the assertion that
+the heuristic can be used to study the distribution of lifetimes.

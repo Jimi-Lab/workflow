@@ -1,0 +1,142 @@
+Adaptation
+CVE-2024-4985Signatures
+Feedback
+Database
+Relevant Feedback
+47c1...
+C1,C5,...
+X: 0.1
+𝜏: 0.4
+T1606.002
+FN47c1...
+C1,C5,C7... FN
+Add This
+TTP
+directly CVE-2024-45409
+LlamaAP6
+Relev-
+ant?
+Verify
+Yes
+CVE-2024-45409
+Similar CVEs
+CVE-2024-4985 47c1... ... C1,C5,...
+25o9... ...
+Predictions
+T1606.002
+not predicted
+Reviewed
+Yes
+No C1,C5,...
+Exact-Match Behavioral
+Add this
+TTP
+X: Cluster Distance Threshold 𝜏: Coverage Threshold AP: Attack Pattern
+Model Adaptation and Prediction Refinement
+Fig. 13: An example of reﬁning initial predicted TTPs.
+a Behavioral Signature (clustered TTP IDs at a 0.1 threshold).
+Signatures, feedback type, and TTP, are stored for future
+reﬁnement.
+2) Model Adaptation: The Model Adaptation sub-step
+(evaluated in Section IV-F) aligns the output of the TTP Pre-
+diction sub-step with historical analyst feedback by reusing the
+Exact-Match Signatures and Behavioral Signatures introduced
+earlier. These signatures serve as retrieval keys for matching
+current attack patterns with previously recorded feedback,
+either through exact context matching or behavioral similarity.
+First, for each attack pattern, the Model Adaptation sub-step
+checks the feedback database for an Exact-Match Signature
+and, if found, directly inherits all linked feedback (TPs, FPs,
+FNs). Second, to compare against stored Behavioral Signa-
+tures, it computes a cluster-coverage scoreS: letting T
+clusters
+be the current pattern’s Behavioral Signature andB the set of
+stored Behavioral Signatures (Equation 8).
+B = DB(1)
+clusters, DB(2)
+clusters
+,..., DB(n)
+clusters (8)
+For each DB(i)
+clusters →B , the coverage score is calculated via
+Equation 9:
+S(DB(i)
+clusters, Tclusters)= |DB(i)
+clusters ⇐ Tclusters|
+|DB(i)
+clusters|
+⇒ 100 (9)
+If the score exceeds threshold ω , the feedback linked to
+DB(i)
+clusters
+is selected. The sub-step then integrates this feedback
+in two stages: (i) all candidate entries are tentatively applied
+to the current attack pattern, and (ii) each feedback TTP is
+veriﬁed with Llama-3.1-8B using the same Yes/No prompting
+strategy as in Label Adjustment. A “Yes” keeps true positives
+or false negatives, while a “No” removes false positives.
+This veriﬁcation step ensures accurate behaviorally adapted
+feedback. Fourth, the ﬁnal adapted prediction is constructed
+by combining the initial TTP predictions with the corrections
+derived from both signature types. Feedback obtained from
+Exact-Match Signatures is applied directly, while feedback
+from Behavioral Signatures is incorporated following model-
+based veriﬁcation. False positive TTPs are removed, false
+negative TTPs are added, and true positive TTPs are reinforced
+according to the veriﬁed feedback outcomes. The step is
+further summarized in Algo. 3 in Appendix A.
+Example 8. Figure 13 illustrates the Model Adaptation
+process. NEXUS analyzes two similar CVEs, CVE-2024-
+4985 and CVE-2024-45409, both missing TTP T1606.002.
+For CVE-2024-4985, feedback with an Exact-Match Signature
+(47c1...) and a Behavioral Signature (C1,C5,C7...)
+exists in the database. ForCVE-2024-45409, no exact match
+is found, so the system retrieves feedback using Behavioral
+Signature matching (X =0 .1, ω =0 .4). Exact-Match
+feedback is directly applied, while Behavioral feedback is
+veriﬁed via Llama-3.1-8B. If conﬁrmed, TTP T1606.002 is
+added to the prediction.
+IV . E
+VA L UAT I O N
+This section ﬁrst describes the experiment setup, and then
+evaluate NEXUS across several aspects.
+A. Experiment Setup
+Implementation. NEXUS is implemented in Python 3.10. Ex-
+periments are conducted on HPC clusters, with nodes featuring
+over 128 CPU cores (AMD EPYC 7763), 250GB RAM, and
+multiple NVIDIA A100 GPUs (20GB/80GB). Model ﬁne-
+tuning uses the Flair framework [59] and Adam optimizer [60].
+Six BERT variants are employed for CVE-to-TTP map-
+ping: BERT-Base-Uncased [41], BERT-Large-Uncased [56],
+RoBERTa-Base [42], RoBERTa-Large [57], SecureBERT [19],
+[43], and SecureBERT-Plus [58]. OpenAI models (e.g., GPT-
+4o-mini) are accessed via the OpenAI Python library [61], and
+Llama models via Transformers and HuggingFace Hub [62].
+Additional core libraries include Torch [63] and NumPy [64].
+Datasets. The evaluation uses ﬁve datasets (D1–D5), among
+them the publicly available SMET CVE-to-TTP dataset [3]
+and MITRE ATT&CK APT and threat reports [38]. The
+primary dataset, the NEXUS Attack-Pattern Dataset (D1), is
+generated and reﬁned through the NEXUS methodology. It
+includes 711,969 attack pattern–CVE pairs, 92,632 unique
+CVEs, and 117,725 augmented CVEs, covering 208 TTPs.
+D1 serves as the main resource for training, validation, and
+testing. We use four additional datasets for evaluation. The
+10k-Minimal-Overlap Dataset (D2) contains 10,000 CVEs
+from D1’s test set across 208 TTPs, with overlap minimized
+for fair comparison: 34% (3,381 CVEs) have no training
+overlap, and only 12% of training samples share minimal
+context. The 3.3k-Fully-Unseen Dataset (D3) consists of these
+3,381 non-overlapping CVEs, covering 192 TTPs, and is
+used to assess generalization under fully unseen conditions.
+The MITRE-APT Dataset (D4) [38] contains ten annotated
+MITRE ATT&CK reports covering groups such as APT1 [65],
+APT3 [66]–[71], APT38 [72]–[74], and others, spanning 128
+TTPs. These reports are far longer and richer than CVE
+descriptions. The SMET Dataset (D5) [75] contains 303 CVEs
+mapped to 41 TTPs, produced by SMET [3].
+Evaluation Strategies. Fine-tuning uses a learning rate of
+1e-5, batch size four, and up to 15 epochs. The NEXUS
+Attack-Pattern Dataset (D1) is split 75/25 with stratiﬁcation
+to preserve all 208 TTP labels. We evaluateNEXUS against
+7

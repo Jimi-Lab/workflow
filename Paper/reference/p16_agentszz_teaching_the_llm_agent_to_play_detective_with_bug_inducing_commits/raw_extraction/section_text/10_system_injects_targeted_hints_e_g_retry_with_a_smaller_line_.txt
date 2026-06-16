@@ -1,0 +1,169 @@
+system injects targeted hints (e.g., “Retry with a smaller line range”)
+to guide the agent toward narrower queries, avoiding repeated
+expensive operations.
+Layer 2: Formatted Outputs.Each tool applies internal for-
+matting before returning results to improve readability and reduce
+noise. git_blame converts git’s verbose porcelain format into a
+concise L{n}: {hash} | {code} representation with a commit
+legend. All commit-displaying tools filter out metadata trailers (e.g.,
+Signed-off-by, Reviewed-by) that are irrelevant to bug-inducing
+commit identification. Additionally, each tool enforces a maximum
+output length (100–300 lines) with truncation notifications, en-
+abling the agent to iteratively refine queries with narrower scopes.
+Algorithm 1Structured Context Compression
+Require:Tool name𝑡, arguments𝑎𝑟𝑔𝑠, fix date𝑑 𝑓 𝑖𝑥, threshold𝜏
+Ensure:Compressed output𝑂 ′
+1:// Search bound enforcement
+2:if𝑡∈{log_s,log_func}and𝑎𝑟𝑔𝑠.before>𝑑 𝑓 𝑖𝑥 then
+3:𝑎𝑟𝑔𝑠.before←𝑑 𝑓 𝑖𝑥
+4:end if
+5:// Layer 1: Cache deduplication
+6:ifCache.Has(𝑡,𝑎𝑟𝑔𝑠)then
+7:𝑂 raw ←Cache.Get(𝑡,𝑎𝑟𝑔𝑠)
+8:else
+9:𝑂 raw ←ExecuteTool(𝑡,𝑎𝑟𝑔𝑠)
+10:if𝑂 raw is timeoutthen
+11:Inject hint: “Retry with narrower parameters”
+12:returntimeout message
+13:end if
+14:Cache.Store(𝑡,𝑎𝑟𝑔𝑠,𝑂 raw)
+15:end if
+16:// Layer 2: Formatted output
+17:𝑂←Format(𝑡,𝑂 raw):
+18:Reformat raw output into concise representation
+19:Strip metadata trailers; truncate at max line limit
+20:// Layer 3: Structured extraction
+21:if|𝑂|≤𝜏then return𝑂
+22:end if
+23:𝑂 ′←Extract(𝑡,𝑂):
+24: show: Strip diff context lines (keep only +/-/@@); head-tail
+truncate at𝐾1
+25: blame: Deduplicate commits into summary header; head-
+tail truncate at𝐾2
+26:log: Keep first𝐾 3 entries
+27:grep: Group by file; keep first𝐾 4 matches
+28:return𝑂 ′
+The truncation thresholds (100–300 lines) are set based on the typ-
+ical output volume of each tool: git_grep produces many short
+matching lines and is capped at 100 to avoid flooding the context
+with repetitive results, while git_log_func includes inline diffs
+that require more space and is allowed up to 300 lines. When output
+exceeds the threshold, the tool appends a truncation notification,
+prompting the agent to retry with narrower parameters (e.g., adding
+a path filter or line range). We did not perform systematic tuning
+of these thresholds; they are designed to balance information com-
+pleteness with context window efficiency.
+Layer 3: Structured Extraction.When formatted outputs ex-
+ceed a character threshold 𝜏= 3000, a deterministic, tool-specific
+extractor further compresses them. Forgit_show, diff context lines
+are removed, retaining only change markers (+/-/@@) and file head-
+ers with head-tail truncation at 𝐾1 lines. For git_blame, repeated
+commits are deduplicated into a summary header, followed by head-
+tail truncation at 𝐾2 lines. For git_log variants, only the first 𝐾3
+entries are retained, and for git_grep, matches are grouped by
+file before limiting to 𝐾4 entries. These rules preserve structurally
+important information (e.g., commit hashes, line numbers, and
+changed code) while aggressively removing redundant context.
+
+===== Page 006 =====
+Preprint, Under Submission, Arxiv Lyu et al.
+blame
+show
+log_s
+grep
+L210-330@ fix^1file:mv_sas.c
+121181f3 file: mv_sas.c
+AgentSZZ
+sas_notify_phy_event_gfpentire repo
+→ only in sas_event.c, sas_init.c(introduced here) ✓
+sas_notify_phy_event_gfppath: libasa/
+grepnotify_port_event(@ 121181f3
+log_funcsas_notify_port_eventfile: sas_event.c6
+show
+show
+grep
+show
+Phase 1: Blameat Fix
+Phase 2: Cross-File Tracing
+5
+4
+3
+Phase 3: Multi-File Verification
+10
+9
+→ 121181f3, 20b09c29... (multiple candidates)
+→ "Remove notifier indirection"API refactor ✗
+→ found in sas_event.c, sas_init.c, libsas.rst
+→ no commits found
+→ found in aic94xx, mvsas, hisi_sas, sas_event.c✓
+→ 1c393b9 (2017) "dynamic allocedwork" ✓
+1c393b9file: libsas.h→ changed event struct and API signature1c393b9file: sas_event.c"sas_alloc_event(", @ 1c393b9
+→ sas_alloc_event() ConfirmedBIC✓✓
+1c393b9file: sas_init.c
+→ added sas_alloc_event(), rewrote notify functions
+Find BIC: 1c393b9
+8
+7
+1
+2
+Figure 3: A successful case ofAgentSZZidentifying a cross-
+file bug-inducing commit.
+3.6 Successful Example
+We illustrateAgentSZZthrough a cross-file bug in the Linux ker-
+nel’s SCSI subsystem.1 Although the fix modifies mvsas/mv_sas.c,
+the root cause lies in the core library libsas/sas_event.c, where
+the event handling mechanism was rewritten four years earlier.
+Fig. 3 shows the 10-turn investigation trajectory.
+Phase 1: Blame at fix (Turns 1–2).Following the blame-first
+strategy, the agent blames the changed lines inmv_sas.c at the par-
+ent commit and identifies commit 121181f3 as a frequent modifier.
+git_show reveals this commit to be an API refactoring (“Remove
+notifier indirection”) that replaces indirect callbacks with direct
+calls—a mechanical change rather than the root cause.
+Phase 2: Cross-file tracing (Turns 3–6).Recognizing that the
+bug lies beyond the driver file, the agent shifts to cross-file explo-
+ration. It uses git_grep to locate sas_notify_phy_event_gfp across
+the repository, identifying references insas_event.c, sas_init.c,
+and related files. After an unsuccessfulgit_log_s search, the agent
+adapts by tracing the pre-refactoring functionnotify_port_event.
+Using git_log_func, it identifies commit 1c393b9 (2017) as the
+change that rewrote the event handling logic.
+Phase 3: Multi-file verification (Turns 7–10).The agent ver-
+ifies the candidate across multiple files. It confirms changes to
+the API and data structures in libsas.h, validates the shift to dy-
+namic allocation in sas_event.c, and uses git_grep to confirm
+that sas_alloc_event was introduced in this commit. Finally, it
+inspectssas_init.cto complete the verification.
+The agent correctly identifies 1c393b9 as the bug-inducing com-
+mit with high confidence. This case highlights three key strengths
+ofAgentSZZ: (i)domain knowledgeenables effective refactor pene-
+tration and strategy adaptation; (ii)task-specific toolssupport cross-
+file tracing beyond line-based SZZ; and (iii)context compression
+1https://github.com/torvalds/linux/commit/feb18e900f0048001ff375dca639eaa327ab3
+maintains tractable context across multi-turn investigation. This
+trajectory illustrates howAgentSZZprogressively shifts from lo-
+cal blame to broader repository exploration when local evidence
+becomes insufficient. Notably, the BIC resides in a different file and
+predates the fix by four years—conditions under which traditional
+SZZ approaches typically fail.
+4 Study Design
+4.1 Research Questions
+To evaluateAgentSZZ, we design the following research questions:
+•RQ1.How effective isAgentSZZat identifying BICs com-
+pared to baselines?
+•RQ2.How efficient isAgentSZZin terms of time and cost?
+•RQ3.What is the contribution of each key component of
+AgentSZZ?
+•RQ4.CanAgentSZZidentify BICs in challenging scenarios?
+In RQ1, we evaluate the effectiveness ofAgentSZZby com-
+paring it with a range of existing SZZ algorithms on the task of
+identifying bug-inducing commits across multiple datasets. In RQ2,
+we assess the efficiency ofAgentSZZin terms of runtime, token
+consumption, and monetary cost, and compare it against the state-
+of-the-art LLM-based approach LLM4SZZ. In RQ3, we conduct an
+ablation study to quantify the contribution of each key component
+ofAgentSZZ(i.e., task-specific tools, domain knowledge, and con-
+text compression) to its overall performance and efficiency. In RQ4,
+we further analyze the effectiveness ofAgentSZZin challenging
+scenarios, with a focus on cross-file and ghost commit cases that
+are known to be difficult for traditional SZZ methods [23, 29].

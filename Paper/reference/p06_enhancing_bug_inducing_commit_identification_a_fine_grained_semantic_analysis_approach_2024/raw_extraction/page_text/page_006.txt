@@ -1,0 +1,107 @@
+3042 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 6. Constraint comparison example.
+endeavoring to find a path to the last block. It is important
+to note that we may encounter mu ltiple candidates during this
+step. For each candidate in the pr evious version, we initially
+prioritize the one that shares th e highest number of constraints
+with the current execution path.If there are multiple candidates,
+preference is given to the one with the most common lines.
+To illustrate this, we use the extracted execution path p from
+the motivation example. To derive its corresponding path in the
+previous version, we initially map its first and last basic blocks
+to their counterparts in the previous version. These correspond
+to the begin’ block and the end’ block, respectively, as
+illustrated in orange in Fig. 4.
+Next, we attempt to find out paths from the first mapped
+block to the last mapped block in the previous version. In
+this case, we aim to find paths from the begin’ block to
+the end’ block in the previous version of the program. We
+use the depth-first-search algorithm to find out candidates. As
+depicted in the figure, we encounter two candidates: p
+′
+1 and p′
+2.
+After comparing their constraints, we observe that candidatep′
+1
+shares more constraints with p, leading us to designate it as the
+corresponding path.
+After path matching, each pathpwith the statesin the current
+version has been paired with a corresponding path p′ with the
+state s′from the previous version. Now, we initially compare the
+two states and proceed to find out which unmodified statements
+in the previous version contribute to the occurrence of the bug.
+The detailed algorithm is outlined in Algorithm 2. Initially,
+we compare the constraints in two program states. If the con-
+straints in the previous path are not identical to those in the
+current path, we first identify the index i where the con-
+straint preCons[i] in the previous version is different from
+the constraint curCons[i] in the current version(lines 1-3).
+In case of a conflict condition, we assume that the previous
+version of the program may neglect the condition curCons[i]
+from the statement S
+i to the statement Si+1, where Si is the
+last statement before curCons[i] and Si+1 is the first state-
+ment after curCons[i]. Consequently, we utilize the function
+extractStmts to extract Si and Si+1, subsequently mapping
+them to the previous version and adding them to the buggy
+statements (lines 4-5).
+We provide a constraint comparison example in Fig.6.I nt h e
+previous version, the path executes from S
+i to Si+1 without a
+condition check while in the current version, it needs to sat-
+isfy Cnew. The newly added constraint is highlighted in green
+while the original constraints are highlighted in red. Here the
+constraints in the previous version are C
+1, C2, and C3.T h e
+Algorithm 2: obtain the buggy statements.
+Input : s, state of the current path.
+s′, state of the previous path.
+Output: bStmts, the obtained buggy statements.
+i←−0
+preCons ←−s′.constraints
+curCons ←−s.constraints
+1 for i<curCons.size () and i<preCons.size () do
+2 if curCons[i]̸=preCons[i] then
+3 break
+i←−i+1
+4 if i̸=curCons.size() then
+5 bStmts.add(extractStmts(curCons [i],s))
+6 for var in s′.vars do
+i←−0
+7 preData ←−s′.var.data
+8 curData ←−s.var.data
+9 for i<curData.size () and i<preData.size ()
+do
+10 if curData[i]̸=preData[i] then
+11 break
+i←−i+1
+12 if i̸=curData.size() then
+13 bStmts.add(preData [i-1],preData [i])
+current version of the program has constraints C1, C2, Cnew
+and C3. We compare all constraints in sequential order and find
+that C3 is conflicted with Cnew at index 2. Thus, we extract the
+last statement Si before Cnew and the first statement Si+1 after
+Cnew. We map these two statements to the previous version and
+add them to buggy statements.
+For each variable in the previous path, we compare its data
+flow with that in the current path (lines 10-11). Again, we first
+locate the conflict index. Then, we add the conflicting index
+and its preceding index’s corresponding statements to the buggy
+statements (lines 12-13). Note that a variable’s data flow is the
+sequence of code statements that define, assign, modify, or use
+the variable in the path. Additionally, when we compare the data
+flow of a variable, we do not consider the control flow.
+In the case of the motivation example, we first examine
+the constraints and identify no differences. Subsequently, we
+analyze the data flow of each variable. Upon inspection, we
+observe that the data flow of the variable flagsin the previous
+version encompasses two statements 11-12, 16-17, while in the
+current version, it comprises three statements 11-12, 15, 16-17.
+Consequently, a conflict ar ises at index 1, as we illustrate in
+green in Fig. 5. As a result, we include the statements 11-12,
+16-17 as the statements contributing to the bug.
+D. Locating Bug-Inducing Commits
+After identifying all buggy statements, the subsequent step
+involves tracing back the commit history to pinpoint the bug-
+inducing commit. We adopt an approach similar to the “per-
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

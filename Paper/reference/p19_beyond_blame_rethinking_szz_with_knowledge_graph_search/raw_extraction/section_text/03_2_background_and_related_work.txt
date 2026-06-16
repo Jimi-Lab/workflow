@@ -1,0 +1,21 @@
+2 Background and Related Work
+SZZ Algorithm and Its Variants.The SZZ algorithm [ 32] pioneered automated BIC identification
+by tracing deleted or modified lines in bug-fixing commits via git blame. Over two decades,
+numerous variants have improved precision through annotation graphs and cosmetic change
+filtering [19], meta-change exclusion [7], refactoring detection [24, 25], deep learning [35], and LLM-
+based reasoning [36, 40]. Most recently, LLM4SZZ [36] leverages LLMs to rank blame candidates and
+expands context around modified lines for candidate collection. We provide detailed descriptions of
+our baselines in Section 5.1. Despite these advances, all approaches share a fundamental limitation:
+they restrict the search space to commits returned by git blame, inherently missing BICs that
+require broader history traversal. AgenticSZZ addresses this limitation by structuring the commit
+history as a temporal knowledge graph and navigating it through agent-guided exploration.
+Knowledge Graphs (KGs) in Software Engineering (SE).A KG is a graph-based data structure
+where nodes represent entities and edges encode relationships between them, enabling queries that
+traverse and reason over these connections [16]. KGs have been increasingly applied to SE tasks. For
+automated program repair, repository-aware KGs bridge semantic gaps between issue descriptions
+and code patches [ 45], and unified code KGs enable multilingual issue resolution [ 5]. For bug
+localization, injecting KG-derived knowledge into LLMs improves fault localization accuracy [21].
+Crash solution recommendation has been addressed by mining Stack Overflow into structured
+KGs [10]. However, none of these works address BIC identification or model the temporal evolution
+of commits. Temporal knowledge graphs (TKGs) extend KGs with time-aware reasoning, enabling
+prediction over evolving relationships [ 26, 28, 38]. To our knowledge, AgenticSZZ is the first

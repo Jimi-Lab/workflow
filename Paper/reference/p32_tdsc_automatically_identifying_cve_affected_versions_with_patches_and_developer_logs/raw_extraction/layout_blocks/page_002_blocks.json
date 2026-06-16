@@ -1,0 +1,317 @@
+[
+  {
+    "page": 2,
+    "block_id": "page_002:block_001",
+    "block_type": "text",
+    "text": "906 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024",
+    "bbox": [
+      42.119998931884766,
+      32.560523986816406,
+      556.1945190429688,
+      40.343284606933594
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_002",
+    "block_type": "text",
+    "text": "to ﬁnd vulnerabilities that are guarded by complex conditions and do not manifest as crashes. The methods based on machine learning [22] , [23] , [24] rely on experts to manually deﬁne features and then use learning models to classify code with or without vulnerabilities. Due to the coarse code granularity, it is difﬁcult to determine the exact location of the vulnerability. The methods based on code similarity [20] , [25] are difﬁcult to detectvulnerabilitiesthatarenotcausedbycodeduplication,and the programs with similar vulnerable code are not necessarily vulnerable, which leads to inaccurate results. For a CVE, we aim to determine the boundary (e.g., the ﬁrst and the last vulnerable versions) of all vulnerable versions in the version tree (i.e., a tree structure to organize all versions, with the major versions in the trunk and minor versions in the branches, introduced in Section IV ). It is worth noting that we only pay attention to the vulnerabilities speciﬁed by CVEs, not all vulnerabilities of a version. Therefore, if aCVEvulnerabilitystill exists inaversion, we call it a vulnerable version.",
+    "bbox": [
+      42.118011474609375,
+      63.950557708740234,
+      293.193359375,
+      278.3088684082031
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_003",
+    "block_type": "text",
+    "text": "We conduct an in-depth large-scale analysis on the open-",
+    "bbox": [
+      52.08060836791992,
+      279.14276123046875,
+      293.1745910644531,
+      290.2610168457031
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_004",
+    "block_type": "text",
+    "text": "source code of the released versions, and systematically evaluate and determine the versions impacted by each CVE. For a given CVE, we divide the problem space into three steps. First, we determine the last vulnerable version in the version tree. Based on our study, we ﬁnd that unpatched code does not necessarily have a vulnerability, because it may have been ﬁxed in another way (called repatching ). Second, we determine the last vulnera- ble version in each branch of the version tree. Third, some early versions may have gone through many updates, which is the reason for partial matching (introduced in Section II-B ) between patches and source code. Accordingly, we design methods to identify the partial matching source code and provide more reliable results for the vulnerabilities. Especially, we use both patchesandgitlogstojustifytheﬁrstversionofthevulnerability. Finally, our work will not only put forward a new idea to justify the Known Affected Software Conﬁgurations of the NVD, but also reveal the special behaviors in patching vulnerable code.",
+    "bbox": [
+      42.118011474609375,
+      291.1038513183594,
+      293.19940185546875,
+      505.4621276855469
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_005",
+    "block_type": "text",
+    "text": "Contributions. Based on the developer logs and patches,",
+    "bbox": [
+      52.08060836791992,
+      506.2960205078125,
+      293.15374755859375,
+      517.414306640625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_006",
+    "block_type": "text",
+    "text": "our tool is dedicated to automatically generate a report with justiﬁcations to correct the Known Affected Software Conﬁg- urations of the NVD. Our work provides several contributions. First, our method builds all the software versions into a version tree according to their commit dependence. We can leverage the version tree to improve the accuracy and efﬁciency of our tool. By contrast, previous tools check each software version separately, which is hard to verify the detection results when they conﬂict with each other. Second, we propose a general method using patches and developer log information to verify which versions are really vulnerable and further determine the version number boundaries of the CVE vulnerabilities in the version tree, because developer logs provide more reliable evidence than patches only. The phenomena of repatching and partial matching are discovered and countermeasures are proposed. Finally, we rectiﬁed 11, 827 incorrect reports of Linux Kernel, and con- ﬁrmed that 94 patched versions lacked corresponding committed records in the changelogs. Our method can be applied for other open source software (e.g. Firefox, OpenSSL). In addition,",
+    "bbox": [
+      42.118011474609375,
+      518.2481689453125,
+      293.20135498046875,
+      744.5675659179688
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_007",
+    "block_type": "text",
+    "text": "we compare our tool to two very representative vulnerability detection tools using a number of versions randomly selected from ﬁve widely used open-source projects as the testing dataset. Ourresultsshowthatthesetoolscouldnotachievehighdetection accuracy while our tool achieved 94.3% precision and 95.6% recall. Our work not only reports the incorrect vulnerability information of the NVD, but also provides important insights on such data sources for future vulnerability detection.",
+    "bbox": [
+      305.13262939453125,
+      63.959529876708984,
+      556.1943969726562,
+      158.76065063476562
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_008",
+    "block_type": "text",
+    "text": "II. B ACKGROUND",
+    "bbox": [
+      395.03314208984375,
+      174.56134033203125,
+      466.2417907714844,
+      185.67959594726562
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_009",
+    "block_type": "text",
+    "text": "We ﬁrst introduce the background on security vulnerability",
+    "bbox": [
+      315.0989990234375,
+      191.48956298828125,
+      556.1942138671875,
+      202.60781860351562
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_010",
+    "block_type": "text",
+    "text": "reporting mechanisms, and then describe several basic require- ments for our tool.",
+    "bbox": [
+      305.13641357421875,
+      203.44171142578125,
+      556.2051391601562,
+      226.52108764648438
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_011",
+    "block_type": "text",
+    "text": "A. Vulnerability Reporting",
+    "bbox": [
+      305.13641357421875,
+      242.4622344970703,
+      413.2157897949219,
+      253.4210968017578
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_012",
+    "block_type": "text",
+    "text": "CVE and CVE-ID. CVE (Common Vulnerability Enumer-",
+    "bbox": [
+      315.0989990234375,
+      259.25018310546875,
+      556.1779174804688,
+      270.3684387207031
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_013",
+    "block_type": "text",
+    "text": "ation) is a list of records for publicly known cybersecurity vulnerabilities. Launched by MITRE in 1999 as a community effort, today it is used in many cybersecurity products and services from around the world. Each CVE record contains an identiﬁcation number (CVE-ID) (e.g., “CVE-2021-3564”), a description, at least one public reference [26] . When people ﬁnd a new vulnerability, they can request and obtain a unique CVE-ID from a CVE Numbering Authority (CNA) [27] .",
+    "bbox": [
+      305.13641357421875,
+      271.2023620605469,
+      556.201171875,
+      366.0124206542969
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_014",
+    "block_type": "text",
+    "text": "NVD. NVD (National Vulnerability Database), launched by",
+    "bbox": [
+      315.0989990234375,
+      366.8462829589844,
+      556.1770629882812,
+      377.96453857421875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_015",
+    "block_type": "text",
+    "text": "NIST (National Institute of Standards and Technology) [28] , is a repository of standard vulnerability management data represented using the Secure Content Automation Protocol (SCAP) [29] . Built upon and fully synchronized with the CVE record List [26] , the NVD in addition provides enhanced struc- turalinformationforeachrecordsuchasﬁxinformation,severity scores, and impact ratings in its vulnerability detail pages. After the initial vulnerability report, the information of the NVD may be manually updated [14] . For instance, for a new CVE, security patches may not be available in the time of releasing the CVE, but later on the links to the security patches can be added to its NVD page.",
+    "bbox": [
+      305.1354064941406,
+      378.8074035644531,
+      556.2151489257812,
+      521.426025390625
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_016",
+    "block_type": "text",
+    "text": "Known Affected Software Conﬁgurations. Each vulnerability",
+    "bbox": [
+      315.0979919433594,
+      522.268798828125,
+      556.1849975585938,
+      533.3870849609375
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_017",
+    "block_type": "text",
+    "text": "in the NVD has a vulnerability detail page, which contains a section called Known Affected Software Conﬁgurations (see Fig. 1(a) ). It is used to show which software or combinations of software are considered vulnerable at the time of analysis. Corresponding to a given CVE-ID, it reports a list of versions impacted by the vulnerable source code. The NVD uses the Common Platform Enumeration (CPE) 2.3 speciﬁcation when creating these applicability statements and the matching CPE URI[s]. Applicability statements are a way to communicate which products are vulnerable in a relatively ﬂexible syntax [30] . This was designed primarily for machines to process and thus is not easy for human readers to understand.",
+    "bbox": [
+      305.1334228515625,
+      534.220947265625,
+      556.2149658203125,
+      676.8485717773438
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_018",
+    "block_type": "text",
+    "text": "B. Basic Requirements",
+    "bbox": [
+      305.1334228515625,
+      692.7986450195312,
+      398.2060546875,
+      703.7575073242188
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_019",
+    "block_type": "text",
+    "text": "Our tool relies on both security patches and developer logs",
+    "bbox": [
+      315.09600830078125,
+      709.587646484375,
+      556.1939697265625,
+      720.7059326171875
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_020",
+    "block_type": "text",
+    "text": "to provide evidence of the vulnerability of a version, so that we assume that security patches and developer logs are correct and",
+    "bbox": [
+      305.1334228515625,
+      721.5397338867188,
+      556.1983032226562,
+      744.6101684570312
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_021",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

@@ -1,0 +1,28 @@
+Threats to Validity. In constructing the ground truth, we manually identified the vulnerable
+versions for each CVE, which may introduce potential inaccuracies. To mitigate this threat, three
+authors with cybersecurity expertise, including one Ph.D. student and two master’s students,
+independently examined each CVE based on their domain knowledge and publicly available
+information. Discrepancies were resolved through collaborative discussion until consensus was
+reached. On average, six CVEs were processed per day, and the entire process took approximately
+one month. To capture the complexity of real-world vulnerabilities, our dataset incorporates
+diverse data qualities. Among the 176 selected CVEs, 58.6% contain low-quality commits with
+irrelevant messages, 9.9% involve complex fixes that modify more than five files, and 5.7% lack
+CWE information. Such heterogeneity suggests that CaVulner possesses a significant degree of
+tolerance toward low-quality input data.
+LLM Capability and Overhead. Previous approaches to vulnerable version identification were
+limited in their ability to understand vulnerability semantics and code logic. The emergence of
+large language models (LLMs) has addressed this limitation by enabling more accurate semantic
+reasoning. However, LLMs are not always precise and may still produce incorrect results. As LLM
+technology continues to evolve, its effectiveness in vulnerability analysis is expected to improve
+further. Although LLM-based identification requires more time compared to traditional methods,
+the improvement in accuracy makes the additional computational cost acceptable.
+Other Ecosystems. This study focuses on the Java ecosystem for three reasons. Java is the
+dominant language in enterprise-level applications, and its vulnerabilities can have far-reaching
+consequences. For example, Log4Shell vulnerability remains one of the most critical flaws ever
+discovered [15]. Moreover, the first author has worked extensively on Java vulnerability research,
+including zero-day discovery, and possesses deep practical expertise with Java codebases and patch
+processes. This experience substantially reduces annotation errors when constructing the ground
+truth of vulnerable versions. Finally, to ensure accurate and efficient extraction of method change
+patterns from fix commits, we employ a Java AST parsing library. Extending vulnerable-version
+identification to other ecosystems such as C, C++, and Python represents an important direction
+for future work.

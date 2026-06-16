@@ -1,0 +1,34 @@
+Implementation. NEXUS is implemented in Python 3.10. Ex-
+periments are conducted on HPC clusters, with nodes featuring
+over 128 CPU cores (AMD EPYC 7763), 250GB RAM, and
+multiple NVIDIA A100 GPUs (20GB/80GB). Model ﬁne-
+tuning uses the Flair framework [59] and Adam optimizer [60].
+Six BERT variants are employed for CVE-to-TTP map-
+ping: BERT-Base-Uncased [41], BERT-Large-Uncased [56],
+RoBERTa-Base [42], RoBERTa-Large [57], SecureBERT [19],
+[43], and SecureBERT-Plus [58]. OpenAI models (e.g., GPT-
+4o-mini) are accessed via the OpenAI Python library [61], and
+Llama models via Transformers and HuggingFace Hub [62].
+Additional core libraries include Torch [63] and NumPy [64].
+Datasets. The evaluation uses ﬁve datasets (D1–D5), among
+them the publicly available SMET CVE-to-TTP dataset [3]
+and MITRE ATT&CK APT and threat reports [38]. The
+primary dataset, the NEXUS Attack-Pattern Dataset (D1), is
+generated and reﬁned through the NEXUS methodology. It
+includes 711,969 attack pattern–CVE pairs, 92,632 unique
+CVEs, and 117,725 augmented CVEs, covering 208 TTPs.
+D1 serves as the main resource for training, validation, and
+testing. We use four additional datasets for evaluation. The
+10k-Minimal-Overlap Dataset (D2) contains 10,000 CVEs
+from D1’s test set across 208 TTPs, with overlap minimized
+for fair comparison: 34% (3,381 CVEs) have no training
+overlap, and only 12% of training samples share minimal
+context. The 3.3k-Fully-Unseen Dataset (D3) consists of these
+3,381 non-overlapping CVEs, covering 192 TTPs, and is
+used to assess generalization under fully unseen conditions.
+The MITRE-APT Dataset (D4) [38] contains ten annotated
+MITRE ATT&CK reports covering groups such as APT1 [65],
+APT3 [66]–[71], APT38 [72]–[74], and others, spanning 128
+TTPs. These reports are far longer and richer than CVE
+descriptions. The SMET Dataset (D5) [75] contains 303 CVEs
+mapped to 41 TTPs, produced by SMET [3].

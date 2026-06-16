@@ -1,0 +1,270 @@
+{
+  "cwe_id": "CWE-364",
+  "name": "Signal Handler Race Condition",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product uses a signal handler that introduces a race condition.",
+  "extended_description": "Race conditions frequently occur in signal handlers, since signal handlers support asynchronous actions. These race conditions have a variety of root causes and symptoms. Attackers may be able to exploit a signal handler race condition to cause the product state to be corrupted, possibly leading to a denial of service or even code execution. These issues occur when non-reentrant functions, or state-sensitive actions occur in the signal handler, where they may be called at any time. These behaviors can violate assumptions being made by the \"regular\" code that is interrupted, or by other signal handlers that may also be invoked. If these functions are called at an inopportune moment - such as while a non-reentrant function is already running - memory corruption could occur that may be exploitable for code execution. Another signal race condition commonly found occurs when free is called within a signal handler, resulting in a double free and therefore a write-what-where condition. Even if a given pointer is set to NULL after it has been freed, a race condition still exists between the time the memory was freed and the pointer was set to NULL. This is especially problematic if the same signal handler has been set for more than one signal -- since it means that the signal handler itself may be reentered. There are several known behaviors related to signal handlers that have received the label of \"signal handler race condition\": Shared state (e.g. global data or static variables) that are accessible to both a signal handler and \"regular\" code Shared state between a signal handler and other signal handlers Use of non-reentrant functionality within a signal handler - which generally implies that shared state is being used. For example, malloc() and free() are non-reentrant because they may use global or static data structures for managing memory, and they are indirectly used by innocent-seeming functions such as syslog(); these functions could be exploited for memory corruption and, possibly, code execution. Association of the same signal handler function with multiple signals - which might imply shared state, since the same code and resources are accessed. For example, this can be a source of double-free and use-after-free weaknesses. Use of setjmp and longjmp, or other mechanisms that prevent a signal handler from returning control back to the original functionality While not technically a race condition, some signal handlers are designed to be called at most once, and being called more than once can introduce security problems, even when there are not any concurrent calls to the signal handler. This can be a source of double-free and use-after-free weaknesses. Signal handler vulnerabilities are often classified based on the absence of a specific protection mechanism, although this style of classification is discouraged in CWE because programmers often have a choice of several different mechanisms for addressing the weakness. Such protection mechanisms may preserve exclusivity of access to the shared resource, and behavioral atomicity for the relevant code: Avoiding shared state Using synchronization in the signal handler Using synchronization in the regular code Disabling or masking other signals, which provides atomicity (which effectively ensures exclusivity)",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-362",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Concurrent Execution using Shared Resource with Improper Synchronization ('Race Condition')"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-415",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Double Free"
+      },
+      {
+        "cwe_id": "CWE-416",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use After Free"
+      },
+      {
+        "cwe_id": "CWE-123",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Write-what-where Condition"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a signal handler that introduces a race condition.",
+    "typical_preconditions": [
+      "freed object reused on later path",
+      "lifetime mismatch across branches",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "freed object reused on later path",
+      "lifetime mismatch across branches"
+    ],
+    "typical_sinks": [
+      "dereference after free",
+      "method call after release"
+    ],
+    "typical_fix_actions": [
+      "null/reset pointer",
+      "reorder free/use",
+      "add ownership guard"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "free/release followed by later use",
+      "missing lifetime guard",
+      "signal",
+      "handler",
+      "race",
+      "are"
+    ],
+    "fix_search_patterns": [
+      "ptr = NULL",
+      "reference count guard",
+      "move free after last use"
+    ],
+    "guard_patterns": [
+      "same object identity",
+      "same control-flow region"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "signal",
+      "handler",
+      "race",
+      "are",
+      "handlers",
+      "shared",
+      "called",
+      "these"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "control_flow_region",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same object identity",
+      "same control-flow region"
+    ],
+    "recommended_predicate_templates": [
+      "free/release followed by later use",
+      "missing lifetime guard",
+      "ptr = NULL",
+      "reference count guard",
+      "move free after last use"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "free/release followed by later use",
+        "missing lifetime guard",
+        "ptr = NULL",
+        "reference count guard"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "free/release followed by later use",
+        "missing lifetime guard",
+        "same object identity",
+        "same control-flow region"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "ptr = NULL",
+        "reference count guard",
+        "free/release followed by later use",
+        "missing lifetime guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This code registers the same signal handler function with two different signals (CWE-831). If those signals are sent to the process, the handler creates a log...",
+        "snippet": "char *logMessage; void handler (int sigNum) { syslog(LOG_NOTICE, \"%s\\n\", logMessage); free(logMessage); /* artificially increase the size of the timing window to make demonstration of this weakness easier. */ sleep(10);..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code registers a signal handler with multiple signals in order to log when a specific event occurs and to free associated memory before exiting.",
+        "snippet": "#include <signal.h> #include <syslog.h> #include <string.h> #include <stdlib.h> void *global1, *global2; char *what; void sh (int dummy) { syslog(LOG_NOTICE,\"%s\\n\",what); free(global2); free(global1); /* Sleep..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-1999-0035",
+        "description": "Signal handler does not disable other signal handlers, allowing it to be interrupted, causing other functionality to access files/etc. with raised privileges",
+        "link": "https://www.cve.org/CVERecord?id=CVE-1999-0035"
+      },
+      {
+        "reference": "CVE-2001-0905",
+        "description": "Attacker can send a signal while another signal handler is already running, leading to crash or execution with root privileges",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0905"
+      },
+      {
+        "reference": "CVE-2001-1349",
+        "description": "unsafe calls to library functions from signal handler",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1349"
+      },
+      {
+        "reference": "CVE-2004-0794",
+        "description": "SIGURG can be used to remotely interrupt signal handler; other variants exist",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-0794"
+      },
+      {
+        "reference": "CVE-2004-2259",
+        "description": "SIGCHLD signal to FTP server can cause crash under heavy load while executing non-reentrant functions like malloc/free.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-2259"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

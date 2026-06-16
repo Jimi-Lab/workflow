@@ -1,0 +1,26 @@
+Paper ID: p06_enhancing_bug_inducing_commit_identification_a_fine_grained_semantic_analysis_approach_2024
+Title: Enhancing Bug-Inducing Commit Identification: A Fine-Grained Semantic Analysis Approach
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\SEM-SZZ\Enhancing Bug-Inducing Commit Identification：A Fine-Grained Semantic Analysis Approach.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\SEM-SZZ\SEM-SZZ
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+Opening Context: The introduction begins from modern software evolution as a sequence of commits and the need to identify bug-inducing commits.
+Why the Problem Matters: Bug-inducing commit identification supports defect/vulnerability lifecycle analysis, but false positives in SZZ-style tracing weaken downstream conclusions.
+Concrete Pain Point: The paper highlights bug-fixing commits that only add lines; deletion-based blame cannot directly identify candidate bug-inducing lines.
+Motivating Example: The introduction previews that nearby unmodified lines around additions often expose bug-inducing commits, but whole-block tracing is too coarse.
+Prior Work Framing: It references SZZ and variants, then separates previous added-line handling from the proposed finer semantic comparison.
+Why Prior Work Is Insufficient: The paper argues block-level tracing around additions improves recall but introduces noise, motivating data-flow/control-flow comparison.
+Technical Challenges: The method must decide which surrounding statements actually contribute to the bug and must avoid broad search scopes that add irrelevant statements.
+Key Insight: The closest useful evidence is not necessarily the added line itself, but statements whose program states differ when comparing fixed and previous versions.
+System / Method Preview: Program slicing isolates nearby relevant basic blocks; state collection records variable data flow and path constraints; state comparison finds changed semantic evidence; line tracing locates bug-inducing commits.
+Contribution List: The introduction states a new approach for pointing out bug-related statements and claims experimental outperformance. Numeric contribution claims require table repair. [NEEDS TABLE REPAIR]
+Claim-Evidence Structure: Motivation observation -> semantic method -> experiments over added-line/deleted-line datasets -> discussion and failure analysis.
+Agent Evidence Anchors: raw_extraction/section_text/02_introduction.txt; raw_extraction/figures/figure_001_caption.txt; raw_extraction/tables/table_index.txt.
+Paragraph Map:
+P1-P2: software evolution and SZZ context; evidence type is related-work framing.
+P3-P5: added-line no-deletion pain point; evidence type is problem framing.
+P6-P9: observations around nearby unmodified lines and SEM-SZZ preview; evidence type is method motivation.
+P10-P12: RQs/evaluation claims; evidence type is table-backed but not citation-ready. [NEEDS TABLE REPAIR]
+Reusable Moves: Define a narrow algorithmic failure mode before presenting the new method; convert observations into method stages.
+Risks for Our Paper: Do not imply SEM-SZZ solves affected-version identification end-to-end; it targets bug-inducing commit identification.

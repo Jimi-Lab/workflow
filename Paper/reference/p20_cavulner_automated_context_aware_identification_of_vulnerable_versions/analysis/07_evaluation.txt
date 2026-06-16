@@ -1,0 +1,30 @@
+Main Results:
+- As shown in Table 1, it resulted in a corpus of 176 CVEs across 43 distinct Java projects and encompassing all 8,730 versions, including popular projects such as jackson-databind [19], liferay- portal [29], jenkins [22], struts [7], tomcat [8], spring-framework [40] and spring-security [41].
+- Comparison with baselines at the CVE level (GT: Ground Truth) Project GT V-SZZ VERJava LLM4SZZ CaVulner True False Accuracy True False Accuracy True False Accuracy True False Accuracy jackson-databind 62 0 62 0.00% 0 62 0.00% 0 62 0.00% 42 20 67.74% liferay-portal 18 8 10 44.44% 1 17 5.56% 6 12 33.33% 10 8 55.56% jenkins 17 3 14 17.65% 4 13 23.53% 3 14 17.65% 12 5 70.59% struts 14 9 5 64.29% 9 5 64.29% 8 6 57.14% 13 1 92.86% tomcat 7 4 3 57.14% 3 4 42.86% 6 1 85.71% 6 1 85.71% spring-framework 7 4 3 57.14% 3 4 42.86% 5 2 71.43% 6 1 85.71% spring-security 3 2 1 66.67% 1 2 33.33% 2 1 66.67% 3 0 100.00% other 48 36 12 75.00% 15 33 31.25% 29 19 60.42% 37 11 77.08% Total 176 66 110 37.50% 36 140 20.45% 59 117 33.52% 129 47 73.30% further verified and refined the fix commit datasets for both V-SZZ and VERJava based on GitHub issues and official project websites.
+- As a result, we obtained a total of 273 fix commits.
+Per-RQ Findings:
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+Ablation:
+- What is the contribution of each component of CaVulner to its overall effectiveness?
+Sensitivity Analysis:
+- [NEEDS EVIDENCE] sensitivity analysis not detected
+Case Study:
+- VERJava selected the TOP6 projects with respect to the number of CVEs having available patches.
+- Additionally, it included Liferay-portal, which contains the highest number of CVEs in NVD.
+- The CVEs in the VERJava dataset span a broad period of each project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+- Our study specifically targeted CVEs from this collection that affect open-source projects hosted on GitHub.
+- To construct our dataset, we merged the CVEs used by V-SZZ and VERJava, then excluded those whose vulnerable versions were not available on GitHub, such as tomcat 5.x.x or 6.x.x.
+- As shown in Table 1, it resulted in a corpus of 176 CVEs across 43 distinct Java projects and encompassing all 8,730 versions, including popular projects such as jackson-databind [19], liferay- portal [29], jenkins [22], struts [7], tomcat [8], spring-framework [40] and spring-security [41].
+Efficiency:
+- [NEEDS EVIDENCE] efficiency not cleanly extracted
+Error Analysis:
+- [NEEDS EVIDENCE] error analysis not cleanly extracted
+Statistical / Validity Notes:
+- [NEEDS CITATION VERIFICATION]
+How Claims Are Supported:
+- Claims are supported by extracted paper text and caption-level table/figure evidence only. Exact numeric claims are blocked until [NEEDS TABLE REPAIR] is addressed.
+Unsupported or Weakly Supported Claims:
+- Any claim about reproduced performance, local runtime behavior, or artifact completeness is unsupported. [EXECUTION NOT REQUESTED]; [NEEDS ARTIFACT]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Keep result claims tied to RQs and avoid transferring their metric numbers to our paper.

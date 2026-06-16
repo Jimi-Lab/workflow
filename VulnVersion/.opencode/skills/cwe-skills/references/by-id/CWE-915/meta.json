@@ -1,0 +1,264 @@
+{
+  "cwe_id": "CWE-915",
+  "name": "Improperly Controlled Modification of Dynamically-Determined Object Attributes",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product receives input from an upstream component that specifies multiple attributes, properties, or fields that are to be initialized or updated in an object, but it does not properly control which attributes can be modified.",
+  "extended_description": "If the object contains attributes that were only intended for internal use, then their unexpected modification could lead to a vulnerability. This weakness is sometimes known by the language-specific mechanisms that make it possible, such as mass assignment, autobinding, or object injection.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-913",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Control of Dynamically-Managed Code Resources"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-502",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Deserialization of Untrusted Data"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Ruby",
+      "ASP.NET",
+      "PHP",
+      "Python",
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product receives input from an upstream component that specifies multiple attributes, properties, or fields that are to be initialized or updated in an object, but it does not properly control which attributes can...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "attributes",
+      "modification",
+      "dynamically-determined",
+      "language-specific"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "attributes",
+      "modification",
+      "dynamically-determined",
+      "language-specific",
+      "vulnerability",
+      "autobinding",
+      "initialized",
+      "assignment"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "JavaScript",
+        "nature": "Bad",
+        "summary": "This function sets object attributes based on a dot-separated path.",
+        "snippet": "function setValueByPath (object, path, value) { const pathArray = path.split(\".\"); const attributeToSet = pathArray.pop(); let objectToModify = object; for (const attr of pathArray) { if (typeof objectToModify[attr] !==..."
+      },
+      {
+        "language": "JavaScript",
+        "nature": "Bad",
+        "summary": "This function sets object attributes based on a dot-separated path.",
+        "snippet": "setValueByPath({}, \"__proto__.isAdmin\", true) setValueByPath({}, \"constructor.prototype.isAdmin\", true)"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "JavaScript",
+        "nature": "Good",
+        "summary": "This function sets object attributes based on a dot-separated path.",
+        "snippet": "function setValueByPath (object, path, value) { const pathArray = path.split(\".\"); const attributeToSet = pathArray.pop(); let objectToModify = object; for (const attr of pathArray) { // Ignore attributes which resolve..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-3283",
+        "description": "Application for using LLMs allows modification of a sensitive variable using mass assignment.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-3283"
+      },
+      {
+        "reference": "CVE-2012-2054",
+        "description": "Mass assignment allows modification of arbitrary attributes using modified URL.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2012-2054"
+      },
+      {
+        "reference": "CVE-2012-2055",
+        "description": "Source version control product allows modification of trusted key using mass assignment.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2012-2055"
+      },
+      {
+        "reference": "CVE-2008-7310",
+        "description": "Attackers can bypass payment step in e-commerce product.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-7310"
+      },
+      {
+        "reference": "CVE-2013-1465",
+        "description": "Use of PHP unserialize function on untrusted input allows attacker to modify application configuration.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2013-1465"
+      },
+      {
+        "reference": "CVE-2012-3527",
+        "description": "Use of PHP unserialize function on untrusted input in content management system might allow code execution.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2012-3527"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,94 @@
+NEXUS: Towards Accurate and Scalable Mapping
+between Vulnerabilities and Attack Techniques
+Ehsan Khodayarseresht Suryadipta Majumdar Serguei Mokhov Mourad Debbabi
+Security Research Centre (SRC), Gina Cody School of Engineering and Computer Science, Concordia University
+{ehsan.khodayarseresht, suryadipta.majumdar, serguei.mokhov, mourad.debbabi}@concordia.ca
+Abstract—The Common Vulnerabilities and Exposures (CVE) 
+program each year records thousands of known vulnerabilities 
+without actionable context about how these vulnerabilities might 
+be exploited by attackers. On the other hand, the MITRE 
+ATT&CK framework outlines attack tactics, techniques, and pro-
+cedures (TTPs) without linking them to speciﬁc vulnerabilities. 
+While enabling automatic mapping of CVE descriptions to TTPs 
+can allow  more accurate and more efﬁcient threat detection and 
+mitigation, existing efforts face several challenges: (i) the lack of 
+large-scale, high-quality datasets linking CVEs to TTPs; (ii) the 
+presence of uneven data distributions and missing key TTPs in the 
+existing datasets; (iii) the difﬁculty of accurately extracting 
+adversarial behaviors from unstructured CVE descriptions; and
+(iv) the lack of adaptive learning mechanisms for continuously 
+correcting the mappings. This paper addresses those challenges 
+with NEXUS, a framework  to automatically map CVEs to TTPs. 
+Our evaluation (on a newly built dataset, covering 208 TTPs  
+and 92K+ CVEs, along with other public datasets) shows that 
+NEXUS achieves a maximum F1-score of 97.94% in CVE-to-
+TTP mapping, with the capability to work on new CVE entries, 
+compared to existing works that achieve a maximum of 67.68%.
+I. INTRODUCTION
+links, or contextual associations. However, both supervised
+and unsupervised methods struggle with accurate CVE-to-TTP
+mapping. Low accuracy remains a key issue: supervised mod-
+els fail to generalize beyond training data, while unsupervised
+methods often misread context, producing high false positive
+and false negative rates. Limited TTP coverage further reduces
+effectiveness, as supervised models depend on labeled data
+availability and unsupervised methods lose accuracy when
+covering a broader set of TTPs. We further illustrate these
+limitations as follows.
+Motivation. Figure 1 highlights two major limitations of
+existing solutions, along with the key challenges that must
+be addressed to overcome them. Speciﬁcally:
+Challenge 1: No Large-Scale Labeled Datasets.Developing
+large-scale annotated datasets mapping CVEs to ATT&CK
+TTPs is challenging [14] due to vague and ambiguous CVE
+descriptions, requiring expert annotators for precise alignment.
+Existing datasets [4]–[8], [15], [16] remain limited, typically
+covering fewer than 8K of over 276K CVEs and fewer than
+52 of 656 enterprise techniques [17], leading to poor model
+generalization. Expanding these datasets with accuracy and
+consistency is crucial for improving models.
+Challenge 2: Difﬁculty in Accurately Mapping CVEs to TTPs.
+Extracting attack behaviors from CVE descriptions and map-
+ping them to TTPs remains difﬁcult for both supervised and
+unsupervised methods [3], [10]. CVEs often contain irrelevant
+information (such as version histories, patch notes, or meta-
+data) that obscures exploitation details, reduces model effec-
+tiveness [18]–[20], and hinders detection of attack patterns [3],
+[9], [11], [21]. Variability in CVE length, structure, and
+extraneous content also consumes model capacity, especially
+for LLMs with token limits, lowering accuracy and efﬁciency.
+Challenge 3: Data Imbalance and Limited TTP Cover-
+age in Dataset. Data imbalance in datasets leads to over-
+representation of certain TTPs, causing supervised models
+to favor common techniques and miss rare or emerging
+ones [14] (e.g., ENISA dataset [15], [16] has 2,699 CVEs
+for T1027 vs. 427 forT1190), especially in multi-label cases
+where CVEs map to multiple TTPs [22]. Additionally, many
+datasets (e.g., [3], [4], [16]) omit critical TTPs used in real
+attacks [23]–[26]; for example,T1059 (Command Execution
+Attacks) is missing from ENISA [16] despite frequent CVE
+mentions [23], [24]. This limits the effectiveness of models
+[18]–[20] and affects both supervised and unsupervised ap-
+There are thousands of new vulnerabilities (e.g., 12,009 
+vulnerabilities in Q1 of 2025 [1] ) reported every year through 
+the Common Vulnerabilities and Exposures (CVE) program. 
+However, those CVE descriptions  do not include much details 
+on how  those vulnerabilities can be exploited. In contrast, 
+MITRE ATT&CK framework [2] deﬁnes various attack tactics, 
+techniques, and procedures (TTP), but does not link them to 
+speciﬁc vulnerabilities. Bridging this gap by automatically 
+mapping CVEs to TTPs can signiﬁcantly help both in detecting 
+and mitigating security threats [3], [4].
+Existing efforts to map CVE descriptions to TTPs fall into 
+two categories. Supervised approaches (e.g., [5]–[8]) map CVE 
+descriptions to TTPs by training classiﬁcation models on 
+labeled datasets to predict TTPs for new sam-ples. 
+Unsupervised approaches use language models (e.g.,[3], [9], 
+[10]) and graph-based methods (e.g., [11]–[13]) to infer 
+relationships between CVEs (or other threat reports) and TTP 
+deﬁnitions based on semantic similarity, structural
+Network and Distributed System Security (NDSS) Symposium 2026
+23-27 February 2026, San Diego, CA, USA
+ISBN 979-8-9919276-8-0
+https://dx.doi.org/10.14722/ndss.2026.242926
+www.ndss-symposium.org

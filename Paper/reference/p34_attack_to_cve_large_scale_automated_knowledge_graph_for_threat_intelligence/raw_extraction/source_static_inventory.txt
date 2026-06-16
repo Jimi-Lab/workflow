@@ -1,0 +1,34 @@
+paper_id: p34_attack_to_cve_large_scale_automated_knowledge_graph_for_threat_intelligence
+artifact_type: Type C - paper plus local data/document artifact; full implementation source not detected
+pdf_path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\RelatedWork_VulnVersionValidation\AttackPerspective\ATT&CK to CVE：A Large-Scale Automated Knowledge Graph for Threat Intelligence.pdf
+local_artifact_path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\RelatedWork_VulnVersionValidation\AttackPerspective\attack_to_cve-master\attack_to_cve-master
+source_code_path: [NEEDS ARTIFACT] no local Neo4j ingestion/pipeline source code matching the paper was detected in the requested target set.
+static_only_boundary: [EXECUTION NOT REQUESTED] no code, queries, graph database, data download, or reproduction step was executed.
+
+Detected local artifact layout:
+- README.md: describes using MITRE ATT&CK to characterize CVE impact and notes that mappings have migrated to CTID's Mappings Explorer.
+- methodology.md: defines a structured mapping methodology with Exploitation Technique, Primary Impact, and Secondary Impact categories; describes vulnerability-type, functionality, and exploit-technique mapping methods.
+- Att&ckToCveMappings.csv: CSV with fields CVE ID, Primary Impact, Secondary Impact, Exploitation Technique, Uncategorized, Phase.
+- getting-started.md and CONTRIBUTING.md: documentation for users/contributors.
+- Images: cve-to-attack-sentence.png, cve-to-attack-no-secondary-impact.png, cve-2018-17900-mapping-example*.png.
+
+Paper evidence from PDF:
+- The paper proposes an automated cybersecurity knowledge graph pipeline ingesting CVE/CVSS from NVD, MITRE CWE, CAPEC, and ATT&CK into Neo4j.
+- It reports large-scale graph entities including CVE, ATT&CK attack pattern, CWE, CAPEC, malware, course-of-action, intrusion set, tool, tactic, data source, and related relationships.
+- It demonstrates multi-hop traversal from CVE to CWE to CAPEC to ATT&CK and reverse traversal from ATT&CK to CVEs.
+
+Artifact consistency:
+- The local CTID-style artifact is useful background for ATT&CK-to-CVE impact categories and manual/curated mapping fields.
+- It is not sufficient evidence for the paper's automated Neo4j ingestion code, daily synchronization, graph construction scripts, or link-discovery implementation. [NEEDS ARTIFACT]
+
+Useful for VulnVersion:
+- Transferable mapping vocabulary: Exploitation Technique, Primary Impact, and Secondary Impact can help describe why a CVE matters to defenders.
+- Transferable graph schema idea: CVE -> CWE -> CAPEC -> ATT&CK is a cross-taxonomy path that can be linked to VulnVersion's CVE -> patch -> code entity -> version/release graph.
+- Not directly sufficient for affected-version identification because it maps vulnerability records to attack techniques, not software release/tag containment.
+
+Known gaps:
+- [NEEDS ARTIFACT] implementation source for the automated knowledge-graph pipeline was not found locally.
+- [NEEDS TABLE REPAIR] PDF contains table-like numeric/entity summaries but table extraction did not produce citation-ready structured tables.
+- [NEEDS FIGURE EXTRACTION] PDF figures and local PNG diagrams need manual verification before visual-detail claims.
+- [NEEDS CITATION VERIFICATION] publication venue/date/DOI are not verified in this pass.
+- [EXECUTION NOT REQUESTED] no reproduction or graph database execution.

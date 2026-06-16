@@ -1,0 +1,76 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 387
+Fig. 5. The vulnerable statements extracted by different methods.
+TABLE IV
+PERFORMANCE OF LLMSI N VULNERABILITY LOGIC COMPREHENSION
+Method (Tool) Avg #Vuln Stmts 1 Precision Recall F1
+Static Analysis (Joern) 22.64 0.435 0.544 0.483
+LLM (DeepSeek) 11.33 0.742 0.796 0.768
+Static Analysis + LLM
+(Joern + DeepSeek) 5.66 0.918 0.945 0.931
+1 The average count of extracted vulnerable statements for each CVE.
+LLM Only. The approach of LLM Only (DeepSeek) involves
+inputting the entire function int o the model for analysis. As
+illustrated in Table V(b), DeepSeek alone (with Few-shot +
+CoT strategies) achieves an F1 score of 0.739, which is 18.7%
+lower than the Joern + DeepSeek combination (0.926). This
+performance gap primarily stems from LLM’s tendency to in-
+clude a broader range of contextual information when given an
+entire function as input, this over-inclusion of context leads to
+lower precision because some of which are tangential to the
+core vulnerability logic. As illustrated in Fig. 5(b), using only
+LLM improves upon static analysis by reducing the extraction
+of irrelevant control ﬂow statements. However, when given
+the entire function as input, the LLM struggles to precisely
+differentiate between core vulnerability-related code and con-
+textual information. This results in the inclusion of some noise,
+such as variable deﬁnitions (Line 1) and unrelated control ﬂow
+statements (Lines 4, 7-8).
+As shown in Fig. 5(c), the combination of Joern’s structured
+analysis with DeepSeek’s code understanding allows for a more
+focused and accurat e extraction of vulner ability-related state-
+ments. Joern provides an initial set of potentially relevant state-
+ments based on program structure, which DeepSeek then reﬁnes
+using its contextual understanding, resulting in a more balanced
+and effective approach to vulner ability logic comprehension.
+2) LLM Performance, Consistency, and Generalization: We
+further evaluated the LLM component by comparing different
+models and analyzing their st ability and ability to generalize.
+TABLE V
+VERCATION WITH DIFFERENT STRATEGIES
+Model Strategy Precision Recall F1 score
+GPT-4
+Zero-shot 0.708 0.823 0.761
+Few-shot 0.892 0.907 0.899
+Few-shot + CoT 0.893 0.946 0.925
+CodeLlama
+Zero-shot 0.671 0.789 0.725
+Few-shot 0.851 0.895 0.873
+Few-shot + CoT 0.842 0.912 0.876
+DeepSeek-V3
+Zero-shot 0.769 0.827 0.797
+Few-shot 0.882 0.921 0.901
+Few-shot + CoT 0.918 0.945 0.931
+Comparative Performance. Table V illustrates the perfor-
+mance of combining the dangerous ﬂows extracted by the Joern
+parser with LLMs on our dataset, with the “Strategy” col-
+umn delineating different prompting strategies. Our observa-
+tion reveals that DeepSeek-V3 prompted with Few-shot and
+CoT surpasses other models. Speciﬁcally, DeepSeek-V3 (Few-
+shot + CoT) exhibits a 0.64% and 6.28% improvement in F1-
+score compared to the GPT-4 and CodeLlama, respectively.
+Moreover, the performance trends with DeepSeek remain con-
+sistently upward across different prompting strategies. When
+prompted with the Few-shot prompt, DeepSeek achieves a
+13.15% improvement in F1-score over the Zero-shot prompt.
+This is further improved by 3.33% F1 with the addition of CoT
+prompting. We observed that the utilization of the Zero-shot
+prompt often results in an increased generation of false positives
+(vulnerable statements), including the statements predeﬁning
+patch variables (e.g., Line 6 in Listing 1). Conversely, in ex-
+amples prompted by Few-shot, we prioritize understanding the
+triggering mechanisms o f vulnerabilities, thereby facilitating
+LLM in learning a more accurate method of generating vul-
+nerability logic.
+LLM Consistency Analysis. To evaluate the stability of our
+LLM-based vulnerable statement extraction, we measured two
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

@@ -1,0 +1,24 @@
+6 Discussion
+6.1 Failure Analysis
+We conduct a qualitative error analysis on a sample of 50 incor-
+rect cases from Apache, GitHub, and Linux. The dominant failure
+mode is misattribution among plausible related commits. Specif-
+ically, 24/50 errors are local semantic misattributions, where the
+agent identifies a nearby plausible commit but fails to trace back to
+the earliest bug-inducing commit, and 11/50 stop at later related
+commits (e.g., propagation, follow-up, or refactoring steps).
+Cross-file localization misses account for 5/50 cases, indicating
+limited pivoting beyond the fix-side file history in some instances.
+Empty-output failures are less frequent (8/50) but involve substan-
+tially longer trajectories, suggesting continued exploration without
+successful convergence. Notably, 40/50 errors are assigned high
+confidence, indicating that the remaining challenge lies in precise
+historical attribution rather than repository exploration.
+These patterns are illustrated by representative cases. In an
+Apache case,3 the agent remained anchored to the fix-side file
+history and selected a plausible blame-linked commit instead of
+the true cross-file origin. In a GitHub case 4https://github.com/
+sebastiaanschool/sebastiaanschool-Android/commit/2454879bfb the
+agent chose a highly relevant but later related commit rather than
+the earliest introducing one. In a Linux ghost commit case,5 weak
+fix-side signals led to a high-confidence but non-earliest attribution.

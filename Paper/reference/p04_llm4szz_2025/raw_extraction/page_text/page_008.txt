@@ -1,0 +1,49 @@
+ISSTA016:8 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+To assess the LLM’s ability to determine whether the bug exists, we need two versions of the
+program: one containing the bug and another where it has been fixed. Therefore, an ideal approach
+is to make use of the bug-fixing commit𝐶𝑓 𝑖𝑥, where the version𝐶𝑓 𝑖𝑥∧1 is buggy and version𝐶𝑓 𝑖𝑥 is
+correct. Although we can directly require the LLM to assess whether the commit is buggy based on
+the root cause of the bug, experimental results indicate that this approach yields low performance
+(see section 4). Instead, we first require the LLM to generate a hint to assist in determining whether
+the commit contains the bug. The hint includes detailed information about the code statements in
+the patch. Its further specifics will be provided later in this section. Then, we separately feed the
+hint and the bug-related contexts extracted from commit 𝐶𝑓 𝑖𝑥 and 𝐶𝑓 𝑖𝑥∧1 to the LLM, asking it to
+identify whether each version contains the bug. If the LLM even cannot identify the two versions
+correctly using its own produced hint, we regard that the LLM is unable to comprehend the bug,
+let alone select the final bug-inducing commit from a set of candidates.
+As shown in Figure 3, the entire context-enhanced assessment process consists of four steps,
+which are as follows:
+❶ Context Expanding: First, we provide the LLM with sufficient context through a process
+that we call context expanding. Previous studies have found that the contextual code is crucial for
+providing information to the model [Chen et al . 2019; Xia et al. 2023]. However, the bug-fixing
+commit often does not contain the full content of the changed functions. The partial content of
+functions in the fixing commit may hinder the LLM’s ability to understand both the functions and
+the modifications. Therefore, for each modified function, we expand its context by extracting the
+full content of both buggy and fixed versions and generating their diffs. For modified lines outside
+the function, we expand their context by extracting three unmodified lines around them. We have
+presented an example of context expanding in the second motivation example, as illustrated in
+Figure 2. Specifically, the code highlighted in blue represents new additions, and the others are
+collected from the original patch. As indicated in Section 2.2, the buggy code this.instanceName
+= clientConf.get(ClientProperty.INSTANCE_NAME)is not located in the original patch but in
+the expanded context, indicating the necessity of the context expanding.
+❷ Hint Generation: Next, we require the LLM to establish a hint to determine whether the bug
+exists in a commit. Specifically, we ask the LLM to identify the code statements leading to the bug
+and provide a reason. Additionally, we require the LLM to identify the code statements that fix the
+bug and provide a reason. Note that we do not limit the LLM to choosing code statements only
+from deleted lines. It can select any code statements from the expanded context.
+❸ Context Refinement: Before assessing the LLMs’ ability to determine whether the bug exists
+in a commit, we need to refine the expanded context to obtain the refined context. This step is
+necessary because the expanded context may contain much irrelevant content that is not related
+to the bug. For example, the expanded context might include an entire function with hundreds of
+lines, while only a few lines are relevant to the bug. Feeding the expanded context directly to LLMs
+may undermine their ability to assess the existence of the bug in a commit, as previous studies [Li
+et al. 2023a] suggest that LLMs struggle with intricate tasks when handling long texts. Therefore,
+we attempt to refine the expanded context. We first extract the buggy statements identified in the
+hint from the file in commit 𝐶𝑓 𝑖𝑥∧1. These buggy statements are then sorted in ascending order
+based on their line numbers {𝑙1, 𝑙2, ... 𝑙𝑛 } in commit 𝐶𝑓 𝑖𝑥∧1, where 𝑙1 is the smallest line number
+and 𝑙𝑛 is the largest. Here, we define 𝑙𝑚𝑖𝑛 as 𝑙1 −𝑁 and 𝑙𝑚𝑎𝑥 as 𝑙𝑛 +𝑁. N is a constant starting from
+3 to ensure that lines 𝑙𝑚𝑖𝑛 and 𝑙𝑚𝑎𝑥 can be mapped to corresponding lines in commit 𝐶𝑓 𝑖𝑥. If line
+𝑙𝑚𝑖𝑛 or line 𝑙𝑚𝑎𝑥 cannot be mapped, we keep incrementing N. Then, we extract the content ranging
+from the line number 𝑙𝑚𝑖𝑛 to the line number 𝑙𝑚𝑎𝑥 , forming the refined context for commit 𝐶𝑓 𝑖𝑥∧1.
+To obtain the refined context for commit𝐶𝑓 𝑖𝑥, we map lines 𝑙𝑚𝑖𝑛 and 𝑙𝑚𝑎𝑥 to their corresponding
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

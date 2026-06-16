@@ -1,0 +1,118 @@
+associated with each version of the TPLs in the component
+segment. As some developers may patch vulnerabilities on
+their own without updating TPL versions, TPLFILTER assesses
+security patches, instead of TPL version, to identify whether
+a vulnerability affects the target program. Hence, TPLF ILTER
+collects security patches of each collected vulnerability, and
+compiles these vulnerabilities and their respective security
+patches in the vulnerability segment.
+Vulnerability detail collection. As the majority of vulnera-
+bility reports are typically listed on CVE and NVD, V ULTURE
+crawls the vulnerability reports from these websites. Within
+these reports, each vulnerability is assigned a unique CVE ID
+for identification and is described using a CPE (Common Plat-
+form Enumeration) to specify the software versions affected.
+Given each TPL stored in the component segment, V UL-
+TURE first filters the vulnerability reports whose descriptions
+contain the TPL name at a coarse level by invoking the
+NVD API with keywordSearch1 . Nonetheless, vulnerabil-
+ity descriptions encompass not only the names of vulnerable
+libraries but also the names of other software impacted by these
+vulnerable libraries, rendering keyword searches less precise.
+Therefore, VULTURE conducts a CPE-guided matching to filter
+vulnerability reports for effective vulnerability identification.
+Specifically, to determine whether a vulnerability affects a
+target TPL, it retrieves the CPE information in the vulnera-
+bility report and checks whether the target TPL name is the
+substring of the CPE string. If the target TPL name is matched,
+VULTURE regards that the vulnerability affects the target TPL
+and records the corresponding information of the CVE ID,
+its CPE, and the vulnerable TPL version(s). Typically, CPE
+manages the vulnerable software versions in two ways: through
+enumerations or version intervals. For enumeration, V ULTURE
+directly extracts all vulnerable version numbers. In the case
+of interval specification, V ULTURE first obtains and ranks all
+versions of a TPL in ascending order, and then determines the
+start and end versions that fall within the specific vulnerable
+version interval.
+Unfortunately, we inspected that some vulnerability reports
+are informally written, thus these vulnerabilities might be over-
+looked by keyword searches and CPE matching. To address
+such issues, V ULTURE extracts additional vulnerability reports
+from public databases including SNYK [12] and the official
+websites of TPLs [7] [4] for further detail matching.
+Security patch collection. VULTURE collects security patches
+for each vulnerability to support accurate 1-day vulnerability
+detection and examine whether a reused TPL in the target
+programs has been patched. Although CVE/NVD includes patch
+information for some vulnerabilities, a significant portion of
+the patch information is not updated timely or maintained
+properly [6], [36]. Alternatively, TPLs maintained on GitHub
+frequently release security patches as GitHub commits, which
+typically include descriptions of vulnerabilities as well as
+detailed code changes.
+To effectively and comprehensively obtain the vulnera-
+bility patches, V ULTURE constructs an LLM-based multi-
+sliced patch searching approach to locate the specific security
+1https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={*}, where
+element * refers to the name of the target TPL.
+patches of each vulnerability. Given the CVE description main-
+tained by CVE/NVD and the repository commits maintained by
+GitHub of each TPL, V ULTURE proceeds with the following
+four steps:
+1) LLM-based description parsing: The vulnerability detail
+provided by CVE/NVD typically consists of the vulnerability
+description (e.g., vulnerability type, vulnerable files, vulnerable
+functions, vulnerable variables, and some specific vulnerable
+features), and CPE describing the affected TPL information
+(e.g., vendor(s) of the TPL, TPL name and versions). Corre-
+spondingly, VULTURE employs a LLM by invoking GPT3.5 to
+parse the vulnerability description and then extracts the vul-
+nerable elements affected by the vulnerability, i.e., vulnerable
+files, vulnerable functions, and vulnerable variables.
+2) Slice-based commit filtering: As a vulnerable TPL repos-
+itory may contain numerous commits that cover document
+changes, routine common bug fixes, feature modifications, and
+vulnerability patches, it is time-consuming and error-prone
+to analyze those commits one by one. Therefore, V ULTURE
+conducts a date-specific commit slicing to exclude the commits
+confirmed to be irrelevant to the vulnerabilities at a coarse-
+grained level. Specifically, V ULTURE first identifies all the
+vulnerable versions from the vulnerability description and CPE
+information. Since the version released immediately after the
+last vulnerable version is typically the first patched version
+of a vulnerability, V ULTURE extracts the timestamps of when
+the last vulnerable version and the first patched version were
+published. Correspondingly, all the commits generated within
+the time range between these two timestamps are considered
+as potential patch commits. Then, it divides the potential patch
+commits into multiple slices based on average partitioning
+(i.e., each slice contains k commits. Within each slice i,
+VULTURE calculates a code diff diffi between the first and the
+last commits. If diffi contains any of the vulnerable elements,
+VULTURE labels the slice i as a candidate slice, indicating that
+at least one commit within this slice contains modifications
+related to vulnerability-specific code elements. Otherwise, it
+continues analyzing the next slice i + 1.
+3) Candidate commit selection: After locating the candidate
+slice, V ULTURE performs fine-grained analysis to select the
+candidate commits that are related to the vulnerability. It
+compares vulnerable code with each patch to generate a code
+diff. If the code diff includes any of the vulnerable elements,
+VULTURE labels the commit as a candidate commit and
+advances to step (4) for further confirmation.
+4) LLM-based patch commit mapping: VULTURE employs
+LLM to confirm the patch commits. On one hand, some
+commits within the candidate commits may also modify the
+vulnerable elements yet are not the patch regarding the target
+vulnerability, requiring V ULTURE to exclude these commits;
+on the other hand, some CPE information provided by NVD
+is incorrect [24] which may lead to false alarms. To address
+the challenges, V ULTURE takes as input the CVE description
+and each candidate commit (i.e., commit description and the
+modified code), and invokes GPT4.0 to infer whether the CVE
+and the commit are relevant. It is important to note that only
+minor candidate commits are needed to be analyzed here, thus
+GPT4.0 incurs minimal costs to calculate the correlations.
+A detailed example of patch commit mapping is illustrated
+6

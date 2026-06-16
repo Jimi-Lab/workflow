@@ -1,0 +1,113 @@
+390 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+can be addressed by AST normalization. Although FCDetector
+also extracts AST as a feature and normalizes variable names
+and constant values, it cannot identify function outline cases (as
+shown in Listing 2). Moreover, the CFG features that FCDetec-
+tor focuses on are not particularly effective when there are only
+a few vulnerable statements.
+2) Analysis of Refactoring Commits: As motivated in Exam-
+ple 2 of Section II-C, refactoring commits can signiﬁcantly im-
+pact vulnerable version identiﬁcation by introducing structural
+differences while preserving code behavior. To validate this
+motivation and evaluate the effectiveness of our code clone de-
+tection approach, we analyzed the commits encountered during
+our evaluation. In the backtrack of our dataset, we conducted a
+total of 276 comparisons between pre-commit and post-commit.
+On average, it takes 3.73 comparisons to identify the vic for
+each vfc. During the commit backtrack, cases with signiﬁcant
+edit-distance differences (θ
+1 <0.9) but minor AST differences
+(θ2 ≥0.8) were classiﬁed as refactoring commits. Out of these
+comparisons, 89 commits (32.2%) were identiﬁed as refactoring
+commits, indicating that refactoring commits are a signiﬁcant
+factor in backtracing vic. Furthermore, our analysis reveals that
+cases without any intermediate commit between the vic and
+the vfc are comparatively uncommon, constituting only 11% of
+instances in our dataset.
+3) Threshold Sensitivity: We used ϑ
+1 and ϑ2 to represent the
+threshold for edit-distance similarity and AST-based similarity,
+respectively. ϑ
+3 represents the similarity_score used for the
+backtrack termination condition. To measure the sensitivity of
+the thresholds, we incrementally increased ϑ1, ϑ2 and ϑ3 by
+0.1 from 0 to 1, and evaluated the identiﬁcation F1-score of the
+CVEs in ground-trut h. Speciﬁcally, we ﬁrst initialized ϑ2 and
+ϑ3 to 0.8, as high similarity thresholds generally provide better
+precision in code clone detection. Then we varied ϑ1 from 0.1
+to 1.0 with a step of 0.1 and found the value ofϑ1 that achieved
+the highest F1-score (0.9). With ϑ1 ﬁxed at 0.9 and kept ϑ3 at
+0.8, we varied ϑ2 from 0.1 to 1.0 and found the optimal value
+(0.8). Finally, with ϑ1 = 0.9 and ϑ2 = 0.8, we varied ϑ3 from
+0.1 to 1.0 and determined the optimal value of ϑ3 (0.7). When
+the thresholds are greater than the optimal values, the precision
+is higher while the recall decreases. In contrast, the precision
+slightly decreases.
+RQ3: Refactoring commits occupy a signiﬁcant proportion
+of the code changes history. The AST-based similarity com-
+parison in Vercation performs better in the vulnerability-
+introducing commit identiﬁcation task for calculating code
+similarity, enhancing the overall effectiveness of Vercation
+in vulnerable versions detection.
+D. RQ4: Real-World Application
+We created a new vulnerability dataset consisting of 342
+CVEs from the NVD. By developing a simple crawler, we
+obtained the corresponding CPE and CVE patches. We applied
+VERCATION to the vulnerability dataset and found the vulnera-
+ble versions of 202 CVEs are incorrect. Among them, the CPE
+for 134 CVEs is incomplete, with 108 CVEs only reporting a
+single vulnerable version, signiﬁcantly increasing the risk of
+vulnerability propagation. Furt hermore, the CPE for 68 CVEs
+is affected by the overinclusion problem, with 56 CVEs con-
+sidered all versions before the OSS version mentioned in the
+vulnerability report as susceptible to attack, without conducting
+a detailed analysis. We hav e submitted reports to the NVD
+detailing the CVEs with incorrectaffected versions information
+we identiﬁed. The NVD team’s response said they plan to
+address these inaccuracies as part of their ongoing efforts to
+enhance the quality of their vulner ability information. More
+importantly, we have discovered 4 CVEs that do not provide
+information about the vulnerable version.
+To understand the practical impact of accurately identifying
+vulnerable versions, we analyzed the severity of 134 vulnerabil-
+ities with incomplete version in formation in the NVD dataset.
+The analysis shows that CVEs with CVSS Score of 4.0-6.9
+(Medium) and 7.0-8.9 (High) accounted for the most, at 49.7%
+and 49.1%. Notably, we identiﬁed 2 critical vulnerabilities
+(CVSS Score 9.0-10.0) in FFmpeg and php. These ﬁndings
+highlight that in many high-severity vulnerabilities, NVD does
+not report the correct vulnerable version. This inaccuracy has
+serious implications, as downstream software manufacturers
+may not recognize the need to update their vulnerable depen-
+dencies in time, exposing their systems to signiﬁcant security
+risks. Vercation’s high accuracy in identifying vulnerable ver-
+sions therefore helps organizations improve the accuracy of
+vulnerability reports.
+RQ4: Applying Vercation to real-world CVEs demonstrated
+practical impact in two key ﬁndings: it identiﬁed 202 CVEs
+(59.1%) with incomplete or overincluded versions in NVD
+reports. Notably, nearly half of the vulnerabilities with incor-
+rect versions were of high or critical severity, emphasizing
+the importance of accurate version identiﬁcation.
+VI. D ISCUSSION
+A. Performance and Cost Analysis
+In terms of performance efﬁciency, V ERCATION analyzes
+each vulnerability in an averageof 28.61 seconds. This includes
+the time for program slicing, LLM processing, and AST-level
+code clone detection. Compared to existing approaches: V-SZZ
+takes 10.25 seconds on average, V0Finder requires approxi-
+mately 22 seconds per CVE, Vision needs 1,094.12 seconds per
+vulnerability, and V1SCAN can detect vulnerabilities within 20
+seconds for 99% of projects. While VERJava performs faster at
+0.71 seconds per CVE, it achieves much lower recall in version
+identiﬁcation. Compared to other methods, Vercation achieves
+higher accuracy without signiﬁcant time overhead.
+The best LLM DeepSeek-V3 in our evaluation, whose API
+pricing is $0.30 per million t okens for input and $1.10 per
+million tokens for output. Basedon our experimental setup with
+10 independent runs for self-consistency, the average LLM API
+cost per CVE is only $0.0034. This cost includes: input tokens
+for CVE descriptions, dangerous ﬂows, and few-shot examples,
+output tokens for logic explanation, and vulnerable statements.
+The low cost allows the LLM’s application in practical security.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

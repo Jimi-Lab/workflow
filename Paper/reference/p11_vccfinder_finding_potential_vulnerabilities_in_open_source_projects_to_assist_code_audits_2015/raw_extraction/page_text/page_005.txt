@@ -1,0 +1,84 @@
+mean mean
+Feature Scope VCCs others U eﬀect size
+Number of commits Repository 282 171 .39 103 980 .95 32143126* 40 %
+Number of unique contributors Repository 524 .99 236 .90 30528184* 43 %
+Contributions in project Author 5 % 15 % 31263040* 42 %
+Additions Commit 306 .19 71 .54 20215148* 62 %
+Deletions Commit 73 .93 37 .46 42983290* 20 %
+Past changes Commit 627 .17 385 .53 40715632* 24 %
+Future changes Commit 792 .46 396 .63 36261346* 33 %
+Past diﬀerent authors Commit 40 .16 22 .70 40292116* 25 %
+Future diﬀerent authors Commit 136 .58 51 .44 29534644* 45 %
+Hunk count Commit 17 .68 9 .88 32348343* 40 %
+Commit message 1 Commit - - - -
+Commit patch 1 Commit - - - -
+Keywords 2 Commit - - - -
+Added functions Function 6 .51 1 .03 28724694* 46 %
+Deleted functions Function 1 .07 0 .49 50084674* 7 %
+Modified functions Function 6 .79 3 .59 41446509* 23 %
+1 These features are text-based and thus not considered in the statistical analysis.
+2 See Table 2 for a statisical analyis of each keyword.
+Table 1: Overview of the features and results of the statistical analysis of the numeric
+features. Mann-Whitney U test significant (*) if p< 0.00059.
+for project-scoped features. In the following, we discuss the
+features. For brevity reasons, we omit the discussion of self-
+explaining features here.All our analyses are based on com-
+mits. A commit can contain changes to one or more files.
+The metrics about files and functions are aggregated in the
+corresponding commit.
+Features scoped by project are obviously the same for ev-
+ery commit in that project. However, in combination with
+other commit-based features, these can still become relevant.
+3.2.1 Features Scoped by Project
+Programming language The primary language the pro-
+ject is written in, as determined by GitHub through
+their open-source linguist library. In our analysis, we
+focused on projects written in either C or C++. The
+main reason for limiting our focus to one language was
+that we wanted to ensure comparability between the
+features extracted from the commit patches. When
+mixing diﬀerent languages and syntaxes, this can’t be
+ensured. We chose C and C++ specifically since many
+security-relevant projects (Linux, Kerberos, OpenSSL,
+etc.) are written in these languages.
+Star count (number) The number of stars the project
+has received on GitHub. Stars are a user’s way of keep-
+ing track of interesting projects, as starred projects
+show up on the own profile page.
+Fork count (number) To fork a project on GitHub means
+copying the repository under your personal namespace.
+This is often the first step to contributing back to the
+project by then making changes under the personal
+namespace and sending a pull request to the oﬃcial
+repository.
+Number of commits (number) We counted the number
+of commits that are reachable from the main branches
+HEAD. The canonical main branch is “master”, but
+some projects like bestpractical/rt use “stable” as the
+default branch. In those cases we used the branch set
+at GitHub by the maintainer of the project.
+3.2.2 Features Scoped by Author
+Contributions (percentage) How many commits the au-
+thor has made in this project in percent, i.e. the num-
+ber of commits authored divided by the number of to-
+tal commits.
+3.2.3 Features Scoped by Commit
+Number of Hunks (number) As a hunk is a continuous
+block of changes in a diﬀ, this number assesses how
+fragmented the commit is (i.e. lots of changes all over
+the project versus one big change in one file or func-
+tion).
+Patch (text) All changes made by the commit as text rep-
+resented as a bag of words.
+Patch keywords (number) For each patch, we counted
+the number of occurrences of each C/C++ keyword.
+See Table 2 for a statistical analysis of the diﬀerent
+distributions of each keyword.
+3.2.4 Features Scoped by File
+Future changes (number) If the commit at hand is not
+the most current one, this is the number of times the
+file will be changed by later commits. We only use
+this feature for our historical analysis and not for the
+classifier, since this feature is naturally not available
+for new commits.
+430

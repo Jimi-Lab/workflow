@@ -1,0 +1,107 @@
+[
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2221",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:002",
+    "block_type": "text",
+    "text": "Fig. 1.\nThe motivating example of Tracing-Commit SZZ.",
+    "bbox": [
+      37.58,
+      253.63,
+      232.41,
+      262.53
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:003",
+    "block_type": "text",
+    "text": "recent change, but are rather concealed deeper in the change\nhistory.\nTo facilitate this exploration, we propose the Tracing-\nCommit SZZ (TC-SZZ) algorithm, which iteratively uses git\nblame until the initial commit is located, and then considers\nall commits in the change history as potential bug-inducing\ncommits. Unlike all previous SZZ variants which identify only\na single bug-inducing commit for a deleted line. This favors\nrecall, but may increase the number of false positives as it\nreturns commits in the line’s change history that are not relevant\nto the bug. For example, as shown in Fig. 1, TC-SZZ returns\nall ﬁve commits in a line’s change history as potentially bug-\ninducing commits, successfully identifying commit 40747f as\nthe bug-inducing commit. In contrast, B-SZZ only considers\nthe previous commit. Applying TC-SZZ to the 17,552 cases\nthat are not detected by the SZZ algorithms but do not in-\nvolve ghost commits revealed that 3,115 out of the 17,552\nfailure cases (17.7%) are located in the change history and\nnot the most recent change. Algorithms that skip over refac-\ntoring changes have the potential to identify such bug intro-\nducing commits more accurately, but refactoring detection is\nlanguage speciﬁc, and such approaches have only been devel-\noped for Java [29], [30], while the Linux kernel is entirely\nC code.\nFor the remaining 14,437 bug-ﬁxing commits, 34.6% of the\nfailure cases are found in the function history but not in the\nhistory of the lines that are changed by the bug-ﬁxing commit.\nThis means that the bug-inducing commit can be identiﬁed\nby applying git log -L on the changed functions (referred to\nas Function-Log Detection). For detailed examples, refer to\nSection VI-C. Additionally, 27.5% of failure are found in the ﬁle\nhistory but not in the history of the changed functions in that ﬁle.\nHere, the bug-inducing commit can be found by applying git\nlog to the changed ﬁles (referred to as Within-File Detection).\nFinally, 37.9% of failure are in the history of a ﬁle other than\nthe changed ﬁles (referred to as Cross-File Detection).\nExperiments with ChatGPT: For the Function-Log De-\ntection, Within-File Detection, and Cross-File Detection cases,",
+    "bbox": [
+      37.58,
+      290.94,
+      288.65,
+      744.4
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:004",
+    "block_type": "text",
+    "text": "where the bug-inducing commit is not in the history of the\nlines changed by the bug-ﬁxing commit, we experiment with\nChatGPT. As ChatGPT has exhibited potential in addressing\nSoftware Engineering tasks [31], [32], we consider whether\nChatGPT, speciﬁcally the GPT-4 version, can help SZZ algo-\nrithms identify bug-inducing commits for these failure cases.\nSpeciﬁcally, we use the commit log subject and body of the bug-\nﬁxing commit, as well as all of the changed function’s code,\nas input for ChatGPT. For Within-File Detection and Cross-\nFile Detection, we leverage ChatGPT to help locate the bug-\ninducing function or ﬁle based on the bug-ﬁxing commit, since\nthe function or ﬁle responsible for the bug is not known from\nthe bug-ﬁxing commits. Our aim is for ChatGPT to pinpoint\nthe speciﬁc line of code in the function that may have induced\nthe bug and thus caused the bug-ﬁxing commit. Given this\nline of code, we can then apply an iterated git blame to it\nto identify the bug-inducing commits. On 375 samples, for\nidentifying bug-inducing commits Function-Blame Detection\n(a subcategory of Function-Log Detection, using git blame once\nfor identifying the bug-inducing commit), ChatGPT showed\nincreased efﬁcacy in recall (with a precision of 0.28, recall\nof 0.62, and F1 of 0.39). However, when it came to dealing\nwith failure cases both in and out of the ﬁle history, ChatGPT’s\nperformance was notably less successful. This is partly due to\nthe challenge of a general-purpose Large Language Model in\ninferring function names or ﬁles not explicitly referenced in the\nbug-ﬁxing commit.\nOverview: In summary, our paper makes the following\ncontributions:\n• Dataset Creation. We identify the Linux kernel as a data\nsource and collect a developer annotated and validated\ndataset of over 76K bug-ﬁxing commits, which we have\nmade publicly available.1",
+    "bbox": [
+      300.59,
+      63.8,
+      551.66,
+      457.49
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:005",
+    "block_type": "text",
+    "text": "• Evaluation. We conduct a comprehensive evaluation of\nsix SZZ algorithms, revealing hidden dangers in real-world\nusage scenarios and analyzing the impact of ghost commits\non the Linux kernel dataset.\n• Further Analysis. We show that by utilizing TC-SZZ, we\ncan address 17.7% of the failure cases. We classiﬁed the\nremaining failure situations as Function-Log Detection,\nWithin-File Detection, and Cross-File Detection.\n• ChatGPT Efﬁcacy Assessment. We investigate the efﬁ-\ncacy of ChatGPT in identifying bug-inducing commits in\nthe three failure situations.\nThe rest of this paper is organized as follows. In Section II,\nwe discuss the background and related work of our study.\nIn Section III, we discuss how we build the dataset of bug-\ninducing commits. Section IV presents the design of our study.\nSection V introduces TC-SZZ. In Section VI, we show the eval-\nuation results and answer our research questions. In Section VII,\nwe explore the potential of ChatGPT to identify bug-inducing\ncommits. Section VIII discusses the reason of SZZ failures.\nWe discuss the threats to validity in Section IX. Finally, we\ndraw the conclusions of our work and present future directions\nin Section X.",
+    "bbox": [
+      300.6,
+      457.94,
+      551.67,
+      720.49
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:006",
+    "block_type": "text",
+    "text": "1https://doi.org/10.6084/m9.ﬁgshare.23889792.v2",
+    "bbox": [
+      308.57,
+      734.04,
+      468.68,
+      743.96
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 3,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:003:007",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

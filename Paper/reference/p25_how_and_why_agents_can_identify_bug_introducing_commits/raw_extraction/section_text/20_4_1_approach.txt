@@ -1,0 +1,30 @@
+4.1 Approach
+Figure 2 shows an overview of Simple-SZZ-Agent. Given a fix com-
+mit, the approach collects the commit histories of all files modi-
+fied by the fix, forming a single candidate set. It then provides an
+LLM-based agent with the fix commit message, the fix commit diff,
+and the full candidate set. The agent has access to standard devel-
+oper tools (file reading, grep, glob) and is instructed to identify the
+bug-introducing commit. Since our ablations showed that omitting
+binary search improves both performance and cost (RQ2e), and that
+Stage 1 alone contributes less than Stage 2 (RQ2d), Simple-SZZ-
+Agent removes both: no SZZ-based filtering, no binary search, and
+no multi-stage pipeline—it relies entirely on the agent to find the
+bug-introducing commit among all candidates.
+4.2 Experimental Setup
+We evaluate whether Simple-SZZ-Agent can match SZZ-Agent’s
+performance and investigate why it works.
+RQ3 (Effectiveness):Can Simple-SZZ-Agent achieve a simi-
+lar performance to SZZ-Agent at identifying bug-introducing
+commits?
+RQ4 (Analysis):How can we explain the surprising success of
+Simple-SZZ-Agent?
+(a) Strategy:How can Simple-SZZ-Agent find the needle (BIC)
+in the haystack (large candidate commit set)?
+(b) Failures:Where does Simple-SZZ-Agent still fail?
+(c) Generalization:Can we expect even better results with
+better agents and/or better models?
+We use the same datasets, pre-processing, baselines, and metrics
+as in Part 1 (§3.2). Unless stated otherwise, all experiments use
+DS_LINUX-26 with Claude Opus 4.5 as the LLM backbone and
+Claude Code as the agent framework.

@@ -1,0 +1,92 @@
+III. M E T H O D O L O G Y
+Our methodology automates the collection and integration
+of heterogeneous cyber threat intelligence from CVE, CWE,
+CAPEC, and MITRE A TT&CK. Through cross-source nor-
+malization and automated upsertion into Neo4j, the system
+produces a uniﬁed, continuously updated knowledge graph that
+preserves semantic links across vulnerabilities, weaknesses,
+attack patterns, and techniques. This enables efﬁcient querying
+and analysis without manual curation (see Fig. 1).
+A. Automation Process
+T o ensure that the cybersecurity knowledge graph remains
+comprehensive, up to date, and consistent across multi-
+ple threat intelligence sources, we developed an automated
+multi-source data acquisition and integration framework. This
+framework consists of dedicated pipelines for four key
+datasets—CVE, CWE, CAPEC, and MITRE A TT&CK—that
+systematically retrieve the latest releases from their respective
+authoritative sources, process and normalize the information,
+and ingest it into a Neo4j graph database. Each pipeline
+is tailored to handle the speciﬁc data formats and update
+mechanisms of its source, enabling seamless integration while
+preserving data ﬁdelity . A lightweight scheduler orchestrates
+the execution of these pipelines on a ﬁxed daily cycle, ensuring
+that the graph continuously reﬂects the most recent threat
+intelligence without the need for manual intervention.
+The automation framework executes on a ﬁxed 24-hour
+cycle with integrated logging and error handling. On a weekly
+basis, it updates the MITRE A TT&CK dataset, while daily
+runs refresh CAPEC, CWE, and CVE (with a full CVE
+synchronization on the ﬁrst pass, followed by incremental
+updates). A TT&CK is updated weekly since its framework
+evolves more slowly , with new techniques, groups, and mit-
+igations published less frequently , whereas the other datasets
+either exhibit frequent changes or are lightweight to process–
+particularly CVE, which receives daily vulnerability disclo-
+Fig. 1. End-to-end pipeline for constructing an automated cybersecurity
+knowledge graph.
+sures. The update order follows the dependency chain—
+A TT&CK→CAPEC→CWE→CVE—since relationships orig-
+inate from CAPEC to A TT&CK, from CWE to CAPEC, and
+from CVE to CWE. This design ensures that upstream entities
+are processed before downstream links are established, keep-
+ing the knowledge graph continuously synchronized without
+manual intervention. The following narrative describes the
+dataset-speciﬁc pipelines:
+Common V ulnerabilities and Exposures (CVE) system
+is a globally recognized catalog of disclosed software and
+hardware vulnerabilities. Our framework retrieves CVE data
+from the NVD CVE 2.0 JSON feeds, initially ingesting all
+yearly archives from 2002 through 2025. After this baseline,
+the system continuously synchronizes with the “recent” and
+“modiﬁed” datasets, incorporating new or updated vulnera-
+bilities without reprocessing history . Data is downloaded, ex-
+tracted, normalized for schema consistency , and upserted into
+Neo4j, ensuring the graph always reﬂects the latest disclosures.
+Common W eakness Enumeration (CWE) catalog, curated
+by MITRE, deﬁnes recurring software and hardware weakness
+types. Unlike CVE’s instance-level vulnerabilities, CWE ab-
+stracts structural ﬂaws such as buffer overﬂows or input vali-
+dation errors. Our system downloads the CWE XML release,
+parses all Weakness entries, captures metadata, descriptions,
+and cross-references, normalizes them, and ingests the results
+into Neo4j as an updated graph representation of weaknesses.
+Common Attack Pattern Enumeration and Classiﬁcation
+(CAPEC) catalog describes adversarial attack patterns that
+exploit weaknesses. Our framework downloads the CAPEC
+archive, parses Attack_Pattern entries, and extracts meta-
+data, descriptions, and hierarchies. The processed data is
+upserted into Neo4j, producing a continuously updated attack-
+pattern entity linked directly to CWE weaknesses.
+MITRE A TT&CK framework captures tactics, techniques,
+and procedures (TTPs) across the Enterprise, Mobile, and
+ICS domains. Our system retrieves A TT&CK STIX bundles,
+extracts entities such as techniques, tactics, intrusion sets,
+tools, courses of action, etc. and processes their relationship
+objects. Data is normalized and ingested into Neo4j with typed
+edges from STIX references, producing a refreshed knowledge
+layer that spans the full A TT&CK ecosystem and supports
+graph-based analytics.
+These pipelines ensure that the cybersecurity knowledge
+graph remains comprehensive, consistent, and continuously
+synchronized with authoritative sources. By automating data
+ingestion, normalization, and integration across CVE, CWE,
+CAPEC, and A TT&CK, the framework eliminates manual
+curation and provides a reliable foundation for downstream
+analytics and reasoning tasks.
+B. Nodes, Properties, and Relationships
+This section provides a detailed overview of the properties
+collected from each source, the relationships encoded between
+them, and the overall distribution of nodes and edges within
+the constructed knowledge graph (Fig. 2).
+CVE (NVD) : The CVE pipeline collects the following

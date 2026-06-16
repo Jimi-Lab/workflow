@@ -1,0 +1,102 @@
+2232
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+Considering that GPT-4 currently has a cap of 25 messages
+every 3 hours and the manual process involved, we selected
+a sample of 375 failure cases18 (with a 95% conﬁdence level
+and 5% margin of error, following previous work [55], [56],
+[57], [58]) from the total of 14,437 identiﬁed failure cases.
+We exclude the “Line Change Detection” category because
+TC-SZZ was able to identify all bug-inducing commits in this
+group. To simplify, we do not use TC-SZZ in this section, as
+our ground truth in Section VI-C only uses git log -L.
+In Section VI-C, we classiﬁed the 14,437 failure cases into
+three categories: Function-Log Detection, Within-File Detec-
+tion, and Cross-File Detection. This section introduces an
+additional category, Function-Blame Detection, which is a
+subset of Function-Log Detection. The differentiation lies in
+the method used for identifying the bug-inducing commit. In
+the case of Function-Log Detection, the git log -L command
+is employed. This command helps in tracing the evolution of
+speciﬁc parts of a ﬁle, revealing the historical changes that led
+to the current state. For Function-Blame Detection, we utilize
+the git blame command only once. This command allows us to
+pinpoint the last change made to those lines. There are a total of
+3,200 Function-Blame Detection cases and 4,994 Function-Log
+Detection cases. For instance, consider the commit 06bbf75.19
+This commit involves a single deleted line within the function
+“process_response_list”. By applying git blame to all the lines
+of this function, we can identify the commit that initially intro-
+duced the bug. Although git log -L can also be used for this
+purpose by showing the evolution of the function over time, git
+blame speciﬁcally returns only the most recent changes.
+In our sample of 375 cases, we found that 8.5% (32 out of
+375) are Function-Log Detections (excluding Function-Blame
+Detection cases), and 25.1% (94 out of 375) are Function-
+Blame Detections. Moreover, 30.9% (116 out of 375) of the
+cases are Within-File Detections, while 35.5% (133 out of
+375) of the cases are the Cross-File Detections.
+A. Pipeline of ChatGPT Experiment
+Fig. 5 shows the pipeline of the ChatGPT experiment.
+The pipeline has three steps: (A) Cross-File Detection, (B)
+Within-File Detection (C) Function-Log (Function-Blame) De-
+tection. The prompts used in the different steps are shown
+in Table IX.
+For the Function-Log Detection cases, we use the Prompt C
+in the Table IX to query ChatGPT. Speciﬁcally, for the 〈Commit
+Message〉in the table, we use the commit log subject and body
+of the bug-ﬁxing commit. For 〈Code of the Function〉, we use
+the code of all changed functions as input for ChatGPT. Subse-
+quently, we execute git log -L on the line(s) of code suggested
+by ChatGPT to trace the bug-inducing commits. Similarly, for
+the Function-Blame Detection cases, we apply the git blame
+command to the line(s) of code that ChatGPT indicates to
+18This sample size was determined to be statistically representative using
+a popular sample size calculator (https://www.surveymonkey.com/mp/sample-
+size-calculator/) with a conﬁdence level of 95% and a 5% margin of error.
+19https://github.com/torvalds/linux/commit/06bbf753476dab23eb262cb5fba
+b6d6d277a0ba3
+Fig. 5.
+The Pipeline of the ChatGPT Experiment.
+TABLE IX
+PROMPT FOR GPT-4 IN DIFFERENT SITUATIONS
+Situations
+Template
+Prompt A:
+Cross-File
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit, which ﬁle in the Linux
+kernel could be causing this bug-ﬁxing
+commit?
+Prompt B:
+Within-File
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit and function names in
+ﬁle 〈ﬁle_name〉, which function or functions
+could be causing this bug-ﬁxing commit?
+〈Function Name List〉
+Prompt C:
+Function-Log
+(Function-Blame)
+Detection
+〈Commit Message〉
+Based on the above commit message of a
+bug-ﬁxing commit, please identify the line
+or lines of code in the following code that
+could be causing this bug-ﬁxing commit:
+〈Code of the Function〉
+identify the bug-inducing commits. To ensure fairness in the
+experiment, we remove all portions of the commit message that
+directly reference a bug-inducing commit.
+Figs. 6 and 7 show an example where ChatGPT successfully
+aids in identifying a bug-inducing commit from a Function-
+Blame Detection case.20 Initially, we query ChatGPT using the
+prompt depicted in Fig. 6. Subsequently, the line(s) of code
+returned by ChatGPT (shown in Fig. 7) are subjected to the git
+blame command to get the bug-inducing commits.
+20https://github.com/torvalds/linux/commit/761e205b559be52852d85e0db4a
+034c9f57965f9
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

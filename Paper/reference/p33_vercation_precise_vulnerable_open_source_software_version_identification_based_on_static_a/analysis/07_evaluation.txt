@@ -1,0 +1,42 @@
+Main Results:
+- These methods are hindered by imprecision due to (1) the exclusion of vulnerability- irrelevant code in the analysis and (2) the inadequacy of code clone detection.
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool.
+- • We have implemented a prototype of our approach and assessed its performance using our dataset, achieving the F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+- We also evaluated three contrasting LLMs — a commer- cial, closed model (GPT-4) and open models (CodeLlama and DeepSeek-V3) — in our approach and reported that they achieved similar performances in our context when appropriate prompting strategies were applied.
+- Ultimately, software analysts discover the vulnerability and ﬁx the code in thevfc, resulting in the ﬁnal function Ff.
+- Therefore, in our work, instead of blindly applying LLM as a standalone tool, we ﬁrst use static analysis to extract candidate vulnerability-related codes and then leverage the se- mantic capturing capabilities of LLMs to improve the accuracy of extracted codes.
+- LLMs can grasp contextual code semantics and achieve human-like understanding in code-related tasks, eliminating the reliance on predeﬁned patterns and rules utilized by traditional static analysis and automated tools.
+Per-RQ Findings:
+- [NEEDS EVIDENCE] per-RQ findings not cleanly extracted
+Ablation:
+- We conducted an ablation study using three different LLMs (GPT-4[30], CodeLlama[31], and DeepSeek-V3 [32]) to evaluate their vulnerability compre- hension capabilities.
+- Without this check, a remote at- tacker can make a crafted ﬁle with a large item_num ﬁeld such as 0xffffffff, causing a buffer overﬂow issue in the avio_read function at Line 25 and potentially leads the application to exhibit incorrect behavior or crash.
+Sensitivity Analysis:
+- [NEEDS EVIDENCE] sensitivity analysis not detected
+Case Study:
+- evaluation, encompassing 12 commonly used OSS projects, 122 Common Vulnerabilities and Exposures (CVEs), and a total of 1,211 OSS versions.
+- This dataset comprised every patch released through Git with respect to those 122 CVEs.
+- • We curated a dataset including 122 published CVEs con- taining 1,211 versions.
+- B ACKGROUND AND MOTIVATION In this section, we clarify the target problem, introduce the LLM and discuss the motivation with two examples.
+- Motivating Examples We present two examples of disclosed vulnerable code in two distinct scenarios, which motivate our work.
+- Example 1) A vulnerability in FFmpeg (CVE-2017-14169 [41]) shows the limitation of existing approaches in terms of capturing vulnerability l ogic.
+Efficiency:
+- Function timeline from vulne rability introduction to vulnerability ﬁxing.
+- They enable developers to revisit speciﬁc points on a particular date or time.
+- An illustrative timeline is presented in Fig.
+Error Analysis:
+- More importantly, during the evaluation, we found 202 version errors in the NVD reports.
+- More im- portantly, by applying our approach, we have detected 202 incorrect vulnerable OSS versions in NVD reports.
+- Without this check, a remote at- tacker can make a crafted ﬁle with a large item_num ﬁeld such as 0xffffffff, causing a buffer overﬂow issue in the avio_read function at Line 25 and potentially leads the application to exhibit incorrect behavior or crash.
+- V-SZZ only considers tracing back deleted line (Line 12) and overlooks the real vulnerability behavior, leading to incorrect identiﬁcation of vic.
+- ===== Page 004 ===== CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 379 1 diff --git a/libavformat/mxfdec.c b/libavformat/ mxfdec.c @@ -493,11 2 +493,11 @@ static int mxf\_read\_primer\_pack 3 static int 4 mxf_read_primer_pack(void *arg, AVIOContext *pb, 5 int tag, int size, 6 UID uid, int64_t klv_offset) { 7 MXFContext *mxf = arg; 8 int item_num = avio_rb32(pb); 9 int item_len = avio_rb32(pb); 10 if (item_len != 18) { 11 avpriv_request_sample(pb, "Primer pack item length %d", item_len); 12 return AVERROR_PATCHWELCOME; 13 } 14 - if (item_num > 65536) { 15 + if (item_num > 65536 || item_num < 0) { 16 av_log(mxf->fc, AV_LOG_ERROR, "item_num % d is too large\n", item_num); 17 return AVERROR_INVALIDDATA; 18 } 19 if (mxf->local_tags) 20 av_log(mxf->fc, AV_LOG_VERBOSE, "Multiple primer packs\n"); 21 av_free(mxf->local_tags); 22 mxf->local_tags_count = 0; 23 mxf->local_tags = av_calloc(item_num, item_len); 24 if (!mxf->local_tags) 25 return AVERROR(ENOMEM); 26 mxf->local_tags_count = item_num; 27 avio_read(pb, mxf->local_tags, item_num* item_len); 28 return 0; 29 \vspace*{-6pt} Listing 1.
+Statistical / Validity Notes:
+- [NEEDS CITATION VERIFICATION]
+How Claims Are Supported:
+- Claims are supported by extracted paper text and caption-level table/figure evidence only. Exact numeric claims are blocked until [NEEDS TABLE REPAIR] is addressed.
+Unsupported or Weakly Supported Claims:
+- Any claim about reproduced performance, local runtime behavior, or artifact completeness is unsupported. [EXECUTION NOT REQUESTED]; [NEEDS ARTIFACT]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Keep result claims tied to RQs and avoid transferring their metric numbers to our paper.

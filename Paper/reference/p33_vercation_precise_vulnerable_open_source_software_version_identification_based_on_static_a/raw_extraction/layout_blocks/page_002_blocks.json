@@ -1,0 +1,92 @@
+[
+  {
+    "page": 2,
+    "block_id": "page_002:block_001",
+    "block_type": "text",
+    "text": "CHENG et al.: V ERCATION : PRECISE VULNERABLE OPEN-SOURCE SOFTWARE VERSION IDENTIFICATION 377",
+    "bbox": [
+      37.58399963378906,
+      32.515296936035156,
+      551.68359375,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_002",
+    "block_type": "text",
+    "text": "snippets and identifying vulnerable versions through code clone detection of these vulnerability features. Existing methods typi- cally extract vulnerability features using static analysis in which vulnerability patterns are pre-deﬁned by human experts: some consider data and control dependencies from the patched code [12] , [13] ; some consider using hashes of entire functions [16] ; and some consider only the patch code [14] , [17] . These meth- ods generally produce many false positives or false negatives because of the inherently imprecise nature of static analysis and the incompleteness of pre-deﬁned vulnerability patterns, making it difﬁcult to distinguish vulnerability-relevant code from irrelevant code ( ➊ ). The majority of the methods for code clone detection are function-level approaches [18] whereas real- world vulnerability logic is typically conﬁned to (often a few) statements only. There are statement-level code clone detection methods but they are limited to textual signatures (such as Levenshtein algorithm [17] and hash value comparison [12] , [16] ), without taking into account the code changes that reor- ganize code while preserving its functionality. These limitations hinder the effectiveness of vulnerability detection in practical scenarios ( ➋ ). These limitations primarily stem from the lack of reason- ing about the context of the vulnerable code being analyzed. Recently, large language models (LLMs) have shown remark- able performance in various code-related tasks, including code generation [19] , [20] and code summarization [21] , [22] . This strong performance demonstrates LLMs’ capability to recog- nize code patterns and correlations at both syntactic and se- mantic levels. As such, we aim to address the ﬁrst limitation by leveraging the power of LLMs. Essentially, we hypothesize that LLMs can be leveraged to address the imprecision of static anal- ysis and the incompleteness of human-deﬁned vulnerability pat- terns ( ➊ ). However, there is a challenge of Prompt engineering in leveraging an LLM in our problem domain. The design of prompts is pivotal in directing the LLM to produce desired responses. In vulnerability comprehension tasks, well-crafted prompts should encompass the code for analysis and offer a lucid description of the analysis objectives. However, in the case of current LLMs, merely providing all the vulnerable function codes and directly instructing vulnerability analysis often yields suboptimal outcomes. When the function code is too long, the LLM’s ability to understand the relationships between distant parts of the context may diminish [23] , [24] . Hence, formulating prompts to guide LLMs in generating desired vulnerability logic analyses poses a challenge. Due to variations in programming styles, variable naming, and structural differences, code clones may manifest different changes. Furthermore, developers often streamline and refactor code through method outlining. Such code structural changes often mislead code clone detection-based approaches to incor- rectly identify the vulnerable versions. Furthermore, prior stud- ies [25] , [26] found that vulnerabilities can often be localized to a few key lines, making ﬁle- and function-level vulnerability detection overly coarse-grained. The limitation motivated us to propose a statement-level code clone detection approach to address the second limitation of current approaches ( ➋ ).",
+    "bbox": [
+      37.58203125,
+      63.788265228271484,
+      288.6993408203125,
+      732.44921875
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_003",
+    "block_type": "text",
+    "text": "Our approach. We propose V ERCATION (Vulnerable version identiﬁcation), a novel method to identify vulnerable versions of open-source C/C ++ software utilizing a symbiotic com- bination of static analysis, LLM, and code clone detection. Given a vulnerability ﬁxing commit ( vfc ), V ERCATION ap- plies program slicing to extract vulnerability-related statements as vulnerability features, leverages the capability of LLM in code understanding to reﬁne the extracted features, and per- forms semantic-level clone detection on vulnerability features in code changes. This hybrid method effectively overcomes the practical limitations of existing approaches. More speciﬁcally, V ERCATION automatically preprocess the ﬁxing commits and construct prompts based on the Few-shot and Chain-of-Thought (CoT) strategies, enabling the LLM to reason with the vulner- ability and identify the most probable vulnerable statements as features. Subsequently, V ERCATION traces earlier modiﬁcations of vulnerability features and applies a clone detection method based on expanded Abstract Syntax Trees (ASTs) to pinpoint the vulnerability-introducing commit vic . Finally, V ERCATION identiﬁes vulnerable versions between the vic and vfc .",
+    "bbox": [
+      300.59869384765625,
+      63.424713134765625,
+      551.675537109375,
+      302.0576477050781
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_004",
+    "block_type": "text",
+    "text": "Evaluation. We meticulously curated a ground-truth dataset for evaluation, encompassing 12 commonly used OSS projects, 122 Common Vulnerabilities and Exposures (CVEs), and a total of 1,211 OSS versions. This dataset comprised every patch released through Git with respect to those 122 CVEs. The ﬁrst author engaged in manual vulnerability validation with the help of public Proof-of-Concept (PoC), meticulously labeling the presence of vulnerabilities across software versions. On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17] , V0Finder [16] , V1SCAN [27] , VERJava [28] and Vision [29] . We conducted an ablation study using three different LLMs (GPT-4 [30] , CodeLlama [31] , and DeepSeek-V3 [32] ) to evaluate their vulnerability compre- hension capabilities. Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool. More importantly, during the evaluation, we found 202 version errors in the NVD reports. V ERCATION has also been shown to be efﬁcient, analyzing each vulnerability on an average of 28.61 seconds.",
+    "bbox": [
+      300.5999755859375,
+      310.9920959472656,
+      551.7162475585938,
+      561.581787109375
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_005",
+    "block_type": "text",
+    "text": "Contributions. The main contributions of this paper are as follows: • Unlike previous efforts that heavily relied on pre-deﬁned patterns of static analysis tools, we present V ERCATION , the ﬁrst framework to integrate the reasoning capability of LLM for vulnerable version identiﬁcation tasks, through the use of a multi-strategy universal prompt engineering. • V ERCATION presents a solution based on expanded and normalized AST to address the structural modiﬁcations in the clone detection challenge, which was designed for refactoring commit identiﬁcation during vulnerability backtrack. • We curated a dataset including 122 published CVEs con- taining 1,211 versions. This extensive dataset was curated",
+    "bbox": [
+      300.60028076171875,
+      570.5252075195312,
+      551.6886596679688,
+      737.4244384765625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "page_002:block_006",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

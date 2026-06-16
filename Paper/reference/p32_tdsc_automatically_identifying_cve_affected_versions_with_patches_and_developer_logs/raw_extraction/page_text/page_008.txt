@@ -1,0 +1,83 @@
+912 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+Fig. 7. Examples of partial matching code (The left side shows the diff hunk
+(DH) of each CVE patch, and the right side shows the corresponding source
+code fragment (SF)).
+the software versions that are partially matched with patches
+may or may not be vulnerable.
+In order to leverage the information of partial matches, we ﬁrst
+classify partial matches into three categories, and then we design
+the method to locate the partially matching code fragments based
+on the diff hunk(s) of a given CVE. Finally we justify whether
+the code has the CVE vulnerability based on git logs and partial
+matches so as to determine the ﬁrst vulnerable versionV from .
+1) Classiﬁcation and Detection of Partial Matches:By ana-
+lyzing the partial matches in a large number of early versions,
+we summarize the code features into the following three cate-
+gories, and then we detect and locate the matching source code
+fragments according to their categories. For ease of presentation,
+we introduce a few notations. We useDH to denote a Diff Hunk
+composed ofsub and oth, Fun to denote the vulnerable Function,
+and SF to denote the Source code Fragment in the CVE-speciﬁed
+ﬁle corresponding to theDH.I nF i g .7(a) and (b), “Function()”
+in the DH (also in SF) represents the Fun, and in Fig. 7(c),
+“FunctionB1()” of theDH represents theFun.
+Case 1. The SF only partially matches oth of the DH.A s
+shown in Fig.7(a), corresponding to theoth code in theDH, SF
+does not call funcD1 and it has “return err” instead of the “break”
+statement in the “if(err)” branch. Moreover, it calls funcD2,
+which has a different name from funcD1 inoth. In this case,
+SF contains all the code insub.
+Case 2. The SF partially matches thesub of theDH.A ss h o w n
+in Fig.7(b),t h eSF lacks “int n” and “if” statements of theDH.
+For oth, SF may not contain the entireoth, but it contains at least
+one oth and onesub statement.
+Case 3. The SF only partially matches the contextual func-
+tions of theDH,b u tt h eSF contains the entiresub.A ss h o w ni n
+Fig. 7(c), contextual functions A1 and C1 are used to locate the
+vulnerable function B1 inDH, but they are named A2 and C2
+in theSF. Although the functions B1 and B2 also have different
+parameters, they might still be the same vulnerable function.
+For example, for CVE-2013-1959, the function used to locate
+Fun is “set_cred_user_ns”, but this function does not exist inSF
+before the Linux kernel version 3.8. For CVE-2017-14991, the
+Fun is “sg_ﬁll_request_table”, but before Linux kernel version
+4.13, the function inSF is “sg_ioctl”, and they are the same
+vulnerable code in different functions. For CVE-2017-8069, the
+contextual function of theDH is “async_set_reg_cb”, but it is
+the “ctrl_callback” function in theSF in Linux kernel version
+3.2.86.
+Given the Diff Hunk(DH) of a CVE, we will detect and locate
+all the Source code Fragments (SFs) in the early versions for
+three partial match cases, respectively. The high level idea of
+our algorithm is as follows. In all three cases, there is at least
+one line of matched code inSF with that inDH. Therefore, we
+use one or two lines of matched code as the anchor point to
+select three blocks of code in the function(Fun) of the source
+code. Let us take the example of only one line of Matched Code
+(called MC), and assume there are L1 and L2 lines of code before
+MC and after MC, respectively, in theDH. To locateSF,i nt h e
+Fun of the source code, we select L1 and L2 lines of code before
+Matched Code(MC) and after MC as the ﬁrst and the third block,
+respectively while MC serves as the second block. When there
+are two or more lines of matched code, the code in the source
+code between the ﬁrst MC and the last MC forms the second
+block while the ﬁrst and third blocks are selected in the same
+way as previously. The detailed algorithm is presented in the
+supplemental document(available online).
+2) Justify the Vulnerable V ersions by Git Logs:After we lo-
+cated all the Source code Fragments(SFs) in the partial matches,
+we will justify whether theseSFs contain the vulnerability with
+the help of git log information. We propose anautomatic log
+tracing method to trace the corresponding git logs. We illustrate
+our idea through the example in Fig.8. Here, with respect to
+a CVE, the versions betweenV1.0 and V2.1 shared the same
+(partial matching) source code fragmentSF3. After an update
+on SF3, the versions betweenV2.2 and V2.5 shared the same
+SF2. After another update onSF2, the versions starting from
+V2.6 shared the (exact matching)SF1.L e tsf-diff represent the
+difference between the SFs of two versions, and it can be
+generated through a diff tool[41]. Since each update resulted
+in a git log that recorded the difference in the form of a Diff
+Hunk, we can use each sf-diff to traverse every git log in the
+git log list whose release time was earlier thanTCV E, and ﬁnd
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

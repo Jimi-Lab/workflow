@@ -1,0 +1,114 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:9
+SMU Classification: Restricted
+1      driver_deferred_probe_timeout = 0;
+2      driver_deferred_probe_trigger();
+        
+3      flush_work(&deferred_probe_work);
+4 -    list_for_each_entry_safe(private, p, &deferred_probe_pending_list,
+5 -                             deferred_probe)
+6 -       dev_info(private->device, "deferred probe pending\n");
+7      }
+8      static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+9          deferred_probe_timeout_work_func);
+1       driver_deferred_probe_timeout = 0;
+2       driver_deferred_probe_trigger();
+3       flush_work(&deferred_probe_work);
+4+     mutex_lock(&deferred_probe_mutex);
+5+     list_for_each_entry(p, &deferred_probe_pending_list, 
+6+                                   deferred_probe)
+7+        dev_info(p->device, "deferred probe pending\n");
+8+     mutex_unlock(&deferred_probe_mutex);
+9+     wake_up_all(&probe_timeout_waitqueue);
+10     }
+11     static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+12          deferred_probe_timeout_work_func);
+eed6e41813d^1 eed6e41813d
+The code statements that lead to the bug are:
+list_for_each_entry_safe(private, p, &deferred_probe_pending_list, deferred_probe)
+dev_info(private->device, "deferred probe pending\nn"); 
+Reason: The provided code snippet is indeed buggy because it uses `list_for_each_entry_safe()` to 
+traverse the `deferred_probe_pending_list` without protecting against concurrent modifications from 
+other threads…
+The code statements that fix the bug are:
+mutex_lock(&deferred_probe_mutex); 
+mutex_unlock(&deferred_probe_mutex); 
+Reason: The provided code snippet correctly uses a mutex lock (`mutex_lock(&deferred_probe_mutex);`) 
+before iterating over the `deferred_probe_pending_list` with `list_for_each_entry()`…
+Hint
+Fig. 4. An example of context-enhanced ability check
+SMU Classification: Restricted
+Extract 
+statements
+hint
+…
+buggy 
+statements
+C1
+C2
+Cn …
+candidate
+contexts
+git
+blame
+context
+generation
+find
+commit
+C𝑓𝑓
+candidate
+commits
+LLM
+The code statements that lead to the 
+bug are:
+…
+Reason:
+…
+The code statements that fix the bug 
+are:
+Reason:
+…
+Check buggy statements
+cid𝑗𝑗
+context for 
+ 𝐜𝐜𝐜𝐜𝐜𝐜𝒋𝒋
+context for 
+ 𝐜𝐜𝐜𝐜𝐜𝐜𝒋𝒋^𝟏𝟏
+……
+1
+2
+Fig. 5. The workflow of context-enhanced identification
+line numbers 𝑙
+′
+𝑚𝑖𝑛 and 𝑙
+′
+𝑚𝑎𝑥 and extract the content between these two line numbers in commit
+𝐶𝑓 𝑖𝑥, forming the refined context for commit 𝐶𝑓 𝑖𝑥.
+❹ Ability Check: Finally, with the contexts for both commits obtained, we begin to check the
+LLM’s ability to determine whether the bug exists in the commit. We provide the LLM with the root
+cause of the bug, the hint collected above, and the refined contexts for two versions. If the LLM can
+correctly identify the fixed version and the buggy version, we proceed to adopt context-enhanced
+identification. Otherwise, we fall back to rank-based identification.
+One example of the context-enhanced ability check is shown in Figure 4, which corresponds to
+the motivation example one. Here, we set N to 3. The LLM identifies lines from 4 to 6 as buggy
+statements in 𝑒𝑒𝑑6𝑒41813𝑑∧1. Therefore, 𝑙𝑚𝑖𝑛 is 1 and 𝑙𝑚𝑎𝑥 is 9. To generate the refined context for
+this commit, we extract lines ranging from line 1 to line 9. We then map line 1 and line 9 to commit
+𝑒𝑒𝑑6𝑒41813𝑑, getting 𝑙
+′
+𝑚𝑖𝑛 as 1 and 𝑙
+′
+𝑚𝑎𝑥 as 12. Finally, we extract the lines between them, forming
+the refined context in commit 𝑒𝑒𝑑6𝑒41813𝑑. We feed the LLM with the root cause of the bug, the
+hint, and two versions of the context. It identifies the context for commit 𝑒𝑒𝑑6𝑒41813𝑑∧1 as buggy
+and the context for commit 𝑒𝑒𝑑6𝑒41813𝑑 as correct, demonstrating its ability to determine whether
+the bug exists in a commit.
+3.3 Commits Identification
+3.3.1 Context-Enhanced Identification. Given a bug-fixing commit, once we verify that the LLM
+can understand the bug in it with the expanded and refined context, we apply context-enhanced
+identification to identify the bug-inducing commits, as shown in Figure 5. First, we retrieve all
+buggy statements from the hint. We then trace back these buggy code statements, obtain a set of
+candidate commits, and sort them in descending order by commit date, forming a candidate list
+{𝐶1, 𝐶2, ... 𝐶𝑖 }. Next, we generate the refined context for each candidate commit following the same
+process used in the ability check. For each candidate commit 𝐶𝑗 , we create the context for both 𝐶𝑗
+and its previous version 𝐶∧
+𝑗 1.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

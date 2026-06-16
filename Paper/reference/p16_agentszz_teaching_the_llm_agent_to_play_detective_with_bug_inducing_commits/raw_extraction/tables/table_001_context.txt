@@ -1,0 +1,90 @@
+Page: 1
+BBox: [53.50310134887695, 229.3699951171875, 295.85400390625, 250.15899658203125]
+Context:
+AgentSZZ: Teaching the LLM Agent to Play Detective with
+Bug-Inducing Commits
+Yunbo Lyu1, Jieke Shi1, Hong Jin Kang2, Ratnadira Widyasari1, Junda He1, Yuqing Niu1,
+Chengran Yang1*, Junkai Chen1, Zhou Yang3, Julia Lawall4, David Lo1
+1Singapore Management University, Singapore
+2University of Sydney, Sydney, Australia
+*Corresponding author
+3University of Alberta, Edmonton, Canada
+4Inria-Paris, Paris, France
+{yunbolyu,jiekeshi,ratnadiraw,yuqingniu,cryang,junkaichen,davidlo}@smu.edu.sg
+hongjin.kang@sydney.edu.au,jundahe.2022@phdcs.smu.edu.sg,zy25@ualberta.ca,julia.lawall@inria.fr
+Abstract
+The SZZ algorithm is the dominant technique for identifying bug-
+inducing commits and underpins many software engineering tasks,
+such as defect prediction and vulnerability analysis. Despite numer-
+ous variants, including recent LLM-based approaches, performance
+remains limited on developer-annotated datasets (e.g., recall of 0.552
+on the Linux kernel). A key limitation is the reliance on git blame,
+which traces line-level changes within the same file, failing in com-
+mon scenarios such as ghost and cross-file cases—making nearly
+one-quarter of bug-inducing commits inherently untraceable. More-
+over, current approaches follow fixed pipelines that restrict iterative
+reasoning and exploration, unlike developers who investigate bugs
+through an interactive, multi-tool process.
+To address these challenges, we propose AgentSZZ, an agent-
+based framework that leverages LLM-driven agents to explore
+repositories and identify bug-inducing commits. Unlike prior meth-
+ods, AgentSZZ integrates task-specific tools, domain knowledge,
+and a ReAct-style loop to enable adaptive and causal tracing of bugs.
+A structured compression module further improves efficiency by re-
+ducing redundant context while preserving key evidence. Extensive
+experiments on three widely used datasets show that AgentSZZ
+consistently outperforms state-of-the-art SZZ algorithms across all
+settings, achieving F1-score gains of up to 27.2% over prior LLM-
+based approaches. The improvements are especially pronounced in
+challenging scenarios such as cross-file and ghost commits, with
+recall gains of up to 300% and 60%, respectively. Ablation studies
+show that task-specific tools and domain knowledge are critical,
+while compression tool outputs reduces token consumption by over
+30% with negligible impact. Replication package is available.
+CCS Concepts
+• Software and its engineering →Maintaining software.
+Keywords
+SZZ algorithm, agent, large language model
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from permissions@acm.org.
+Preprint, Arxiv
+© 2026 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 978-1-4503-XXXX-X/2018/06
+https://doi.org/XXXXXXX.XXXXXXX
+ACM Reference Format:
+Yunbo Lyu1, Jieke Shi1, Hong Jin Kang2, Ratnadira Widyasari1, Junda He1,
+Yuqing Niu1,, Chengran Yang1*, Junkai Chen1, Zhou Yang3, Julia Lawall4,
+David Lo1. 2026. AgentSZZ: Teaching the LLM Agent to Play Detective
+with Bug-Inducing Commits. In . ACM, New York, NY, USA, 12 pages.
+https://doi.org/XXXXXXX.XXXXXXX
+1
+Introduction
+SZZ algorithms have been proposed since 2005 [33] and have be-
+come a foundational technique with broad impact in the software
+engineering (SE) community [1]. Given a bug-fixing commit, SZZ
+identifies the bug-inducing commits that introduced the defect.
+They have been widely used in many downstream tasks such as
+defect prediction [13, 15, 28, 34, 46], analysis of how bugs are in-
+troduced [5, 6, 39], and vulnerability version identification [4, 8].
+More recently, security code generation benchmarks also rely on
+SZZ algorithms to identify vulnerability-inducing commits [7].
+Many variants of SZZ algorithms have been proposed to improve
+the accuracy of bug-inducing commit identification. AG-SZZ [18]
+filters cosmetic changes such as blank lines and comments; MA-
+SZZ [10] excludes meta, branch, and property changes; and RA-
+SZZ [24] detects and filters refactoring changes. More recently,
+LLM4SZZ [36] leverages LLMs to assess blame candidates with
+expanded context, achieving state-of-the-art (SOTA) results across
+multiple datasets. Despite these advances, performance remains far
+from satisfactory on developer-annotated datasets [23, 30, 42]. For
+example, LLM4SZZ achieves a recall of only 0.552 on the Linux ker-
+nel dataset, indicating that nearly half of the bug-inducing commits
+remain unidentified.
+The fundamental limitation is that existing SZZ algorith
+
+Citation Readiness: medium; verify against page crop.

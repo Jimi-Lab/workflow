@@ -1,0 +1,40 @@
+trol flow of the function, and (2) dependencies between
+each code line, which are used to generate signatures.
+5 Evaluation
+In this section, we evaluateMOVERY . Section 5.1 investigates
+how accurately MOVERY discovers VCCs in modified com-
+ponents, compared to existing VCC discovery techniques (i.e.,
+VUDDY [17] and ReDeBug [14]). Section 5.2 and Section
+5.3 compare MOVERY to the recurring vulnerability detection
+technique (i.e., MVP [49]) and the SCA-based technique (i.e.,
+CENTRIS [48]), respectively, We evaluate the speed and scal-
+ability of MOVERY in Section 5.4, and introduce the efficacy
+of the search space reduction in Section 5.5. Finally, Section
+5.6 presents a case study observed in our experiments. We
+ran MOVERY on a machine with Ubuntu 16.04, Intel Xeon
+Processor @ 2.40 GHz, 32GB RAM, and 6TB HDD.
+3044    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 010 =====
+Table 3: Target software overview.
+IDX Name Version #Line ∗ #Comp† Domain
+T1 FreeBSD v12.2.0 14,489,534 47 Operating system
+T2 ReactOS v0.4.13 6,419,855 23 Operating system
+T3 ArangoDB v3.7.9 3,064,973 22 Database
+T4 FFmpeg n4.3.2 1,230,520 4 Multimedia processing
+T5 OpenCV v4.5.1 1,092,317 15 Computer vision
+T6 Emscripten v2.0.15 759,020 11 Compiler
+T7 Crown v0.42.0 723,372 20 Game engine
+T8 Git v2.31.0 293,467 5 Version control system
+T9 OpenMVG v1.6 262,610 8 Image processing
+T10 Redis v5.0.12 212,672 8 Database
+Total - - 28,548,340 190 -
+*: Counting only C/C++ code lines, †: The number of modified OSS components.
+5.1 Accuracy of M OVERY
+Target software selection. We selected target software based
+on the following three criteria to claim the generality of
+MOVERY : they (1) should be popular C/C++ OSS, (2) should
+contain a sufficient number of modified components, and (3)
+should not be biased toward any particular domain.
+We first collected C/C++ repositories from GitHub that
+exhibit more than 1,000 starga

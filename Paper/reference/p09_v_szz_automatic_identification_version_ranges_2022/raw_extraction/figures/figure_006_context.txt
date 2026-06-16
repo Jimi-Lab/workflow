@@ -1,0 +1,33 @@
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
++ Document<T> doc = ATOM_ENGINE.getparser().parse(is);
++ XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+Fixing Commit: 9beb2d
+Previous Commit: 7d30ae
+Descendants Commit: 42d310 
+- Document<T> doc = parser.parse(is)
++ Document<T> doc = prser.parse(reader)
++ Document<T> doc = parser.parse(is)
+- Document<T> doc = ATOM_ENGINE.getparser().parse(is);
+Figure 6: An example of a failing line mapping.
+However, V-SZZ still failed to identify inducing commits for a
+small number of vulnerabilities. One reason is that a few vulnera-
+bilities’ true inducing commits are not in the earliest descendants
+commits, e.g., CVE-2018-14884 in Figure 5. Another reason is that
+the mapping algorithms in our proposed approach fail to identify
+the modified lines. For C/C++ projects, the line mapping algorithm
+based on string similarity does not consider the semantic of the
+source code. For example, in CVE-2016-2549 from linux-kernel,
+the modified line hrtimer_cancel(&stime->hrt); in the previ-
+ous commit is wrongly mapped to a deleted line with the same
+content in another function. For Java projects, the mapping algo-
+rithms based on AST [17] also failed in some cases. Figure 6 presents
+an example from CVE-2016-8739 in the project Apache/CXF. We
+find that a vulnerable line in the fixing commit cannot be mapped
+in the previous commit so that our approach cannot identify the
+descendants commit, which is the true inducing commit.
+Compared to the previous SZZ algorithms, V-SZZ can detect
+more true inducing commits for the vulnerabilities and outper-
+form them in terms of F1-score.
+5.2.2
+RQ2. Table 5 a

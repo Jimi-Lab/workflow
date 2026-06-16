@@ -1,0 +1,272 @@
+[
+  {
+    "page": 9,
+    "block_id": "page_009:block_001",
+    "block_type": "text",
+    "text": "384 IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026",
+    "bbox": [
+      42.345001220703125,
+      32.515541076660156,
+      556.4161987304688,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_002",
+    "block_type": "text",
+    "text": "TABLE II G ROUND- T RUTH D ATASET O VERVIEW",
+    "bbox": [
+      106.02943420410156,
+      65.57783508300781,
+      229.7145233154297,
+      83.44530487060547
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_003",
+    "block_type": "text",
+    "text": "IDX Name #Version #CVE Domain",
+    "bbox": [
+      49.302101135253906,
+      95.18974304199219,
+      227.5478515625,
+      104.37926483154297
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_004",
+    "block_type": "text",
+    "text": "1 Binutils 157 18 Programming tools 2 cJSON 48 3 JSON parser 3 FFmpeg 405 31 Multimedia processing 4 Jasper 99 12 Image coding toolkit 5 Libarchive 51 10 Streaming processing 6 Libcaca 7 3 Graphics library 7 Liblouis 69 6 Braille translator 8 Libming 14 9 Flash library 9 Libtiff 78 7 Image tools 10 Libxml2 233 12 XML toolkit 11 OpenJPEG 25 8 Image codec 12 Pcre2 25 3 Regular expression engine",
+    "bbox": [
+      49.302093505859375,
+      109.65962219238281,
+      286.4507751464844,
+      217.184326171875
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_005",
+    "block_type": "text",
+    "text": "Total - 1,211 122 -",
+    "bbox": [
+      49.302101135253906,
+      222.17076110839844,
+      203.1855926513672,
+      231.36029052734375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_006",
+    "block_type": "text",
+    "text": "4) The OSS must have a certain number of versions for compre- hensive analysis. Based on the selection criteria, we established a dataset comprising 122 publicly disclosed CVEs associated with public PoC and patches, spanning 12 prevalent OSS, as detailed in Table II . The published date of these CVEs from 2016 to 2025. Meanwhile, the collected vulnerabilities cover 13 common CWE types. Some vulnerabilities are classiﬁed into multiple CWEs. For example, CVE-2023-1579 belongs to both CWE-119 (Improper Restriction of Operations within the Bounds of a Memory Buffer) and CWE-787 (Out-of-bounds Write). Among the dataset, vulnerabilities belonging to CWE- 787 (Out-of-bounds Write) are the most numerous, accounting for 20.27%.",
+    "bbox": [
+      42.345001220703125,
+      267.0263671875,
+      293.4215087890625,
+      421.6059265136719
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_007",
+    "block_type": "text",
+    "text": "Patches. We acquired security patches by crawling vfc from the OSS Git repositories. In total, the vfc s cover 2,287 modiﬁcation lines containing 1,532 insertion lines and 755 deletion lines. Among these, 289 lines are unrelated to vulnerability (e.g., modiﬁcations in the ChangeLog ﬁle). On average, each vfc has 21.8 modiﬁcation lines. The number of added lines signiﬁcantly exceeds that of deleted lines, underscoring the critical impor- tance of incorporating additional code into the analysis process. Among these, 10.3% are large vfc s (the number of modiﬁca- tion lines exceeding 50). Notably, 79 vfc s (64.75%) contain both code insertion and deletion, 29 vfc s exclusively insertions (23.77%), and 15 vfc s solely involve deletions (12.30%).",
+    "bbox": [
+      42.34498596191406,
+      428.05572509765625,
+      293.4104309082031,
+      571.0518798828125
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_008",
+    "block_type": "text",
+    "text": "Verifying & Labeling. We apply the following process to systematically label the ground-truth dataset: (i) The ﬁxed version can be determined through the ofﬁcial release of vfc s. We conﬁrm whether versions following the ﬁxed version are vulnerable by checking if they con- tain the patch code. (ii) For the remaining version, we obtained the public PoC of each vulnerability from the Git issues or by referring to OSS sites. (iii) To validate the PoC on each corresponding OSS version, we establish the dependent environment for each OSS version and compile the libraries. (iv) During the PoC input testing process for each vulnerabil- ity, we analyze the triggering conditions and dangerous",
+    "bbox": [
+      42.346961975097656,
+      577.49267578125,
+      293.407470703125,
+      744.402099609375
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_009",
+    "block_type": "text",
+    "text": "behaviors of the vulnerability and label the statements that trigger the vulnerability as S trigger . For versions where the PoC cannot trigger the vulnerability (as some PoCs are only applicable to certain speciﬁc versions), we check whether the version contains S trigger to label the version. In our experimental setup, we took 10 days to build the software and version pool. Then we took 30 days to build the ground- truth dataset, including the time taken to establish the dependent environment for each software version, as well as the time to perform vulnerability veriﬁcation and labeling.",
+    "bbox": [
+      305.35321044921875,
+      63.794185638427734,
+      556.424072265625,
+      194.46347045898438
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_010",
+    "block_type": "text",
+    "text": "B. Baseline and Metrics",
+    "bbox": [
+      305.35321044921875,
+      210.3239288330078,
+      405.58489990234375,
+      221.2827911376953
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_011",
+    "block_type": "text",
+    "text": "Baseline. For the vulnerable version identiﬁcation task, we selected the NVD [52] , along with SOTAs: SZZ-based methods (AG-SZZ [53] , B-SZZ [54] , V-SZZ [17] ) and clone-based meth- ods (V0Finder [16] , V1SCAN [27] , VERJava [28] and Vision [29] ) for accuracy comparison. We gathered the vulnerable version range of each CVE from CPE to evaluate the NVD’s accuracy. The basic idea of SZZ algorithms is to backtrack the commit history to locate the earliest commit that introduces the dele- tion lines removed by security patches. We use different SZZ algorithms to identify the vic , with the versions between the vic and the vfc considered vulnerable. Since these algorithms trace deleted lines individually, instances may arise where multiple vic are identiﬁed, and in such cases, we select the earliest one as the detection outcome. V0Finder, V1SCAN, VERJava, and Vision are clone-based methods. We use their techniques to detect code clone for each version and identify the affected versions of the vulnerabilities in the ground-truth dataset. Because VERJava and Vision are applied in Java, we modiﬁed the code to make them compatible with C/C ++ . For V ERCATION , we selected thresholds ϑ 1 = 0 . 9 , ϑ 2 = 0 . 8 and ϑ 3 = 0 . 7 (related experiments are introduced in Sec- tion V-C ). In terms of the performance of vulnerability code extraction, we compared the differences between combining various LLMs (GPT-4, CodeLlama-13B, DeepSeek-V3) and using the static analysis tool Joern parser [33] alone.",
+    "bbox": [
+      305.3511962890625,
+      226.74429321289062,
+      556.4207763671875,
+      549.0631103515625
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_012",
+    "block_type": "text",
+    "text": "Metrics. To evaluate the accuracy, we employ the follow- ing three metrics, i.e., true positives ( TP ), false positives ( FP ), false negatives ( FN ), precision ( # T P",
+    "bbox": [
+      305.3517761230469,
+      555.5128784179688,
+      556.4063110351562,
+      591.2318115234375
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_013",
+    "block_type": "text",
+    "text": "# T P +# F P ), recall ( # T P",
+    "bbox": [
+      305.35333251953125,
+      579.7943725585938,
+      556.4059448242188,
+      604.9888305664062
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_014",
+    "block_type": "text",
+    "text": "# T P +# F N ) and F1-score ( 2 ∗ precision ∗ recall",
+    "bbox": [
+      309.8700866699219,
+      592.9172973632812,
+      487.5693359375,
+      608.4266967773438
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_015",
+    "block_type": "text",
+    "text": "precision + recall ), to measure the accuracy of the above methodologies. These metrics are also used in previous studies to evaluate the technique’s performance [9] , [17] . Because of signiﬁcant differences in the version count for distinct OSS, we compute the precision and recall for each OSS and report the average of precisions and recalls ﬁnally.",
+    "bbox": [
+      305.35272216796875,
+      593.870361328125,
+      556.4144897460938,
+      664.7672729492188
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_016",
+    "block_type": "text",
+    "text": "C. Implementation Details",
+    "bbox": [
+      305.35369873046875,
+      680.627685546875,
+      414.27496337890625,
+      691.5865478515625
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_017",
+    "block_type": "text",
+    "text": "We utilized Joern [33] for program slicing and developed Python scripts to extract control and data dependencies, out- putting the sliced statements as dangerous ﬂows. We explored three LLM models, GPT-4 [30] , CodeLlama-13B [31] , and",
+    "bbox": [
+      305.3526916503906,
+      697.4166870117188,
+      556.4125366210938,
+      744.4003295898438
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_018",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

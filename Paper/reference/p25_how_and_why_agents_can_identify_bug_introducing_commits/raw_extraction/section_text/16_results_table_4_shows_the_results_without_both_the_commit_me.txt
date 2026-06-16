@@ -1,0 +1,31 @@
+Results.Table 4 shows the results. Without both the commit mes-
+sage and the diff, SZZ-Agent drops to 0.48 F1-score, below standard
+SZZ (0.56). Providing only the diff recovers performance to 0.73,
+and providing only the message reaches 0.77—each individually
+already exceeding the previous state-of-the-art (LLM4SZZ, 0.62 on
+DS_LINUX-26). This suggests that the two sources carry partially
+redundant information. However, combining both achieves 0.81, in-
+dicating that each source also provides complementary information
+not captured by the other.
+Finding 2:The fix commit message and the fix commit diff carry
+partially redundant information: each alone already surpasses
+the previous state-of-the-art. However, combining both yields the
+highest performance (0.81 F1), showing that neither source fully
+subsumes the other.
+3.3.5 RQ2d: Stage 1 vs. Stage 2.We investigate the individual con-
+tribution of each stage to the overall pipeline.
+Table 6: RQ2e: Impact of the commit selection threshold.
+Costs are average per fix commit. Best results in bold.
+Commit
+Identifier
+Threshold
+Precision Recall F1-Score Cost (USD)
+8 0.76 0.75 0.76 $0.68
+32 0.81 0.80 0.81 $0.67
+128 0.80 0.79 0.80 $0.39
+512 0.81 0.80 0.81 $0.35
+∞0.82 0.81 0.82 $0.33
+Setup.We run Stage 1 and Stage 2 in isolation and compare against
+the combined pipeline. All experiments use DS_LINUX-26 with
+Claude Opus 4.5. We also report the average cost per fix commit in
+USD.

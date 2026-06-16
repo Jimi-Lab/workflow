@@ -1,0 +1,45 @@
+ as child TPL reuse, leading
+to a high number of false positives. In contrast, DB iot, as a
+curated subset focused on IoT-related libraries, minimizes such
+misidentifications and achieves higher specificity. We did not
+incorporate VULTURE with DBcentris due to its lack of critical
+information (e.g., birth time, file path information) required by
+VULTURE .
+2) 1-day vulnerability detection: Here, we applied V UL-
+TURE , V1SCAN and SNYK to identify real-world 1-day vul-
+nerabilities. Table VII only highlights the top 5 target pro-
+grams with the highest number of detected vulnerabilities.
+The remaining 5 target programs were found to have no
+vulnerabilities according to the detection results.
+Table VII shows that V ULTURE is the most effective tool,
+identifying 175 vulnerabilities, and consistently outperforms
+SNYK and V1SCAN across all test targets. In comparison,
+12
+
+===== PAGE 013 =====
+TABLE VII: Vulnerability Detection Result in Wild Software
+Target VULTURE SNYK V1SCAN
+Dtc Cfm Dtc Confm Dtc Cfm
+AliOS-Things 93 89 105 84 8 2
+LiteOS 19 19 22 16 3 3
+TizenRT 68 66 16 10 11 8
+Tasmota 1 1 2 0 0 0
+TDengine 0 0 3 1 0 0
+Total 181 175 148 111 22 13
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+TABLE VIII: Time cost of TPL reuse and 1-day vulnerability
+detection across different tools (in seconds)
+Target VULTURE V1SCAN
+TPL reuse 1-day TPL reuse 1-day
+AliOS-Things 20.1 3.0 23.5 11.8
+LiteOS 14.1 3.9 28.1 8.7
+Tasmota 5.5 129.9 7.1 -
+TizenRT 9.2 2.1 8.1 8.8
+TDengine 37.2 - 59.4 -
+The values in the table represent the average time (in seconds) required
+to detect a single TPL reuse or a single 1-day vulnerability. A dash (”-”)
+indicates that no reuses or vulnerabilities were identified.
+SNYK detected 111 vulnerabilities, and V1SCAN detected
+only 13. Furthermore, V ULTURE also pinpointed the exact
+locations and specific code statements that required 

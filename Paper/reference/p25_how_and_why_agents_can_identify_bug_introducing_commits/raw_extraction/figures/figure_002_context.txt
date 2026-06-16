@@ -1,0 +1,187 @@
+Page: 3
+Caption: Figure 1 shows an overview of SZZ-Agent. It consists of two stages.
+
+Page text context:
+How and Why Agents Can Identify Bug-Introducing Commits
+Preprint, Under Submission, arXiv
+Table 1: RQ1: SZZ-Agent vs. baselines across three datasets. Best results per dataset in bold.
+DS_LINUX
+DS_GITHUB-c
+DS_GITHUB-j
+Approach
+Precision
+Recall
+F1-Score
+Precision
+Recall
+F1-Score
+Precision
+Recall
+F1-Score
+SZZ
+0.49
+0.60
+0.54
+0.46
+0.61
+0.53
+0.48
+0.68
+0.57
+AG-SZZ
+0.48
+0.58
+0.52
+0.46
+0.64
+0.53
+0.45
+0.59
+0.51
+L-SZZ
+0.44
+0.43
+0.44
+0.38
+0.38
+0.38
+0.41
+0.41
+0.41
+R-SZZ
+0.48
+0.47
+0.47
+0.59
+0.58
+0.59
+0.47
+0.47
+0.47
+MA-SZZ
+0.45
+0.57
+0.50
+0.45
+0.64
+0.53
+0.43
+0.56
+0.49
+RA-SZZ
+0.45
+0.57
+0.50
+0.45
+0.64
+0.53
+0.37
+0.48
+0.42
+V-SZZ
+0.44
+0.55
+0.49
+0.46
+0.61
+0.53
+0.48
+0.67
+0.56
+LLM4SZZ
+0.65
+0.64
+0.64
+0.63
+0.62
+0.63
+0.55
+0.55
+0.55
+SZZ-Agent
+0.78
+0.76
+0.77
+0.75
+0.74
+0.75
+0.67
+0.67
+0.67
+3
+Part 1: SZZ-Agent
+To test whether the capabilities of LLM-based agents translate into
+effective bug-introducing commit identification, we design SZZ-
+Agent, an agentic approach to identify bug-introducing commits.
+In this section we explain how SZZ-Agent works (§3.1) and present
+our evaluation (§3.2–§3.3).
+3.1
+Approach
+Figure 1 shows an overview of SZZ-Agent. It consists of two stages.
+Stage 1: SZZ-based Identification. The approach starts from a fix
+commit, defined by its diff, showing which lines were added and/or
+deleted, and its commit message. Via standard SZZ, all deleted lines
+are traced back to the commits that last introduced them, forming
+the SZZ candidate set. We then provide a LLM-based agent with
+the fix commit message, the fix commit diff, and for each candidate
+commit its message and diff (all with five lines of context). The agent
+is instructed to analyze the fix to understand the bug, examine each
+candidate for whether it introduced the bug, and select the earliest
+bug-introducing commit, or NONE if no candidate is responsible.
+Stage 2: Binary Search. For entries where Stage 1 abstains or
+where no SZZ candidates exist, we apply a second stage that oper-
+ates over the full commit history of every file touched by the fix.
+We then perform a binary search over this history: at each step, the
+agent receives the full file contents at the candidate commit, the
+buggy version immediately before the fix, the fixed version, the fix
+commit message, and the fix commit diff. Based on this, the agent
+determines whether the bug is already present at the candidate
+commit. Once the search window narrows to a tunable threshold
+of candidates (default: 33; see §3.3.6 for an ablation), the approach
+switches to direct candidate selection, presenting the remaining
+candidates’ diffs and messages for the agent to choose the most
+likely bug-introducing commit.
+3.2
+Experimental Setup
+The goal of the evaluation is to investigate how effective SZZ-Agent
+is and why it works. To achieve this goal, we ask the following
+research questions:
+RQ1 (Effectiveness): How effective is SZZ-Agent at identifying
+bug-introducing commits?
+RQ2 (Ablations): Why is SZZ-Agent effective?
+(a) Data Leakage: Can the effectiveness of SZZ-Agent be ex-
+plained by data leakage?
+(b) LLM Backbone: Is SZZ-Agent more effective than previous
+state-of-the-art because it uses better LLMs?
+(c) Context: What contextual information enables SZZ-Agent
+to determine the BICs?
+(d) Stage Contribution: What is the contribution of Stage 1
+vs. Stage 2?
+(e) Hyperparameter: How does the performance vary with
+the threshold for direct commit selection in Stage 2?
+The following paragraphs describe the experimental setup shared
+across all experiments. Experiment-specific details are provided in
+the individual setup paragraphs in §3.3.
+3.2.1
+Datasets and Pre-processing. We use the most popular datasets
+across two programming language families, which are also the
+datasets used in the LLM4SZZ evaluation [25].
+DS_LINUX. Since October 2013, Linux kernel developers label bug-
+fixing patches with the commit identifiers of the corresponding
+bug-introducing commits via Fixes: tags. Lyu et al. [18] leverage
+this practice to construct a developer-annotated dataset of 76,046
+fix commit and bug-introducing commit pairs.
+DS_LINUX-26. To evaluate on fix commits published after the
+training data cutoff of the LLMs we use, we apply the methodology
+of Lyu et al. [18] to collect 5275 fix commit and bug-introducing
+commit pairs from the Linux kernel for fix commits published
+between September 1, 2025 and January 31, 2026.
+DS_GITHUB-c and DS_GITHUB-j. Rosa et al. [21] construct a
+developer-annotated dataset from GitHub projects by using natural
+language processing to identify fix commits in which developers
+explicitly reference the bug-introducing commits, followed by man-
+ual filtering. We split this dataset by language into DS_GITHUB-c
+(C/C++ projects) and DS_GITHUB-j (Java projects).
+
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

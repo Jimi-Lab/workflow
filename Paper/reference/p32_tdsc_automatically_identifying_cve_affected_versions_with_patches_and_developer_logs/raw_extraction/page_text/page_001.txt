@@ -1,0 +1,105 @@
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024 905
+Automatically Identifying CVE Affected Versions
+With Patches and Developer Logs
+Yongzhong He , Yiming Wang , Sencun Zhu ,W e iW a n g, Yunjia Zhang, Qiang Li,a n dA i m i nY u
+Abstract—While vulnerability databases are important sources
+of information for software security, it is known that information in
+these databases is inconsistent. How to rectify these incorrect data
+is a challenging issue. In this article, we employ developer logs and
+patches to automatically identify vulnerable source code versions
+that each CVE really affects. Our tool organizes all versions of a
+piece of software into a version tree, and identiﬁes the ﬁrst vulner-
+able version, and the last vulnerable versions in the version tree
+trunk and branches. For evaluation, we took Linux Kernel as the
+case study and quantiﬁed the error rate of the vulnerable versions
+reported by the NVD. The total number of vulnerable Linux Kernel
+versions reported by the NVD was 43,727 (as of September 2020),
+of which the total number of false positives reached 2,497 and the
+total number of false negatives reached 9,330, accounting for 5.7%
+and 21.34%, respectively. In addition, we compare our tool with two
+vulnerability detection tools and show that our tool could achieve
+high detection accuracy.
+Index Terms—Developer logs, NVD, patch, versions, vulnerab-
+ility.
+CCS CONCEPTS: Security and privacy Software
+security
+I. INTRODUCTION
+S
+OURCE code vulnerabilities in computer and network sys-
+tems are a serious threat to users and organizations. The
+2021 open-source software security and threat analysis report of
+Synopsys [1] showed that more than 75 percent of commercial
+software using open-source components had known bug code.
+Although there were 13 automatic ﬁx mechanisms, at least 86
+percent of computers were not patched even when vulnerabilities
+Manuscript received 19 February 2022; revised 4 January 2023; accepted 7
+January 2023. Date of publication 5 April 2023; date of current version 14 March
+2024. This work was supported in part by the Fundamental Research Funds for
+the Central Universities of China under Grant 2020JBZ104, and in part by the
+National Natural Science Foundation of China under Grants U21A20463 and
+U22B2027. (Y. Wang is the co-ﬁrst author of this article. Y. Wang and Y. Zhang did
+this work under the supervision of Y. He.) (Corresponding authors: Yongzhong
+He; Wei Wang; Qiang Li.)
+Yongzhong He, Wei Wang, and Qiang Li are with the Beijing Key Laboratory
+of Security and Privacy in Intelligent Transportation, School of Computer,
+Beijing Jiaotong University, Beijing 100044, China (e-mail: yzhhe@bjtu.edu.cn;
+wangwei1@bjtu.edu.cn; qiangcas@gmail.com).
+Yiming Wang and Yunjia Zhang are with the Beijing Jiaotong University, Bei-
+jing 100044, China (e-mail: 19120480@bjtu.edu.cn; 18120489@bjtu.edu.cn).
+Sencun Zhu is with the Department of Computer Science and Engineering,
+The Pennsylvania State University, State College, PA 16801 USA (e-mail:
+sxz16@psu.edu).
+Aimin Yu is with the Institute of Information Engineering, Chinese Academy
+of Sciences, Beijing 100045, China (e-mail: yuaimin@iie.ac.cn).
+This article has supplementary downloadable material available at https://doi.
+org/10.1109/TDSC.2023.3264567.
+Digital Object Identiﬁer 10.1109/TDSC.2023.3264567
+were presently available as of 2020, as reported by Lopes[2].
+Therefore, it is important to identify and remedy the software
+security problems that are constantly found to protect computer
+systems.
+Security professionals rely on various sources of information
+to inform them of new security issues. An important source
+is the vulnerability database. Public vulnerability databases in-
+clude CVE, NVD, SecurityFocus, Redhat Bugzilla, ExploitDB,
+OpenWall, SecurityTracker, etc., but we focus on the most
+widely used and authoritative database: National Vulnerability
+Database (NVD)[3] in this work. The database is maintained by
+the U.S. government, committed to accurately record all known
+vulnerabilities, and effectively as an industry standard. For ex-
+ample, business security services (such as Hakiri[4],S n y k[5]
+and SourceClear [6]) and open-source security tools (such as
+BudlerAudit [7], OW ASP OSSIndex[8] and dependency check-
+ing [9]) rely on NVD vulnerability information to run effectively.
+Researchers [10], [12] use the NVD as the core data source
+to reveal all aspects of vulnerability discovery and recovery
+process. Aksu et al.[13] rely on the information of the NVD to
+generate attack graph automatically. However, is the information
+from the NVD database accurate? Indeed, previous work has
+pointed out the inaccuracy of NVD information. For example,
+Dong et al.[14] reported the inconsistent vulnerable software
+versions of the NVD are highly prevalent: only 59.82% of the
+vulnerability CVE summaries strictly match the standardized
+NVD entries, and the inconsistency level increases over time.
+Anwar et al.[15] discovered the inconsistent or incomplete data
+of the NVD and showed the possible impact of these data prob-
+lems. Other work[16], [17], [18] also investigated some types
+of NVD data quality problems. The above work indicated that
+the known affected software conﬁgurationof NVD (introduced
+in SectionII-A) was indeed inaccurate. However, the previous
+work mostly pointed out the inaccuracy of the NVD, with
+the following question largely remaining unanswered:which
+vulnerable versions are exactly affected by a CVE-ID?
+To ﬁll this gap, we aim to propose a practical solution to
+justify the incorrect versions reported by the NVD. For a given
+CVE, none of the existing vulnerability detection methods can
+guarantee that the vulnerability can be accurately identiﬁed
+in all released versions, so just relying on these methods is
+not enough. For example, patch-based detection[19], [20] has
+one assumption: the unpatched code is vulnerable and patched
+code is secure. However, in this article we ﬁnd this assumption
+is not correct. Fuzzing [21] has low false positives, but it is
+difﬁcult to fuzz programs that take highly structured inputs, or
+1545-5971 © 2023 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

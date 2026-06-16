@@ -1,0 +1,86 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\LLM4SZZ\LLM4SZZ
+Analysis Mode: static-only
+Runtime Behavior: [EXECUTION NOT REQUESTED]
+
+Repository / File Layout Observed:
+- dir: core
+- dir: dataset
+- file: 1_get_input.py (2972 bytes)
+- file: 2_get_vcc.py (1224 bytes)
+- file: 3_gen_vuln_version.py (6243 bytes)
+- file: 4_get_duplicated_patch.py (903 bytes)
+- file: 5_parse_result.py (5283 bytes)
+- file: ablation.py (1547 bytes)
+- file: CFG.py (32134 bytes)
+- file: constant.py (35 bytes)
+- file: diss.py (7650 bytes)
+- file: gen_baseline_results_for_dels.py (5761 bytes)
+- file: gen_baseline_results_for_no_deletes.py (5842 bytes)
+- file: gen_results_for_dels.py (14222 bytes)
+- file: gen_results_for_dels_llm.py (10135 bytes)
+- file: gen_results_for_dels_vszz.py (16715 bytes)
+- file: gen_results_for_no_dels.py (14109 bytes)
+- file: gen_results_for_no_dels_llm.py (17600 bytes)
+- file: gen_results_for_no_dels_vszz.py (17723 bytes)
+- file: log_generation.py (6891 bytes)
+- file: parse_patch.py (8321 bytes)
+- file: README.md (2796 bytes)
+- file: requirements.txt (4527 bytes)
+- file: time.txt (38179 bytes)
+- file: util.py (28162 bytes)
+- file: version_range_evidence.py (4930 bytes)
+- file: core\abstract_szz.py (15553 bytes)
+- file: core\comment_parser.py (6053 bytes)
+- file: core\vszz.py (6421 bytes)
+- file: dataset\FFmpeg_dataset_fa.json (198 bytes)
+
+Primary Files:
+- 1_get_input.py: lines=110; functions=get_cmp_cve; imports=constant, git, io, json, os, re, time, tqdm, unidiff
+- 2_get_vcc.py: lines=45; functions=[NEEDS EVIDENCE]; imports=constant, git, io, json, os, re, time, tqdm, unidiff
+- 3_gen_vuln_version.py: lines=189; functions=get_commit_tags, generate_vulnerable_versions_fix_vcc, gen_cve_patch_dict, get_cmp_cve, gen_vuln_version; imports=json, log_generation, os, time
+- 4_get_duplicated_patch.py: lines=35; functions=[NEEDS EVIDENCE]; imports=json, os
+- 5_parse_result.py: lines=144; functions=[NEEDS EVIDENCE]; imports=constant, functools, git, json, os, tree_sitter, tree_sitter_c, util
+- ablation.py: lines=70; functions=[NEEDS EVIDENCE]; imports=json, os
+- CFG.py: lines=888; functions=__init__, add_pred_id, add_succ_id, get_preds_ids, get_succs_ids, add_cfg_nodes_ids, get_cfg_nodes_ids, add_cfg_nodes, get_cfg_nodes, set_break, get_break, set_return, get_return, set_continue, get_continue, set_goto; imports=copy, matplotlib.pyplot, networkx, tree_sitter
+- constant.py: lines=2; functions=[NEEDS EVIDENCE]; imports=[NEEDS EVIDENCE]
+- diss.py: lines=237; functions=parse_pdg; imports=CFG, Levenshtein, copy, functools, git, json, shutil, subprocess, traceback, tree_sitter, util
+- gen_baseline_results_for_dels.py: lines=183; functions=[NEEDS EVIDENCE]; imports=json, logging, os, sys, szz.ag_szz, szz.b_szz, szz.l_szz, szz.ma_szz, szz.r_szz, traceback
+- gen_baseline_results_for_no_deletes.py: lines=188; functions=[NEEDS EVIDENCE]; imports=json, logging, os, random, sys, szz.ag_szz, szz.b_szz, szz.l_szz, szz.ma_szz, szz.r_szz, traceback
+- gen_results_for_dels.py: lines=396; functions=get_introducing_cid, get_pre_diff_line; imports=CFG, Levenshtein, argparse, copy, functools, git, json, sys, traceback, tree_sitter, tree_sitter_c, util
+- gen_results_for_dels_llm.py: lines=282; functions=get_introducing_cid, get_pre_diff_line; imports=CFG, Levenshtein, argparse, copy, core.vszz, functools, git, json, traceback, tree_sitter, tree_sitter_c, util
+- gen_results_for_dels_vszz.py: lines=465; functions=get_introducing_cid, get_pre_diff_line; imports=CFG, Levenshtein, argparse, copy, core.vszz, functools, git, json, traceback, tree_sitter, tree_sitter_c, util
+- gen_results_for_no_dels.py: lines=403; functions=get_cur_diff_line, get_curr_diff_line1; imports=CFG, Levenshtein, argparse, constant, copy, functools, git, json, os, traceback, tree_sitter, tree_sitter_languages
+- gen_results_for_no_dels_llm.py: lines=486; functions=get_cur_diff_line, get_curr_diff_line1; imports=CFG, Levenshtein, argparse, copy, core.vszz, functools, git, json, sys, traceback, tree_sitter, tree_sitter_c
+- gen_results_for_no_dels_vszz.py: lines=488; functions=get_cur_diff_line, get_curr_diff_line1; imports=CFG, Levenshtein, argparse, copy, core.vszz, functools, git, json, sys, traceback, tree_sitter, tree_sitter_c
+- log_generation.py: lines=191; functions=wrapper_change_path, is_nosise, inner, __init__, git_tag_contins, git_log, git_tag, git_show, git_diff, git_diff_2, get_commit_time, fetch_tags, get_tags, get_commits_range, get_commits_from; imports=git, io, os, subprocess, sys, unidiff
+- parse_patch.py: lines=300; functions=__init__, __str__, get_line_info, __init__, add_line, get_lines, __str__, to_str_without_del_lines, set_patch_file_name, get_patch_file_name, __init__, add_hunk, get_info, __str__, get_hunks, get_raw_file_str; imports=copy, re, time
+- util.py: lines=945; functions=get_patch_content, get_file_content, get_func_defs, get_func_name, get_func_call_names, get_introducing_cid, get_r_commits, get_l_commits, get_diff_index, get_line_map, get_ts_node_by_line, get_changed_lines, get_basic_blocks_by_line, copy_path, gen_preds, gen_succs; imports=Levenshtein, collections, constant, copy, git, os, parse_patch, subprocess, tempfile, tree_sitter, util
+- version_range_evidence.py: lines=129; functions=read_patch, get_tags, get_vulnerable_tags, file_at_tag, check_patch_presence, has_codeql, create_db, analyze_db, parse_sarif, main; imports=argparse, constant, json, log_generation, os, parse_patch, subprocess
+- core\abstract_szz.py: lines=361; functions=__init__, __del__, repository, repository_path, find_bic, get_impacted_files, _blame, _parse_line_ranges, _is_comment, _set_working_tree_to_commit, __cleanup_repo, __clear_gitpython, get_commit, get_commit_diff, get_commit_unified_diff_text, __init__; imports=abc, comment_parser, enum, git, logging, ntpath, os, pydriller, shutil, tempfile, typing
+- core\comment_parser.py: lines=160; functions=parse_comments, parse_comments_srcml, js_comment_parser, php_comment_parser, rb_comment_parser, py_comment_parser; imports=collections, logging, os, re, subprocess, tempfile
+- core\vszz.py: lines=151; functions=remove_whitespace, compute_line_ratio, __init__, find_bic, map_modified_line; imports=Levenshtein, core.abstract_szz, git, json, logging, os, pydriller, subprocess, sys, traceback, typing
+
+Key Static Evidence:
+- README.md and requirements.txt are present.
+- Dataset directory is present with FFmpeg_dataset_fa.json.
+- Script sequence names suggest input preparation, VCC extraction, vulnerable-version generation, duplicated patch detection, and result parsing.
+- LLM-specific scripts are visible: gen_results_for_dels_llm.py and gen_results_for_no_dels_llm.py.
+- Baseline and V-SZZ comparison scripts are visible: gen_baseline_results_for_* and gen_results_for_*_vszz.py.
+- Core SZZ support is visible under core/abstract_szz.py, core/vszz.py, and core/comment_parser.py.
+- version_range_evidence.py and 3_gen_vuln_version.py indicate affected-version/version-range post-processing artifacts.
+
+Static Consistency Notes:
+- Static layout partially supports the paper claim that LLM4SZZ combines LLM assessment with SZZ-style candidate tracing.
+- Runtime behavior, prompts sent to models, API outputs, and benchmark reproduction were not checked. [EXECUTION NOT REQUESTED]
+- Completeness of required precomputed save_logs/model outputs is not verified. [NEEDS ARTIFACT]
+- The artifact appears to include post-processing for affected versions, which is adjacent to but distinct from paper-level SZZ evaluation.
+
+Observed Local Output / Data Artifacts:
+- README.md (2796 bytes)
+- requirements.txt (4527 bytes)
+- time.txt (38179 bytes)
+- dataset\FFmpeg_dataset_fa.json (198 bytes)
+
+Missing Data / Missing Entrypoints:
+- End-to-end execution was not requested. [EXECUTION NOT REQUESTED]
+- External repositories, full benchmark data, model outputs, API keys, and generated save_logs are not verified in this pass. [NEEDS ARTIFACT]

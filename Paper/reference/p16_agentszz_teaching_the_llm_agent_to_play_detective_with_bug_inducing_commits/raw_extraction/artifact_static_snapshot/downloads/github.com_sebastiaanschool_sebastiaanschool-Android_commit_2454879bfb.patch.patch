@@ -1,0 +1,47 @@
+From 2454879bfbad68792bd952e74d27a3b1425860a1 Mon Sep 17 00:00:00 2001
+From: Barend Garvelink <bgarvelink@xebia.com>
+Date: Sun, 23 Oct 2016 11:36:54 +0200
+Subject: [PATCH] Dispose of DownloadManagerInterface in onDestroy.
+
+This fixes a bug introduced in cf27461bfaa78798252103345b1c14528bb4828c. Prior
+to that commit, the DMI was bound to the Application object and there was no
+reason to unregister the download receiver. Now that it's bound to the main
+activity, there is.
+---
+ .../java/nl/sebastiaanschool/contact/app/MainActivity.java  | 6 ++++++
+ .../app/data/downloadmanager/DownloadManagerInterface.java  | 5 +++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/MainActivity.java b/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/MainActivity.java
+index 66df028..6310e86 100644
+--- a/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/MainActivity.java
++++ b/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/MainActivity.java
+@@ -62,6 +62,12 @@ private void initializeApplicationServices() {
+         }
+     }
+ 
++    @Override
++    protected void onDestroy() {
++        super.onDestroy();
++        DownloadManagerInterface.getInstance().destroy(this);
++    }
++
+     private void initializeStrictMode() {
+         if (BuildConfig.DEBUG) {
+             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+diff --git a/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/data/downloadmanager/DownloadManagerInterface.java b/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/data/downloadmanager/DownloadManagerInterface.java
+index 57c350f..fcf09e2 100644
+--- a/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/data/downloadmanager/DownloadManagerInterface.java
++++ b/Sebastiaanschool/src/main/java/nl/sebastiaanschool/contact/app/data/downloadmanager/DownloadManagerInterface.java
+@@ -63,6 +63,11 @@ private void registerReceiver(Context context) {
+         context.registerReceiver(downloadCompletionReceiver, filter);
+     }
+ 
++    public void destroy(Context context) {
++        context.unregisterReceiver(downloadCompletionReceiver);
++        instance = null;
++    }
++
+     /**
+      * Returns a hot observable that emits status updates for downloaded files.
+      * @return download observable.

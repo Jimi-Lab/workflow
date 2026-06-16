@@ -1,0 +1,46 @@
+Approach Precision Recall F1-Score
+SZZ 0.54 0.59 0.56
+AG-SZZ 0.55 0.60 0.57
+L-SZZ 0.52 0.51 0.51
+R-SZZ 0.52 0.51 0.52
+MA-SZZ 0.51 0.58 0.54
+RA-SZZ 0.51 0.58 0.54
+V-SZZ 0.44 0.49 0.47
+LLM4SZZ 0.62 0.61 0.62
+SZZ-Agent (Ours) 0.81 0.80 0.81
+Pre-processing.To prevent the agents from identifying the bug-
+introducing commit by matching commit hashes referenced in
+the fix commit message (e.g., in Fixes: tags), we redact commit
+hash references from all provided diffs and messages. Specifically,
+all occurrences of ground-truth commit hashes are replaced with
+COMMIT_HASH, and lines containingFixes:tags that reference these
+commits are removed entirely.
+3.2.2 Baselines.We compare against eight SZZ variants described
+in §2: SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ, RA-SZZ, V-SZZ, and
+LLM4SZZ. For all baselines except V-SZZ and LLM4SZZ, we use
+the implementations provided by Rosa et al. [22]. For V-SZZ and
+LLM4SZZ, we use the implementations provided by the respec-
+tive authors [4, 25]. To the best of our knowledge, LLM4SZZ [25],
+published at ACM ISSTA 2025, represents the state of the art.
+3.2.3 Agents.We use Claude Code [ 2] as our agent framework.
+Claude Code provides 30 built-in tools [ 3], including bash com-
+mand execution, file reading and editing, glob and grep search, web
+search, and sub-agent spawning—capabilities that are essential for
+inspecting source code across repository versions. We block all
+agents from using web search tools (e.g., WebSearch and WebFetch
+in Claude Code) to prevent them from searching the internet for
+solutions. As LLM backbones, we use models from Anthropic and
+OpenAI; see the individual experiment setups for details on which
+models we used. We explore open-source agents and open-source
+LLM backbones in Part 2 (§4.3.4).
+3.2.4 Metrics.Following Lyu et al . [18], we evaluate using pre-
+cision, recall, and F1-score. Since each fix commit 𝑐fix can have
+multiple ground-truth bug-introducing commits 𝐵 and multiple
+predicted commits ˆ𝐵, we compute per-fix-commit precision and
+recall as:
+Precision(𝑐fix)= |𝐵∩ ˆ𝐵|
+|ˆ𝐵|
+,Recall(𝑐 fix)= |𝐵∩ ˆ𝐵|
+|𝐵| .(1)
+We then macro-average across all fix commits and compute F1-score
+as the harmonic mean of the averaged precision and recall.

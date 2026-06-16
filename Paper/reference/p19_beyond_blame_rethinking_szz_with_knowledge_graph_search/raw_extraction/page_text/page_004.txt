@@ -1,0 +1,39 @@
+4 Yu Shi et al.
+Fig. 1. Categorization of bug-inducing commits (BICs) relative to blame commits. The Blame category (green)
+contains BICs that appear in blame commits; the Blame Ancestor category (blue) requires backward search
+from blame; the BFC Ancestor category (orange) requires backward search from the BFC toward blame.
+the common assumption that the bug fix location has to be one or more lines previously modified by
+the BIC [32]. This assumption of course can be incorrect, for instance when the commit identified
+by blame only modified whitespace characters and the real BIC is older than the former commit. In
+such cases, one could recursively apply blame to trace further back (illustrated as “Blame Ancestor”
+in Figure 1); other times, the BIC actually could be more recent than the blame commit (“BFC
+Ancestor” in Figure 1), for instance when the BIC changes the value of a configuration option,
+which reveals a bug in a different part of the system. In such a situation, some other kind of code
+or commit relation should be used to navigate from the BFC to the BIC.
+However, without knowing how often each scenario occurs and how deep the search must go,
+such extensions to the base SZZ techniques remain impractical. While prior work has examined
+file and statement overlap between BICs and bug-fixing commits (BFCs) [42], the distribution of
+ground truth BICs across different positions in the commit history relative to blame results has not
+been systematically characterized. Understanding this distribution is essential for better guiding
+the search strategy across the commit history of a project. For instance, if one would find that BICs
+requiring backward traversal are common, how far back in history should one go to search the
+BIC? If BICs instead lie in between the blame commit and the BFC, how much closer to the BFC
+are they typically located? This preliminary study addresses this gap by categorizing where BICs
+appear with respect to blame commits, in order to assess the completeness of blame-based search
+and to determine whether broader history traversal is necessary.
+3.2 Approach
+3.2.1 Datasets.We use the same three developer-annotated datasets as LLM4SZZ [ 36], where
+BFC-BIC pairs are extracted from bug reports or commit messages authored by developers. These
+datasets provide higher ground truth quality than SZZ-generated datasets [8, 25].DS_LINUX[ 23]
+is derived from the Linux kernel (written in C), where developers explicitly label bug-inducing
+commits in their fix messages. We use the exact same 1,500 pairs provided by LLM4SZZ [ 36].
+DS_APACHE[ 42] is constructed from five Apache Software Foundation Java projects, with BIC
+annotations extracted from issue tracking systems and commit messages. This dataset contains 241
+validated pairs.DS_GITHUB[ 29] spans 295 open-source repositories with developer-annotated
+BIC information mined from commit messages. This dataset contains 361 pairs, which we further
+split into DS_GITHUB-c (C language, 286 pairs) and DS_GITHUB-j (Java, 75 pairs) for language-
+specific analysis. In total, our evaluation covers 2,102 BFC-BIC pairs with 2,272 ground truth BICs,
+as some fixes address bugs introduced by multiple commits.
+3.2.2 BIC Categorization.To characterize the search space, we execute git blameon the modified
+lines of each BFC and automatically classify the ground truth BIC based on its reachability from
+, Vol. 1, No. 1, Article . Publication date: February 2026.

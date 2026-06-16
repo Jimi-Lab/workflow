@@ -1,0 +1,47 @@
+ISSTA016:4 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+results demonstrate that LLM4SZZ surpasses all other baselines in F1-score, with a notable improve-
+ment ranging from 6.9% to 16.0%. Furthermore, LLM4SZZ enhances both precision and F1-score
+without significantly sacrificing recall.
+RQ2: How effective are the key components of LLM4SZZ ?
+We also conduct an ablation experiment to ensure that all key components of LLM4SZZ, namely
+the context-enhanced assessment, the context-enhanced identification, and the rank-based identifi-
+cation, contribute to its performance. Additionally, we demonstrate that utilizing LLMs directly on
+the SZZ algorithm cannot yield satisfactory results.
+RQ3: How effective is LLM4SZZ if we apply it on other open-source large language models?
+In this RQ, we aim to examine whether the core ideas of LLM4SZZ can be applied to other
+open-source large language models. We implement LLM4SZZ using llama3-8b and llama3-70b. The
+experimental results show that LLM4SZZ can be effectively applied to other LLMs, and better LLMs
+can enhance its performance.
+In summary, we make the following contributions:
+•We provide insights into how large language models (LLMs) can enhance the performance of the
+SZZ algorithm while also highlighting the limitations in this task.
+•Based on these insights, we propose a novel approach to fully leverage the LLM’s capabilities,
+which consists of two methods for locating bug-inducing commits, with the choice of method
+being adaptive to the LLM’s ability to comprehend the bug.
+•We implement LLM4SZZ on two popular programming languages and evaluate it on three
+developer-annotated datasets. The experimental results show that LLM4SZZ outperforms all
+other baselines across the datasets.
+2 Background
+In this section, we first introduce the SZZ algorithm’s variants. Then we present our motivation
+examples.
+2.1 SZZ Algorithms
+AG-SZZ. The AG-SZZ algorithm was proposed by Kim et al. [Kim et al . 2006]. They observed
+that some changes in bug-fixing commits, such as blank lines, comments, and cosmetic changes,
+do not affect the program’s behavior. Therefore, they excluded these changes when tracing back
+deleted lines. Additionally, they utilized the annotation graph instead of simply using the annotate
+command, as the annotation graph provides more detailed information about line changes and
+movements.
+MA-SZZ. Da Costa et al. proposed the MA-SZZ algorithm. [Da Costa et al. 2016]. They found that
+the AG-SZZ algorithm mistakenly identifies commits with only meta-changes as bug-inducing
+commits. Meta-changes refer to branch changes, merge changes, and property changes. Da Costa et
+al. addressed this issue by connecting all meta-change nodes in the annotation graph to their prior
+changes, ensuring that the MA-SZZ algorithm does not include meta-changes as bug-inducing
+commits.
+R-SZZ and L-SZZ. L-SZZ and R-SZZ, both based on the AG-SZZ algorithm, were proposed by
+Davies et al. [Davies et al . 2014]. They improved the AG-SZZ algorithm by selecting only one
+commit as the bug-inducing commit from the results produced by the AG-SZZ algorithm. R-SZZ
+selects the commit with the most recent date, while L-SZZ selects the commit with the most changed
+lines.
+RA-SZZ. Neto et al. [Neto et al . 2018] proposed the RA-SZZ algorithm after discovering that
+previous SZZ algorithms trace back changed lines related to refactoring operations when locating
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

@@ -1,0 +1,75 @@
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3043
+Fig. 7. Locating bug-inducing commits.
+fect test” model proposed by Rodríguez-Pérez et al. [29].T h e
+model consists of two parts. The first part involves determining
+whether a commit is buggy. They assume there exists a “per-
+fect test” to accomplish this. If a commit can pass the test,
+it is considered correct; otherwise, it is deemed buggy. The
+second part involves locating the bug-inducing commit. They
+trace back from the bug-fixing commit until encountering the
+earliest commit that fails the “perfect test,” marking it as the
+bug-inducing commit. However, in practice, there is always no
+applicable “perfect test” available. Therefore, they replace it
+with manually designed tests based on bug reports.
+Based on the model mentioned above, our method to locate
+the bug-inducing commits also consists of two parts. To deter-
+mine whether a commit is buggy, we replace the “perfect test”
+with the buggy statements collected above. As we mentioned
+above, each buggy statement is indispensable to the occurrence
+of the bug. Thus, we consider the commit as buggy only when it
+contains all buggy statements or it contains statements with the
+same semantic meaning as all buggy statements. To determine
+whether two statements have the same semantic meaning, we
+leverage the methodology proposed by V-SZZ [17].I ft w o
+statements have a line similarity beyond a threshold, we believe
+that they have the same semantic meaning. Here, we also use the
+same method to compute line similarity and set the similarity
+t h r e s h o l dt o0 . 7 5a sV - S Z Z .
+Suppose that we have two strings S
+1 and S2. We first cal-
+culate the sum of the length of S1 and S2 as in formula 1.
+Then we calculate the line similarity shown in formula2, where
+the levenshteinDistance function is used to calculate the
+Levenshtein edit distance[30] of the two strings. Line similarity
+ranges from 0 to 1. Higher values indicate a greater likelihood
+that two code statements share the same semantic meaning.
+L=len(S
+1)+ len(S2) (1)
+S =(L−levenshteinDistance(S1,S2))/L (2)
+To locate the bug-inducing commits, we trace back all buggy
+statements, generating a set of candidate commits. Subse-
+quently, we scrutinize these candidates to identify the earliest
+buggy commit and designate it as the bug-inducing commit,
+which is the same as the model above.
+Fig. 7 illustrates the process o f locating bug-inducing
+commits. After obtaining statements contributing to the bug,
+we first use the git blame tool on the statements and
+obtain two candidates: commit 153bedbac2e and commit
+feb4a51323b. Then we begin to check which commit
+first introduces all buggy statements. We first check the
+earliest commit 153bedbac2e and find that no statement
+has a line similarity over 0.75 with the statement flags
+= atomic_fetch_andnot(IRQ_WORK_PENDING, &
+work-> flags). The most closely related statement is line
+3, but its similarity is still under 0.75. Thus, 153bedbac2e
+is not the bug-inducing commit. Then, we check commit
+feb4a51323b and find that it contains all statements in
+the buggy statements. Thus, we designate it as the final
+bug-inducing commit, which is the same as the developers’
+message in Fig. 1.
+E. Extending S
+EM-SZZ to Bug-Fixing Commits With
+Deleted Lines
+While our method is primarily designed for bug-fixing com-
+mits with only added lines, the approach of comparing program
+states and identifying buggy statements can also be applied to
+commits with deleted lines. However, some adjustments are
+necessary for this scenario, particularly with respect to deleted
+lines.
+First, during program slicing, we mark the basic block con-
+taining deleted lines as the point of interest and search its nearest
+N predecessors and successors. Second, when comparing pro-
+gram states, we focus more on deleted lines. Specifically, if we
+find differences in path constraints between the previous and
+current versions, we identify the deleted lines related to those
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

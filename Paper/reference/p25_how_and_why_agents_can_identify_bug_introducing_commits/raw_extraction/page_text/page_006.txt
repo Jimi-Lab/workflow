@@ -1,0 +1,72 @@
+Preprint, Under Submission, arXiv Risse et al.
+Fix Commit
+Get Files
+Modified by
+Fix Commit
+Collect File
+Commit
+Histories
+Candidate
+Commits
+Commit
+Identifier BICs
+Direct Commit Selection
+Input Process Agent Call Output
+Figure 2: Simple-SZZ-Agent: The fix commit’s file histories are collected into a single candidate set. An agent with access to
+developer tools directly selects the bug-introducing commit, without SZZ-based filtering or binary search.
+Table 7: RQ3: Comparison of SZZ-Agent and Simple-SZZ-Agent for bug-introducing commit identification. Best results per
+dataset in bold.
+DS_LINUX DS_GITHUB-c DS_GITHUB-j
+Approach Precision Recall F1-Score Precision Recall F1-Score Precision Recall F1-Score
+SZZ 0.49 0.60 0.54 0.46 0.61 0.53 0.48 0.68 0.57
+LLM4SZZ 0.65 0.64 0.64 0.63 0.62 0.63 0.55 0.55 0.55
+SZZ-Agent 0.78 0.76 0.770.750.740.750.67 0.67 0.67
+Simple-SZZ-Agent 0.82 0.81 0.81 0.75 0.75 0.75 0.75 0.75 0.75
+lowest cost. If the agent can identify the bug-introducing commit
+from a large candidate set in a single step, do we need the complexity
+of SZZ-Agent at all? Motivated by this finding, we design Simple-
+SZZ-Agent, a drastically simplified approach that removes both the
+SZZ-based first stage and the binary search.
+4.1 Approach
+Figure 2 shows an overview of Simple-SZZ-Agent. Given a fix com-
+mit, the approach collects the commit histories of all files modi-
+fied by the fix, forming a single candidate set. It then provides an
+LLM-based agent with the fix commit message, the fix commit diff,
+and the full candidate set. The agent has access to standard devel-
+oper tools (file reading, grep, glob) and is instructed to identify the
+bug-introducing commit. Since our ablations showed that omitting
+binary search improves both performance and cost (RQ2e), and that
+Stage 1 alone contributes less than Stage 2 (RQ2d), Simple-SZZ-
+Agent removes both: no SZZ-based filtering, no binary search, and
+no multi-stage pipeline—it relies entirely on the agent to find the
+bug-introducing commit among all candidates.
+4.2 Experimental Setup
+We evaluate whether Simple-SZZ-Agent can match SZZ-Agent’s
+performance and investigate why it works.
+RQ3 (Effectiveness):Can Simple-SZZ-Agent achieve a simi-
+lar performance to SZZ-Agent at identifying bug-introducing
+commits?
+RQ4 (Analysis):How can we explain the surprising success of
+Simple-SZZ-Agent?
+(a) Strategy:How can Simple-SZZ-Agent find the needle (BIC)
+in the haystack (large candidate commit set)?
+(b) Failures:Where does Simple-SZZ-Agent still fail?
+(c) Generalization:Can we expect even better results with
+better agents and/or better models?
+We use the same datasets, pre-processing, baselines, and metrics
+as in Part 1 (§3.2). Unless stated otherwise, all experiments use
+DS_LINUX-26 with Claude Opus 4.5 as the LLM backbone and
+Claude Code as the agent framework.
+4.3 Experiments
+4.3.1 RQ3: Effectiveness.We evaluate whether Simple-SZZ-Agent
+can match or exceed the performance of SZZ-Agent despite its
+drastically simpler design.
+Setup.We run Simple-SZZ-Agent on DS_LINUX, DS_GITHUB-
+c, and DS_GITHUB-j, and compare against SZZ, LLM4SZZ, and
+SZZ-Agent.
+Results.Table 7 shows the results. Simple-SZZ-Agent matches
+or outperforms SZZ-Agent on every dataset. On DS_LINUX, it
+achieves 0.81 F1-score compared to 0.77 for SZZ-Agent, an improve-
+ment of 4 percentage points. On DS_GITHUB-c, both achieve 0.75.
+On DS_GITHUB-j, Simple-SZZ-Agent achieves 0.75 compared to
+0.67 for SZZ-Agent, an improvement of 8 percentage points.

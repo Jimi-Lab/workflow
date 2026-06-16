@@ -1,0 +1,34 @@
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 7
+Fig. 4. AgenticSZZ architecture. Given a Bug-Fixing Commit (BFC) and its repository, TKG Construction
+identifies blame commits and expands the search space by traversing file history backward from two starting
+points (Blame Ancestor and BFC Ancestor). Agentic BIC Search then navigates the resulting graph using four
+specialized tools to identify the Bug-Inducing Commit (BIC).
+Summary of RQ0
+•While 57.2% of BICs do appear directly in blame commits, 36.6% of these Blame category cases involve
+multiple candidates requiring intelligent selection.
+•28.0% of BICs require commit history traversal beyond blame results (Blame Ancestor or BFC Ancestor),
+and 14.1% of cases are blameless (traditional blame-based approaches cannot apply).
+Implication:Differentiating between these three categories is a promising direction for improving BIC
+identification. However, it requires intelligent reasoning to predict which category applies to a given case,
+as exhaustive graph traversal for all potential BIC candidates would be prohibitively expensive.
+4 Methodology
+Based on the findings of the preliminary study, we propose a new BIC identification approach
+called AgenticSZZ that goes beyond focusing only on commits of the Blame category, where prior
+approaches are confined to. AgenticSZZ has two phases as shown in Figure 4: (1) constructing a
+Temporal Knowledge Graph (TKG) that expands the candidate set beyond direct blame commits
+to include ancestor commits, and (2) leveraging an LLM agent equipped with specialized tools to
+navigate and reason over this graph, allowing to identify other commits such as BIC, for instance a
+BFC Ancestor or even a Blameless commit.
+Given a bug-fixing commit (BFC) and its repository, we first construct a TKG through blame
+analysis and commit history traversal in two directions: backward from blame commits (Blame
+Ancestor) and backward from the BFC itself (BFC Ancestor). The TKG encodes commits as nodes
+with temporal ordering and code structure connections in the form of shared files and functions. An
+LLM agent then navigates this graph using specialized tools that support candidate enumeration,
+commit property inspection, causal analysis, and structural relationship exploration. The TKG
+should be as complete as possible to ensure the true BIC is reachable, while the agent must be as
+precise as possible to avoid overwhelming false positives from simply returning all graph nodes as
+candidates.
+4.1 Temporal Knowledge Graph Construction
+The TKG construction phase transforms raw repository data into a structured search space that
+captures both temporal commit relationships and code entity connections.
+, Vol. 1, No. 1, Article . Publication date: February 2026.

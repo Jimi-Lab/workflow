@@ -1,0 +1,11 @@
+2 Background and Related Work
+2.1 SZZ Algorithms
+The SZZ algorithm [33] is the foundational approach for automated
+BIC identification. Given a bug-fixing commit, it traces deleted or
+modified lines back to the commits that last touched them, treating
+those commits as BIC candidates. The original implementation
+operates on CVS repositories using the annotate command; modern
+implementations adapt this principle to Git viagit blame. While
+conceptually simple, the algorithm suffers from false positives, as
+not all changes to the fixed lines are semantically meaningful.
+A series of refinements have been proposed to address these

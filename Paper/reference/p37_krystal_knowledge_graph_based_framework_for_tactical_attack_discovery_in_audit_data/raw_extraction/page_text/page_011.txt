@@ -1,0 +1,126 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 3 
+Attack Scenarios. 
+Scenario 
+ID Dataset ID OS Platform Scenario Name Scenario description 
+1 Cadets I FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . An attacker sent a malformed HTTP request to a 
+vulnerable Nginx web server that leads to several malicious ﬁle creations and process 
+executions in the local system ( Figure 11 ). 
+2 Cadets I FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . A vulnerable Nginx webserver downloads several 
+malicious ﬁles after being exploited by a malformed HTTP request ( Figure 12 ). 
+3 Cadets II FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . Similar to Scenario 3, the vulnerable Nginx webserver 
+was successfully exploited by an attacker. It downloads a payload ﬁle which leads to 
+sensitive information leaking ( Figure 13 ). 
+4 Theia Ubuntu 
+12.04 
+Firefox 
+backdoor 
+Firefox backdoor w/ Drakon in-memory . Firefox process gets exploited by a malicious website 
+to download and execute ﬁles to steal sensitive information from users ( Figure 11 ). 
+5 Five 
+Direction 
+Windows 
+10 
+Firefox 
+backdoor 
+Firefox backdoor w/ Drakon in-memory . Firefox process gets exploited via a drakor memory 
+payload after browsing a malicious website ( Figure 15 ). 
+Furthermore, we extended the existing SEPSES Cybersecurity 
+Knowledge Graph ( Kiesling et al., 2019 ) by including attack tech- 
+niques and tactics from MITRE ATT&CK and incorporate it as exter- 
+nal background knowledge. Furthermore, we translate existing IoC 
+Sigma ( Roth and Patzke, 2021 ) rules into SPARQL queries. 
+To construct attack graphs (through backward-forward chaining 
+and graph querying ), link internal and external background knowl- 
+edge (via SPARQL query federation), as well as to visualize the re- 
+sulting attack graphs, we use the in-memory Jena TDB 33 and the 
+Stardog Enterprise Knowledge Graph platform . 34 
+7.2. Application scenarios 
+In the following application scenarios, we demonstrate how 
+the KRYSTAL framework automatically constructs compact attack 
+graphs, links and contextualizes them with background knowledge, 
+and ﬁnally maps them to high-level attack steps via TTPs deﬁned 
+in MITRE ATT&CK. 
+We use a DARPA dataset ( DAR, 2021 ) that contains attack sce- 
+narios carried out by a red team as part of the DARPA Transpar- 
+ent Computing (TC) program. An overview of the attack scenarios 
+can be found in Table 3 . Due to space limitation, we only explain 
+one scenario in this section (Scenario 1), and include the remaining 
+scenarios in the appendix. Scenario 1 - Nginx backdoor w/ Drakon 
+in-memory This attack scenario has been used as motivation exam- 
+ple in Section 1 . As shown in Fig. 11 , our system detected a num- 
+ber of alerts including ﬁle creation, change permission, ﬁle execu- 
+tion, and data-leak . After performing backward and forward chain- 
+ing, we successfully constructed the attack graph of this scenario. 
+Furthermore, we performed query federation during forward chain- 
+ing to include external background knowledge. Our query yields 
+an attack graph that automatically links the detected alerts to the 
+MITRE ATT&CK techniques and tactics. Finally, we can see the re- 
+constructed attack graph together with its kill-chain phases such 
+as Reconnaissance, Defense Evasion, Execution and Exﬁltration . 
+8. Evaluation 
+In this section, we evaluate the KRYSTAL framework through a 
+set of experiments and discuss the results. 
+8.1. Experimental setup 
+We performed the experiments on two machines: (i) an Ubuntu 
+18.04 Server (Intel 2.59 GHz vCPU, 32 GB RAM) was used for 
+provenance graph building and evaluation of threat detection and 
+alerting techniques. (ii) a Windows 10 (Intel 2.90 GHz vCPU, 16 GB 
+33 https://jena.apache.org/documentation/tdb/ 
+34 https://www.stardog.com/platform/ 
+RAM) machine was used for scenario reconstruction, graph query- 
+ing and attack graph visualization using Stardog Studio . 35 
+Dataset Overview For the evaluation, we used well-established 
+datasets from red vs. blue team adversarial engagements produced 
+as part of the third Transparent Computing (TC) program organized 
+by DARPA ( DAR, 2021 ). The datasets are organized into ﬁve cat- 
+egories, namely Cadets, Trace, Theia, FiveDirections and ClearScope . 
+Each dataset includes log events generated during the engage- 
+ments on a speciﬁc targeted host and platform. For example, Cadets 
+represents dtrace 36 log data from FreeBSD OS, Trace and Theia have 
+been generated from auditd 37 Ubuntu log data, and FiveDirection 
+contains ETW 38 log data from Microsoft Windows and ClearScope 
+collected from Android logs. In addition, a description of attack 
+steps is available as ground truth. Table 4 summarizes the ﬁve at- 
+tack scenarios from the Theia (TH), Cadets (CD), and FiveDirection 
+(FD) datasets that we evaluated. In total, the scenarios covers more 
+than 7 days of log data from three datasets, with more than 53 GB 
+of logs in JSON format. 39 
+8.2. Experiment results 
+We collect the following evaluations metrics in our experi- 
+ments: (i) provenance graph size reduction and compression per- 
+formance, (ii) run-time performance, (iii) provenance-based alert 
+detection, (iv) rule-based alert detection. 
+Graph Size Reduction & Compression Performance Table 4 shows 
+the evaluation results for provenance graph generation and com- 
+pression in the ﬁve scenarios. 
+Our system generates RDF-based provenance graphs in RDF 
+TURTLE format. 40 Out of the 18.7 GB Theia log dataset, for instance, 
+we generated a 280 MB provenance graph (i.e., 66x smaller), the 
+set of Cadets datasets (19 GB) resulted in a 400 MB provenance 
+graph (i.e., 48x smaller), and out of the Five direction dataset 
+(16 GB), we generated a 25 MB provenance graph (i.e., 640x 
+smaller). 
+The last column of Table 4 shows the compression re- 
+sults of the generated provenance graphs for each dataset in 
+HDT ( Fernández et al., 2013 ) format. On average, the resulting com- 
+pressed provenance graphs are approximately smaller by a factor 
+of 22 than the generated provenance graphs in TURTLE format. 
+Run-time Performance We evaluate three aspects to measure 
+the run-time performance of our approach: (i) Time for generating 
+the provenance graphs from the log data, including time for tag- 
+propagation, attenuation & decay and provenance-based alerting ; (ii) 
+35 https://www.stardog.com/studio/ 
+36 https://en.wikipedia.org/wiki/DTrace 
+37 https://linux.die.net/man/8/auditd 
+38 https://docs.microsoft.com/en-us/windows/win32/etw/event-tracing-portal 
+39 Note that DARPA published the datasets in both binary and JSON formats, we 
+used the JSON data as input in our evaluation. 
+40 https://www.w3.org/TR/turtle/ 
+12

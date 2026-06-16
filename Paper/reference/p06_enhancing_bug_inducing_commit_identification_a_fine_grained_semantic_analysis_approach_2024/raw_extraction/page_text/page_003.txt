@@ -1,0 +1,84 @@
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3039
+Fig. 1. A motivation example.
+• We introduce a new method for locating bug-inducing
+commits by identifying the earliest commit that introduces
+all these buggy statements and designating it as the bug-
+inducing commit.
+• Our experimental results demonstrate that S EM-SZZ out-
+performs all other baselines in all scenarios.
+II. M OTIVATION
+In this section, we present a motivation example to illustrate
+the need for an alternative approach.
+Fig. 1 illustrates our motivation example, showing a bug-
+fixing commit in the Linux kernel [22]. Due to space con-
+straints, only the most significant part of the patch is displayed.
+The commit message clearly indicates the reason behind the
+evolution of the bug. Specifically, the previous version of the
+program fails to clear the pending bit of the variable flags be-
+fore passing it to the functionatomic_cmpxchg. The developer
+addresses this issue by introducing a clear-bit operation through
+an add-and-assign operation at line 15.
+The previous approach, the A-SZZ algorithm [21], identifies
+the block that encompasses the added lines. In this example, it
+covers lines ranging from line 11 to 17. While it successfully
+identifies the bug-inducing commit, it also introduces signifi-
+cant noise. For instance, we can easily observe that the variable
+definition statement at line 11 is unrelated to the bug. The
+problem worsens when the block contains numerous lines. Most
+of these lines are unrelated to the bug.
+From the motivation example, we can make the following
+observations:
+Observation 1. Most of the bug-inducing commits can be
+found by tracing back the unmodified lines near the added
+lines. For instance, in this example, the bug-inducing commit
+can be located by tracing back to line 13, which is only two
+lines away from the added lines. Therefore, there is no need
+to trace back the entire block. In fact, subsequent experiments
+reveal that by tracing back only the two nearest unmodified
+lines adjacent to the added lines, we can identify 85% of bug-
+inducing commits with a much higher precision than the A-SZZ
+algorithm.
+Observation 2. To improve precision, we need to perform
+a more fine-grained analysis. Although tracing back the
+unmodified lines near the added lines is effective in locating
+bug-inducing commits, it still su ffers from low precision. For
+example, line 14 is unrelated to the variableflags and therefore
+unrelated to the bug. A more fine-grained analysis can resolve
+this issue. By conducting a data flow analysis on two versions
+of the program, one for the buggy version and one for the fixed
+version, we can observe that the sole difference lies in the data
+flow of the flags variable. In the previous version, the data flow
+of flags extends from line 12 to line 16. In the current version,
+it flows from lines 12, and 15 to 16, with a new add-and-assign
+operation at line 15. Thus, we can exclude the irrelevant line 14.
+Observation 3. The bug arises from the combined impact
+of multiple statements, each of which is indispensable for
+its occurrence. From the commit message, it is obvious that the
+bug requires two specific conditi ons. First, the variable flags
+must be assigned without clearing the pending bit (lines 12-
+13). Secondly, the variable flag must be passed to the function
+atomic_cmpxchg (lines 16-17). It’s the interaction between
+these statements that triggers the bug. Thus, when pinpointing
+bug-inducing commits, it’s essential to ensure that both state-
+ments are present within the identified commit, rather than just
+one of them.
+III. A
+PPROACH
+Building on the motivation example, our proposed method
+aims to effectively identify all statements contributing to the
+appearance of the bug. The architecture of S
+EM-SZZ is shown
+in Fig. 2.
+Observation 1 leads our approach to focusing on program
+segments near the added lines. Thus, we begin by performing
+program slicing [23], [24] to extract relevant program parts
+close to the additions. Based on Observation 2, after slicing the
+program, we delve into a more detailed analysis. This involves
+comparing the states of both versions of the program, one with
+the added lines and one without. Through thorough comparison
+and analysis, we identify specific statements associated with
+the added lines, pinpointing them as the triggers for the bug.
+Drawing on Observation 3, we proceed to locate bug-inducing
+commits by finding the earliest commit that contains all buggy
+statements.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

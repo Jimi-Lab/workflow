@@ -1,0 +1,92 @@
+Fig. 2. Schema visualization of node labels and relationship types in the
+Neo4j cybersecurity knowledge graph.
+properties: the vulnerability identiﬁer ( id), mapped CWE
+identiﬁers, a textual description, CVSS metrics (including
+vector string, base score, and severity — where CVSS, the
+Common V ulnerability Scoring System, is an industry-standard
+method for rating the severity of software vulnerabilities),
+exploitability and impact scores, and extracted CPE ( Common
+Platform Enumeration ) criteria, which specify the affected
+hardware, operating systems, or software products.
+Relationships created: The framework establishes relation-
+ships that link CVE to its corresponding CWE ( CVE → CWE).
+CWE (MITRE) : The CWE extraction process gathers
+identiﬁers and metadata (ID, name, abstraction level, structural
+type, and status), rich text ﬁelds (description, extended descrip-
+tion, background), and a wide range of structured or nested
+elements, including alternative terms, applicable platforms,
+modes of introduction (describing when and how the weakness
+can be introduced during development), likelihood of exploit,
+weakness ordinalities (sequence in which weaknesses might
+occur), common consequences, detection methods, potential
+mitigations etc.
+Relationships created: The pipeline forms hierarchical
+parent–child links between CWEs ( CWE → CWE), precedence
+links that indicate which weaknesses can occur before others,
+and cross-references connecting CWEs to related CAPEC
+attack patterns ( CWE → CAPEC).
+CAPEC (MITRE) : For CAPEC data, the collected prop-
+erties include identiﬁers and metadata (ID, name, abstraction,
+status), description, likelihood, severity , mid-level structured
+sections such as mitigations, prerequisites, indicators, required
+skills and resources, example instances, notes, consequences,
+execution ﬂow (sequence of attacker actions), and content
+history .
+Relationships created: W e establish hierarchical parent–child
+links between CAPEC entries ( CAPEC → CAPEC), precedence
+links, and mappings from CAPEC attack patterns to A TT&CK
+techniques ( CAPEC → ATT&CK).
+A TT&CK (Enterprise/Mobile/ICS STIX) : Across all
+supported A TT&CK domains, the pipeline collects common
+properties such as ID, external ID, object type, name,
+description, external references, timestamps/versioning, and
+domains. Depending on the object type, additional ﬁelds may
+include platforms (target operating systems or environments),
+aliases (alternative names), detection guidance etc.
+Extracted nodes include attack-pattern, campaign,
+course-of-action, intrusion-set, malware,
+tool, x-mitre-asset, x-mitre-data-source,
+x-mitre-tactic, x-mitre-matrix, etc.
+Relationships created: In our system, STIX-deﬁned
+relationship objects are materialized as graph edges by
+leveraging the relationship_type, source_ref, and
+target_ref ﬁelds, or, when APOC is unavailable,
+through a fallback naming scheme of the form
+sourceType_to_targetType.
+As shown in T able I, the largest node set in the constructed
+knowledge graph comes from the CVE dataset, with 307,142
+vulnerability entries. This is followed by 1,106 A TT&CK
+technique (STIX attack
+pattern) nodes from the A TT&CK
+framework. The third-largest group consists of 968 CWE
+nodes, reﬂecting common software and hardware weaknesses,
+while the fourth is 795 malware nodes, also extracted from
+A TT&CK. The 615 CAPEC nodes rank ﬁfth, capturing com-
+mon adversarial attack patterns.
+T ABLE I
+NO D E T Y P E S A N D T H E I R C O R R E S P O N D I N G E N T I T Y C O U N T S I N T H E NE O4J
+K N OW L E D G E G R A P H , S O RT E D F RO M H I G H E S T TO L OW E S T C O U N T .
+Node T ype Entity Count Node T ype Entity Count
+cve 307,142 tool 93
+attack pattern 1,106 campaign 51
+cwe 968 data source 42
+malware 795 tactic 40
+capec 615 asset 14
+course of action 334 matrix 4
+intrusion set 185 identity 1
+data component 122 marking deﬁnition 1
+The knowledge graph encodes a rich set of relationships
+across entities, capturing both structural and behavioral
+connections. The largest is the related_cwe relation
+(CVE→CWE) with 227,981 edges, followed by
+malware_to_attack_pattern (10,694 edges),
+intrusion_set_to_attack_pattern (4,095 edges),
+data_component_to_attack_pattern (2,522
+edges), course_of_action_to_attack_pattern
+(1,915 edges), related_capec (CWE→CAPEC, 1,212
+edges), cwe_child (1,151 edges), etc.
+T ogether, these interconnected entities and their rich set of
+relationships form a comprehensive, multi-perspective knowl-
+edge graph that represents vulnerabilities, weaknesses, attack
+patterns, malware, and adversarial behaviors across multiple
+MITRE knowledge sources. By capturing hierarchical, se-

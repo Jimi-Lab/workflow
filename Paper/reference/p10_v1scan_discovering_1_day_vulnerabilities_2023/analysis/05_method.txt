@@ -1,0 +1,8 @@
+System Overview: V1SCAN combines improved version-based detection with code-based verification through code classification.
+Pipeline Stages: hash target code; represent OSS/CPE/CVE candidates; perform version-based candidate filtering; perform code-based verification; report unique CVEs.
+Core Algorithm: Detector.py statically shows ctags-based extraction of functions/macros/structs/variables, normalization, TLSH hashing, CPE/CVE lookup, and vulnerability/patch hash matching.
+Data Structures: dictionaries for vulnerable hashes, patch hashes, reverse CVE mapping, target hashes, manual OSS-CPE mapping, and OSS list files.
+Design Choices: use entity-level code classification to distinguish reused code categories; combine version and code checks to reduce single-family detector errors.
+Static Reproducibility Signals: Detector.py, Detector_wrong.py, 32_v1scan_auto.py, ctags/readtags/optscript, OSSList files. Required dataset directories are missing. [NEEDS ARTIFACT]
+Execution Status: [EXECUTION NOT REQUESTED]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text; raw_extraction/source_static_inventory.txt; raw_extraction/tables; raw_extraction/figures.

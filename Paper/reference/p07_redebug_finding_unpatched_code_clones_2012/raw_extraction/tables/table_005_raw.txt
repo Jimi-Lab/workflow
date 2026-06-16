@@ -1,0 +1,90 @@
+tial tokens.
+Overall, this represents a larger number of tokens exactly
+matched, which yields a more conservative metric for “real”
+bugs (see § IV for a discussion).
+As we increased n, the total number of unpatched code
+clones ReDeBug found decreased. Note that as n increases,
+the total number of diffs we queried decreased. The reason
+is that some diffs had fewer than n tokens in total. Overall,
+ 0
+ 50
+ 100
+ 150
+ 200
+ 250
+ 300
+ 0
+ 50
+ 100
+ 150
+ 200
+ 250
+ 300
+ 350
+ 400
+The number of patches
+The number of identified unpatched code clones
+Figure 7: The identiﬁed unpatched code clones per patch
+The size of n
+n = 4
+n = 5
+n = 7
+# of queried diffs
+1,634
+1,248
+503
+Un-
+patched
+code
+clones
+Debian Lenny
+1,482
+1,013
+309
+Ubuntu Maverick
+1,058
+736
+251
+Linux Kernel 2.6.37.4
+3
+2
+0
+SourceForge (C/C++)
+10,248
+6,211
+2,130
+Debian Squeeze
+1,532
+1,061
+391
+Ubuntu Oneiric
+1,223
+828
+293
+Total
+15,546
+9,851
+3,374
+Table V: Unpatched code clones with various n for δ1 and
+δ2
+in the most conservative experiment, ReDeBug identiﬁed
+3,374 unique unpatched code copies that likely constitute
+real bugs.
+F. Code Clone Detection Errors
+A key question is, what is the false detection rate of Re-
+DeBug? There are several ways to answer this. One popular
+metric is the accuracy of the matching process. In ReDeBug,
+this is the Bloom ﬁlter tests. The Bloom ﬁlter tests have no
+false negatives, but may have false positives. We performed
+an exact match test on the 15,599 unpatched code clones
+initially reported, of which 15,546 were conﬁrmed. Thus,
+overall we had a 0.3% false positive rate in the Bloom ﬁlters.
+Our post-processing system removes this source of errors
+from the ﬁnal output.
+In several cases, such as the one shown in Listing 2,
+the vulnerability was found in dead code, which is not
+included at build time. This vulnerability can lead to an
+integer overﬂow that allows denial of service [15].
+56
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+

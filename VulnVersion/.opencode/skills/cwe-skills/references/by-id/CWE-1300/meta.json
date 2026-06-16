@@ -1,0 +1,277 @@
+{
+  "cwe_id": "CWE-1300",
+  "name": "Improper Protection of Physical Side Channels",
+  "abstraction": "Base",
+  "status": "Stable",
+  "description": "The device does not contain sufficient protection mechanisms to prevent physical side channels from exposing sensitive information due to patterns in physically observable phenomena such as variations in power consumption, electromagnetic emissions (EME), or acoustic emissions.",
+  "extended_description": "An adversary could monitor and measure physical phenomena to detect patterns and make inferences, even if it is not possible to extract the information in the digital domain. Physical side channels have been well-studied for decades in the context of breaking implementations of cryptographic algorithms or other attacks against security features. These side channels may be easily observed by an adversary with physical access to the device, or using a tool that is in close proximity. If the adversary can monitor hardware operation and correlate its data processing with power, EME, and acoustic measurements, the adversary might be able to recover of secret keys and data.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-203",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Observable Discrepancy"
+      },
+      {
+        "cwe_id": "CWE-203",
+        "nature": "ChildOf",
+        "view_id": "1194",
+        "ordinal": "Primary",
+        "name": "Observable Discrepancy"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The device does not contain sufficient protection mechanisms to prevent physical side channels from exposing sensitive information due to patterns in physically observable phenomena such as variations in power...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "physical",
+      "adversary",
+      "channels",
+      "side"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "physical",
+      "adversary",
+      "channels",
+      "side",
+      "information",
+      "protection",
+      "emissions",
+      "phenomena"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Consider a device that checks a passcode to unlock the screen.",
+        "snippet": "As each character of the PIN number is entered, a correct character exhibits one current pulse shape while an incorrect character exhibits a different current pulse shape."
+      },
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Consider the device vulnerability CVE-2021-3011, which affects certain microcontrollers [REF-1221]. The Google Titan Security Key is used for two-factor...",
+        "snippet": "The local method of extracting the secret key consists of plugging the key into a USB port and using electromagnetic (EM) sniffing tools and computers."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The code snippet provided here is part of the modular exponentiation module found in the HACK@DAC'21 Openpiton System-on-Chip (SoC), specifically within the...",
+        "snippet": "... module mod_exp ... `UPDATE: begin if (exponent_reg != 'd0) begin if (exponent_reg[0]) result_reg <= result_next; base_reg <= base_next; exponent_reg <= exponent_next; state <= `UPDATE; ... endmodule"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "Consider a device that checks a passcode to unlock the screen.",
+        "snippet": "Rather than comparing each character to the correct PIN value as it is entered, the device could accumulate the PIN in a register, and do the comparison all at once at the end. Alternatively, the components for the..."
+      },
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "Consider the device vulnerability CVE-2021-3011, which affects certain microcontrollers [REF-1221]. The Google Titan Security Key is used for two-factor...",
+        "snippet": "Several solutions could have been considered by the manufacturer. For example, the manufacturer could shield the circuitry in the key or add randomized delays, indirect calculations with random values involved, or..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The code snippet provided here is part of the modular exponentiation module found in the HACK@DAC'21 Openpiton System-on-Chip (SoC), specifically within the...",
+        "snippet": "... module mod_exp ... `UPDATE: begin if (exponent_reg != 'd0) begin if (exponent_reg[0]) begin result_reg <= result_next; end else begin mask_reg <= result_next; end base_reg <= base_next; exponent_reg <=..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-35888",
+        "description": "Power side-channels leak secret information from processor",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-35888"
+      },
+      {
+        "reference": "CVE-2021-3011",
+        "description": "electromagnetic-wave side-channel in security-related microcontrollers allows extraction of private key",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-3011"
+      },
+      {
+        "reference": "CVE-2019-14353",
+        "description": "Crypto hardware wallet's power consumption relates to total number of pixels illuminated, creating a side channel in the USB connection that allows attackers to determine secrets displayed such as PIN numbers and...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-14353"
+      },
+      {
+        "reference": "CVE-2020-27211",
+        "description": "Chain: microcontroller system-on-chip contains uses a register value stored in flash to set product protection state on the memory bus but does not contain protection against fault injection (CWE-1319), which leads to...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-27211"
+      },
+      {
+        "reference": "CVE-2013-4576",
+        "description": "message encryption software uses certain instruction sequences that allows RSA key extraction using a chosen-ciphertext attack and acoustic cryptanalysis",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2013-4576"
+      },
+      {
+        "reference": "CVE-2020-28368",
+        "description": "virtualization product allows recovery of AES keys from the guest OS using a side channel attack against a power/energy monitoring interface.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-28368"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

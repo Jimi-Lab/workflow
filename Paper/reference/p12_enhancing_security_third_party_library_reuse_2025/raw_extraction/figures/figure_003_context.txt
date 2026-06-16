@@ -1,0 +1,78 @@
+fficial patches for certain vulnerable TPLs, V ULTURE further
+provides fix suggestions based on the reported vulnerabilities.
+4
+
+===== PAGE 005 =====
+1.  TPLFILTER Construction 2. TPL Reuse Identification
+Similarity
+Comparison
+Function Hash 
+Hashing
+Birth-time Comparison
+Path-name Comparison
+Target Program
+ Identification Optimization
+3. 1-day Vulnerability Detection
+CVE-Commit Mapping
+Patch Commit
+V1 V2 ...... Vn
+V1.2
+Release Slice
+Reused
+LibraryRedundant
+Function
+Elimination
+Vulnerability
+Report
+Selection
+TPL
+Selection
+TPL Hash
+Flaw Report
+Line Match
+Chunk Match
+Chunk Extraction
+Code FormatSyntactic Analysis
+Chunk-based Analysis
+File Path
+Version
+Func Hashing
+CVE ID
+CPE
+Patch Commit
+ Reuse Report
+TPL Summary
+SynChunk Process
+Candidate
+Vulnerability
+Extraction
+Component 
+Segment
+Vulnerability 
+Segment
+Candidate Libraries
+Public database
+Birth Time
+Description
+Parsing
+Commit
+Mapping
+LLM
+Fig. 3: Workflow of V ULTURE
+IV. V ULTURE
+A. TPLF ILTER
+To detect 1-day vulnerabilities introduced by TPL reuses,
+VULTURE must 1) identify the reused TPLs in the target
+program; 2) verify whether the reused TPL version is vulner-
+able; 3) suggest if any potential patch is available. Therefore,
+VULTURE is required to construct a database, containing the
+TPLs commonly used by a platform and the corresponding
+vulnerable and patch information as a detection reference.
+1) TPL Selection: As TPLs vary across different plat-
+forms, VULTURE executes TPLF ILTER to construct a database
+containing TPLs specific to the targeted platform (e.g., IoT
+firmware, Android, iOS). Since most open-source projects are
+maintained and operated on GitHub, TPLF ILTER first collects
+all prevalent libraries from GitHub or existing TPL databases,
+such as OpenWRT [9] and Awesome Android [1]. To select
+TPLs specific to the target platform, we manu

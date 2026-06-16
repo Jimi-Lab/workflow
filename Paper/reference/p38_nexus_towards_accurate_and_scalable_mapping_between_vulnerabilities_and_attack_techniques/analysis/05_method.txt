@@ -1,0 +1,21 @@
+Method Deep Analysis
+
+Core idea:
+NEXUS addresses automatic CVE-to-ATT&CK TTP mapping. The paper identifies four challenges: lack of large-scale labeled datasets, difficulty extracting attack behavior from unstructured CVE descriptions, data imbalance/limited TTP coverage, and lack of adaptive feedback mechanisms.
+
+Pipeline:
+1. Ground-truth dataset construction: uses structured CVE-CWE-CAPEC-TTP chains to map CVEs to ATT&CK techniques.
+2. Attack-pattern extraction: preprocesses CVE descriptions, uses semantic/dependency-style extraction, and classifies whether sub-sentences contain attack patterns.
+3. Dataset enhancement: uses GPT-4o-mini-style label adjustment to add missing TTP labels and Llama-3.1-8B-style paraphrasing to augment samples for underrepresented TTPs.
+4. Multi-label classifier training: fine-tunes BERT-family models such as BERT, RoBERTa, SecureBERT, and SecureBERT-Plus for CVE-to-TTP prediction.
+5. Prediction and adaptation: stores analyst feedback through exact-match and behavioral signatures, then reuses/validates feedback to refine future predictions without full retraining.
+
+Design pattern useful for VulnVersion:
+- Combine structured chains with LLM repair: VulnVersion can combine deterministic CVE-patch-version graph edges with LLM/agent judgment only where structured evidence is ambiguous.
+- Treat dataset imbalance as a first-class problem: affected-version datasets may overrepresent popular ecosystems and direct fixes, while backports, renamed files, and partial fixes are rarer.
+- Add feedback memory: agent judgments can store corrected patterns such as "patch backported without same commit hash" or "function renamed before vulnerable version" for future cases.
+- Multi-stage evaluation: NEXUS separates dataset construction, enhancement, classifier choice, prediction, and adaptation; VulnVersion can similarly evaluate retrieval, graph construction, judgment, and feedback.
+
+Not transferable:
+- NEXUS predicts ATT&CK techniques, not affected version ranges.
+- Its high reported F1 scores cannot justify VulnVersion effectiveness without affected-version experiments. [NEEDS EXPERIMENT]

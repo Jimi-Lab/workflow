@@ -1,0 +1,46 @@
+ISSTA016:20 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+performance of code generation using techniques such as chain of thought reasoning [Jiang et al.
+2023; Zhang et al . 2023], static analysis [Ahmed et al . 2024] and finetuning [Shin et al . 2023].
+LLMs can also be used to generate new test cases, showing higher coverage [Deng et al . 2023;
+Hu et al. 2023]. Combing with techniques such as differential testing, they can generate more
+failure-inducing test cases [Li et al. 2023b]. In software maintenance, LLMs can be used in tasks
+such as fault localization [Kang et al. 2023; Wu et al. 2023], bug reproducing [Feng and Chen 2024],
+bug severity predicting [Mashhadi et al. 2023] and program repair [Xia and Zhang 2022, 2023a,b].
+SZZ algorithm evaluation. The SZZ algorithm and its variants have been extensively evalu-
+ated by many researchers. Initially, evaluations are based on datasets manually annotated by
+researchers [Davies et al. 2014]. However, building such datasets is time-consuming and may not
+yield accurate results. To address these challenges, researchers have proposed datasets based on
+developers’ annotations. They extract these annotations from bug reports [Wen et al. 2019] and
+commit messages [Lyu et al. 2024; Rosa et al. 2021].
+SZZ algorithm application. The SZZ algorithms have been widely used in empirical studies,
+including software quality [Çaglayan and Bener 2016], code smells [Palomba et al . 2018], code
+reviews [Bavota and Russo 2015; Kononenko et al. 2015], and developer collaboration [Bernardi et al.
+2018]. The SZZ algorithm has also been applied to just-in-time defect detection [Jiang et al. 2013;
+Kamei et al. 2012; McIntosh and Kamei 2018]. Researchers use the SZZ algorithm to identify bug-
+inducing commits in projects, which are then used to train models and evaluate their effectiveness.
+8 Conclusion and Future Work
+In this study, we propose a novel approach named LLM4SZZ, which utilizes large language models
+(LLMs) to locate bug-inducing commits based on bug-fixing commits. The core idea of LLM4SZZ
+is to adopt different approaches for identifying bug-inducing commits based on the LLM’s ability
+to comprehend the bug. During the ability assessment, we provide the LLM with both expanded
+and refined contexts to assist it in locating buggy statements and determining whether the bug
+exists. Based on the assessment results, we then employ either rank-based identification or context-
+enhanced identification. We evaluateLLM4SZZ using three high-quality datasets, and experimental
+results show that it outperforms all other baselines in F1-score and can identify extra bug-inducing
+commits that the baselines cannot detect. In the future, we plan to extend LLM4SZZ to support
+additional programming languages and collect more high-quality datasets of bug-fixing commits
+along with their corresponding bug-inducing commits. Additionally, we intend to fine-tune the
+LLMs to enhance their ability to comprehend bugs and determine their presence in a commit.
+Furthermore, we aim to leverage the LLMs to identify bug-inducing commits based on bug-fixing
+commits, even in cases where they do not modify the same files or functions.
+9 Acknowledgement
+This research/project is supported by the National Science Foundation of China (No.62372398,
+No.62202420 and No.72342025) and the Zhejiang Pioneer (Jianbing) Project (2025C01198(SD2)), and
+funded by ZJU-China Unicom Digital Security Joint Laboratory.
+Data Availability
+The replication package, which includes the source code, datasets, and LLMs’ output, can be found
+at https://doi.org/10.6084/m9.figshare.27418236.v1.
+References
+Toufique Ahmed, Kunal Suresh Pai, Premkumar Devanbu, and Earl Barr. 2024. Automatic semantic augmentation of
+language model prompts (for code summarization). In Proceedings of the IEEE/ACM 46th International Conference on
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

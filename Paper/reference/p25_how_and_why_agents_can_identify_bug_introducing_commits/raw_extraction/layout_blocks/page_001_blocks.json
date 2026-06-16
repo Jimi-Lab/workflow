@@ -1,0 +1,257 @@
+[
+  {
+    "page": 1,
+    "block_id": "page_001:block_001",
+    "block_type": "text",
+    "text": "How and Why Agents Can Identify Bug-Introducing Commits",
+    "bbox": [
+      64.63099670410156,
+      78.01364135742188,
+      547.3682250976562,
+      100.22151184082031
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_002",
+    "block_type": "text",
+    "text": "Niklas Risse MPI-SP Bochum, Germany niklas.risse@mpi-sp.org",
+    "bbox": [
+      134.15098571777344,
+      105.99241638183594,
+      232.6212615966797,
+      157.86843872070312
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_003",
+    "block_type": "text",
+    "text": "Marcel Böhme MPI-SP Bochum, Germany marcel.boehme@acm.org",
+    "bbox": [
+      377.94403076171875,
+      105.99241638183594,
+      481.2761535644531,
+      157.86843872070312
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_004",
+    "block_type": "text",
+    "text": "Abstract",
+    "bbox": [
+      53.79803466796875,
+      164.231201171875,
+      95.41625213623047,
+      178.8712158203125
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_005",
+    "block_type": "text",
+    "text": "Śliwerski, Zimmermann, and Zeller (SZZ) just won the 2026 ACM SIGSOFT Impact Award for asking:",
+    "bbox": [
+      53.79800033569336,
+      178.90382385253906,
+      294.04638671875,
+      202.25437927246094
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_006",
+    "block_type": "text",
+    "text": "When do changes induce fixes?",
+    "bbox": [
+      116.3489990234375,
+      203.7467803955078,
+      231.4507293701172,
+      216.1383514404297
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_007",
+    "block_type": "text",
+    "text": "Their paper from 2005 served as the foundation for a wide array of approaches aimed at identifying bug-introducing changes (or commits) from fix commits in software repositories. But even after two decades of progress, the best-performing approach from 2025 yields a modest increase of 10 percentage points in F1-score on the most popular Linux kernel dataset. In this paper, we uncover how and why LLM-based agents can substantially advance the state-of-the-art in identifying bug- introducing commits from fix commits. We propose a simple agentic workflow based on searching a set of candidate commits and find that it raises the F1-score from 0.64 to 0.81 on the most popular Linux kernel dataset, a bigger jump than between the original 2005 method (0.54) and the previous SOTA (0.64). We also uncover why agents are so successful: They derive short greppable patterns from the fix commit diff and message and use them to effectively search and find bug-introducing commits in large candidate sets. Finally, we also discuss how these insights might enable further progress in bug detection, root cause understanding, and repair.",
+    "bbox": [
+      53.46699905395508,
+      217.6308135986328,
+      295.5561218261719,
+      416.3233642578125
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_008",
+    "block_type": "text",
+    "text": "1 Introduction",
+    "bbox": [
+      53.79800033569336,
+      427.607177734375,
+      133.3798828125,
+      442.2471923828125
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_009",
+    "block_type": "text",
+    "text": "The problem of identifying bug-introducing commits from fix com- mits has seen remarkable interest from the software engineering research community, demonstrated by the more than 1300 citations of the award-winning paper by Śliwerski, Zimmermann, and Zeller (SZZ) [ 31 ]. The problem is also highly relevant for practitioners, since identifying bug-introducing changes is essential to determine which software versions are affected by security-critical bugs [5]. Even though many new approaches have been released since 2005 [ 4 , 6 , 7 , 11 , 19 , 24 , 25 ], the performance gains remain fairly limited [ 5 ]. The foundational 2005 SZZ paper [ 31 ] already achieves 0.54 F1-score on a high-quality developer-annotated dataset derived from the Linux kernel [ 18 ]. On the same dataset, the state-of-the- art method from 2025 [ 25 ] scores just 10 percentage points higher, with an F1-score of 0.64. To break the trend of small incremental improvements, entirely new approaches are needed. In this paper, we study LLM-based agents for the task of identi- fying bug-introducing commits (BICs) from fix commits.",
+    "bbox": [
+      53.46699905395508,
+      442.28082275390625,
+      295.5624084472656,
+      630.014404296875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_010",
+    "block_type": "text",
+    "text": "Part 1: SZZ-Agent. First, we introduce SZZ-Agent , which targets fix commits where the original SZZ algorithm struggles: cases where SZZ finds no candidate BICs (e.g., because the fix adds code rather than removing it), or where its prediction is likely wrong. SZZ-Agent collects candidate BICs from the file history and binary searches over them, examining the source code at each version to determine when the bug first appeared.",
+    "bbox": [
+      53.46699905395508,
+      631.5067749023438,
+      295.42803955078125,
+      709.6513671875
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_011",
+    "block_type": "text",
+    "text": "In our evaluation, SZZ-Agent convincingly beats all previous approaches, raising the state-of-the-art score by more than 12 per- centage points on the three most popular C/C++ and Java datasets. Beyond effectiveness, we dive into why SZZ-Agent works using five ablation studies to investigate whether (a) the performance comes from data leakage, (b) what context SZZ-Agent relies on, (c) whether the performance gain can be explained by a better LLM- backbone, (d) what components of SZZ-Agent contribute the most to its success, and (e) how a specific hyperparameter, the commit selection threshold, controls its performance.",
+    "bbox": [
+      317.62298583984375,
+      165.20582580566406,
+      559.71875,
+      276.2273254394531
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_012",
+    "block_type": "text",
+    "text": "Part 2: Simple-SZZ-Agent. During our ablation studies, we dis- cover that SZZ-Agent can be drastically simplified: skipping binary search entirely and letting the agent directly select from all can- didates yields the best F1-score at 43% lower LLM token cost (in USD) per fix commit. Based on this finding, we propose Simple- SZZ-Agent, which collects candidates from the file history and directly asks the agent to select the bug-introducing commit—yet it outperforms SZZ-Agent. Surprisingly, it is also highly scalable: its resource consumption (e.g., tokens) is almost independent of the number of candidate commits. To understand why, we investigated what the agent actually does. This led us to uncover why Simple-SZZ-Agent works so well: The agent distills the fix commit message and diff into short string patterns, greps the candidate set for matches, and then reads and evaluates the results, repeating this process until it identifies the bug-introducing commit. To finalize our study, we propose directions for future work based on our findings. The agent’s ability to compress knowledge about a bug into short greppable patterns opens avenues beyond identifying bug-introducing commits: these patterns could help practitioners understand how a bug was introduced, detect similar bugs in other code, or provide context for generating fixes.",
+    "bbox": [
+      317.62298583984375,
+      280.3838195800781,
+      559.721435546875,
+      522.9124145507812
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_013",
+    "block_type": "text",
+    "text": "Contributions. We make the following key contributions:",
+    "bbox": [
+      317.9549865722656,
+      527.0687866210938,
+      533.5611572265625,
+      540.0969848632812
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_014",
+    "block_type": "text",
+    "text": "• SZZ-Agent: An agentic workflow that uses binary search over source code versions to identify bug-introducing com- mits, outperforming all previous approaches by more than 12 percentage points in F1-score on three popular datasets. We conduct five ablation studies to understand why it works.",
+    "bbox": [
+      333.9219970703125,
+      543.6167602539062,
+      559.7203369140625,
+      599.8433837890625
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_015",
+    "block_type": "text",
+    "text": "• Simple-SZZ-Agent: A simpler agent discovered during our ablations that outperforms even SZZ-Agent by directly se- lecting the bug-introducing commit from a large candidate set. We uncover its strategy: it compresses the fix commit into short greppable patterns to efficiently search the candi- dates.",
+    "bbox": [
+      333.9219970703125,
+      598.4107666015625,
+      559.7198486328125,
+      665.5973510742188
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_016",
+    "block_type": "text",
+    "text": "Data Availability. All scripts and data to reproduce our experi- ments are publicly available at https://github.com/niklasrisse/agents- for-szz.",
+    "bbox": [
+      317.9549865722656,
+      675.3427734375,
+      561.725830078125,
+      709.6513671875
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 1,
+    "block_id": "page_001:block_017",
+    "block_type": "text",
+    "text": "arXiv:2603.29378v1 [cs.SE] 31 Mar 2026",
+    "bbox": [
+      10.940000534057617,
+      222.1300048828125,
+      37.619998931884766,
+      569.8699951171875
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

@@ -1,0 +1,22 @@
+[project]
+name = "vulngraph"
+version = "0.1.0"
+description = "Lightweight event-sourced multidimensional graph for CVE agent judgement."
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "neo4j>=5.20",
+  "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+vulngraph = "vulngraph.cli.main:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

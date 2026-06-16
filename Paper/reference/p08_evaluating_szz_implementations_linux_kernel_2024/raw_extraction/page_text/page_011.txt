@@ -1,0 +1,81 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2229
+Fig. 4.
+Overlap between SZZ variants on KFC dataset and datasetRosa.
+TABLE V
+AN OVERVIEW OF THE PROJECTS AND GHOST COMMIT’
+FREQUENCY. RMG, AMG STAND FOR REMOVE MAPPING
+GHOST AND ADD MAPPING GHOST
+Project
+Commits
+RMG
+AMG
+Previous Mean [17]
+12,216
+8.05%
+2.41%
+Previous Median [17]
+9,231
+7.64%
+2.68%
+Linux kernel (Our study)
+1,138,001
+17.47%
+5.30%
+RQ1 Findings: Compared to Rosa’s dataset, the
+average precision in our dataset slightly improved
+from 0.46 to 0.47 (↑2.2%), while the average recall
+decreased from 0.60 to 0.52 (↓13.8%). Similar with
+the ﬁndings from the previous study [28], R-SZZ
+and B-SZZ remain the top performers in terms
+of precision and recall. The similarities between all
+the SZZ algorithms increase in the current dataset.
+B. RQ2: Ghost Commits’ Impact
+In this RQ, we aim to investigate the frequency of ghost com-
+mits in our dataset. Table V shows the ghost commit frequency
+from the dataset of Rezk et al. [17], derived from 12 Apache
+projects, as well as our study. The results reveal that in the Linux
+kernel, 17.47% of all bug-ﬁxing commits are Remove Mapping
+Ghost (i.e., bug-ﬁxing commits involving do not have removed
+lines). In the previous study by Rezk et al. [17], the highest
+percentage of Remove Mapping Ghost observed was 11.72%,
+with a median of 7.64% across the 12 Apache projects. Our
+Remove Mapping Ghost result is thus 128.66% higher than
+the median from the previous study, suggesting that Remove
+Mapping Ghost occurrences are more common in Linux kernel,
+approaching one in six cases. This highlights the need to address
+this issue.
+Add Mapping Ghost is also more prevalent in the Linux
+kernel compared to the datasets examined in prior studies.
+Rezk et al. reported the highest proportion of Add Mapping
+Ghost at 4.6%, with a median of 2.68%. However, in our
+KFC dataset, Add Mapping Ghost constituted 5.3% of all
+commits, which is 97.76% higher than the median observed
+in previous research. In Rezk et al.’s study, the ground truth
+of bug-inducing commits was unknown. Consequently, it was
+impossible to determine the number of bug-ﬁxing commits
+for which SZZ algorithms could not identify their correspond-
+ing bug-inducing commits due to the Add Mapping Ghost
+problem. In contrast, our study has access to the ground truth,
+allowing us to more accurately assess the impact of Add
+Mapping Ghost. In our KFC dataset, we identiﬁed 482 bug-
+inducing commits as Add Mapping Ghost, which appeared
+585 times in 584 bug-ﬁxing commits. As a result, a mere
+0.77% of bug-ﬁxing commits are associated with an Add
+Mapping Ghost bug-inducing commit. In addition, Add Map-
+ping Ghost bug-inducing commits account for only 0.73% of
+all bug-inducing commits (585 out of 79649). However, some
+bug-ﬁxing commits associated with Add Mapping Ghost bug-
+inducing commits experience partial success (at least one bug-
+inducing commit is found) or failure due to Remove Mapping
+Ghosts. In the end, for 361 bug-ﬁxing commits (0.47%), SZZ
+algorithms were unable to detect any bug-inducing commits due
+to Add Mapping Ghosts.
+We also discovered Ghost Commits within Rosa’s dataset
+[28]. Given that previous work has not studied the Ghost Com-
+mit problem in a developer-informed dataset, we decided to
+investigate the Mapping Ghosts in Rosa’s dataset. We found
+that out of the 1115 bug-ﬁxes, only 1084 bug-ﬁxing commits’
+repositories are still accessible on GitHub. Among these 1084
+bug-ﬁxing commits, 96 (8.86%) are Remove Mapping Ghosts;
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

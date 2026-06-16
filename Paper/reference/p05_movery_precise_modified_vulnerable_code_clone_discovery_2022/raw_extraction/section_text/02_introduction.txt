@@ -1,0 +1,139 @@
+1 Introduction
+The growing number of open-source software (OSS) has made
+it possible for developers to reuse neat functionalities from
+reliable OSS projects [11, 12, 37]. At the same time, how-
+ever, vulnerabilities propagated by the third-party OSS reuse
+can threaten the security of the entire system [14, 17, 48, 49].
+*Heejo Lee is the corresponding author.
+Maintaining OSS components up to date can, in principle, be a
+solution to prevent such threats. However, a hasty component
+update can adversely affect the entire system (e.g., backward
+compatibility problems [40, 44]), especially when developers
+reuse OSS projects with code or structural modifications [48].
+Therefore, developers often backport upstream security
+patches [43] to prevent undesirable threats from vulnerabil-
+ities, instead of updating the entire component. To this end,
+they first need to identify vulnerable code in the component
+to be fixed [13, 43], for example, by leveraging vulnerable
+code clone (VCC) discovery techniques (e.g., [17, 49]) and
+software composition analysis (SCA) techniques that identify
+reused components in a target program (e.g., [9, 48]).
+Unfortunately, the precise discovery of vulnerabilities from
+modified OSS components is becoming challenging; the main
+obstacle is the syntax diversity of vulnerable code, mostly
+caused by the following two types of OSS modifications.
+• Internal modification of the OSS: The OSS source
+code frequently changes during OSS version updates. In
+this context, vulnerable codes can exist in various forms
+depending on the OSS version, and can be propagated
+to other software with various syntaxes.
+• External modification of the OSS: Vulnerable code
+can be modified during the OSS reuse process, owing to
+the nature of the OSS ecosystem where the source code
+is often modified in the reuse process [48].
+These two types of OSS modifications collectively impair the
+accuracy of discovering propagated vulnerable code, as their
+syntax can differ from that of the disclosed vulnerable code
+(e.g., through public vulnerability databases [31]). To the best
+of our knowledge, none of the existing techniques are capable
+of precisely discovering vulnerable codes of various syntaxes
+present in the modified OSS components.
+Limitations of existing techniques. Existing VCC discovery
+techniques (e.g., [14, 17, 49]) do not consider internal modifi-
+cations of the OSS and examine only external modifications
+in a limited fashion, thereby producing many false negatives.
+In particular, they can only discover VCCs containing code
+USENIX Association 31st USENIX Security Symposium    3037
+
+===== PAGE 003 =====
+lines that were deleted from security patches, which are often
+omitted in VCCs within modified OSS components. In con-
+trast, existing SCA tools (e.g., [9,48]) determine the existence
+of vulnerabilities based only on the reused OSS version, pro-
+ducing false positives especially when the vulnerable code is
+patched through backporting or not reused. Incidentally, exist-
+ing code clone detection techniques (e.g., [35,42]) can be used
+to discover VCCs, but they are prone to produce false posi-
+tives because they cannot distinguish vulnerable and patched
+codes that exhibit high code similarities in general [17, 49].
+To overcome such shortcomings, we present MOVERY
+(MOdified Vulnerable code clone discovERY), a precise ap-
+proach for discovering modified vulnerable code clones from
+modified OSS components.
+Our approach. The key idea of MOVERY , which is out-
+standingly distinguishable from existing VCC discovery tech-
+niques, lies in generating an extensible signature that compre-
+hends from the oldest to disclosed vulnerable functions.
+MOVERY comprises the following two phases: (1) P1 for
+generating signatures, and (2) P2 for discovering VCCs.
+In P1, MOVERY generates vulnerability and patch signa-
+tures using vulnerable and patched functions reconstructed
+from security patches. Specifically, MOVERY uses techniques
+called function collation and core line extraction. Unlike ex-
+isting techniques that focus only on the disclosed vulnerable
+function, MOVERY additionally considers the oldest vulnera-
+ble function and collates them; this is for addressing internal
+OSS modifications, as the delta between the oldest and dis-
+closed vulnerable functions summarizes the changes in the
+vulnerable code during OSS updates. Thereafter, MOVERY
+generates signatures by storing only the core vulnerable and
+patch code lines; the generated signatures can be used to dis-
+cover VCCs without being affected by code changes other
+than core vulnerable and patch code lines (see Section 3.1).
+In P2, MOVERY discovers the VCCs in the target software
+using the generated signatures. For scalability, MOVERY re-
+duces the VCC search space by leveraging the concept of
+the existing SCA technique [48], which only inspects code
+parts borrowed from other OSS. For accuracy, MOVERY ap-
+plies a selective abstraction technique to precisely discover
+VCCs with external OSS modifications. Finally, MOVERY
+confirms that the function in the target software is a vulnera-
+ble code clone when it matches vulnerability signatures and
+is distinctive from patch signatures (see Section 3.2).
+Evaluation. Experimental results showed that MOVERY sig-
+nificantly outperformed existing VCC discovery techniques
+such as ReDeBug [14] and VUDDY [17]. For evaluation,
+we collected 4,219 Common Vulnerabilities and Exposures
+(CVE) patches from the NVD [31], including all the C/C++
+CVEs that released their patches via Git [19, 47].
+When we appliedMOVERY , ReDeBug, and VUDDY on ten
+popular software selected from diverse domains, we observed
+that 91% of the discovered VCCs had a different syntax from
+disclosed vulnerable functions. In the experiments, MOVERY
+was able to discover VCCs at least 2.5 times more than ex-
+isting techniques with much higher accuracy; this is because
+ReDeBug and VUDDY neither consider OSS modifications
+nor properly address the syntax diversity of VCCs, resulting
+in many false negatives. Specifically, MOVERY discovered
+415 VCCs with 96% precision and 96% recall, meanwhile
+ReDeBug and VUDDY discovered 163 and 72 VCCs with at
+most 77% precision and 38% recall (see Section 5.1).
+We further confirmed that MOVERY showed substantially
+better accuracy in discovering VCCs from modified compo-
+nents than MVP [49] (i.e., a recurring vulnerability detection
+technique) and CENTRIS [48] (i.e., an SCA technique): MVP,
+which does not consider internal OSS modifications, reported
+184 false negatives (54% recall) for ten target software, while
+the CENTRIS -based VCC discovery approach yielded 272
+false positives (51% precision) as it did not consider back-
+ported security patches (see Section 5.2 and Section 5.3).
+Moreover, we demonstrated that MOVERY discovered
+VCCs from ten target software of various code sizes ( i.e.,
+ranging from 212,672 to 14,489,534 C/C++ lines of code)
+within 200 s on average (for each software). This measured
+elapsed time is shorter than that of ReDeBug (298 s) and
+VUDDY (798 s), suggesting that MOVERY is sufficiently fast
+and scalable for practical usage (see Section 5.4).
+Contributions. We summarize our contributions below.
+• We present MOVERY , the first approach for precisely
+discovering VCCs in modified OSS components. The
+key technique is generating signatures that are capable of
+addressing the internal and external OSS modifications.
+• We demonstrated that internal modifications of the OSS,
+which were hardly considered in existing techniques, can
+play a leading role in the syntax diversity of VCCs.
+• Although most (91%) of the syntax of VCCs in modi-
+fied components differed from the disclosed vulnerable
+functions, MOVERY was able to discover 415 VCCs in
+ten target software selected from diverse domains, with
+96% precision and 96% recall.

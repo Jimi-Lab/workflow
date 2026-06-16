@@ -1,0 +1,364 @@
+Method Expansion. Due to code refactoring often outlining
+code into a new method, as shown in Listing 2, the codes
+in Lines 7-8 are outlined into methods FFMIN. The standard
+AST comparison treats the if -condition (Lines 7-8) as com-
+pletely different from the FFMIN function call, resulting in
+a false vulnerability identiﬁcati on. Therefore, we utilize the
+inline technique to expand the method during AST generation to
+gather more code behavior within the statements. This involves
+obtaining the method deﬁnitio n at the callsite and expanding
+the method body inline, resulting in a more comprehensive code
+representation. We get the AST for the target ﬁle using Clang
+without performing actual compilation. Furthermore, through
+recursive retrieval of line numbers for sub-ASTs, we can locate
+the sub-AST corresponding to S
+v.
+AST Normalization. To address structural variations arising
+from different developer coding styles, it is essential to nor-
+malize the AST. This process m itigates incons istencies and
+reduces analytical noise by standardizing code representations.
+AST normalization involves conditional struct ure normaliza-
+tion, loop structure normalization, and relational operation
+normalization.
+• Conditional structure can be implemented by if-
+else and switch-case. We normalize the structure
+of switch-case: switch(expression){case
+value1: statement1; break; case
+value2: statement2; break; default
+statement3;} into a if-else structure: if(exp
+== value1) statement1; else if(exp ==
+value2) statement2; else statement3.
+• Loop structure can be represented as while, do-while
+and for structures, we normalize all the loop structure
+to while [48].T h e for structure is for(initialize;
+condition; increment) {statements;},w e
+transform it into while structure: initialize; while
+(condition) {statements; increment}.
+• Relational operation include commutative and noncom-
+mutative operation. Commutative relational operation (i.e.,
++, !=, &&) refers to the operation where commutate the
+operands does not change the operation semantics. We
+normalize the two operands (left and right child nodes)
+of the operation (parent nodes) by alphabetical order. For
+example, we transform b+a (b is the left child node) to
+a+b(a is the left child node). Noncommutative relational
+operation (i.e., >, <=) will change the operation semantic
+when commutating the operands, we normalize them by
+predeﬁned rules. For example, we transformb<a to a>b
+(normalize operation < to >).
+AST Similarity. Ultimately, we utilize an in-order traversal
+to ascertain whether the commit introduces S by comparing
+the AST similarity of S
+i and S′
+i. First, we perform an in-order
+traversal of the ASTs for Si and S′
+i, converting the results
+into sequences Sqi and S′qi. Then, we calculate the edit dis-
+tance between the two sequences as their AST-based similarity
+Similarity
+B(Sqi,S′qi). We set a similarity threshold ϑ2, and
+if SimilarityB(Sqi,S′qi)≥ϑ2, Si and S′
+i are considered to
+be AST-based similar. If SimilarityB(Sqi,S′qi)<ϑ2,i ti n -
+dicates that there is no statement similar to Si in the pre-
+modiﬁcation commit. During this process, we classify a commit
+as a refactoring commit when it exhibits low edit-distance sim-
+ilarity (SimilarityA(Si,S′
+i)<ϑ1) but high AST-based similar-
+ity (SimilarityB(Sqi,S′qi)≥ϑ2). This indicates that while the
+code structure has been signiﬁcantly modiﬁed, the underlying
+functionality remains unchanged.
+3) Statement Weight Allocation: Not all statements identi-
+ﬁed by an LLM contribute equally to vulnerability in triggering
+the exploit. To address this, we propose a weight allocation
+strategy that prioritizes vulnerable statements based on their in-
+vocation of known sensitive functions. The core premise is that
+the presence of speciﬁc, high-risk functions within a statement
+is a strong indicator of its criticality. We followed a systematic
+process to identify and categorize these sensitive functions.
+Starting with a comprehensive review of previous studies [49],
+[50], we collected existing sensitive function enumerations.
+We then conducted a preliminary study of common C/C ++
+vulnerabilities to identify the mo st frequent vulnerability cat-
+egories, such as buffer overﬂow, integer overﬂow, and use-
+after-free, and examined the functions commonly involved in
+known vulnerabilities for each type. This process involved three
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 008 =====
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 383
+TABLE I
+SENSITIVE FUNCTIONS FOR SOME VULNERABILITY TYPES
+Vulnerability Type Sensitive Function
+Buffer overﬂow strcpy, strncpy, memcpy, memset, read,
+write, gets, gets_s, strcat
+Integer overﬂow add, multiple, bit-shifting, memcpy
+Null pointer derefrence m alloc, calloc, realloc, strdup
+Pointer out-of-bounds access memcpy, memmove
+Use after free free, malloc, calloc
+Format string sprintf, printf, scanf
+Arbitrary command execution fopen, popen, system
+authors with security expertise: the ﬁrst author proposed the ini-
+tial categorization, which was then independently reviewed and
+validated by the fourth and ﬁfth authors, with any discrepancies
+resolved through discussion. The result is the pre-deﬁned table
+(Table I) of sensitive functions for v arious vulnerability types.
+We analyze each vulnerable statement extracted by the LLM.
+If a statement contains a direct call to any function listed in our
+sensitive function table, it is assigned a higher weight, marking
+it as a probable vulnerability trigger. For instance, in Listing 1,
+Lines 21 and 25 are critical trigger lines.
+Furthermore, we conduct an inter-procedural analysis to
+identify customized functions that serve as variants of canonical
+sensitive functions. For instance, the av_callocfunction on
+Line 21 is a variant of thecallocfunction. To discern whether
+the customized function Fcontains sensitive functions, we ﬁrst
+analyze the deﬁnition and implementation code of function F,
+then check if F’s function body calls any sensitive functions
+from TableI. If such call relationships are found,Fis also iden-
+tiﬁed as a sensitive function. Taking Listing 1 as an example,
+considering this is an overﬂow-type vulnerability, we recognize
+the av_callocin Line 21 and avio_readfunction in line
+25 as sensitive functions.
+Parameters. There are two parameters for the weight allocation
+of statements, i.e., W
+sensitive and Wbase, that could affect the
+effectiveness of V ERCATION:1 ) Wbase is the base weight for
+initializing the weights of all statements. 2) Wsensitive is the
+weight for the statements containing sensitive functions. We set
+Wsensitive =2 ×Wbase, Wbase =1.0, the detailed weighting
+conﬁguration experiment is in Section V-B.
+4) Code Clone Determination: We calculate the sim-
+ilarity_score for each code modiﬁcation of the previous
+commit with the backtrack. We set a threshold ϑ3,i f
+similarity_score<ϑ 3, we determine that there is no code
+clone between the pre-modiﬁcation code of this previous com-
+mit and the vulnerable statements, thus conﬁrming that this
+commit introduced th e vulnerability. Ot herwise, we proceed
+with the commit backtrack process.
+similarity_score = sim_a×Wsensitive +sim_b×Wbase
+a×Wsensitive +b×Wbase
+where, Wsensitive and Wbase are predeﬁned weights assigned
+to different types of statements; a and b are the total counts
+of the statements in Sv corresponding to these weight types;
+sim_a and sim_b are the counts of statements that were found
+to be similar, either through syntactic or structural analysis.
+C. Vulnerable Version Range Determination
+To precisely determine the range of software versions af-
+fected by a vulnerability, we e mploy a methodology based on
+the principle of commit reachability. The core premise is that a
+vulnerability, once introduced in a speciﬁc vic, is propagated to
+all subsequent commits in its lineage until it is ﬁxed by a vfc.
+The basis for our analysis is the concept of reachability,
+where a commitAis considered reachable from another commit
+B, if commit A is an ancestor of commit B in the project’s
+commit graph [17]. As version tags are essentially pointers to
+speciﬁc commits, they inherit the reachability properties of the
+commits they represent. This allows us to map the vulnerabil-
+ity’s presence from the commit level to software versions.
+Our methodology formally deﬁnes the set of vulnerable ver-
+sions (Vv) as follows: First, we identifyVi, the set of all version
+tags reachable from vic. Second, we identify Vf,t h es e to fa l l
+version tags reachable from vfc. The vulnerable version set Vv
+is then derived from the set difference between these two sets:
+Vv =Vi −Vf.
+We illustrate the procedure by the case of CVE-2021-
+20294 in the Binutils project [51]. For this vulnerability,
+the set of versions containing the vic is [ binutils-2_35,
+binutils-2_42], while the set of patched versions con-
+taining the vfc is [ binutils-2_36, binutils-2_42],
+with binutils-2_42being the latest version of the Binutils
+project. Therefore, we consider the version tags [ binutils-
+2_35, binutils-2_36) as vulnerable. This notation sig-
+niﬁes a range that includes binutils-2_35 but excludes
+binutils-2_36.
+IV . EXPERIMENTAL SETUP
+A. Dataset
+With conﬁrmation from the author of V-SZZ, it is established
+that V-SZZ assumes the deleted lines in the vfc as vulnera-
+ble codes and manually labels the ﬁrst introduction of deleted
+lines in a vfc as the vic to construct the dataset. However, as
+mentioned in Section II-C, deleted lines cannot fully capture
+the vulnerability logic. Add itionally, it cannot be guaranteed
+that the identiﬁed software version will necessarily exhibit the
+vulnerability. Meanwhile, V-SZZ excludes the vfcs that only
+contain added lines of code in thei r vulnerability selection, as
+the SZZ algorithm relies on tracking deleted lines of code to
+locate vic and thus cannot handle such cases. Therefore, we
+need to construct a ground-truth dataset with labeled vulnerable
+versions or non-vulnerable versions of OSS, which are veriﬁed
+by a public PoC.
+Vulnerabilities. To build a reliable evaluation dataset, we for-
+mulate four vulnerability selection criteria: 1) The vulnerability
+must be a CVE reported in an OSS project; 2) The vulnerability
+must have publicly available PoCs and patches; 3) The PoC
+must be reproducible across different versions of the OSS and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 009 =====
+384 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+TABLE II
+GROUND-TRUTH DATASET OVERVIEW
+IDX Name #Version #CVE Domain
+1 Binutils 157 18 Programming tools
+2 cJSON 48 3 JSON parser
+3 FFmpeg 405 31 Multimedia processing
+4 Jasper 99 12 Image coding toolkit
+5 Libarchive 51 10 Streaming processing
+6 Libcaca 7 3 Graphics library
+7 Liblouis 69 6 Braille translator
+8 Libming 14 9 Flash library
+9 Libtiff 78 7 Image tools
+10 Libxml2 233 12 XML toolkit
+11 OpenJPEG 25 8 Image codec
+12 Pcre2 25 3 Regular expression engine
+Total - 1,211 122 -
+4) The OSS must have a certain number of versions for compre-
+hensive analysis. Based on the selection criteria, we established
+a dataset comprising 122 publicly disclosed CVEs associated
+with public PoC and patches, spanning 12 prevalent OSS, as
+detailed in Table II. The published date of these CVEs from
+2016 to 2025. Meanwhile, the co llected vulnerabilities cover
+13 common CWE types. Some vulnerabilities are classiﬁed
+into multiple CWEs. For example, CVE-2023-1579 belongs to
+both CWE-119 (Improper Restriction of Operations within the
+Bounds of a Memory Buffer) and CWE-787 (Out-of-bounds
+Write). Among the dataset, vulnerabilities belonging to CWE-
+787 (Out-of-bounds Write) are the most numerous, accounting
+for 20.27%.
+Patches. We acquired security patches by crawlingvfc from the
+OSS Git repositories. In total, thevfcs cover 2,287 modiﬁcation
+lines containing 1,532 insertion lines and 755 deletion lines.
+Among these, 289 lines are unrelated to vulnerability (e.g.,
+modiﬁcations in the ChangeLog ﬁle). On average, each vfc has
+21.8 modiﬁcation lines. The number of added lines signiﬁcantly
+exceeds that of deleted lines, underscoring t he critical impor-
+tance of incorporating additional code into the analysis process.
+Among these, 10.3% are large vfcs (the number of modiﬁca-
+tion lines exceeding 50). Notably, 79 vfcs (64.75%) contain
+both code insertion and deletion, 29 vfcs exclusively insertions
+(23.77%), and 15 vfcs solely involve deletions (12.30%).
+Verifying & Labeling. We apply the following process to
+systematically label the ground-truth dataset:
+(i) The ﬁxed version can be determined through the ofﬁcial
+release of vfcs. We conﬁrm whether versions following
+the ﬁxed version are vulnerable by checking if they con-
+tain the patch code.
+(ii) For the remaining version, we obtained the public PoC
+of each vulnerability from the Git issues or by referring
+to OSS sites.
+(iii) To validate the PoC on each corresponding OSS version,
+we establish the dependent environment for each OSS
+version and compile the libraries.
+(iv) During the PoC input testing process for each vulnerabil-
+ity, we analyze the trigger ing conditions and dangerous
+behaviors of the vulnerability and label the statements
+that trigger the vulnerability as S
+trigger. For versions
+where the PoC cannot trigger th e vulnerability (as some
+PoCs are only applicable to certain speciﬁc versions), we
+check whether the version contains Strigger to label the
+version.
+In our experimental setup, we took 10 days to build the software
+and version pool. Then we took 30 days to build the ground-
+truth dataset, including the time taken to establish the dependent
+environment for each software version, as well as the time to
+perform vulnerability veriﬁcation and labeling.
+B. Baseline and Metrics
+Baseline. For the vulnerable version identiﬁcation task, we
+selected the NVD [52], along with SOTAs: SZZ-based methods
+(AG-SZZ [53],B - S Z Z[54],V - S Z Z[17]) and clone-based meth-
+ods (V0Finder [16], V1SCAN [27], VERJava [28] and Vision
+[29]) for accuracy comparison. We gathered the vulnerable
+version range of each CVE from CPE to evaluate the NVD’s
+accuracy.
+The basic idea of SZZ algorithms is to backtrack the commit
+history to locate the earliest commit that introduces the dele-
+tion lines removed by security patches. We use different SZZ
+algorithms to identify the vic, with the versions between the vic
+and the vfc considered vulnerable. Since these algorithms trace
+deleted lines individually, ins tances may arise where multiple
+vic are identiﬁed, and in such cases, we select the earliest one
+as the detection outcome.
+V0Finder, V1SCAN, VERJava, and Vision are clone-based
+methods. We use their techniques to detect code clone for each
+version and identify the affected versions of the vulnerabilities
+in the ground-truth dataset. Because VERJava and Vision are
+applied in Java, we modiﬁed the code to make them compatible
+with C/C++.
+For V
+ERCATION, we selected thresholds ϑ1 =0.9, ϑ2 =
+0.8 and ϑ3 =0.7 (related experiments are introduced in Sec-
+tion V-C). In terms of the performance of vulnerability code
+extraction, we compared the differences between combining
+various LLMs (GPT-4, CodeLlama-13B, DeepSeek-V3) and
+using the static analysis tool Joern parser [33] alone.
+Metrics. To evaluate the accuracy, we employ the follow-
+ing three metrics, i.e., true positives ( TP ), false positives
+(FP ), false negatives ( FN), precision (
+#TP
+#TP +#FP ), recall
+( #TP
+#TP +#FN ) and F1-score ( 2∗precision∗recall
+precision+recall ), to measure the
+accuracy of the above methodologies. These metrics are also
+used in previous studies to evaluate the technique’s performance
+[9], [17]. Because of signiﬁcant differences in the version count
+for distinct OSS, we compute the precision and recall for each
+OSS and report the average of precisions and recalls ﬁnally.
+C. Implementation Details
+We utilized Joern [33] for program slicing and developed
+Python scripts to extract control and data dependencies, out-
+putting the sliced statement s as dangerous ﬂows . We explored
+three LLM models, GPT-4 [30], CodeLlama-13B [31], and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 010 =====
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 385
+DeepSeek-V3 [32] for vulnerable code extraction. We use the
+public API developed by OpenAI to perform the experiment in
+GPT-4. The API version is GPT-4-0613 published in 2023.
+CodeLlama was created through further ﬁne-tuning of Llama 2
+on speciﬁc code datasets. We selected the 13B parameter model
+(codellama/CodeLlama-13b-hf) from the CodeLlama
+model series. The API of DeepSeek-V3 was published in July
+2024. We set the temperature parameter to 1.0. To account for
+the stochastic nature of LLM outputs, we generate 10 inde-
+pendent responses for each CVE [55]. We employ a majority
+voting strategy where statements appearing in ≥ 6 out of 10
+runs are included in the ﬁnal vulnerable statement set for eval-
+uation. The maximum size of tokens is 1,024. We deployed
+the Codellama model on our server with four NVIDIA RTX
+A5000 GPUs. Similar to GPT-4, the temperature parameter is
+set to 1.0, and the maximum size of tokens is set to 1,024.
+Subsequently, we apply weight allocation strategies to extract
+vulnerable statements using Python scripts. For threshold se-
+lection, we used θ
+1 = 0.9, θ2 = 0.8 and θ3 = 0.7 based on
+grid search optimization described in our sensitivity analysis. In
+the code change detection, we utilize the Clang 10.0.0 tool for
+function expansion (inline optimization) and AST generation
+of C/C ++ code. Speciﬁcally, we use the -fsyntax-only option
+to perform syntax checking without actual compilation. We
+then develop Python scripts to achieve AST normalization and
+similarity comparison. Overall, we constructed our system with
+6K LoC in Python.
+V. E
+VALUATION
+In this section, we evaluate the performance of the proposed
+VERCATION by answering the following research questions
+(RQs).
+• RQ1. Overall Effectiveness: How does the overall per-
+formance of V ERCATION compare against state-of-the-art
+vulnerable version identiﬁcation methods?
+• RQ2. Architectural Contribution: H o wd ot h ek e ya r -
+chitectural choices in V ERCATION—the use of an LLM,
+static analysis, and statement weighting—contribute to its
+performance?
+• RQ3. Component Robustness: How accurate and robust is
+VERCATION’s statement-level code clone detection?
+• RQ4. Real-World Application: What are the effects of
+applying VERCATION in the real world scenarios?
+A. RQ1: Overall Effectiveness
+We ﬁrst compare V ERCATION against the NVD and SOTA
+methods. Table III shows the vulnerable version identiﬁcation

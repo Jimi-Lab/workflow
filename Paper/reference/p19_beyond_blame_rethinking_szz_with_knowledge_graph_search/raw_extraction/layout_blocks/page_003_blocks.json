@@ -1,0 +1,167 @@
+[
+  {
+    "page": 3,
+    "block_id": "page_003:block_001",
+    "block_type": "text",
+    "text": "Beyond Blame: Rethinking SZZ with Knowledge Graph Search 3",
+    "bbox": [
+      45.827999114990234,
+      60.6286735534668,
+      440.172607421875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_002",
+    "block_type": "text",
+    "text": "• AgenticSZZ, the first approach to apply Temporal Knowledge Graphs to software evolution analysis, reframing BIC identification as a graph search problem and enabling identification of BICs beyond the blame-defined candidate set.",
+    "bbox": [
+      61.29999923706055,
+      83.4370346069336,
+      440.1736755371094,
+      121.1153793334961
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_003",
+    "block_type": "text",
+    "text": "• Comprehensive evaluation demonstrating state-of-the-art performance, with ablation analysis validating the contribution of each component.",
+    "bbox": [
+      61.29999923706055,
+      119.30306243896484,
+      440.1702575683594,
+      145.02639770507812
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_004",
+    "block_type": "text",
+    "text": "2 Background and Related Work",
+    "bbox": [
+      45.827999114990234,
+      154.23526000976562,
+      200.69659423828125,
+      167.08702087402344
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_005",
+    "block_type": "text",
+    "text": "SZZ Algorithm and Its Variants. The SZZ algorithm [ 32 ] pioneered automated BIC identification by tracing deleted or modified lines in bug-fixing commits via git blame . Over two decades, numerous variants have improved precision through annotation graphs and cosmetic change filtering [ 19 ], meta-change exclusion [ 7 ], refactoring detection [ 24 , 25 ], deep learning [ 35 ], and LLM- based reasoning [ 36 , 40 ]. Most recently, LLM4SZZ [ 36 ] leverages LLMs to rank blame candidates and expands context around modified lines for candidate collection. We provide detailed descriptions of our baselines in Section 5.1 . Despite these advances, all approaches share a fundamental limitation: they restrict the search space to commits returned by git blame , inherently missing BICs that require broader history traversal. AgenticSZZ addresses this limitation by structuring the commit history as a temporal knowledge graph and navigating it through agent-guided exploration.",
+    "bbox": [
+      45.827999114990234,
+      168.1630401611328,
+      441.85845947265625,
+      289.52740478515625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_006",
+    "block_type": "text",
+    "text": "Knowledge Graphs (KGs) in Software Engineering (SE). A KG is a graph-based data structure where nodes represent entities and edges encode relationships between them, enabling queries that traverse and reason over these connections [ 16 ]. KGs have been increasingly applied to SE tasks. For automated program repair, repository-aware KGs bridge semantic gaps between issue descriptions and code patches [ 45 ], and unified code KGs enable multilingual issue resolution [ 5 ]. For bug localization, injecting KG-derived knowledge into LLMs improves fault localization accuracy [ 21 ]. Crash solution recommendation has been addressed by mining Stack Overflow into structured KGs [ 10 ]. However, none of these works address BIC identification or model the temporal evolution of commits. Temporal knowledge graphs (TKGs) extend KGs with time-aware reasoning, enabling prediction over evolving relationships [ 26 , 28 , 38 ]. To our knowledge, AgenticSZZ is the first approach to apply TKGs to software evolution analysis. The temporal dimension is essential for BIC identification: a commit can only induce a bug if it precedes the fix, and understanding causal relationships requires reasoning about the sequence of code changes over time.",
+    "bbox": [
+      45.459999084472656,
+      290.8980712890625,
+      441.7057800292969,
+      448.1283874511719
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_007",
+    "block_type": "text",
+    "text": "LLM Agents for SE. LLM-based agents have emerged as powerful tools for complex SE tasks, marking a shift toward Agentic SE (SE 3.0) where agents work as AI teammates [ 14 , 20 ]. Recent ap- proaches navigate codebases autonomously to resolve GitHub issues [ 46 , 47 ], using tool-augmented LLMs to search, read, and edit files. Simpler pipelines without persistent agent state have also proven effective [ 43 ], general-purpose agent frameworks provide flexible foundations [ 41 ], and unified agents have been proposed to orchestrate multiple SE capabilities [ 1 ]. For bug fixing specifically, combining code KGs with agentic reasoning has shown promise [ 22 ]. An LLM-based framework has been proposed for BIC localization by integrating execution traces and commit artifacts [ 40 ]. However, this approach requires test execution for candidate filtering and does not model the tem- poral structure of commit history. In contrast, AgenticSZZ operates over a TKG of commit history, using specialized tools designed for BIC search. This design enables reasoning about historical code evolution rather than static code states.",
+    "bbox": [
+      45.827999114990234,
+      449.49908447265625,
+      441.8569641113281,
+      594.7743530273438
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_008",
+    "block_type": "text",
+    "text": "3 Preliminary Study (RQ0): Where are Bug-Inducing Commits Located?",
+    "bbox": [
+      45.827999114990234,
+      603.9832763671875,
+      376.5565185546875,
+      616.8350219726562
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_009",
+    "block_type": "text",
+    "text": "3.1 Motivation",
+    "bbox": [
+      45.827999114990234,
+      618.9273071289062,
+      118.80404663085938,
+      631.779052734375
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_010",
+    "block_type": "text",
+    "text": "Existing SZZ techniques [ 7 , 19 , 24 , 32 ] predominantly assume that bug-inducing commits (BICs) can be identified by applying git blame on the deleted or modified lines in the BFC. This is based on",
+    "bbox": [
+      45.827999114990234,
+      632.8550415039062,
+      440.1756591796875,
+      658.578369140625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "page_003:block_011",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      260.1289978027344,
+      671.4816284179688,
+      440.1734313964844,
+      682.496337890625
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

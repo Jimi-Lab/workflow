@@ -1,0 +1,162 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\SEM-SZZ\SEM-SZZ
+Analysis Mode: static-only
+Runtime Behavior: [EXECUTION NOT REQUESTED]
+
+Repository / File Layout Observed:
+- Total files: 25
+- Extension counts: {'.md': 1, '.py': 19, '.pyc': 3, '.txt': 2}
+- Top-level entries:
+  - 1_get_input.py
+  - 2_get_vcc.py
+  - 3_gen_vuln_version.py
+  - 4_get_duplicated_patch.py
+  - 5_parse_result_llm_conservative.py
+  - ablation.py
+  - CFG.py
+  - constant.py
+  - core/
+  - diss.py
+  - gen_baseline_results_for_dels.py
+  - gen_baseline_results_for_no_deletes.py
+  - gen_results_for_dels.py
+  - gen_results_for_no_dels.py
+  - log_generation.py
+  - parse_patch.py
+  - README.md
+  - requirements.txt
+  - time.txt
+  - tmp/
+  - util.py
+
+Primary Files:
+- 1_get_input.py
+- 2_get_vcc.py
+- 3_gen_vuln_version.py
+- 4_get_duplicated_patch.py
+- 5_parse_result_llm_conservative.py
+- CFG.py
+- parse_patch.py
+- util.py
+- gen_results_for_no_dels.py / gen_results_for_dels.py
+- gen_baseline_results_for_no_deletes.py / gen_baseline_results_for_dels.py
+- README.md
+- requirements.txt
+
+README/config inspected: yes
+Main entrypoints inspected: yes, by filename and static AST symbol inventory
+Key Static Evidence:
+README excerpt:
+# Replication package
+
+This repository contains datasets and source code of our paper "Enhancing Bug-Inducing Commit Identification: A Fine-Grained Semantic Analysis Approach
+", which is submitted to IEEE Transactions on Software Engineering. 
+
+## Directories
+
+This repository contains four sub-directories:
+
+1. **dataset**: This directory includes the dataset mentioned in the paper. The names of the three files correspond to `DATASET-A`, `DATASET-FA`, and `DATASET-D`, respectively.
+2. **result**: This directory contains the experimental results for each test case. To calculate the metrics directly, use the cal_metrics.py file.
+3. **DelBaselines**: This directory contains the baselines for `DATASET-D`.
+4. **NoDelBaselines**: This directory contains the baselines for `DATASET-A` and `DATASET-FA`.
+
+## Files
+**_CFG.py_** : This file aims to build a control flow graph from the AST parsed by [tree-sitter](https://github.com/tree-sitter/tree-sitter). We borrow the core idea from [tree_climber](https://github.com/bstee615/tree-climber).
+
+**_constant.py_** : This file defines some constants that needs to set, such as the project directory.
+
+**_diss.py_** : This file includes the code used in the Discussion section of the paper.
+
+**_gen_baseline_results_for_dels.py_** : This file contains the code generating the baselines' results for `DATASET-D`.
+
+**_gen_baseline_results_for_no_dels.py_** : This file contains the code generating the baselines' results for `DATASET-A` and `DATASET-FA`.
+
+**_gen_results_for_dels.py_** : This file contains the code used to get *SEMA-SZZ* reults for `DATASET-D`
+
+**_gen_results_for_no_dels.py_** : This file contains the code used to get *SEMA-SZZ* results for `DATASET-A` and `DATASET-FA`.
+
+**_parse_patch.py_** : This file parses a bug-fixing commit, extracting added lines, deleted lines, and their line numbers.
+
+**_util.py_** : This file includes utility functions and classes used in _gen_results_for_dels.py_ and _gen_results_for_no_dels.py_. It includes the classes representing the data flow of a variable and  path contraints. It also includes the functions that do program slicing, collect states of the program and locate bug-inducing commits.
+
+## Environment
+
+Install all packages listed in requirements.txt for the Python environment.
+
+Install Joern from the [official site](https://joern.io/)
+
+
+## Pre-calculated results
+
+### RQ 1
+To replicate our results for RQ 1:
+
+```
+python gen_baseline_results_for_no_deletes.py
+
+python gen_results_for_no_dels.py
+```
+
+### RQ 2
+
+To replicate our results for RQ 2:
+
+```
+python gen_baseline_results_for_d
+
+requirements.txt excerpt:
+# packages in environment at /data1/lingxiaotang/conda/conda3/envs/learntreesitter:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                        main  
+_openmp_mutex             5.1                       1_gnu  
+asttokens                 2.4.1                    pypi_0    pypi
+backcall                  0.2.0                    pypi_0    pypi
+black                     24.8.0                   pypi_0    pypi
+ca-certificates           2024.3.11            h06a4308_0  
+comm                      0.2.2                    pypi_0    pypi
+contourpy                 1.1.1                    pypi_0    pypi
+cycler                    0.12.1                   pypi_0    pypi
+debugpy                   1.8.1                    pypi_0    pypi
+decorator                 5.1.1                    pypi_0    pypi
+executing                 2.0.1                    pypi_0    pypi
+fonttools                 4.53.0                   pypi_0    pypi
+importlib-metadata        7.1.0                    pypi_0    pypi
+importlib-resources       6.4.0                    pypi_0    pypi
+ipykernel                 6.29.4                   pypi_0    pypi
+ipython                   8.12.3                   pypi_0    pypi
+jedi                      0.19.1                   pypi_0    pypi
+jupyter-client            8.6.2                    pypi_0    pypi
+jupyter-core              5.7.2                    pypi_0    pypi
+kiwisolver                1.4.5                    pypi_0    pypi
+ld_impl_linux-64          2.38                 h1181459_1  
+libffi                    3.4.4                h6a678d5_1  
+libgcc-ng                 11.2.0               h1234567_1  
+libgomp                   11.2.0               h1234567_1  
+libstdcxx-ng              11.2.0               h1234567_1  
+matplotlib                3.7.5                    pypi_0    pypi
+matplotlib-inline         0.1.7                    pypi_0    pypi
+mypy-extensions           1.0.0                    pypi_0    pypi
+ncurses                   6.4                  h6a678d5_0  
+nest-asyncio              1.6.0                    pypi_0    pypi
+networkx                  3.1                      pypi_0    pypi
+numpy                     1.24.4                   pypi_0    pypi
+openssl                   3.0.13               h7f8727e_2  
+packaging                 24.0                     pypi_0    pypi
+parso                     0.8.4                    pypi_0    pypi
+pathspec                  0.12.1                   pypi_0    pypi
+pexpect                   4.9.0                    pypi_0    pypi
+
+Static Consistency Notes:
+- The paper describes SEM-SZZ as a fine-grained semantic-analysis SZZ method using slicing, control-flow/data-flow comparisons, and handling of both no-deletion and deletion bug-fixing commits.
+- The local source contains staged scripts named for input collection, VCC retrieval, vulnerable-version generation, duplicated-patch handling, LLM conservative result parsing, and baseline/result generation.
+- CFG.py, parse_patch.py, util.py, and core/ are consistent with a static implementation surface for control/data/patch analysis, but runtime behavior was not verified.
+- requirements.txt and README.md are present; no dependency installation or script execution was performed.
+
+Observed Local Output / Data Artifacts:
+- tmp/ directory exists and may contain local intermediate/output artifacts; not treated as verified benchmark data. [NEEDS ARTIFACT]
+- time.txt exists; semantics not verified by execution. [EXECUTION NOT REQUESTED]
+
+Missing Data / Missing Entrypoints:
+- Original evaluation datasets, exact benchmark split, and reproduced result artifacts were not validated by execution. [NEEDS ARTIFACT]
+- Runtime metrics and final tables cannot be regenerated under static-only mode. [EXECUTION NOT REQUESTED]

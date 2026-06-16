@@ -1,0 +1,182 @@
+[
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2227",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:002",
+    "block_type": "text",
+    "text": "commits are not the most recent changes before the bug ﬁx, but\nrather appeared earlier in a deleted or modiﬁed line’s change\nhistory.\nFor example, Fig. 1 shows a line’s change history (i.e., it-\neratively using git blame until the initial commit) of the bug-\nﬁxing commit 68ad6d.11 Following Bao et al. [48], we call the\nimmediately preceding the lines changed in the ﬁxing commit\nthe previous commits (i.e., commit 53c13b in Fig. 1) and all\ncommits (except the initial one) that previously modiﬁed these\nlines as the descendant commits (i.e., commit 8c49d9, 40747f,\n61a492 in Fig. 1). We refer to the commit at which tracing\ncan no longer continue as the initial commit (i.e., commit\n454ede in Fig. 1). B-SZZ identiﬁed the previous commit as the\nbug-inducing commit, relying on using git blame once. Other\nalgorithms, such as AG-SZZ and MA-SZZ, which improve on\nB-SZZ, access the rest of the descendant commits, identifying\nbug-inducing commits from other commits by considering cri-\nteria such as whether the commit is a meta-change. However, no\nexisting algorithm comprehensively examines the line change\nhistory to identify the bug-inducing commit.\nTherefore, we propose the Tracing-Commit-SZZ (TC-SZZ)\nalgorithm, which assumes a distinct function as compared to\nprevious SZZ algorithms. Unlike the six SZZ algorithms dis-\ncussed in this paper, which normally identify only the pre-\nvious commit as the bug-inducing commit, and V-SZZ [48],\nwhich considers the initial commit based on the observation\nthat vulnerabilities are often foundational, TC-SZZ is designed\nto more effectively locate and understand the position of the\nbug-inducing commit in the change history of lines. TC-SZZ\napplies git blame iteratively to all deleted or modiﬁed lines\nin the bug-ﬁxing commit until it reaches the initial commit,\nand returns all commits (i.e., the descendant commits and the\ninitial commit in Fig. 1) in the change history of these lines.\nIf git blame leads to a commit that has multiple removed\nlines, TC-SZZ chooses one among them to continue the iter-\nation. Choosing all lines could lead to too much fanout, giving\nmany false positives. For this, we have developed an algo-\nrithm based on V-SZZ [48]. Our algorithm takes into account\nboth the string similarity and the relative distance between\nthe line reported by git blame and the deleted lines in the\nsame commit.\nAn alternative to the iterative use of git blame would be to\nuse git log -L, which tracks changes to speciﬁc lines through\nthe history. TC-SZZ, however, adds an additional dimension\nby considering string similarity, which can account for moved\nlines, thus identifying more bug-inducing commits than git log\n-L. Take for example commit 5b47348.12 If we apply the git\nlog -L command on the lines deleted by this bug-ﬁxing commit,\nwe only trace back to commit ed928a3.13 In this commit, the\ndeveloper relocated a few functionsto a different part of the ﬁle.",
+    "bbox": [
+      37.58,
+      63.79,
+      288.66,
+      660.72
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:003",
+    "block_type": "text",
+    "text": "11https://github.com/torvalds/linux/commit/d8ad6d39c35d2b44b3d48b787df\n7f3359381dcbf\n12https://github.com/torvalds/linux/commit/5b47348fc0b18a78c96f8474cc90\nb7525ad1bbfe\n13https://github.com/torvalds/linux/commit/ed928a3402d8a24a70c242c6310\n9c069a7b1f3ab",
+    "bbox": [
+      37.58,
+      687.42,
+      291.75,
+      743.96
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:004",
+    "block_type": "text",
+    "text": "TABLE II\nRECALL, PRECISION, AND F1 RESULTS OF ALL SZZ ALGORITHMS",
+    "bbox": [
+      318.27,
+      65.58,
+      534.0,
+      83.45
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:005",
+    "block_type": "text",
+    "text": "Algorithm\ndatasetlinux\ndatasetrosa\nPrecision\nRecall\nF1\nPrecision\nRecall\nF1",
+    "bbox": [
+      305.06,
+      96.3,
+      544.67,
+      114.17
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:006",
+    "block_type": "text",
+    "text": "B-SZZ\n0.42\n0.58\n0.49\n0.39\n0.69\n0.50\nAG-SZZ\n0.42\n0.56\n0.48\n0.45\n0.60\n0.52\nL-SZZ\n0.57\n0.43\n0.49\n0.52\n0.45\n0.48\nR-SZZ\n0.59\n0.45\n0.51\n0.66\n0.57\n0.61\nMA-SZZ\n0.40\n0.55\n0.46\n0.36\n0.64\n0.46\nSZZ@PYD\n0.43\n0.55\n0.48\n0.39\n0.67\n0.49",
+    "bbox": [
+      305.06,
+      119.44,
+      547.24,
+      173.17
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:007",
+    "block_type": "text",
+    "text": "The git log -L command interprets this as the initial commit\nfor these lines. However, TC-SZZ goes beyond this by ﬁnding\nlines with similar content and executing git blame once more,\nenabling us to identify the bug-inducing commits.\nTo facilitate future research on understanding the placement\nof bug-inducing commits in the change history, TC-SZZ offers\nmultiple modes: (1) Chronological Trace Mode: For every\ndeleted or modiﬁed line in a bug-ﬁxing commit, TC-SZZ re-\nturns all potential bug-inducing commits in the order of git\nblame. For instance, Fig. 1 illustrates the change history of\na bug-ﬁxing commit for a speciﬁc deleted or modiﬁed line,\nwith TC-SZZ providing the sequence: previous commit, de-\nscendants commit 61a492, 40747f, 8c49d9, and initial commit.\n(2) Unique Commits Mode: For the sake of conciseness, based\non the results from Chronological Trace Mode, only unique\npotential bug-inducing commits are returned, eliminating du-\nplicates. (3) Custom Blame Invocation Mode: The user has\nthe ability to specify the number of times git blame is invoked\n(a parameter of 1 is standard for SZZ, a parameter of 2 means\nusing git blame twice for each modiﬁed line, and a parameter\nof -1 identiﬁes the initial commit). Our implementation of TC-\nSZZ is publicly available in the replication package.",
+    "bbox": [
+      300.6,
+      199.9,
+      551.71,
+      462.08
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:008",
+    "block_type": "text",
+    "text": "VI. RESULTS",
+    "bbox": [
+      399.2,
+      477.93,
+      453.05,
+      489.04
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:009",
+    "block_type": "text",
+    "text": "In this section, we answer the three Research Questions pro-\nposed in Section IV.",
+    "bbox": [
+      300.6,
+      495.86,
+      551.65,
+      518.93
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:010",
+    "block_type": "text",
+    "text": "A. RQ1: SZZ Performance",
+    "bbox": [
+      300.6,
+      537.17,
+      409.97,
+      548.13
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:011",
+    "block_type": "text",
+    "text": "Table II presents the results for the six SZZ algorithms,\nordered chronologically, on our newly collected KFC dataset,\ncompared against the results reported by Rosa et al. [28] for\ntheir dataset (datasetrosa).\nThe results demonstrate that R-SZZ is the best algorithm\n(with the highest F1) on both datasets, given that F1 combines\nprecision and recall. There are several factors that cause R-SZZ\nto outperform the other SZZ variants on our dataset. First and\nforemost, R-SZZ only returns the most recent commit among\nall candidates. At the same time, 96.1% (73,109) of the Linux\nbug-ﬁxing commits have only one bug-inducing commit. Thus,\nR-SZZ, by returning only one bug-inducing commit, achieves\nhigher precision than SZZ algorithms that return multiple bug-\ninducing commits.\nFour of the six algorithms demonstrate better precision on the\nKFC dataset than on the baseline (i.e., Rosa’s result), with an",
+    "bbox": [
+      300.6,
+      553.96,
+      551.66,
+      744.4
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 9,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:009:012",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

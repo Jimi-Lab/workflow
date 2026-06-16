@@ -1,0 +1,44 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN
+Analysis Mode: static-only [EXECUTION NOT REQUESTED]
+Repository / File Layout Observed:
+- Top-level code files: Detector.py, Detector_wrong.py, 32_v1scan_auto.py.
+- Bundled native tools: ctags, optscript, readtags.
+- OSS list files visible: curl_OSSList.txt, FFmpeg_OSSList.txt, httpd_OSSList.txt, ImageMagick_OSSList.txt, linux_OSSList.txt, openjpeg_OSSList.txt, openssl_OSSList.txt, qemu_OSSList.txt, tcpdump_OSSList.txt, wireshark_OSSList.txt.
+- dataset/ exists but contains 0 immediate entries in this local snapshot. [NEEDS ARTIFACT]
+- target/ exists but contains 0 immediate entries in this local snapshot. [NEEDS ARTIFACT]
+- README file was not observed in the local source root. [NEEDS ARTIFACT]
+Primary Files:
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\Detector.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\Detector_wrong.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\32_v1scan_auto.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\ctags
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\optscript
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\readtags
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\curl_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\FFmpeg_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\httpd_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\ImageMagick_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\linux_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\openjpeg_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\openssl_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\qemu_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\tcpdump_OSSList.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\V1SCAN\V1SCAN\wireshark_OSSList.txt
+Key Static Evidence:
+- Detector.py defines configuration paths for Git2CPE, CPE2CVE, OSS function hashes, vulnerable/patch hashes, vulnerable files, and target outputs.
+- Detector.py imports tlsh, ast, json, re, subprocess, os, and sys, suggesting hash-based and external-tool-assisted static analysis.
+- targetHashing parses C/C++ files and uses ctags to collect functions, macros, structs, and variables for hashing/indexing.
+- representingOSS maps target OSS to CPE/CVE information and candidate vulnerability records.
+- ver_detectVuls, codeVerification, and code_detectVuls implement version-based filtering, code-based verification, and combined detection logic by static code inspection.
+- 32_v1scan_auto.py iterates over an input folder and invokes Detector.py, but it was not executed.
+Static Consistency Notes:
+- Paper claim that V1SCAN combines version- and code-based detection is supported by Detector.py function names and configuration paths.
+- Paper claim that reused code is classified into code entities is partially supported by targetHashing and ctags-based function/macro/struct/variable extraction.
+- Local dataset/CPE/vulnerability hash directories required by Detector.py are absent or empty in this snapshot. [NEEDS ARTIFACT]
+- No README/config documentation was visible locally; run commands and environment assumptions are inferred only from code. [NEEDS ARTIFACT]
+Observed Local Output / Data Artifacts:
+- OSSList files for curl, FFmpeg, httpd, ImageMagick, linux, openjpeg, openssl, qemu, tcpdump, and wireshark.
+- Empty or placeholder dataset/ and target/ directories were observed.
+Missing Data / Missing Entrypoints:
+- Git2CPE, CPE2CVE, OSSallFuncs, OSSverList, vulHashes, vulFiles datasets referenced by Detector.py are missing locally. [NEEDS ARTIFACT]
+- Runtime behavior and reported metrics were not reproduced. [EXECUTION NOT REQUESTED]

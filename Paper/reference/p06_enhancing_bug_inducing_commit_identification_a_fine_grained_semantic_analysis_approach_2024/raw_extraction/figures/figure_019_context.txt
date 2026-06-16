@@ -1,0 +1,15 @@
+3044 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 8. An example of handling bug- fixing commits w ith deleted lines.
+constraints and mark them as buggy statements. Similarly, when
+comparing the data flow of each variable, if there’s a difference
+between versions, we identify and mark the related deleted lines
+as buggy statements.
+Fig. 8 illustrates why comparing paths is necessary. If we
+blamed all deleted lines, lines 3 and 17 would be included.
+However, line 3 is simply replaced by line 4 and does not affect
+the program’s state. By comparing paths, we can see that the
+data flow of variables buffer and count is not affected,
+allowing us to exclude line 3 and reduce noise.
+IV . E
+XPERIMENT SETUP
+A. Experime

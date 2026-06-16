@@ -1,0 +1,46 @@
+ISSTA016:18 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+Table 7. Statistics related to the scalability of LLM4SZZ
+DATASET llm calls token numbers time
+DS_LINUX 9.8 14,489 30.43s
+DS_GITHUB 10.3 14,890 20.20s
+DS_APACHE 13.67 24,023 28.14s
+R-SZZ performs comparably to the B-SZZ and AG-SZZ algorithms, while in DS_GITHUB, it
+significantly outperforms all other baselines. From the table, we observe thatLLM4SZZ consistently
+outperforms all baselines. Specifically, in DS_LINUX, it improves precision by 6.8% and the F1-
+score by 17.3% compared to the best-performing baseline. Similarly, in DS_GITHUB, LLM4SZZ
+improves precision by 4.0% and the F1-score by 10.2%. These results demonstrate that LLM4SZZ’s
+performance improvements are not caused by data leakage.
+6.3 Scalability
+Table 7 presents statistics on the scalability of LLM4SZZ, including the average number of LLM
+calls, the average number of tokens consumed, and the average time required to process a bug-
+fixing commit. The average number of LLM calls and the average token consumption are primarily
+determined by the size of the bug-fixing commit. Bug-fixing commits in DS_APACHE are generally
+larger than those in DS_GITHUB and DS_LINUX, which results in higher LLM call frequencies and
+greater token consumption for DS_APACHE.
+Additionally, the table shows that LLM4SZZ requires approximately 30 seconds to handle a
+bug-fixing commit. This is longer than the processing time of some baselines, such as the B-SZZ
+algorithm, because these baselines rely on basic assumptions or simple heuristic rules. However,
+when compared to more complex techniques like RA-SZZ, which employs program analysis to
+detect refactorings, LLM4SZZ is significantly faster. Our experiment indicates that RA-SZZ takes
+an average of 78.4 seconds to process a single bug-fixing commit, nearly 2.6 times longer than
+LLM4SZZ.
+The total time cost of LLM4SZZ consists of two components: the time for LLM calls and the time
+required to retrieve relevant project information. For example, LLM4SZZ retrieves file contents
+from specific commits in the project, which contributes to the time cost. This explains why the
+average processing time for bug-fixing commits in DS_LINUX is longer than that in DS_GITHUB
+and DS_APACHE, even though DS_LINUX requires fewer LLM calls. The Linux project’s large size
+increases the time required for information retrieval, leading to higher overall processing times.
+Although this larger size results in increased time, the overal time remains acceptable, indicating
+that LLM4SZZ is feasible for large projects. We also investigate whether there are any extremely
+long bug-fixing commits that exceed the LLM’s token limit. Our results show that there is only one
+such commit in the Hadoop project, and it has minimal impact on overall performance.
+6.4 Bugs that LLMs Fail to Understand
+In this section, we analyze the test cases in which LLMs fail to understand the bug and fall back
+to rank-based identification. We randomly select 50 such test cases from the total of 797 failed
+cases and manually examine the characteristics of the bugs. Among these, 38 test cases are from
+DS_LINUX, 7 from DS_GITHUB, and 5 from DS_APACHE. We categorize the bugs into two types:
+those with an excessively large context and those requiring subtle changes to resolve.
+Bugs involving an excessively large context. LLM4SZZ performs context refinement before
+requiring the LLM to determine whether the commit contains a bug. However, even after refinement,
+the context can remain excessively large. In 32 of the analyzed test cases, the context ranges from
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

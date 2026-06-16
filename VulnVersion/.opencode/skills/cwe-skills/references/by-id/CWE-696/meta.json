@@ -1,0 +1,255 @@
+{
+  "cwe_id": "CWE-696",
+  "name": "Incorrect Behavior Order",
+  "abstraction": "Class",
+  "status": "Incomplete",
+  "description": "The product performs multiple related behaviors, but the behaviors are performed in the wrong order in ways that may produce resultant weaknesses.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-691",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Insufficient Control Flow Management"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "Web Based"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product performs multiple related behaviors, but the behaviors are performed in the wrong order in ways that may produce resultant weaknesses.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "behaviors",
+      "order",
+      "weaknesses",
+      "performed"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "behaviors",
+      "order",
+      "weaknesses",
+      "performed",
+      "resultant",
+      "behavior",
+      "multiple",
+      "produce"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code attempts to validate a given input path by checking it against an allowlist and then return the canonical path. In this specific case, the...",
+        "snippet": "String path = getInputPath(); if (path.startsWith(\"/safe_dir/\")) { File f = new File(path); return f.getCanonicalPath(); }"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This function prints the contents of a specified file requested by a user.",
+        "snippet": "function printFile($username,$filename){ //read file into string $file = file_get_contents($filename); if ($file && isOwnerOf($username,$filename)){ echo $file; return true; } else{ echo 'You are not authorized to view..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "Assume that the module foo_bar implements a protected register. The register content is the asset. Only transactions made by user id (indicated by signal...",
+        "snippet": "module foo_bar(data_out, usr_id, data_in, clk, rst_n); output reg [7:0] data_out; input wire [2:0] usr_id; input wire [7:0] data_in; input wire clk, rst_n; wire grant_access; always @ (posedge clk or negedge rst_n)..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "The following code attempts to validate a given input path by checking it against an allowlist and then return the canonical path. In this specific case, the...",
+        "snippet": "String path = getInputPath(); File f = new File(path); if (f.getCanonicalPath().startsWith(\"/safe_dir/\")) { return f.getCanonicalPath(); }"
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "Assume that the module foo_bar implements a protected register. The register content is the asset. Only transactions made by user id (indicated by signal...",
+        "snippet": "always @ (posedge clk or negedge rst_n) begin if (!rst_n) data_out = 0; else assign grant_access = (usr_id == 3'h4) ? 1'b1 : 1'b0; data_out = (grant_access) ? data_in : data_out; end endmodule"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2019-9805",
+        "description": "Chain: Creation of the packet client occurs before initialization is complete (CWE-696) resulting in a read from uninitialized memory (CWE-908), causing memory corruption.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-9805"
+      },
+      {
+        "reference": "CVE-2007-5191",
+        "description": "file-system management programs call the setuid and setgid functions in the wrong order and do not check the return values, allowing attackers to gain unintended privileges",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-5191"
+      },
+      {
+        "reference": "CVE-2007-1588",
+        "description": "C++ web server program calls Process::setuid before calling Process::setgid, preventing it from dropping privileges, potentially allowing CGI programs to be called with higher privileges than intended",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-1588"
+      },
+      {
+        "reference": "CVE-2022-37734",
+        "description": "Chain: lexer in Java-based GraphQL server does not enforce maximum of tokens early enough (CWE-696), allowing excessive CPU consumption (CWE-1176)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-37734"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

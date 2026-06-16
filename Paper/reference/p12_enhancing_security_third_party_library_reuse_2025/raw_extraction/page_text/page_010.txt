@@ -1,0 +1,116 @@
+• Characteristic comparison. We compared DB iot with
+the prevalent library database published recently [48]
+[27].
+• Database integration. We integrated DB iot with the
+state-of-the-art TPL reuse detection tool, Centris, to verify
+if its detection performance is enhanced.
+Characteristic Comparison. We compared DB iot with
+DBkwd and the databases constructed by Centris (i.e.,
+DBcentris) and TPLite (i.e., DB tplite) from three aspects:
+storage consumption, efficiency and maintainability.
+The comparison results are listed in Table I. In total, DB iot
+includes only 1,872 libraries related to IoT, requiring 3.5 GB
+of storage, but DB kwd and DBcentris consume ten times more
+storage because they include many irrelevant libraries through
+random TPL selection. In contrast, TPLF ILTER effectively
+filters out most irrelevant libraries when constructing DB iot.
+When processing each TPL, although DB iot, DBkwd, and
+DBcentris cost the same time to clone one TPL repository
+and calculate function hash values within it, DB centris needs
+115.1s on average to eliminate the redundant functions within
+each TPL whereas DB iot only needs 0.1s to remove the
+redundancy. As most detection tools adapt similarity com-
+parisons to identify the reused TPLs, the database accuracy
+significantly affects the search space and detection efficiency.
+Specifically, the search space of DB iot is smaller than both
+DBkwd and DBcentris, indicating that when using DBiot, much
+fewer similarity comparisons are needed to identify one TPL
+reuse. With frequent updates to TPLs, databases for TPL
+reuse detection need to be updated and maintained easily.
+However, the time needed to update DB centris is more than
+100 hours. On the contrary, DBiot requires only a few minutes
+to update, supported by hashing-index based elimination to
+remove redundancy. Although TPLite also creates a database
+for TPL reuse detection, its database creation requires large
+storage to store excessive library details, including all function
+details. Its storage capacity became overwhelmed when only
+processing 1,000 TPLs, indicating that using TPLite to build a
+database for TPLite is impractical.
+Database Integration. To test how DB iot performs when in-
+tegrate with state-of-the-art tools, we compared DB iot, DBkwd
+and DB centris in detecting TPL reuses on the Top-10 IoT
+projects in C/C++ from GitHub as the target programs. Details
+of these projects are listed in Appendix B.
+Table II shows the results when integrating Centris with the
+three different databases. When using DB centris, Centris only
+identified 71 TPL reuses; however, its performance improved
+significantly, detecting 174 and 112 TPL reuses when leverag-
+ing DB iot and DB kwd, respectively. Notably, although DB iot
+has the smallest size, its comprehensiveness and specification
+enabled Centris to detect more reuses than the other two larger
+databases.
+2) Vulnerability Segment Evaluation: We compared V UL-
+TURE against the state-of-the-art CVE patch mapping tool
+VFCFinder, commonly employed schemes Link Matching
+(directly collect patch information from CVE/NVD refer-
+ences) [46] and SNYK Database Retrieval [12], assessing their
+mapping accuracy, time cost, and space cost, respectively. The
+patch commits can be directly collected from CVE/NVD and
+are assumed available for all the solutions.
+We exclude PatchScout [41] and VCMatch [45] from the
+comparison because both schemes demonstrably underperform
+compared to VFCFinder [20], as discussed and evaluated in the
+study.
+Commit benchmark. We randomly selected 200 CVEs and
+manually identified the corresponding patch commits using
+information from the NVD website and project commits.
+Overall, 158 (out of 200) CVEs have been labeled with the
+corresponding patch commits and the other 42 (out of 200)
+CVEs are labeled with “None” whose patch commits cannot
+be found within the given CPE scope manually (from the last
+vulnerable version to the fixed version).
+Mapping accuracy. We quantified the number of patch com-
+mits identified by each of the three methods and manually
+validated the results. Table III presents the number of patch
+commits identified by each method ( Detected) and the num-
+ber of correctly identified patches confirmed through manual
+verification (Confirmed). Additionally, to quantify the overall
+performance of each method, we also considered their ability
+to handle cases labeled with “None” and calculated the F1
+score ( F1). As shown in the table, V ULTURE successfully
+identified the highest number of validated patch commits
+(124) while generating zero false alarms. For the 34 patch
+commits that were not identified, we found that 33 were due
+to the absence of any information related to the vulnerable
+elements (files, functions, variables) in the CVE descriptions
+for revealing vulnerability details. For instance, the description
+of CVE-2007-0457 3 in the NVD is “ Unspecified vulnerability
+in the IEEE 802.11 dissector ... ” , which provides no useful
+information about the vulnerable elements. The one remaining
+failed case occurred because the LLM ( GPT -4) was unable to
+accurately identify the patch commit among the candidates in
+Step 4 (IV-A3). Instances of this kind of failure are relatively
+rare. In general, in terms of the F1 score, V ULTURE achieved
+the highest F1 score among all approaches with a significant
+advantage.
+To prevent data bias and ensure even data distribution, we
+divided the dataset into five groups and performed 5-fold group
+validation to verify the performance of V ULTURE . V ULTURE
+achieved F1 scores of 87.5%, 88.9%, 88.51%, 88.50%, and
+86.11% in each validation round, respectively, demonstrating
+its effectiveness.
+Time and space cost. We compared the time and space
+overhead of V ULTURE and VFCFinder. To evaluate the time
+overhead performance, we randomly selected 50 CVEs that
+all the two methods could successfully identify the patch
+commits. For space overhead, we calculated the average space
+expenditure required to match each CVE directly on the ground
+truth dataset. The experimental results are shown in Table IV.
+As indicated, V ULTURE exhibited the lowest time overhead
+(in both average and median values) and the smallest space
+overhead. In terms of space overhead, VFCFinder requires
+cloning the GitHub repository locally to obtain candidate com-
+mits, which results in significant additional space overhead. In
+contrast, VULTURE accesses candidate commits via the GitHub
+3https://nvd.nist.gov/vuln/detail/CVE-2007-0457
+10

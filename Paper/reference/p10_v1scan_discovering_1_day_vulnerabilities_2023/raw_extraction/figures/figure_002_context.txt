@@ -1,0 +1,35 @@
+Page: 4
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+tween the disclosed vulnerable functions and the vulnerable
+functions that existed in ReactOS, indicated a similarity of
+less than 60% in the six cases. Moreover, because VUDDY
+is not designed to detect vulnerabilities that exist outside func-
+tions, it missed two vulnerabilities.
+Finally, VUDDY produced eight false positives, all of
+which were caused by abstraction. In the case of a security
+patch that changes only its abstraction targets, VUDDY can-
+not distinguish between vulnerable and patched functions,
+thereby producing false positives.
+V1SCAN. V1SCAN discovered 26 vulnerabilities in ReactOS
+while eliminating most false positives and negatives produced
+by the existing approaches. It is noteworthy that V1SCAN
+detected more vulnerabilities with significantly fewer false
+positives than the union results of existing approaches.
+Here we introduce the LibTIFF v4.0.10 case, which is
+reused in ReactOS. V1SCAN could filter out vulnerabilities
+of LibTIFF that were not reused in ReactOS (e.g., CVE-2020-
+35521). In addition, V1SCAN detected the CVE-2018-19210
+vulnerability that was not discovered in the version-based
+approach, because the CPE provides an incorrect version
+(v4.0.9). Moreover, the CVE-2019-14973 vulnerability, in
+which the security patch modified outside functions, was
+not detected by the code-based approach but discovered in
+V1SCAN. Note that the aforementioned vulnerabilities have
+been patched in the latest version of ReactOS.
+3
+Design of V1SCAN
+In this section, we describe the design of V1SCAN, which can
+precisely detect propagated 1-day vulnerabilities.
+3.1
+Ove

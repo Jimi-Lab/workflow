@@ -1,0 +1,104 @@
+committed within a day6. Another Linux kernel vulnerability
+with CVE-2012-2119, this time a buffer overflow, had a patch
+spanning 5 short fixing commits modifying the same file, all
+committed on the same day7.
+Defining a lifetime metric comes down to explicitly defin-
+ing the start and end points of the time measurement.
+– Which of the potentially multiple VCCs/fixing commits
+should we consider as a start/end point? Considering the
+causes for multiple commits either introducing or fixing a vul-
+nerability, we decide to use the first of the VCCs as the start
+of the time measurement and the last of the fixing commits as
+the end. For cases like the first example concerning multiple
+sub-vulnerabilities described in one CVE, we therefore mea-
+sure the lifetime of the oldest one. For re-introduction cases,
+like the one in the second example, we measure the total life-
+time. In those cases, this whole period is most often a period
+of risk for systems running “stable” software versions (only
+applying critical patches), since the premature fix is often not
+designated as a security issue, and therefore not considered a
+critical patch.
+– Which timestamp to use? Most projects use a “main”
+branch of development (traditionally master in git) to track
+their code, and have a public mirror of this repository so that
+users can download the most recent versions of the code 8.
+Changes are then developed, discussed, and tested in private
+copies of the repository. When a change is ready to make it to
+the main branch, it is either (a) prepared as a (typically short)
+series of commits based on a recent reference commit and
+then merged into the main branch, or (b) directly committed to
+the main branch. For the purpose of measuring the lifetime of
+a vulnerability as a part of its window of exposure, we would
+want to measure the time between the VCC and the fix being
+widely available to users (including, e.g. maintainers of soft-
+ware distributions). Following this argumentation, we would
+use the time a VCC or a fixing commit was merged into the
+main branch as its timestamp, rather than its “commit times-
+tamp” (because the change may potentially be kept private
+until merging). This was indeed our first approach. However,
+from our empirical results we came to the conclusion that
+this adds unnecessary complexity to both the definition and
+the computation of the metric. The time between the commit
+and its merging into the main branch is usually very short
+(average of ∼20 days) in comparison to the lifetime of a vul-
+nerability (average in years). This is due to the fact that the
+usual practice after a fix is prepared and tested, is to download
+the most recent version of the code from the main branch
+of development and create a patch against this version. Fur-
+thermore, more complexity in the definition would have been
+6more information at https://www.spinics.net/lists/linux-nfs/
+msg63334.html.
+7more information at https://bugs.launchpad.net/ubuntu/
++source/linux/+bug/987566.
+8see https://git.kernel.org/pub/scm/linux/kernel/git/
+torvalds/linux.git for Linux.
+needed to account for fixes that were never merged into the
+main branch because the vulnerability they addressed only
+affected older versions of the software (and were therefore
+merged into e.g. a stable branch). Considering the above, we
+backtracked and decided to use the commit timestamp, which
+is readily available in the metadata of a commit in all three
+popular version control systems (git, SVN, mercurial).
+3 Dataset creation
+In this section we describe the data collection and cleaning
+process. This process allowed us to create the largest and
+most complete, to the best of our knowledge, datasets of (a)
+mappings between a CVE and its VCC(s), and (b) mappings
+between a CVE and its fixing commit(s). We therefore con-
+sider the dataset to be a valuable contribution in itself and
+will make it publicly available for other researchers to use9.
+3.1 Linking CVEs to their VCCs
+An integral part of our dataset are mappings from CVEs to
+their VCCs to create a “ground truth” dataset. These map-
+pings come from manually curated datasets of researchers
+and project maintainers and enable us to evaluate and validate
+methods that automatically estimate lifetimes of vulnerabili-
+ties for which no such ground truth data are available.
+The largest source we identified for such mappings, is the
+Ubuntu CVE Tracker [6]. In this project, the Ubuntu Security
+Team gathers and curates several data points on vulnerabilities
+affecting the Linux kernel, often including their fixing com-
+mits and VCCs. Note that we exclude some of the mappings
+in the project from our dataset as their corresponding VCC
+refers to the initial git commit of the Linux kernel, leaving us
+with 1,202 mappings between 885 CVEs and their VCCs. Our
+reasoning is that vulnerabilities found in this commit were
+introduced before the beginning of the git era and thus using
+the timestamp of the initial git commit would let their lifetime
+appear shorter than it actually is.
+Additionally, we found 436 ground truth mappings for
+Chromium10 (226 CVEs), and 163 for the Apache HTTP
+Server (httpd) (60 CVEs) in the Vulnerability History
+Project [21]. The project also contains a few additional data
+points for repositories, other than Chromium and httpd, how-
+ever these repositories do not use C/C++ as their main pro-
+gramming language. Since the quantity of those mappings
+for other programming languages was too low to validate the
+accuracy of our methodology on them, we decided to limit
+our dataset to C/C++ repositories. Overall we were able to
+map 1,171 CVEs to one or more VCCs, from high-quality
+sources.
+9dataset available at https://figshare.com/s/
+4dd1130c336f43f6e18c
+10Chromium is a web browser on its own right, but its codebase is also
+used as a basis for Google Chrome, as well as other web browsers.

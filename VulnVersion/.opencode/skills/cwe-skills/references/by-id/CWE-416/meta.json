@@ -1,0 +1,290 @@
+{
+  "cwe_id": "CWE-416",
+  "name": "Use After Free",
+  "abstraction": "Variant",
+  "status": "Stable",
+  "description": "The product reuses or references memory after it has been freed. At some point afterward, the memory may be allocated again and saved in another pointer, while the original pointer references a location somewhere within the new allocation. Any operations using the original pointer are no longer valid because the memory \"belongs\" to the code that operates on the new pointer.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-825",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Expired Pointer Dereference"
+      },
+      {
+        "cwe_id": "CWE-672",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Operation on a Resource after Expiration or Release"
+      },
+      {
+        "cwe_id": "CWE-672",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Operation on a Resource after Expiration or Release"
+      },
+      {
+        "cwe_id": "CWE-672",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Operation on a Resource after Expiration or Release"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-120",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"
+      },
+      {
+        "cwe_id": "CWE-123",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Write-what-where Condition"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Variant level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product reuses or references memory after it has been freed. At some point afterward, the memory may be allocated again and saved in another pointer, while the original pointer references a location somewhere within...",
+    "typical_preconditions": [
+      "freed object reused on later path",
+      "lifetime mismatch across branches",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "freed object reused on later path",
+      "lifetime mismatch across branches"
+    ],
+    "typical_sinks": [
+      "dereference after free",
+      "method call after release"
+    ],
+    "typical_fix_actions": [
+      "null/reset pointer",
+      "reorder free/use",
+      "add ownership guard"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "free/release followed by later use",
+      "missing lifetime guard",
+      "references",
+      "original",
+      "new",
+      "allocation"
+    ],
+    "fix_search_patterns": [
+      "ptr = NULL",
+      "reference count guard",
+      "move free after last use"
+    ],
+    "guard_patterns": [
+      "same object identity",
+      "same control-flow region"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "references",
+      "original",
+      "new",
+      "allocation",
+      "operations",
+      "afterward",
+      "allocated",
+      "somewhere"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "control_flow_region",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same object identity",
+      "same control-flow region"
+    ],
+    "recommended_predicate_templates": [
+      "free/release followed by later use",
+      "missing lifetime guard",
+      "ptr = NULL",
+      "reference count guard",
+      "move free after last use"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "free/release followed by later use",
+        "missing lifetime guard",
+        "ptr = NULL",
+        "reference count guard"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "free/release followed by later use",
+        "missing lifetime guard",
+        "same object identity",
+        "same control-flow region"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "ptr = NULL",
+        "reference count guard",
+        "free/release followed by later use",
+        "missing lifetime guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following example demonstrates the weakness.",
+        "snippet": "#include <stdio.h> #include <unistd.h> #define BUFSIZER1 512 #define BUFSIZER2 ((BUFSIZER1/2) - 8) int main(int argc, char **argv) { char *buf1R1; char *buf2R1; char *buf2R2; char *buf3R2; buf1R1 = (char *)..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code illustrates a use after free error:",
+        "snippet": "char* ptr = (char*)malloc (SIZE); if (err) { abrt = 1; free(ptr); } ... if (abrt) { logError(\"operation aborted before commit\", ptr); }"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-20141",
+        "description": "Chain: an operating system kernel has insufficent resource locking (CWE-413) leading to a use after free (CWE-416).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-20141"
+      },
+      {
+        "reference": "CVE-2022-2621",
+        "description": "Chain: two threads in a web browser use the same resource (CWE-366), but one of those threads can destroy the resource before the other has completed (CWE-416).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-2621"
+      },
+      {
+        "reference": "CVE-2021-0920",
+        "description": "Chain: mobile platform race condition (CWE-362) leading to use-after-free (CWE-416), as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-0920"
+      },
+      {
+        "reference": "CVE-2020-6819",
+        "description": "Chain: race condition (CWE-362) leads to use-after-free (CWE-416), as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-6819"
+      },
+      {
+        "reference": "CVE-2010-4168",
+        "description": "Use-after-free triggered by closing a connection while data is still being transmitted.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-4168"
+      },
+      {
+        "reference": "CVE-2010-2941",
+        "description": "Improper allocation for invalid data leads to use-after-free.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-2941"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

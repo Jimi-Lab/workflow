@@ -1,0 +1,295 @@
+{
+  "cwe_id": "CWE-131",
+  "name": "Incorrect Calculation of Buffer Size",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product does not correctly calculate the size to be used when allocating a buffer, which could lead to a buffer overflow.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not correctly calculate the size to be used when allocating a buffer, which could lead to a buffer overflow.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "calculation",
+      "allocating",
+      "calculate",
+      "correctly"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "calculation",
+      "allocating",
+      "calculate",
+      "correctly",
+      "could",
+      "lead"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code allocates memory for a maximum number of widgets. It then gets a user-specified number of widgets, making sure that the user does not...",
+        "snippet": "int i; unsigned int numWidgets; Widget **WidgetList; numWidgets = GetUntrustedSizeValue(); if ((numWidgets == 0) || (numWidgets > MAX_NUM_WIDGETS)) { ExitError(\"Incorrect number of widgets requested!\"); } WidgetList =..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following image processing code allocates a table for images.",
+        "snippet": "img_t table_ptr; /*struct containing img data, 10kB each*/ int num_imgs; ... num_imgs = get_num_imgs(); table_ptr = (img_t*)malloc(sizeof(img_t)*num_imgs); ..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example applies an encoding procedure to an input string and stores it into a buffer.",
+        "snippet": "char * copy_input(char *user_supplied_string){ int i, dst_index; char *dst_buf = (char*)malloc(4*sizeof(char) * MAX_SIZE); if ( MAX_SIZE <= strlen(user_supplied_string) ){ die(\"user string too long, die evil hacker!\");..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code is intended to read an incoming packet from a socket and extract one or more headers.",
+        "snippet": "DataPacket *packet; int numHeaders; PacketHeader *headers; sock=AcceptSocketConnection(); ReadPacket(packet, sock); numHeaders =packet->headers; if (numHeaders > 100) { ExitError(\"too many headers!\"); } headers =..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2025-46687",
+        "description": "Chain: Javascript engine code does not perform a length check (CWE-1284) leading to integer overflow (CWE-190) causing allocation of smaller buffer than expected (CWE-131) resulting in a heap-based buffer overflow...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2025-46687"
+      },
+      {
+        "reference": "CVE-2025-27363",
+        "description": "Font rendering library does not properly handle assigning a signed short value to an unsigned long (CWE-195), leading to an integer wraparound (CWE-190), causing too small of a buffer (CWE-131), leading to an...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2025-27363"
+      },
+      {
+        "reference": "CVE-2020-17087",
+        "description": "Chain: integer truncation (CWE-197) causes small buffer allocation (CWE-131) leading to out-of-bounds write (CWE-787) in kernel pool, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-17087"
+      },
+      {
+        "reference": "CVE-2004-1363",
+        "description": "substitution overflow: buffer overflow using environment variables that are expanded after the length check is performed",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-1363"
+      },
+      {
+        "reference": "CVE-2004-0747",
+        "description": "substitution overflow: buffer overflow using expansion of environment variables",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-0747"
+      },
+      {
+        "reference": "CVE-2005-2103",
+        "description": "substitution overflow: buffer overflow using a large number of substitution strings",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-2103"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

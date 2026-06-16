@@ -1,0 +1,79 @@
+{
+  "before": {
+    "source_run": "runs\\batches\\root-cause-v2-native-pilot-3",
+    "total_taxonomy": {
+      "semantic_node_without_shared_observation": 2,
+      "missing_fix_commit_id": 2,
+      "missing_patch_hunk_id": 2,
+      "explanatory_anchor_in_required_refs": 1
+    },
+    "cves": [
+      {
+        "cve_id": "CVE-2020-24020",
+        "status": "rejected",
+        "taxonomy": {
+          "semantic_node_without_shared_observation": 2
+        },
+        "details": [
+          "vulnerable predicate pred-vuln-missing-length-check lacks shared observation with anchor anchor-set-input-output",
+          "fix predicate pred-fix-length-post-check lacks shared observation with anchor anchor-set-input-output"
+        ],
+        "gate_errors": [
+          "references evidence-gate-rejected vulnerable_predicate_id: pred-vuln-missing-length-check",
+          "references evidence-gate-rejected fix_predicate_id: pred-fix-length-post-check",
+          "references evidence-gate-rejected guard_condition_id: guard-negative-length-reject"
+        ]
+      },
+      {
+        "cve_id": "CVE-2022-3109",
+        "status": "rejected",
+        "taxonomy": {
+          "missing_fix_commit_id": 1,
+          "missing_patch_hunk_id": 1,
+          "explanatory_anchor_in_required_refs": 1
+        },
+        "details": [
+          "anchor ca-CVE-2022-3109-deref missing fix_commit_id",
+          "anchor ca-CVE-2022-3109-deref missing patch_hunk_id",
+          "anchor ca-CVE-2022-3109-deref is explanatory/non-patch-bound but is required by hypothesis"
+        ],
+        "gate_errors": [
+          "references evidence-gate-rejected anchor_id: ca-CVE-2022-3109-deref"
+        ]
+      },
+      {
+        "cve_id": "CVE-2023-47342",
+        "status": "rejected",
+        "taxonomy": {
+          "missing_fix_commit_id": 1,
+          "missing_patch_hunk_id": 1
+        },
+        "details": [
+          "anchor anchor:CVE-2023-47342:vuln:libavformat/rtsp.c:parse_fmtp missing fix_commit_id",
+          "anchor anchor:CVE-2023-47342:vuln:libavformat/rtsp.c:parse_fmtp missing patch_hunk_id"
+        ],
+        "gate_errors": [
+          "references evidence-gate-rejected vulnerable_predicate_id: vuln-pred:CVE-2023-47342:001",
+          "references evidence-gate-rejected guard_condition_id: guard:CVE-2023-47342:001",
+          "references evidence-gate-rejected negative_condition_id: neg:CVE-2023-47342:001"
+        ]
+      }
+    ]
+  },
+  "after_smoke": {
+    "accepted_count": 1,
+    "rejected_count": 0,
+    "contract_error_count": 0,
+    "contract_taxonomy": {},
+    "legacy_adapter_count": 0
+  },
+  "after_pilot": {
+    "accepted_count": 3,
+    "rejected_count": 0,
+    "contract_error_count": 0,
+    "contract_taxonomy": {},
+    "evidence_backed_hypothesis_count": 3,
+    "legacy_adapter_count": 0,
+    "invented_id_cases": []
+  }
+}

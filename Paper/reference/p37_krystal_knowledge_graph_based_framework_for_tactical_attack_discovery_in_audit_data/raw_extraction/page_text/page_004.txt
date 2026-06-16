@@ -1,0 +1,122 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+tion. 10 In the security context, this is a major beneﬁt, as security- 
+relevant information is typically dispersed across different sys- 
+tems and networks and requires the consideration of e.g., different 
+log sources, IT repositories, and cyberthreat intelligence sources 
+( Kurniawan et al., 2020 ). 
+4. Requirements 
+Based on our analysis of the limitations of the state of the art 
+(cf. Section 2 ), we identify the following set of requirements for the 
+construction of a modular framework for knowledge graph-driven 
+tactical attack discovery. 
+R1. Contextualization 
+Investigating and prioritizing security alerts, which typically 
+include a large number of false positives, requires extensive 
+security domain knowledge to understand the context of an 
+alert ( Sarker et al., 2020 ). This makes it necessary to contextualize 
+information in the provenance graph with appropriate background 
+knowledge, which necessitates a ﬂexible data model. As an exam- 
+ple, important contextual information on the system under eval- 
+uation includes installed software and patch versions of the host 
+where an alert has been raised. Existing approaches (e.g., Hossain 
+et al., 2020; Milajerdi et al., 2019a ) typically hard-code some con- 
+text information (e.g., external networks and software), whereas 
+the majority currently ignores them altogether. To overcome these 
+limitations, the ability to contextualize provenance graphs with 
+background knowledge on the system under investigation is a key 
+requirement for our framework. 
+R2. Reusability and Extensibility Reusability – e.g., of attack 
+patterns and resulting graphs –a n d extensibility – e.g., of de- 
+tection, reconstruction, and summarization techniques –h a v e not 
+been design priorities in existing monolithic solutions for prove- 
+nance based log analysis. Consequently, approaches each rely on 
+their own data structures developed speciﬁcally for each approach, 
+While this allows for some optimization, it makes it diﬃcult to 
+reuse and extend methods, techniques, information, and results. 
+The lack of uniﬁed data formats as a (more speciﬁc) aspect of this 
+requirement has also been highlighted as a major limitation of the 
+state of the art in a recent survey ( Li et al., 2021 ). To tackle this 
+limitation, the developed framework should – while offering ad- 
+equate performance –m a k e it possible to: (i) formulate and ex- 
+change rules for detection, alerting, and attack graph reconstruc- 
+tion in a declarative language, (ii) exchange instances of prove- 
+nance graphs in a standard representation, (iii) query the prove- 
+nance graphs in a standard language, (iv) incorporate and exchange 
+threat information, and (v) reuse and combine analytic techniques. 
+R3. Threat intelligence linking Connecting isolated events to re- 
+construct a complete attack scenario is an important step to under- 
+stand the relevance and impact of alerts. In this context, an ability 
+to link low-level threat evidence to phases of complex multi-stage 
+attacks would be highly beneﬁcial. While some existing approaches 
+( Hassan et al., 2020; Milajerdi et al., 2019b; Zou et al., 2020 ) aim to 
+identify steps and associate them with high-level APT phases, they 
+do not take advantage of the abundance of available Cyber Threat 
+Intelligence (CTI) information available in external sources such as 
+MITRE ATT&CK ( Mitre, 2021 ), which offers links to Common Vul- 
+nerabilities and Exposures (CVE) ( CVE, 2021 ), Common Weakness 
+Enumeration (CWE) ( CWE, 2021 ), and others. We therefore deﬁne 
+the ability to leverage such connections and provide integrated 
+querying capabilities as a key requirement for the developed ap- 
+proach. This will facilitates abstraction from low-level event graphs 
+to higher level techniques and tactics, provide additional informa- 
+10 https://www.w3.org/TR/sparql11-federated-query/ 
+tion for prioritization, impact assessment and mitigation, and make 
+tedious attack investigations more eﬃcient and effective. 
+R4. Cross-platform Interoperability Integrating provenance 
+data from heterogeneous sources and constructing integrated at- 
+tack graphs spanning multiple systems would be highly beneﬁcial 
+in the face of complex multi-host/multi-platform attacks ( Li et al., 
+2021 ). This necessitates a uniﬁed provenance representation that 
+can abstract from speciﬁcs of individual platforms. 
+5. Conceptualization 
+In this section, we describe the conceptualization of our ap- 
+proach and the use of inference for provenance graph construction. 
+5.1. System-Call provenance representation 
+Provenance graphs are a highly effective representation to keep 
+track of information ﬂows ( Li et al., 2021 ). They represent inter- 
+actions between objects as events. Each event involves a subject , 
+i.e., a system object (e.g., a process, thread) that performs a par- 
+ticular operation (e.g., write, read, send) on an object (e.g., ﬁle, 
+socket, registry). As objects typically appear in multiple events, 
+a graph emerges. Although system-call provenance is represented 
+similarly across different existing approaches ( Hassan et al., 2020; 
+Hossain et al., 2017; 2020; Milajerdi et al., 2019b ), no formal and 
+standardized representation (ontology) exists. Instead, existing ap- 
+proaches typically use ad-hoc and hard-coded data models which 
+limits their interoperability, reusability and extensibility. 
+5.2. KRYSTAL Provenance ontology 
+We propose the KRYSTAL ontology 11 as as t a n d a r d representa- 
+tion for system-call provenance graphs. Key beneﬁts of using on- 
+tologies is the ability to share a common understanding – includ- 
+ing concepts and structure, making assumptions explicit, facilitat- 
+ing semantic reasoning, and promoting concept reuse ( Noy and 
+McGuinness, 2001 ). Furthermore, the use of an ontology for prove- 
+nance graph representation makes it easy to integrate background 
+knowledge and unify the conceptual model across different threat 
+detection approaches. 
+In developing the KRYSTAL ontology, we followed a hybrid ap- 
+proach, i.e., using bottom-up and top-down approaches concurrently 
+( Noy and McGuinness, 2001 ). Bottom-up, we started by analysing 
+low-level data structures from applications (e.g., auditlog) and 
+identifying their entities and relations. Top-down, we considered 
+attack patterns from existing cyberthreat intelligence sources (e.g., 
+MITRE ATT&CK Mitre, 2021 ) and compared our ontology to existing 
+non-ontological provenance models/schemas. Our developed ontol- 
+ogy is able to represent low-level system-call provenance data and 
+link it to high-level attack patterns (cf. Section 6.4 ). 
+Figure 2 depicts an excerpt of the KRYSTAL Ontology centered 
+around core concepts such as User , Host , System Object . 
+The latter represent system entities such as Process es, File s, 
+and Socket s. We assign each system object so to a class 
+(identiﬁed by rdfs:Class ) and potential sub-classes (identi- 
+ﬁed by rdfs:subClassOf ). Each system object so is a ver- 
+tex v and the relations between system objects (e.g., writes , 
+isReadBy , sends , etc.) are represented via edges e (identiﬁed by 
+owl:ObjectProperty ). 
+The SystemObject class represent system entities in general. It 
+has three sub-classes such as Process , File and Socket . The Pro- 
+cess class represents a running process in a system (e.g. ﬁrefox, 
+ssh, etc.) while the File class represents a ﬁle (e.g., system ﬁle, ap- 
+plication ﬁle, etc.). We introduce kry:writes , kry:isReadBy 
+11 https://w3id.org/sepses/vocab/event/log/ 
+5

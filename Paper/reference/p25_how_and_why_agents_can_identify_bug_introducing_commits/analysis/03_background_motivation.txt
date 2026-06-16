@@ -1,0 +1,29 @@
+Domain Concepts Introduced:
+- 3.1 Approach Figure 1 shows an overview of SZZ-Agent.
+- Stage 1: SZZ-based Identification.The approach starts from a fix commit, defined by its diff, showing which lines were added and/or deleted, and its commit message.
+- Via standard SZZ, all deleted lines are traced back to the commits that last introduced them, forming the SZZ candidate set.
+- We then provide a LLM-based agent with the fix commit message, the fix commit diff, and for each candidate commit its message and diff (all with five lines of context).
+- The agent is instructed to analyze the fix to understand the bug, examine each candidate for whether it introduced the bug, and select the earliest bug-introducing commit, orNONEif no candidate is responsible.
+- Stage 2: Binary Search.For entries where Stage 1 abstains or where no SZZ candidates exist, we apply a second stage that oper- ates over the full commit history of every file touched by the fix.
+- We then perform a binary search over this history: at each step, the agent receives the full file contents at the candidate commit, the buggy version immediately before the fix, the fixed version, the fix commit message, and the fix commit diff.
+- Based on this, the agent determines whether the bug is already present at the candidate commit.
+Task Definition:
+- Inferred from title and extracted sections: identify vulnerability-introducing commits, bug-introducing commits, vulnerable/affected versions, or evidence useful for version validation. [NEEDS CITATION VERIFICATION]
+Threat Model / Assumptions:
+- [NEEDS EVIDENCE] not asserted unless explicitly stated in the paper.
+Motivating Case:
+- [NEEDS EVIDENCE] no clean motivating case extracted
+Why the Case Is Chosen:
+- [NEEDS EVIDENCE]
+Definitions Needed by Readers:
+- Vulnerability-introducing commit / bug-inducing commit, patch evidence, developer log, vulnerable version, SZZ-style tracing, depending on the paper scope.
+How Background Leads to Method:
+- method (0.54) and the previous SOTA (0.64).
+- We also uncoverwhy agents are so successful: They derive shortgreppablepatterns from the fix commit diff and message and use them to effectively search and find bug-introducing commits in large candidate sets.
+- Their paper from 2005 served as the foundation for a wide array of approaches aimed at identifying bug-introducing changes (or commits) from fix commits in software repositories.
+- But even after two decades of progress, the best-performing approach from 2025 yields a modest increase of 10 percentage points in F1-score on the most popular Linux kernel dataset.
+Writing Pattern:
+- Build from concrete artifact evidence toward why naive blame or simple version matching is insufficient.
+Relevance to Our Paper:
+- Useful for affected versions background and related-work positioning.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json

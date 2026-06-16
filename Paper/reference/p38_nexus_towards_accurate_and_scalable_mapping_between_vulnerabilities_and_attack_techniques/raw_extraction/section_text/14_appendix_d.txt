@@ -1,0 +1,69 @@
+Appendix D).
+In contrast to NEXUS applications, the existing
+CVE–CWE–CAPEC–TTP mapping (covering 141 TTPs) is
+useful only when it already captures the relevant behavior and
+the CVE is not exploitable via any other TTPs. This applies
+to cases with a few high-impact vulnerabilities, limited
+TTP-coverage needs, clear CERT advisory links, or when
+expert judgment is more reliable than automated inference.
+VII. D
+ISCUSSION AND LIMITATIONS
+Model Selection and Pipeline Flexibility. Preliminary ex-
+periments showed that larger models (e.g., GPT-4o, Llama-
+3.1-70B) offered negligible performance gains for CVE-to-
+TTP mapping and augmentation, while incurring signiﬁ-
+cantly higher costs. We thus adopt GPT-4o-mini and Llama-
+3.1-8B for efﬁciency. The NEXUS pipeline remains model-
+agnostic—substitutions with future LLMs require no archi-
+tectural changes. Our ablation study (Section IV-C) further
+conﬁrms each step’s contribution to system performance and
+coverage.
+Analyst-Aided CVE Exploitation Detection.While NEXUS
+effectively surfaces relevant TTPs and provides Sigma rule
+exemplars, our Case Study 1 (Sec.. VI-A) reveals key lim-
+itations. It does not automate CVE exploitation detection
+but acts as an analyst aid, offering actionable insights and
+contextual guidance. Detecting complex exploits still demands
+human expertise to interpret system-speciﬁc behaviors, adapt
+rules, and ensure accuracy. Thus, NEXUS enhances analyst
+workﬂows, but detection efﬁcacy ultimately depends on expert
+reﬁnement.
+Hierarchical and Multi-View Modeling. We adopt hier-
+archical and multi-view learning to capture the structured,
+interdependent nature of TTPs and attack patterns, which
+ﬂat classiﬁcation overlooks. By modeling label dependencies
+through graphs and hierarchical propagation, our approach
+aligns with analyst workﬂows and enables more accurate,
+context-aware predictions.
+Hierarchical vs. Flat Classiﬁcation. We compared hierar-
+chical modeling with ﬂat classiﬁcation, which treats TTPs as
+independent labels. For complex CVEs with interdependent
+TTPs, the ﬂat model shows higher false positives and misses
+contextually linked TTPs (Section IV-C). Hierarchical mod-
+eling enables contextual label propagation and veriﬁcation,
+reducing errors and annotation noise (Section IV-D and IV-F),
+and better reﬂects real-world analyst decision-making.
+14
+
+===== Page 015 =====
+Generalizing beyond Our Dataset. We evaluate NEXUS
+on ﬁve datasets, including two public benchmarks—MITRE-
+APT [38] and SMET [3] (Section IV-B and IV-C). Our evalua-
+tion accounts for real-world vulnerability and attack diversity.
+As shown in Figure 18 and Tab. VI,NEXUS improves TTP
+and CVE coverage across all ATT&CK tactics and consistently
+boosts mapping accuracy, demonstrating strong generalization
+beyond our own dataset.
+High-Quality CVE-TTP Labels. We evaluated the LLM-
+based annotator+veriﬁer (GPT-4o-mini and Llama-3.1-8B) on
+two public benchmarks [3], [38], showing high robustness and
+strong agreement with ground-truth labels (Appendix C). On
+a 15K-sample subset of our dataset, the pipeline achieved
+100% precision and 93.68% recall, closely matching LLM
+judgment. Additional noise injection and candidate veriﬁcation
+tests further validate the accuracy and reliability of our label
+assignment strategy.
+VIII. R
+ELATED WORK
+TTP Recognition from Structured Data. Recent work
+identiﬁes TTPs using structured system-level data such as

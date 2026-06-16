@@ -1,0 +1,217 @@
+2 Motivation
+In this section, we clarify the target problem ofMOVERY , and
+discuss the motivation for MOVERY with examples.
+2.1 Problem statement
+We focused on discovering propagated vulnerabilities in the
+modified OSS components. Suppose that a vulnerability is
+introduced in an OSS and is then patched. Let fd be the dis-
+closed vulnerable function (e.g., through public vulnerability
+databases), fp be the patched function, and fo be the vulnera-
+ble function contained in an older version of the OSS, which
+has a different code syntax from fd (see Figure 1).
+3038    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 004 =====
+…
+Patched
+function
+Disclosed
+vulnerable function
+Initial
+function
+Vulnerability
+patchfd fp
+Vulnerability
+introduction update
+Oldest
+vulnerable function
+fo
+update
+Figure 1: Depiction of the vulnerability fix flow from the vulner-
+ability introduction to the vulnerability patch.
+Using these terms, we can classify the propagation of vul-
+nerability caused by vulnerable OSS reuse into the following
+four categories (C1 to C4, see Table 1):
+Table 1: Classification of vulnerable function propagation.
+Category Description
+C1 fd is reused without code modification.
+C2 fd is reused with code modification.
+C3 fo is reused without code modification.
+C4 fo is reused with code modification.
+Regardless of the category, all propagated vulnerable func-
+tions should be discovered and patched.
+Technical challenges. The main technical challenge is ad-
+dressing the syntax diversity of vulnerable code, mostly arises
+for the following two reasons: internal and external modifi-
+cation of the OSS. As the source code of an OSS frequently
+changes during OSS version updates (i.e., internal modifica-
+tions of OSS), the syntax of a vulnerable function can also
+be changed ( i.e., C3 and C4). Moreover, developers often
+apply their own code patches to OSS components (i.e., exter-
+nal modifications of OSS), and thus, a propagated vulnerable
+function can exist with various syntaxes (i.e., C2 and C4).
+Such syntax diversity significantly impairs the accuracy
+of VCC discovery. Existing VCC discovery techniques (e.g.,
+[14, 17, 49]) can cover onlyC1 and limited C2, thereby pro-
+ducing many false negatives. Typically, they define code lines
+deleted from the security patch as vulnerable lines, and deter-
+mine a function as VCC only if the function contains all the
+vulnerable lines. However, the vulnerable lines in fd they de-
+fined may not exist in fo due to the OSS modifications; in this
+case, they fail to discover VCCs, producing false negatives.
+2.2 Motivating examples
+We introduce two VCC examples with different syntaxes from
+disclosed vulnerable codes; all are now fixed (i.e., patched)
+by the development teams. What we want to emphasize here
+is that syntactically different VCCs can appear in practice
+owing to internal and external OSS modifications, and that
+these are difficult to discover precisely.
+Example 1) We first introduce a memory allocation failure
+vulnerability that existed in LibZip before v1.3.0 (i.e., CVE-
+2017-14107). Listing 1 shows the patch snippet for fixing the
+vulnerability. We confirmed that PHP1, which was reusing
+vulnerable LibZip, backported the security patch in 2017; the
+patched function snippet in PHP is shown in Listing 2.
+1https://github.com/php/php-src
+Listing 1: A patch snippet for CVE-2017-14107 in LibZip.
+1 index 3bd593b1..9d3a4cbb 100644
+2 ––– a/lib/zip_open.c
+3 +++ b/lib/zip_open.c
+4 @@ ... @@ _zip_read_eocd64 (...) {
+5 zip_cdir_t *cd;
+6 zip_uint64_t offset;
+7 zip_uint8_t eocd[EOCD64LEN];
+8 ...
+9 zip_error_set(error, ZIP_ER_SEEK, EFBIG);
+10 return NULL;
+11 }
+12 - if ((flags & ZIP_CHECKCONS)
+&& offset+size != eocd_offset) {
+13 + if (offset+size > buf_offset + eocd_offset) {
+14 + /* cdir spans past EOCD record */
+15 + zip_error_set(error, ZIP_ER_INCONS, 0);
+16 + return NULL;
+17 + }
+18 + if ((flags & ZIP_CHECKCONS)
+&& offset+size != buf_offset + eocd_offset) {
+19 zip_error_set(error, ZIP_ER_INCONS, 0);
+Listing 2: The patched _zip_read_eocd64 function in PHP. High-
+lighted areas indicate the code parts that differ from the dis-
+closed patched function. The vulnerable _zip_read_eocd64 func-
+tion in PHP exhibited only 13% syntax similarity to the disclosed
+vulnerable function of LibZip.
+1 static struct zip_cdir * _zip_read_eocd64 (...) {
+2 struct zip_cdir_t *cd;
+3 zip_uint64_t offset;
+4 const zip_uint8_t *cdp;
+5 ...
+6 _zip_error_set(error, ZIP_ER_SEEK, EFBIG);
+7 return NULL;
+8 }
+9 if (offset+size > buf_offset + eocd_offset) {
+10 /* cdir spans past EOCD record */
+11 _zip_error_set(error, ZIP_ER_INCONS, 0);
+12 return NULL;
+13 }
+14 if ((flags & ZIP_CHECKCONS)
+&& offset+size != buf_offset + eocd_offset) {
+15 _zip_error_set(error, ZIP_ER_INCONS, 0);
+Because PHP reused an older version of LibZip (released
+in 2013) with code modifications, the syntax of the vulnerable
+function in PHP was different from that specified in the dis-
+closed patch for CVE-2017-14107. Considering the function
+as a set of code lines, when measuring Jaccard similarity [46]
+between the vulnerable function in PHP and the vulnerable
+function disclosed in LibZip, the measured similarity was
+13%. Moreover, the PHP team could not directly apply the se-
+curity patch owing to the syntax diversity. For these reasons,
+the PHP team modified and applied the disclosed security
+patch to their codebase, rather than updating the entire LibZip
+to a safe version (i.e., v1.3.0 or later).
+This suggests the need to discover VCCs with large code
+differences (in this case, 87%) from the disclosed vulnerable
+function. MOVERY , which considers the syntax of the oldest
+vulnerable function and uses only the core lines in signature
+generation, can discover even a VCC with such large code
+differences (details are explained in Section 3).
+USENIX Association 31st USENIX Security Symposium    3039
+
+===== PAGE 005 =====
+Listing 3: A patch snippet for CVE-2014-5461 in Lua 5.2.3.
+1 index aafa3dca2..d02e11328 100644
+2 ––– a/ldo.c
+3 +++ b/ldo.c
+4 @@ -326,7 +327,13 @@ int luaD_precall (...) {
+5 Proto *p = clLvalue(func)->p;
+6 - luaD_checkstack(L, p->maxstacksize);
+7 - func = restorestack(L, funcr);
+8 n = cast_int(L->top - func) - 1;
+9 + luaD_checkstack(L, p->maxstacksize);
+10 for (; n < p->numparams; n++)
+11 setnilvalue(L->top++);
+12 - base = (!p->is_vararg)? func + 1:
+adjust_varargs(L, p, n);
+13 + if (!p->is_vararg) {
+14 + func = restorestack(L, funcr);
+15 + base = func + 1;
+16 + }
+Listing 4: A backporting patch for CVE-2014-5461 in Redis.
+1 ––– a/deps/lua/src/ldo.c
+2 +++ b/deps/lua/src/ldo.c
+3 @@ -276,3 +276,3 @@ int luaD_precall (...) {
+4 Proto *p = cl->p;
+5 - luaD_checkstack(L, p->maxstacksize);
+6 + luaD_checkstack(L, p->maxstacksize + p->numparams);
+7 func = restorestack(L, funcr);
+8 // No "base = (!p->is_vararg)? func + 1:..." code line
+However, VUDDY [17], a scalable VCC discovery tech-
+nique that only considers limited changes in the vulnerable
+function, cannot discover such VCCs. ReDeBug [14], a VCC
+discovery technique that considers nearby three (by default)
+lines of deleted and added code lines from the patch, also fails
+to discover such a VCC because the three lines immediately
+above the lines deleted from the patch (i.e., lines #9, #10, and
+#11 in Listing 1) differ from those of the function in PHP (i.e.,
+lines #6, #7, and #8 in Listing 2).
+Example 2) As an example of a VCC that does not in-
+clude the code lines deleted from the patch, we introduce a
+buffer overflow vulnerability that existed in Lua2 v5.1 through
+v5.2.2, which allows context-dependent attackers to cause
+a denial of service attack ( i.e., CVE-2014-5461). Listing 3
+shows the patch snippet applied in Lua v5.2.3. We confirmed
+that Redis3, which reused vulnerable Lua with code modifica-
+tions, backported the security patch for CVE-2014-5461 in
+September 2020 (see Listing 4).
+Specifically, we noted that the patch applied in Redis was
+different from that applied in the Lua repository. This is be-
+cause Redis reused an old version of Lua (v5.1.5) where the
+syntax of the vulnerable function is different from what is
+disclosed, it was infeasible for the Redis team to apply the
+patch for CVE-2014-5461 as it was (e.g., line #12 of Listing 3
+did not exist in the reused code parts of Lua within Redis),
+and thus they followed the patch suggested on the official bug
+tracker of Lua4.
+2https://github.com/lua/lua
+3https://github.com/redis/redis
+4http://www.lua.org/bugs.html#5.2.2-1
+fo
+ fd
+ fp
+INPUT
+OUTPUT
+INPUT
+OUTPUT
+Figure 2: High-level overview of the workflow of M OVERY .
+This case highlights the need to discover VCCs that were
+propagated with the syntax of older versions, which may
+not contain the code lines deleted from security patches.
+MOVERY makes this possible by collating vulnerable func-
+tions between the oldest and the disclosed vulnerable ver-
+sions (see Section 3). However, existing VCC discovery tech-
+niques [14, 17, 49] fail to discover such a VCC when vul-
+nerable lines they defined (e.g., in this case, line #12 in List-
+ing 3) are not contained in the VCC. In contrast, existing SCA
+techniques [9, 48] misinterpret that Redis still contains the
+vulnerability because a vulnerable version of Lua (i.e., v5.1.5)
+is reused in Redis, despite the Redis team has backported the
+security patch.

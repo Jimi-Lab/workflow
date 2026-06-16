@@ -1,0 +1,78 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 7. Signature/rule-based threat detection example using the translated Sigma -rule query. 
+Listing 5. Alerting policy represented as SPARQL query. 
+below 0.5 are considered low integrity and the respective triple 
+?file :isExecutedBy ?process ) will be marked with the 
+detected rule. 17 
+Signature/Rule-based Threat Detection We complement the 
+provenance-based mechanisms with a signature/rule-based detec- 
+tion approach that utilizes IoC deﬁnitions to identify known at- 
+tacks in log events. This illustrates that the uniform KG representa- 
+tion facilitates the combination of a variety of approaches by using 
+a common declarative query language. 
+Signatures are an established and effective approach in de- 
+tecting known attack patterns, but maintaining the set of rules 
+and signatures can be labour-intensive ( Li et al., 2021 ). To tackle 
+this problem, KRYSTAL leverages Sigma 18 –a n open, shareable, 
+community-driven and generic rule format for threat detection in 
+logs. 
+Figure 7 part (1) shows an example of signature/rule-based 
+threat detection deﬁned in Sigma . 19 Each Sigma -rule is written 
+in YAML 20 and deﬁnes the detection rule and its metadata ( ti- 
+tle, id, date, author, log-source etc.). A key beneﬁt of these rules 
+is that the tags metadata links rules to speciﬁc TTPs from MITRE 
+ATT&CK. For example, attack.t1204.002 corresponds to the tech- 
+nique T1204.002 21 ( User Execution: Malicious File ). As per November 
+2021 22 , Sigma contains more than 1497 rules/signatures for differ- 
+ent log sources (e.g., application, network, web logs) and platforms 
+(e.g., Linux & Windows). 
+17 We used the SPARQL CONSTRUCT syntax to generate new triples and link the 
+detected alert to the respective rule. 
+18 https://github.com/SigmaHQ/sigma 
+19 https://github.com/SigmaHQ/sigma 
+20 https://en.wikipedia.org/wiki/YAML 
+21 https://attack.mitre.org/techniques/T1204/003/ 
+22 Last access: 11/26/2021 
+Our framework translates these Sigma rule speciﬁcations 23 au- 
+tomatically and transforms them into SPARQL query expressions. 
+Speciﬁcally, we identiﬁed two search-identiﬁers under the detec- 
+tion attribute: (i) lists that contain strings applied to the full log 
+message and joined with a logical ’OR’, and (ii) maps that consist 
+of key/value pairs, where key is a ﬁeld in the log data and value 
+is a string or integer. Lists of maps are joined with a logical “OR”
+while all elements of a map are joined with a logical “AND”. 
+We express lists as SPARQL ﬁlters with regex matching, while 
+maps are represented as triple patterns, i.e. Subject (S), Predicate 
+(P), and Object (O). S is a log object, P is a log property i.e., key/ﬁeld 
+in the log data and O is the value. Similar to lists , we express 
+the key/value pair matching using regex ﬁlters in SPARQL. Fur- 
+thermore, we also map and transform the rule metadata into RDF. 
+Figure 7 part (2) shows an example translation of a Sigma rule into 
+SPARQL and RDF. 
+The translated Sigma rules are executed against the provenance 
+graph to detect potential attacks/threats in the Threat Detection and 
+Alerting module of our framework. As we can see in Fig. 7 part (3), 
+we detect an alert called “Program Executions in Suspicious Folder ”
+in the provenance graph since the execution of the /tmp/vUgefal 
+process is located in the /tmp/ folder as deﬁned in the Sigma rule. 
+Subsequently, the generated alert will be linked automatically to 
+the T1204.002 ( User Execution: Malicious File ) technique from the 
+ATT&CK knowledge graph ( Kurniawan et al., 2021 ) in the back- 
+ground knowledge (cf. Fig. 7 part (4)). We explain this linking 
+mechanism further in Section 6.3 . 
+6.3. Attack graph reconstruction 
+The next important step once the provenance graph has been 
+constructed and alerts have been raised is to understand how the 
+alerts are connected and to reconstruct potential attack steps. To 
+this end, we construct an attack graph and the attack scenario 
+out of the provenance graph through (i) Backward-Forward Chain- 
+ing and (ii) Graph Querying . 
+Backward-Forward Chaining Backward-Forward Chaining is 
+used to ﬁrst identify the potential root cause of an attack and then 
+reconstruct the overall attack steps. As provenance-based alerting 
+may produce a lot of alerts, we need to prioritize them and iden- 
+tify potential root cause alerts of an attack. This can be done by 
+assigning an alert score during backward searching , i.e., increment- 
+ing alert scores of each predecessor alert on a path. 
+23 https://github.com/SigmaHQ/sigma/wiki/Speciﬁcation 
+9

@@ -1,0 +1,90 @@
+
+original
+source
+packages
+for
+Debian
+and
+Ubuntu there are a number of existing patches (e.g.,
+debian/patches/) that can be applied during a build;
+we applied these patches as well. As a result, the packages
+were patched current up to security advisories on the down-
+load date. Since we downloaded the SourceForge packages
+via revision control systems, we assume all patches were
+already applied.
+The experiments show the number of duplicate buggy
+code segments that are still likely vulnerable. We have
+veriﬁed the presence of all reported unpatched code clones,
+i.e., clones of the exact same buggy code, to conﬁrm
+the ReDeBug implementation is correct. We discuss this
+measurement in § III-F.
+ 0
+ 5
+ 10
+ 15
+ 20
+ 25
+9.0M
+245M
+258M
+349M
+397M
+922M
+Time to build a database (hours)
+                    Lines of Code
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 3: Time to build a database with various sizes of
+dataset
+Distributions
+DB Size
+Projects #
+Files #
+Debian Lenny
+6.0GB
+10,699
+1,155,594
+Ubuntu Maverick
+5.6GB
+11,237
+1,067,579
+Linux Kernel 2.6.37.4
+344MB
+-
+57,653
+SourceForge (C/C++)
+29GB
+30,437
+5,574,905
+Debian Squeeze
+8.2GB
+14,977
+1,586,325
+Ubuntu Oneiric
+9.8GB
+18,240
+1,892,911
+Table III: Size of created databases
+Default Parameters: The default context in a diff ﬁle
+is 3 lines of code. Unless otherwise noted, we set n = 4.
+n = 4 when the amount of context c = 3 guarantees that
+every reported duplicate had at least one changed line along
+with surrounding context. In all experiments for unpatched
+code clones we set θ = 1, e.g., with the default parameters
+all n-tokens from the original buggy code segment needed
+to be found in an unpatched copy to report a bug. m is
+the size of a Bloom ﬁlter and N is the number of n-tokens
+to be hashed into a Bloom ﬁlter. ReDeBug used 256KB-
+sized Bloom ﬁlters where the m/N ratio was always at least
+greater than 32. ReDeBug took advantage of 3 fast hash
+functions: djb2, sdbm, and jenkins [6].
+C. Performance
+We ran ReDeBug to create the database for each source
+code dataset. Figure 3 shows the database build time. The
+database build for Ubuntu Maverick and Debian Lenny both
+took about 6 hours. The database build for SourceForge took
+about 23.3 hour

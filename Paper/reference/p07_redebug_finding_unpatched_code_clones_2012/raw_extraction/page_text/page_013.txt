@@ -1,0 +1,116 @@
+Clone Detection
+Real Clones
+False Detection
+Missed
+ReDeBug
+180
+0
+15
+Deckard
+96
+183
+99
+Table VI: Code clone detection performance
+wise comparisons Deckard consumed more than 20 GB of
+memory in less than 2 minutes, after which we killed the
+process. Instead of the entire OS, we ran Deckard on each
+package at a time with 28 randomly selected C code ﬁles
+which contain security bugs. We report only code clones
+which match with the buggy code regions. Deckard took
+more than 12 hours to complete the code clone detection
+in Debian Lenny, utilizing 8 threads to process 8 packages
+at the same time. While Deckard processed only the source
+code written in C (Deckard can process one language at
+a time), ReDeBug processed a wealth of languages (e.g.,
+C/C++, Java, Shell, Python, Perl, Ruby, and PHP) in 6 hours.
+Table VI shows the code clone detection results of
+Deckard and ReDeBug. As expected, ReDeBug had no false
+detections, and surprisingly, missed 6 times as few code
+clones compared to Deckard. The code clones that ReDeBug
+missed came from the use of different variable names or
+types.
+Deckard faired worse than ReDeBug despite using a more
+sophisticated strategy. We investigated the causes, and found
+that 38 out of 99 of the cases were due to parse failures
+in Deckard, with the remainder just being missed due to
+the algorithm for detecting code clones. This result lends
+support that parsing code is hard and can be a limiting factor
+in practice, and that ReDeBug’s relatively simpler approach
+can be valuable in such circumstances.
+B. Unpatched code clones that are not vulnerable
+Since ReDeBug gets rid of Bloom ﬁlter errors and dead
+code, a metric for false positives is the number of unpatched
+code clones that were not vulnerable for some other reason.
+We have identiﬁed two other causes for this type of false
+positive. First, normalization may be too aggressive in some
+circumstances and thus the identiﬁed code clone is not
+really a code clone. Second, we may ﬁnd real unpatched
+code clones, but other code modiﬁcations may prevent the
+unpatched code from being called in an exploitable context.
+Normalization reduces the false negative rate, but may
+increase the false positive rate. For example, imagine two
+code sequences that are equivalent but one is performed on
+an unsigned integer “A” and the other on a signed integer
+“a”. If the bug relates to signedness, only the latter code is
+vulnerable. However, normalization converts all variables to
+lower-case, thus we would mistakenly report the former as
+also buggy.
+Listing 10 shows an example of an unpatched code clone
+that is present but not vulnerable. The patch ﬁxes an integer
+signedness bug in various BSD kernels. NetBSD contains the
+same vulnerable code, but ﬁxed the problem by changing the
+type of crom_buf->len from signed integer to unsigned
+integer instead of using the shown patch.
+- if (crom_buf->len < len)
++ if (crom_buf->len < len && crom_buf->len > 0)
+Listing 10: CVE-2006-6013
+An unpatched code clone was detected in the ircd-ratbox
+package from the patch shown in Listing 11. The package
+maintainer informed us that the vulnerability was ﬁxed in
+a different location, i.e., adding a separate error checking
+routine if (len<=1) break; ahead of the vulnerable
+code.
+else
+*d++ = *src;
+-
+++src;
+-
+--len;
++
+if (len > 0) {
++
+++src, --len;
++
+}
+}
+*d = ’\0’;
+return dest;
+Listing 11: CVE-2009-4016
+V. RELATED WORK
+MOSS [28] is a well-known similarity detection tool
+using n-tokens. MOSS is based upon an algorithm called
+winnowing [28], a fuzzy hashing technique that selects a
+subset of n-tokens to ﬁnd similar code. The main difference
+is that ReDeBug uses feature hashing to encode n-tokens
+in a bitvector, which allows ReDeBug to perform similarity
+comparison in a cache-efﬁcient way. We swap out winnow-
+ing for feature hashing for improved speed. This decision
+was based upon the work by Jang et al. [22]. Furthermore,
+in order to ﬁnd unpatched code clones we use the insight
+of only looking for code clones of patched bugs to scale to
+large OS distributions.
+Most recent work in academia has focused on detecting
+all code clones (i.e., reducing the number of missed code
+clones, but having more false detections of clones). Exam-
+ples include Deckard [23], CCFinder [24], CP-Miner [25]
+and Deja Vu [21]. Detecting all code clones is a harder
+problem than just searching for copies of patched code in
+that the former potentially requires comparison of all code
+pairs, while the latter is a single sweep over the data set.
+This line of research uses a variety of matching heuristics
+based upon high-level code representations such as CFGs
+and parse trees. For example, CCFinder uses lexing and
+then performs transformations based upon rules to determine
+whether code is similar [24]. The transformation rules are
+60
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

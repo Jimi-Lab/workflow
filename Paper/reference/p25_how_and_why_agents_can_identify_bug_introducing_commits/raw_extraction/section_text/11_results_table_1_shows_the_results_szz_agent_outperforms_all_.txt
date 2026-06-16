@@ -1,0 +1,20 @@
+Results.Table 1 shows the results. SZZ-Agent outperforms all base-
+lines on every dataset. Compared to LLM4SZZ, the previous state
+of the art, SZZ-Agent improves F1-score by 13 percentage points on
+DS_LINUX (0.77 vs. 0.64), 12 on DS_GITHUB-c (0.75 vs. 0.63), and
+12 on DS_GITHUB-j (0.67 vs. 0.55). SZZ-Agent achieves the highest
+precision and recall on all datasets, with the exception of recall on
+DS_GITHUB-j where standard SZZ achieves 0.68 compared to 0.67.
+All improvements are statistically significant (𝑝< 0.01) with large
+effect sizes, except for DS_GITHUB-j vs. LLM4SZZ where the effect
+size is large but𝑝=0.013.
+3.3.2 RQ2a: Data Leakage.Since the fix commits in DS_LINUX,
+DS_GITHUB-c, and DS_GITHUB-j were published before the train-
+ing data cutoff of Claude Opus 4.5 (August 2025 [1]), the model may
+have encountered them during training. We investigate whether
+SZZ-Agent’s effectiveness can be explained by such data leakage.
+Setup.We evaluate SZZ-Agent on DS_LINUX-26, which we col-
+lected by applying the same methodology as Lyu et al. [18] used
+for DS_LINUX but on more recent kernel data. It contains 100 ran-
+domly sampled fix commits published between September 2025 and
+January 2026—after the training data cutoff of Claude Opus 4.5.

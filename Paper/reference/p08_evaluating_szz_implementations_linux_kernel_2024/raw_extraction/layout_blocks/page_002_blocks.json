@@ -1,0 +1,62 @@
+[
+  {
+    "page": 2,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:002:001",
+    "block_type": "text",
+    "text": "2220\nIEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024",
+    "bbox": [
+      42.35,
+      32.52,
+      556.42,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:002:002",
+    "block_type": "text",
+    "text": "address failures from Filtering Ghosts, Da Costa et al. [12]\npropose a framework to ﬁlter out suspicious commits.\nMotivation: While there has been extensive research over\ntwo decades aiming to improve the precision of the SZZ algo-\nrithm [2], [12], [13], [14], [15], [16], discussions on enhancing\nrecall are relatively limited. This analysis gap is critical because\noverlooking certain buggy patterns can impact downstream\ntasks dependent on this algorithm, such as defect prediction [5],\n[6], [11], [20], [21], [22], [23], [24] and the analysis of factors\nrelated to software quality [9], [10], [11], [25], [26], [27]. The\nclosest work is that of Sahal et al. [19] and Rezk et al. [17], who\nuse a syntax-based method [19] and context-aware data ﬂow\nanalysis [17] to address Remove Mapping Ghosts. However,\ntheir work only partially addresses one possible scenario where\nSZZ fails to identify bug-inducing commits. Moreover, there is\na lack of comprehensive examination of the full range of sce-\nnarios where the SZZ algorithm falls short, such as cases where\nﬁles are not shared between the bug-inducing and bug-ﬁxing\ncommits. Therefore, our work aims to present a whole picture\nof the recall challenges faced by all current SZZ algorithms.\nThe wide use of the SZZ algorithm and the introduction of its\nmany variants raises the need to evaluate the algorithms fairly.\nThe original SZZ lacked an empirical evaluation [1], while vari-\nants of SZZ were manually assessed by the authors themselves,\nrather than by domain experts. As noted by da Costa et al. [12]\nand Rosa et al. [28], due to a lack of developer-labeled data,\nevaluations of SZZ variants mostly rely on researchers’ manual\nanalysis of small datasets [1], [2], [14], [15], [16]. As the\nresearchers are not developers of the projects being analyzed,\ntheir judgement on bug-introducing commits may not always be\ncorrect. The cost of manual analysis is also overwhelming. To\navoid the need for manual analysis, while at the same time ben-\neﬁting from the expertise of project developers, Rosa et al. [28]\nproposed an automation-based methodology to build a high-\nquality dataset from commits where the log message indicates\nboth that the commit ﬁxes a bug and the identity of the bug-\ninducing commit. Still, the resulting dataset only takes a few\ncommits from each of many projects, which might not provide\na realistic view. For instance, in Rosa et al.’s dataset, there exist\njust three bug-ﬁxing commits from FFmpeg despite FFmpeg\nhaving over a hundred thousand commits.\nThere does exist, however, a large, developer-created dataset\nlinking bug-ﬁxing commits to the corresponding bug-inducing\ncommits, as is needed to evaluate SZZ algorithms. Since\nOctober 2013, Linux kernel developers have been annotating\nbug-ﬁxing patches with the keyword “Fixes:” followed by the\ncommit id of the bug-inducing commit and the subject-line of\nthe corresponding log message. Starting with fewer than 200\nsuch annotated commits in 2013, the practice has steadily grown\nover the years, until reaching a steady state of 11-13K such\ncommits per year, since 2019. Kernel developers include Fixes:\nannotations in their submitted patches, and the annotations are\nsubject to the kernel code-review process. This dataset intro-\nduces the possibility of evaluating the SZZ algorithms at a large\nscale, and accurately measuring the impact of ghost commits.\nMain Findings: In this paper, we collect a dataset of com-\nmits from the Linux kernel, named the Linux Kernel Fixing",
+    "bbox": [
+      42.34,
+      63.79,
+      293.41,
+      744.4
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:002:003",
+    "block_type": "text",
+    "text": "Commits (KFC) dataset. The KFC dataset has more than 76K\n“Fixes:” commits over the last nearly 10 years of Linux kernel\ndevelopment to evaluate the SZZ algorithm and ﬁve of its vari-\nants. We ﬁnd that all of the considered algorithms have recall\nand precision between 0.40 and 0.60, with some algorithms\nhaving higher recall, while others have higher precision, leading\nto an F1 score in all cases of around 0.50. The average recall for\nall SZZ algorithms evaluated in our dataset is 13.8% lower than\nthat observed by Rosa et al. on their dataset, and the differences\nbetween individual SZZ algorithms are less pronounced.\nUsing the KFC dataset, we can additionally assess previous\nwork on the frequency of ghost commits. Rezk et al. [17] have\ndone a large scale study of the prevalence of ghost commits,\nfocusing on 14 Apache projects. They found a median rate of\n7.64% of occurrences of Remove Mapping Ghost (bug-ﬁxing\ncommits that have no removed lines, and thus have no changed\nlines to map back to bug-inducing commits) over the considered\nprojects. In the Linux Kernel dataset, we ﬁnd a much higher\npercentage, 17.65%. We also ﬁnd a higher percentage than Rezk\net al. of occurrences of Add Mapping Ghost (commits over the\nwhole Linux commit history that have no added lines), with a\nrate of 5.3% for the Linux kernel as compared to a median of\n2.68% for the applications in Rezk et al.’s dataset. Indeed, Rezk\net al. lack a ground truth for the set of bug-inducing commits,\nand thus compute the rate of all commits that contain no added\ncode as compared to the complete set of commits. In the case of\nthe Linux kernel, we can also assess the rate of Add Mapping\nGhost commits among the bug-inducing commits labelled by\nthe developer. We ﬁnd that Add Mapping Ghost bug-inducing\ncommits account for only 0.7% of all bug-inducing commits\n(585 out of 79649). Thus, the results for the Linux kernel show\nthat the ﬁndings of Rezk et al. across the entire code history do\nnot reﬂect the actual rate at which commits that have no added\nlines are bug-inducing commits.\nWe furthermore ﬁnd that ghost commits are not the only rea-\nson for failures (lower recall) of the SZZ algorithms. Indeed, we\nﬁnd that the bug-inducing commit is often not the most recent\nprevious commit on any of the lines changed by the bug-ﬁxing\ncommit. And that over 13% of bug-inducing commits share\nno ﬁles in common with the subsequent bug-ﬁxing commits.\nThe ﬁles modiﬁed in the cross-ﬁle bug-inducing commits are\npresent in the version control history but are different from the\nﬁles in the bug-ﬁxing commits. An example of a cross-ﬁle bug-\nﬁxing commit is commit 79b591c, which does not share any\nﬁle with its bug-inducing commit. The bug-inducing commit\nmodiﬁed a constant shared between multiple ﬁles, requiring a\nnecessary unit conversion to be applied in each ﬁle that uses the\nconstant. The bug was introduced as the bug-inducing commit\nneglected to update a relevant ﬁle. The correct unit conversion\nin this ﬁle was later introduced in the bug-ﬁxing commit. The\nSZZ algorithms are founded on the assumption that “a bug-\ninducing change adds lines that are later removed by a ﬁx.” In\nthe context of the git version control system, this means that\nSZZ algorithms use the git blame command just once for each\nremoved line to identify the most recent change. To increase\nthe recall, admittedly at the expense of precision, we examine\nwhether bug-inducing commits might not always be in the most",
+    "bbox": [
+      305.35,
+      63.42,
+      556.47,
+      744.41
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 2,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:002:004",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

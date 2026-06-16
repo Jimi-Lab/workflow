@@ -1,0 +1,54 @@
+System Overview:
+ReDeBug is a syntax-based unpatched-code-clone detector. It preprocesses source files into compact matching structures, extracts buggy pre-patch code snippets from unified diffs, queries source databases, removes Bloom-filter errors by exact matching, optionally filters dead code, and reports clone contexts.
+
+Pipeline Stages:
+1. Source preprocessing: normalize/tokenize source files.
+2. n-token windowing: slide a window over normalized token streams.
+3. Database construction: hash n-tokens into Bloom filters/bitvectors and store them.
+4. Patch ingestion: parse unified diffs and extract deleted lines plus context from the pre-patch code.
+5. Query: hash patch n-tokens and test containment against source Bloom filters.
+6. Post-process: exact-match verification, dead-code filtering when possible, report generation.
+7. Optional code similarity mode: feature hashing and bitvector Jaccard approximation.
+
+Core Algorithm:
+The core algorithm is conservative set containment over normalized n-token windows, accelerated by Bloom filters. For similarity measurement, it uses feature-hashing bitvectors to approximate Jaccard similarity.
+
+Data Structures:
+- n-token sets.
+- Bloom filters for set membership.
+- Feature-hashing bitvectors for similarity.
+- PatchInfo, SourceInfo, ContextInfo in local common.py.
+- Match dictionary from patch IDs to source IDs in local sourceloader.py.
+
+Model / Agent Components:
+No model/agent component. This is deterministic static analysis.
+
+Design Choices:
+- Syntax-based normalization instead of AST/CFG parsing.
+- Language-agnostic support over many file types.
+- Conservative theta=1 in unpatched-clone evaluation.
+- Exact-match verification after Bloom-filter candidate retrieval.
+- Dead-code filtering for C when possible.
+
+Why Each Choice Is Needed:
+The design trades semantic completeness for scalability, speed, parser independence, and lower matching-induced false detections.
+
+Failure Handling:
+Bloom-filter false positives are handled by exact matching. Dead-code matches are filtered when compiler evidence is available. Semantic false positives/false negatives remain possible.
+
+Complexity / Cost Discussion:
+The paper emphasizes near-linear scaling with source corpus size for building/querying and gentle query growth with number of diffs. Exact runtime values require table/figure repair for citation-ready use.
+
+Pseudocode or Algorithm Blocks:
+No standalone pseudocode block was detected. Figure 2 provides the workflow. Equations for containment/similarity were extracted heuristically and need [NEEDS FORMULA REPAIR] before exact reproduction.
+
+Static Reproducibility Signals:
+Local Python reimplementation exposes CLI and modules matching the workflow: redebug.py, patchloader.py, sourceloader.py, reporter.py, common.py.
+
+Agent Evidence Anchors:
+- raw_extraction/section_text/03_redebug.txt
+- raw_extraction/figures/figure_002_caption.txt
+- raw_extraction/source_static_inventory.txt
+
+Writing Pattern:
+State a design-space tradeoff explicitly, then map each algorithmic stage to the tradeoff it serves.

@@ -1,0 +1,73 @@
+result of our tool and the Known Affected Software Versions of
+the NVD. We use the boundary versions (V upto, V i.j.U , V from )
+in the version tree for each vulnerability, which we have veriﬁed
+previously. It is worth noting that in this section we introduce
+FP/FN for the NVD information, not FP/FN of our tool.
+In Figs. 10 and 11, for fairness, we sample 273 versions at
+intervals of 5 versions for mapping. The x-axis represents the
+CVE-IDs from 2011/2003 to 2020 and the y-axis represents the
+Fig. 12. An example of CVE-2013-1826.
+Fig. 13. The error rate of last vulnerable version set of NVD.
+version numbers. Due to the large amount of data, we hide the
+scale of the x-axis. In Fig.10, we can observe that in many cases
+the maximum committed versions in the changelogs, theupto
+versions (i.e., the last vulnerable version) of NVD, and theV upto
+reported by our method are different. That is, in many cases
+neither the upto versions reported by NVD nor the changelog
+based maximum committed versions are correct. Take CVE-
+2013-1826 as an example (see Fig.12), for the branch of major
+version V3.4, itsV i.j.U should be minor versionV3.4.13, which
+is our veriﬁed version, but the NVD reported version isV3.4.122.
+Therefore, it is regarded as a false negative case. In the second
+example, for CVE-2017-15868, itsV upto veriﬁed by our tool is
+V3.18.63, but NVD reportedV3.18.66 as itsupto version; therefore,
+this is regarded as a false positive case. In another example, for
+CVE-2017-15951, itsV upto veriﬁed by our tool isV4.13.9,b u t
+the NVD upto version isV4.12.14, which is regarded as a false
+negative case.
+Fig. 11 shows the report on thefrom versions (i.e., the ﬁrst
+vulnerable version) of each CVE in the NVD, and it can be seen
+that most of the from versions it reported are versionV1.2.0.
+Through our method, we ﬁnd that in most cases,V from is greater
+than version 1.2.0, which indicates that there are a lot of false
+positives on the from versions of the NVD. For example, in our
+vulnerable version set, V from of CVE-2015-7550 should be
+version V2.6.10, but the NVD report isV1.2.0,s ot h i sfrom version
+is regarded as a false positive. Finally, under our dataset, we
+found 11,827 versions incorrectly reported in NVD. Our study
+also shows that some versions missed records in changelogs.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 012 =====
+916 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+Fig. 14. The error rate of all vulnerable version set of NVD.
+Fig. 15. Changelogs missing records of some patched versions.
+For example, the maximum committed version of CVE-2020-
+12655 in the changelog is V5.4.50, but the actual maximum
+patched version isV5.7. Therefore, there was a missing record
+of the corresponding changelog. As shown in Fig.15, we found
+94 versions have been patched, but their commit-ids were not
+recorded in the corresponding changelogs. In particular, the
+changelogs released in 2016 had the highest error rate 16% (36
+out of 221 CVE-IDs released in 2016), followed by 6% in 2018
+(20 out of 338 CVE-IDs released in 2018).
+Overall, for the 1,367 Linux kernel CVE-IDs, the number of
+false positives for the upto versions of the NVD reached 276,
+and the number of false negatives reached 289, accounting for
+20.19% and 21.14%, respectively. As shown in Figs.13 and 14,
+we show the error rates of upto versions of the NVD and the error
+rates of all vulnerable version sets of the NVD over the years,
+respectively. Corresponding to the CVE-IDs, the denominator
+of the formula for calculating the rates is the total number of
+vulnerable versions reported by the NVD in one year, and the
+numerator is the number of false positives or false negatives for
+those versions. Among the 1,367 CVE-IDs, the total number of
+the vulnerable versions reported by NVD was 43,727, of which
+the total number of false positives reached 2,497, and the total
+number of false negatives reached 9,330, accounting for 5.7%
+and 21.34%, respectively.
+E. Comparison With ReDeBug and VUDDY
+In this section, we will compare with two well-known vulner-
+able code detection tools that are available, ReDeBug[32] and
+Fig. 16. In our ﬁve datasets, the number of repatch we found.
+VUDDY [43]. ReDeBug uses a syntax-based pattern matching

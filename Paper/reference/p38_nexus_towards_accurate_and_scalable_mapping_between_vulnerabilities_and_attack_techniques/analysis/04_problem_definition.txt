@@ -1,0 +1,33 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- [NEEDS EVIDENCE] formal definitions not cleanly extracted
+Objective:
+- Abstract—The Common Vulnerabilities and Exposures (CVE) program each year records thousands of known vulnerabilities without actionable context about how these vulnerabilities might be exploited by attackers.
+- On the other hand, the MITRE ATT&CK framework outlines attack tactics, techniques, and pro- cedures (TTPs) without linking them to speciﬁc vulnerabilities.
+- While enabling automatic mapping of CVE descriptions to TTPs can allow more accurate and more efﬁcient threat detection and mitigation, existing efforts face several challenges: (i) the lack of large-scale, high-quality datasets linking CVEs to TTPs; (ii) the presence of uneven data distributions and missing key TTPs in the existing datasets; (iii) the difﬁculty of accurately extracting adversarial behaviors from unstructured CVE descriptions; and (iv) the lack of adaptive learning mechanisms for continuously correcting the mappings.
+- This paper addresses those challenges with NEXUS, a framework to automatically map CVEs to TTPs.
+Constraints:
+- system calls and provenance graphs, but these approaches do not apply to CVE-to-TTP mapping, which depends only on unstructured text.
+- TREC [88] uses few-shot learning on provenance graphs to detect APT tactics and techniques, and HOLMES [89] correlates audit-log ﬂows to recognize TTPs in real time; however, both require detailed runtime activity that CVE descriptions do not provide.
+- We assume the initial ground truth, including CVE–CWE–CAPEC–TTP mappings, is sufﬁciently accurate for training, and that meaningful attack patterns can be reliably extracted from CVE descriptions.
+- We also assume that human analysts can correctly ﬂag false positives and false negatives during feedback collection [39].
+- For those applications, we assume attackers use existing attack techniques from the MITRE ATT&CK framework [2] to exploit vulnerabilities documented in the NVD knowl- edge base [30].
+Evaluation Target:
+- experiments show that NEXUS achieves an F1-score of up to 97.94%, compared to existing solutions [3], [6], [9], [11], [16], [37], which achieve a maximum of 67.68%.
+- To demonstrate the practical applicability of NEXUS, Section VI presents three complementary case studies, an end-to-end operational scenario, an analysis of am- biguous CVE descriptions, and an evaluation on unstructured non-CVE threat-intelligence inputs, followed by additional possible uses ofNEXUS.
+- LLMs handle label adjustment, data augmentation, 2 ===== Page 003 ===== (4) TTP Classifier Model Building (1) Ground Truth Building Initial Dataset (Labeling CVEs based on TTPs) (2) Attack Pattern Extraction (5) Prediction and Adaptation Outputs TTPs Description Technique IDs ...
+- >92K CVEs 141 TTPs Unseen CVE Report Inputs CVEs CWEs CAP- ECs TTPs CTI Knowledge Bases (3) Dataset Enhancement Paraphrase it CVE Sample Llama-3.1-8B Pick a CVE Sample Generate a new Add to Repeat it n times Pick a GPT-4o- mini Update Dataset Returns CVE Prompt Generate Adjust Labels Adjusted Labels TTP Labels LLM Fine- tuningAdding Tokenizing HyperparametersSamples Training Feedback Database Clustering Dictionary TTP Classifier Model TTPs Mitigation Techniques Detection Techniques Etc.
+- T4] 1 2 CVE Context APs TTP Classifier Model Predicted TTPs TTP Prediction Correct Wrong/Missed Analyst FeedbackAPD Model Sub-sentences without attack patterns Update OR Dataset with Attack Patterns Go for Prediction Not relevant to TTPs Sub- sentences with attack patterns SRL Model Unseen CVE Description(s) Tokenized Sentences Inclu-desSubject Verb Object OR Sub- Sentences Data Preprocessing Attack Pattern Classification Texts Possible Flows Training Prediction Fig.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- Figure 1 highlights two major limitations of existing solutions, along with the key challenges that must be addressed to overcome them.
+- Bridging this gap by automatically mapping CVEs to TTPs can signiﬁcantly help both in detecting and mitigating security threats [3], [4].
+- Unsupervised approaches use language models (e.g.,[3], [9], [10]) and graph-based methods (e.g., [11]–[13]) to infer relationships between CVEs (or other threat reports) and TTP deﬁnitions based on semantic similarity, structural Network and Distributed System Security (NDSS) Symposium 2026 23-27 February 2026, San Diego, CA, USA ISBN 979-8-9919276-8-0 https://dx.doi.org/10.14722/ndss.2026.242926 www.ndss-symposium.org ===== Page 002 ===== ChallengesOur Ideas CVEs CWEs Capecs TTPs New Dataset >92K CVEs 141 TTPs Predicted TTPs CVE Analyst NEXUS FPs FNs Feedback Start Fixes FPs and FNs for future similar CVEs T1027: 2,699 CVEsImbalance Important Missed TTPs E.g., Top 10 TTPs in 2022 and 2024 T1190: 427 CVEs Original Dataset Label Adjustment Data Augmentation Important Missed TTPs Less Imbalanced and Supports 67 more TTPs New Dataset Generate Large- Scale Dataset Extract TTP Details More Accurately Enhance Dataset Utilize Analyst Feedback Limited Availability of Large-Scale Datasets 1 Difficulty in Accurately Mapping CVE Details to TTPs 2 Data Imbalance and Limited TTP Coverage in Dataset 3 Lack of Adaptive Learning for Continuous Improvement 4 CVE Description LLM CVE-specific attack patterns 3000 samples Irrelevant Information Attack Patterns
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

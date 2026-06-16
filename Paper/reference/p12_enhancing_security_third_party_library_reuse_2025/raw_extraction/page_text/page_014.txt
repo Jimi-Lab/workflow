@@ -1,0 +1,108 @@
+performance in detecting customized TPL reuse, and also
+cannot handle the issue of nested TPLs that interactive code
+segments. Targeting the above issues, function-level code reuse
+detection schemes are developed. Woo et al. [48] proposed
+Centris to match unique parts of TPLs by hashing functions
+and eliminate duplicated code to extract function features.
+Similarly, Wu et al. [49] developed OSSFP which focuses
+on identifying core functions. However, Jiang et al. [27]
+pointed out that in practical deployment, Centris still exhibits
+poor performance in cases of TPL nesting. To address this,
+TPLite [27] was developed which introduced function birth
+time and the directory they locate in to build a dependency
+graph and analyze the nesting relationships.
+Nevertheless, the aforementioned methods require prior
+analysis of dependencies between TPLs before detection,
+which means the candidate TPL database cannot be eas-
+ily expanded. Adding any new TPL necessitates reanalyzing
+all dependencies — an extremely time-consuming process.
+Therefore, as TPL pool and software complexity increasingly
+develop, TPL reuse detection tools must be maintainable,
+which is compatible in V ULTURE .
+B. Security Patch Collection
+To collect security patches, existing solutions include re-
+trieving patch information from vulnerability maintenance plat-
+forms [15], [46], [52] and mapping GitHub commits related to
+vulnerabilities from GitHub repositories [20], [38], [41], [45].
+Some studies [15], [46], retrieved patch links by accessing
+the CVE/NVD websites and extracting the “Hyperlink” field.
+However, due to the untimely updates of CVE/NVD, the
+number of patches collected through this method is quite
+limited. Distinctively, Tracer [52] collected security patches
+from multiple known sources, such as Debian and Red Hat,
+together with CVE/NVD. However, the issue of untimely
+updates is prevalent across all the platforms.
+To address the aforementioned issues, other works [20],
+[38], [41], [45], pursued an effort to identify patches from
+GitHub commits. Tan et al. [41] introduced PatchScout, which
+analyzed the correlation between vulnerability information
+and GitHub commits through a ranking strategy. Similarly,
+[20], [38], [45] also developed ranking-based methods, in-
+corporating machine learning and deep learning models (e.g.,
+XGBoost [17], CNN [29], CodeBERT [22]) to extract features.
+However, ranking-based solutions cannot precisely map patch
+commits, as depicted in the studies, highly recall rates can
+only be achieved in Top-N (e.g., Top-5) scenarios, which ne-
+cessitates substantial manual efforts for verification. Moreover,
+these schemes cannot cope with the absence of patch commits
+for some CVEs. If the CPE provided on CVE/NVD is wrong
+or the patch is just released by other channels, false alarms
+would be returned with recognizing commits possessing some
+degree of similarity.
+Differently, VULTURE filters candidate commits based on
+affected code elements, ensuring the exclusion of non-patch
+commits; beyond that, V ULTURE leverages LLM to logically
+determine the actual patch commits, effectively addressing the
+defects of existing solutions.
+C. TPL Vulnerability Detection
+TPL vulnerability detection primarily relies on TPL reuse
+detection, associated with TPL vulnerability analysis. ReDe-
+Bug [26] employed a token-based approach for detecting
+reused vulnerable code through token-level similarity com-
+parison. Similarly, Kim et al. [28] proposed a high-efficiency
+TPL vulnerability detection strategy VUDDY based on func-
+tion comparison, with constructing hash-based function finger-
+prints. Zhang et al. [57] designed FIBER, leveraging subgraph
+matching to trace the propagation of patches. However, these
+methods struggle to detect vulnerabilities in cases of complex
+custom TPL reuse, limiting their practicality in real-world
+software. To address the above issues, Xiao et al. [51] pro-
+posed MVP to extract coarse-grained semantic information for
+identifying modified vulnerable code clones. Woo et al. [47]
+introduced Movery, which constructs function fingerprints
+towards core vulnerability features based on vulnerability-
+specific code and patch lines. Beyond that, V1SCAN [46]
+further extracted patched code lines from vulnerability patches
+and, when detecting TPL vulnerabilities, further reduced false
+alarms by comparing patch lines. Nevertheless, these meth-
+ods still exhibit limitations, resulting in false positives in
+complicated custom reuse. In detail, Movery fails to deal
+with the reused vulnerable code that has been patched; while
+V1SCAN solely relies on counting patch lines, instead of patch
+contents, which is nearly tantamount to random judgment
+when handling some real-world software. Additionally, some
+studies focus on the analysis of TPL vulnerabilities in IoT
+firmware [58], [59], mobile software [19], [33], [50], [55]
+and web applications [39], offering solutions tailored to other
+platforms and various programming languages.
+VULTURE employs static analysis to convert code to
+chunks based on vulnerability features. Compared to existing
+approaches, VULTURE can detect defects introduced by custom
+TPL reuse and analyze whether custom patch exists. Addition-
+ally, VULTURE ’s TPL database is maintainable, allowing it to
+adapt to the evolving software supply chain environment, a
+capability that existing solutions lack.
+VII. C ONCLUSION
+This study reveals that achieving accurate software supply
+chain security detection requires a comprehensive toolchain.
+We introduced V ULTURE , which employs a combination of
+database construction, security patch collection, TPL reuse
+detection, and library vulnerability detection. Through the
+construction of a comprehensive database and advanced al-
+gorithms, V ULTURE minimizes false alarms and improves
+detection efficiency. Evaluation shows that V ULTURE signifi-
+cantly outperforms state-of-the-art tools, including commercial
+solutions. Despite some limitations, V ULTURE proves to be
+effective in real-world scenarios, offering developers a robust
+tool to mitigate risks associated with TPL reuses.
+14

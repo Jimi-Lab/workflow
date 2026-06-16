@@ -1,0 +1,171 @@
+CPE database. To construct the CPE database, we extract
+CPEs of all CVEs registered in NVD using the NVD JSON
+feeds. We stored CPE in a dictionary, in which the vulnerable
+software (with version) as the key and the CVEs contained in
+the vulnerable software as the value; this dictionary becomes
+the CPE database. Consequently, we stored a total of 137,892
+CVEs with 75,489 vulnerable software information (a total of
+559,305 versions) in the CPE database (as of August 2022).
+The issue here is that the names and versions of the OSS
+components detected in V1SCAN follow the form provided
+by GitHub (as with the CENTRIS dataset), whereas CPE uses
+its own form of vulnerable software and version names. For
+example, Linux kernel v5.15 is referred as “torvalds/linux,
+v5.15” on GitHub and “linux/linux_kernel, 5.15” on CPE. It
+is nearly infeasible and time-consuming to check all the tens
+of thousands of vulnerable software lists and internal versions.
+Therefore, we first examined the following software, and man-
+ually match the software and version names of GitHub and
+those of CPE: (1) OSS that was reused in the target pro-
+grams selected for the experiments (see Section 5.1) and (2)
+frequently reused OSS projects mentioned in the CENTRIS
+paper (e.g., Zlib, Lua, and GoogleTest). Information on the
+rest of the software will also be examined.
+5
+Evaluation
+In this section, we evaluate V1SCAN based on the following
+three questions.
+Q1. Detection accuracy: How precisely does V1SCAN de-
+tect vulnerabilities compared to the state-of-the-art vul-
+nerability detection approaches? (Section 5.1)
+Q2. Effectiveness: How effective is V1SCAN compared to
+existing version- and code-based approaches in vulnera-
+bility discovery? (Section 5.2)
+Q3. Performance and scalability: How fast and scalable is
+V1SCAN in detecting vulnerabilities? (Section 5.3)
+We ran V1SCAN on a machine with Windows 10, AMD
+Ryzen 7 3700X @ 3.60 GHz, 48GB RAM, and 1TB SSD.
+Target software selection. To demonstrate the generality of
+V1SCAN, we selected target software based on the following
+three criteria: (1) popular C/C++ software, (2) containing a
+sufficient number of OSS components, and (3) including a
+considerable number of CVE vulnerabilities.
+We examined GitHub [10], which is one of the most popu-
+lar hosting services, as the first criterion. We collected C/C++
+repositories that exhibited more than 5,000 stargazers (a pop-
+ularity indicator) from GitHub and collected approximately
+600 software programs. As a sufficient number of CVEs were
+required for accuracy measurement, we selected the version
+of each software that was released last year (closest to January
+2021). For the second criterion, we ranked the 600 collected
+software according to the number of OSS components iden-
+tified by CENTRIS. While examining the ranked software
+Table 4: Target software overview.
+IDX
+Name
+Version #CVE† #OSS #C/C++ Line #Star§
+Domain
+S1
+Turicreate
+v6.4.1
+69
+28
+4,091,413 10.7K Machine learning
+S2
+ReactOS
+v0.4.13
+67
+23
+6,419,855 10.8K Operating system
+S3
+TizenRT 3.0_GBM
+62
+22
+2,156,848
+439
+Operating system
+S4
+Aseprite
+v1.2.25
+53
+12
+846,500
+17K
+Animation tool
+S5
+FreeBSD
+v12.2.0
+30
+47
+14,489,534 6.4K Operating system
+S6
+MongoDB
+r4.2.11
+28
+13
+2,822,534 21.5K
+Database
+S7
+MAME
+0228
+24
+26
+4,541,014 5.8K
+Emulator
+S8
+Filament
+v1.9.9
+16
+16
+1,295,918 13.8K Rendering engine
+S9
+Godot
+v3.2.2
+16
+21
+1,298,228 48.1K
+Game engine
+S10 ArangoDB
+v3.6.12
+15
+22
+5,465,881 12.2K
+Database
+Total
+-
+-
+380
+230
+43,427,725 147K
+-
+†: #CVEs discovered by the version-based approach, §: #Stargazers.
+projects in descending order, we applied a version-based ap-
+proach to each software program, identified the number of
+contained CVEs (with manual version correction), and se-
+lected the software that contained more than 10 CVEs (for the
+third criterion). Consequently, nine target software programs
+were selected. In addition, we included TizenRT1, which con-
+tains many components and can represent industrial software.
+Table 4 summarizes the ten selected target programs. The
+target programs that were selected based on the clear cri-
+teria had various codebase sizes ranging from 846,500 to
+14,489,534 C/C++ lines of code, and were obtained from di-
+verse domains (operating systems, emulators, and databases).
+Therefore, we determined that the selected target programs
+could provide generality to V1SCAN during evaluation. Note
+that we chose target programs with a considerable number
+of vulnerabilities for a more impartial accuracy assessment.
+V1SCAN can detect vulnerabilities even in software with few
+vulnerabilities, without any limitations.
+5.1
+Accuracy measurement
+Methodology. We compared V1SCAN with the state-of-the-
+art vulnerability discovery approaches: MOVERY [34] and
+V0Finder [35], which are capable of discovering vulnerable
+codes propagated with code modifications to some extent. We
+used their default settings by referring to their paper.
+To evaluate accuracy, we used the following five metrics:
+true positive (TP), false positive (FP), false negative (FN),
+precision (P = #TP/(#TP + #FP)), and TP detection rate (R =
+#TP/(#TP + #FN)). Because it is nearly infeasible to detect all
+vulnerabilities in a target program, we cannot easily measure
+the FNs of the tested approaches. Therefore, we consider
+only indisputable FNs; for example, FNs in V1SCAN refer
+to the vulnerabilities detected by the other two approaches,
+but were not discovered by V1SCAN. The TPs and FPs were
+determined by manual analysis, and two security analysts
+examined all vulnerability detection results. We examined
+the results by referring to (1) the detected vulnerable code,
+(2) the security patch, (3) the NVD description, and (4) issue
+trackers that denote vulnerability.
+1https://github.com/samsung/tizenrt

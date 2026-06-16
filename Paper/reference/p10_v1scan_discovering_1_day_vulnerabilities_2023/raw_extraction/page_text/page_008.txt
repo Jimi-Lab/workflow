@@ -1,0 +1,114 @@
+3.4
+Consolidation phase (P3)
+By consolidating the vulnerability detection results of the
+improved version- and code-based approaches, V1SCAN de-
+termines vulnerabilities that exist in the target program.
+As explained in P1 and P2, V1SCAN reduces false posi-
+tives and negatives in the version- and code-based approach.
+The false alarms produced by the version-based approach
+were removed through the reuse code classification-based
+filtering, and the false alarms of the code-based approach
+were prevented by using both the hash and line comparisons.
+Moreover, V1SCAN covers the false negatives of version- and
+code-based approaches by combining their results. Vulnera-
+bilities included in less frequently identified versions (i.e., not
+a prevalent version) can be covered by detecting them with
+the code-based approach of V1SCAN. In addition, by leverag-
+ing vulnerable code classification and focusing only on core
+vulnerable code lines, V1SCAN can address false negatives
+of existing code-based approaches. Therefore, we denote the
+union of the detection results of both approaches as the list of
+vulnerabilities contained in the target programs.
+4
+Implementation of V1SCAN
+This section introduces the implementation of V1SCAN, in-
+cluding its architecture and the datasets.
+4.1
+Architecture
+V1SCAN comprises the two modules: a dataset collector and
+a vulnerability detector. The dataset collector constructs the
+OSS and CVE datasets (see Section 4.2 and Section 4.3).
+The vulnerability detector performs vulnerability discovery
+on the target program, which is implemented in approximately
+1,800 lines of Python code excluding external libraries. We
+use CENTRIS [36] to identify the OSS components in the
+target program. For the parser and LSH algorithm, we utilize
+Ctags [5] and TLSH [23,30]. Ctags is a regular expression-
+based parser, and has the advantage of scalability and detec-
+tion accuracy; it can be used to precisely parse C/C++ source
+files without being affected by the code size of the target pro-
+gram. In addition, because Ctags provides the functionality
+to identify functions, structures, macros, and variables from
+source files, it can be effectively used to classify vulnerable
+locations. Next, we selected the TLSH [23,30] as the LSH
+algorithm, which is both accurate and scalable. We used the
+similarity measurement function provided by TLSH as it is,
+and selected the cutoff value of 30 (see Section 3.1), which
+was observed to be the most efficient in their paper [23].
+4.2
+OSS dataset
+The OSS dataset is utilized for identifying OSS components
+in the target program. We leveraged the OSS dataset provided
+by CENTRIS [36], which consists of all versions of the 10,241
+popular C/C++ OSS projects on GitHub.
+Table 3: CVE dataset overview.
+Category
+Count (#)
+• Security patches
+4,612
+- Vulnerable and patched function pairs
+7,675
+- Vulnerable and patched structure pairs
+106
+- Vulnerable and patched macro pairs
+221
+- Vulnerable and patched variable pairs
+598
+• CPE database
+- Contained CVEs
+137,892
+- Collected vulnerable software
+75,489
+- Collected vulnerable versions
+559,305
+Since the dataset of CENTRIS was constructed in April
+2020, we additionally collected versions generated after that
+of each repository (as of April 2022). As a result, the number
+of versions increased from 229,326 to 246,512 in V1SCAN.
+4.3
+CVE dataset
+For each CVE, V1SCAN first collects the security patch, and
+then extracts necessary information (e.g., vulnerable func-
+tions) from the patch. V1SCAN then constructs the CPE
+database, which is used in the improved version-based ap-
+proach. Table 3 summarizes the CVE dataset.
+Collecting security patches. We collected security patches
+of CVE vulnerabilities by leveraging existing approaches [11,
+16, 35, 37]. We examined CVEs in the NVD and checked
+whether a “Git commit” URL was included in the references;
+this URL provides the code-level security patches. Hence, we
+can obtain the security patch commits for CVE vulnerabilities
+by crawling the URLs. As a result, we collected 4,612 C/C++
+security patches from the NVD (as of August 2022).
+Identifying vulnerable locations. Because V1SCAN uses
+vulnerable code classification, it is necessary to identify the
+location to which the code modified by the security patch
+belongs. Each security patch provides (1) a Git index and (2)
+code line numbers that include vulnerable and patched code.
+We access the index to obtain the vulnerable and patched
+source files (e.g., using the “git show” command). We then
+parse the source files using Ctags [5]. Using this output, we
+can obtain the start and end line numbers of each function,
+structure, macro, and variable. Finally, we identify the loca-
+tions that contain the modified code lines in the patch. If
+the modified code lines belong to a function or structure, the
+entire code of the vulnerable and patched function (and struc-
+ture) is extracted. If the modified code lines belong to a macro
+or variable, the exact lines of code are extracted.
+As a result, we collected 7,675 vulnerable and patched
+function pairs, 106 structure pairs, 221 macro pairs, and 598
+variable pairs. Over 97% of the code repaired by the patch was
+included in one of the four locations. The remaining 3% were
+code patches that very rarely appear, such as changing header
+file names. This confirms that considering these four locations
+for vulnerability detection is sufficiently comprehensive.

@@ -1,0 +1,48 @@
+Problem:
+- Those sources may include repos- itories that curate vulnerabilities, weaknesses, attack pattern related data in different formats with varying degrees of detail.
+- The resulting knowledge graph contains hundreds of thousands of interconnected entities and edges, enabling multi-hop analysis in various directions (e.g., from attack techniques to vulnerabilities, from vulnerabilities to attack techniques).
+- W e demonstrate the usefulness of the knowledge graph for comprehensive weakness analysis, linking adversary groups to exploited vulnerabilities, and graph-based inference tasks that include variable-length path traversal and link discov- ery .
+- Each of these resources is indispensable in its own domain, yet their siloed formats, differing schemas, and inconsistent cross-references present signiﬁcant hurdles for analysts who need an integrated and holistic view that interconnects vulnerabilities, weaknesses, attack patterns, and adversarial behaviors.
+- As a result, organizations are left with incomplete or outdated views of how newly published vulnerabilities may be exploited, which weaknesses cause recurring attacks, or how defensive mea- sures align with adversary techniques.
+Gap:
+- Our case studies on CISA advisories show that hierarchical graph traversals uncover CVEs beyond those explicitly listed, bridging critical gaps in threat intelligence.
+- Existing efforts to unify CTI often focus on one or two sources, rely on static or manually curated mappings, or lack mechanisms to keep pace with daily updates.
+- In this paper, we introduce a fully automated cybersecurity knowledge graph that bridges these gaps.
+- However, these works primarily focus on structural integration of a limited subset of sources and do not scale to large, enriched graphs with extensive properties.
+Core Idea:
+- method for rating the severity of software vulnerabilities), exploitability and impact scores, and extracted CPE ( Common Platform Enumeration ) criteria, which specify the affected hardware, operating systems, or software products.
+- CWE (MITRE) : The CWE extraction process gathers identiﬁers and metadata (ID, name, abstraction level, structural type, and status), rich text ﬁelds (description, extended descrip- tion, background), and a wide range of structured or nested elements, including alternative terms, applicable platforms, modes of introduction (describing when and how the weakness can be introduced during development), likelihood of exploit, weakness ordinalities (sequence in which weaknesses might occur), common consequences, detection methods, potential mitigations etc.
+- A TT&CK (Enterprise/Mobile/ICS STIX) : Across all supported A TT&CK domains, the pipeline collects common properties such as ID, external ID, object type, name, description, external references, timestamps/versioning, and domains.
+- Depending on the object type, additional ﬁelds may include platforms (target operating systems or environments), aliases (alternative names), detection guidance etc.
+- Relationships created: In our system, STIX-deﬁned relationship objects are materialized as graph edges by leveraging the relationship_type, source_ref, and target_ref ﬁelds, or, when APOC is unavailable, through a fallback naming scheme of the form sourceType_to_targetType.
+- As shown in T able I, the largest node set in the constructed knowledge graph comes from the CVE dataset, with 307,142 vulnerability entries.
+Method:
+- method for rating the severity of software vulnerabilities), exploitability and impact scores, and extracted CPE ( Common Platform Enumeration ) criteria, which specify the affected hardware, operating systems, or software products.
+- CWE (MITRE) : The CWE extraction process gathers identiﬁers and metadata (ID, name, abstraction level, structural type, and status), rich text ﬁelds (description, extended descrip- tion, background), and a wide range of structured or nested elements, including alternative terms, applicable platforms, modes of introduction (describing when and how the weakness can be introduced during development), likelihood of exploit, weakness ordinalities (sequence in which weaknesses might occur), common consequences, detection methods, potential mitigations etc.
+- A TT&CK (Enterprise/Mobile/ICS STIX) : Across all supported A TT&CK domains, the pipeline collects common properties such as ID, external ID, object type, name, description, external references, timestamps/versioning, and domains.
+- Depending on the object type, additional ﬁelds may include platforms (target operating systems or environments), aliases (alternative names), detection guidance etc.
+- Relationships created: In our system, STIX-deﬁned relationship objects are materialized as graph edges by leveraging the relationship_type, source_ref, and target_ref ﬁelds, or, when APOC is unavailable, through a fallback naming scheme of the form sourceType_to_targetType.
+- As shown in T able I, the largest node set in the constructed knowledge graph comes from the CVE dataset, with 307,142 vulnerability entries.
+Evaluation Setup:
+- [NEEDS EVIDENCE] evaluation details require section-level verification
+Main Results:
+- The resulting knowledge graph contains hundreds of thousands of interconnected entities and edges, enabling multi-hop analysis in various directions (e.g., from attack techniques to vulnerabilities, from vulnerabilities to attack techniques).
+- As a result, organizations are left with incomplete or outdated views of how newly published vulnerabilities may be exploited, which weaknesses cause recurring attacks, or how defensive mea- sures align with adversary techniques.
+- The resulting knowledge graph is both comprehensive and expressive: it captures hundreds of thousands of nodes representing vulnerabilities, weaknesses, attack patterns, tech- niques, malware, tools, intrusion sets, mitigations, etc.
+- Recently , retrieval- augmented generation (RAG) approaches such as CyKG-RAG have integrated KGs with language models, leveraging structured cybersecurity knowledge for improved reasoning over unstructured CTI reports [17], [18].
+- Our system downloads the CWE XML release, parses all Weakness entries, captures metadata, descriptions, and cross-references, normalizes them, and ingests the results into Neo4j as an updated graph representation of weaknesses.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- Abstract—Cyber threat intelligence (CTI) includes collecting and analyzing cybersecurity-related information across diverse and heterogeneous sources.
+- Those sources may include repos- itories that curate vulnerabilities, weaknesses, attack pattern related data in different formats with varying degrees of detail.
+- Analysts must continuously reconcile these sources to gain a coherent view of the evolving threat landscape, yet this process is often manual, incomplete, and error-prone.
+- Our case studies on CISA advisories show that hierarchical graph traversals uncover CVEs beyond those explicitly listed, bridging critical gaps in threat intelligence.
+- Index T erms—Cyber Threat Intelligence, Knowledge Graph, Graph Databases, CWE, CVE, A TT&CK, CAPEC I.
+- I N T RO D U C T I O N The modern cyber threat landscape is vast, dynamic, and fragmented across multiple authoritative but heterogeneous sources of intelligence.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

@@ -1,0 +1,152 @@
+[
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:001",
+    "block_type": "text",
+    "text": "IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024\n2219",
+    "bbox": [
+      37.58,
+      32.52,
+      551.67,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:002",
+    "block_type": "text",
+    "text": "Evaluating SZZ Implementations: An Empirical\nStudy on the Linux Kernel",
+    "bbox": [
+      59.68,
+      57.35,
+      529.62,
+      111.92
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:003",
+    "block_type": "text",
+    "text": "Yunbo Lyu\n, Hong Jin Kang\n, Ratnadira Widyasari\n, Graduate Student Member, IEEE, Julia Lawall\n, and\nDavid Lo\n, Fellow, IEEE",
+    "bbox": [
+      43.4,
+      119.49,
+      545.85,
+      144.67
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:004",
+    "block_type": "text",
+    "text": "Abstract—The SZZ algorithm is used to connect bug-ﬁxing\ncommits to the earlier commits that introduced bugs. This\nalgorithm has many applications and many variants have been\ndevised. However, there are some types of commits that cannot\nbe traced by the SZZ algorithm, referred to as “ghost commits”.\nThe evaluation of how these ghost commits impact the SZZ\nimplementations remains limited. Moreover, these implemen-\ntations have been evaluated on datasets created by software\nengineering researchers from information in bug trackers and\nversion controlled histories. Since Oct 2013, the Linux kernel\ndevelopers have started labelling bug-ﬁxing patches with the\ncommit identiﬁers of the corresponding bug-inducing commit(s)\nas a standard practice. As of v6.1-rc5, 76,046 pairs of bug-ﬁxing\npatches and bug-inducing commits are available. This provides\na unique opportunity to evaluate the SZZ algorithm on a large\ndataset that has been created and reviewed by project developers,\nentirely independently of the biases of software engineering\nresearchers. In this paper, we apply six SZZ implementations to\n76,046 pairs of bug-ﬁxing patches and bug-introducing commits\nfrom the Linux kernel. Our ﬁndings reveal that SZZ algorithms\nexperience a more signiﬁcant decline in recall on our dataset\n(↓13.8%) as compared to prior ﬁndings reported by Rosa\net al., and the disparities between the individual SZZ algorithms\ndiminish. Moreover, we ﬁnd that 17.47% of bug-ﬁxing commits\nare ghost commits. Finally, we propose Tracing-Commit SZZ\n(TC-SZZ), that traces all commits in the change history of lines\nmodiﬁed or deleted in bug-ﬁxing commits. Applying TC-SZZ to\nall failure cases, excluding ghost commits, we found that TC-\nSZZ could identify 17.7% of them. Our further analysis based\non git log found that 34.6% of bug-inducing commits were in the\nfunction history, 27.5% in the ﬁle history (but not in the function\nhistory), and 37.9% not in the ﬁle history. We further evaluated\nthe effectiveness of ChatGPT in boosting the SZZ algorithm’s\nability to identify bug-inducing commits in the function history,\nin the ﬁle history and not in the ﬁle history.",
+    "bbox": [
+      37.58,
+      174.48,
+      288.67,
+      523.55
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:005",
+    "block_type": "text",
+    "text": "Index\nTerms—SZZ,\ndefect\nprediction,\nempirical\nstudy,\nChatGPT.",
+    "bbox": [
+      37.58,
+      528.15,
+      288.65,
+      548.45
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:006",
+    "block_type": "text",
+    "text": "Manuscript received 5 August 2023; revised 6 May 2024; accepted\n9 May 2024. Date of publication 29 May 2024; date of current version\n19 September 2024. This work was supported by the National Research\nFoundation, under its Investigatorship Grant NRF-NRFI08-2022-0002. Rec-\nommended for acceptance by J. Wang. (Corresponding author: Yunbo Lyu.)\nYunbo Lyu, Ratnadira Widyasari, and David Lo are with the School\nof Computing and Information Systems, Singapore Management Univer-\nsity, Singapore 178902 (e-mail: yunbolyu@smu.edu.sg; ratnadiraw.2020@\nphdcs.smu.edu.sg; davidlo@smu.edu.sg).\nHong Jin Kang is with the University of California, Los Angeles, CA 90095\nUSA (e-mail: hjkang@g.ucla.edu)\nJulia Lawall is with Inria-Paris, 75013 Paris, France (e-mail: julia.lawall@\ninria.fr).\nDigital Object Identiﬁer 10.1109/TSE.2024.3406718",
+    "bbox": [
+      37.58,
+      579.65,
+      288.68,
+      705.11
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:007",
+    "block_type": "text",
+    "text": "I. INTRODUCTION\nI\nN MSR 2005, ´Sliwerski, Zimmermann, and Zeller intro-\nduced an approach to identifying bug-inducing commits in\na software code base [1]. Their approach, subsequently referred\nto as the SZZ algorithm [2], ﬁrst identiﬁes bug-ﬁxing commits\nby correlating commits to reports in a bug tracker. It then uses\nthe history mechanism of the version control-system to map\neach line of code removed by the bug ﬁx to the commit that\nmost recently added or modiﬁed that line. Finally, the resulting\nset of commits is ﬁltered to remove those that postdate the bug\nreport, unless there is evidence that the commit represents a\npartial ﬁx or the commit is a bug-introducing commit for some\nother bug-ﬁxing commit. The SZZ algorithm has been used in\ndefect prediction techniques [3], [4], [5], [6], [7], and to analyze\nhow bugs are born [8], [9], [10], [11].\nDespite the success and inﬂuence of the SZZ algorithm, over\nthe years, researchers have identiﬁed a number of weaknesses\nin its strategy for identifying bug-inducing commits. For ex-\nample, the SZZ algorithm may incorrectly ﬂag non-semantic\nsource code (e.g., formatting changes) [2], meta-changes (e.g.,\nbranch changes) [12], and refactoring changes [13], [14] as bug-\ninducing. Several algorithm reﬁnements have been proposed,\nsuch as excluding formatting and cosmetic changes [2], ex-\ncluding changes that represent version-control system metadata\n(e.g., merge commits) [12], excluding changes that perform\nrefactorings [13], [14], excluding non-executable changes [15],\nand combining the syntactic approach proposed by SZZ with\nanalysis of changes in dependencies, including potentially in-\nterprocedural analysis [16].\nRecently, attention has turned to the notion of a ghost commit",
+    "bbox": [
+      300.6,
+      173.91,
+      551.68,
+      537.71
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:008",
+    "block_type": "text",
+    "text": "[17]. As the SZZ algorithm relies on connecting the removed\nlines in the bug-ﬁxing commit to the added lines in the bug-\ninducing commit, it is intrinsically unable to provide results for\nbug-ﬁxing commits that have no removed lines (referred to as\nRemove Mapping Ghost), and to detect bug-inducing commits\nthat have no added lines (referred to as Add Mapping Ghost).\nThe SZZ algorithm furthermore cannot detect bug-inducing\ncommits that are discarded due to the various ﬁltering strategies\n(referred to as Filtering Ghost), such as commits dated after the\nbug report, commits that perform refactoring, or commits that\naddress multiple purposes (i.e., tangled commits [18]). Some\nfurther variants have been proposed to mitigate these issues.\nSpeciﬁcally, to address failures from Remove Mapping Ghost,\nA-SZZ [19] and Rezk et al.’s [12] method were proposed. To",
+    "bbox": [
+      300.6,
+      538.55,
+      551.67,
+      705.08
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:009",
+    "block_type": "text",
+    "text": "0098-5589 © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.\nSee https://www.ieee.org/publications/rights/index.html for more information.",
+    "bbox": [
+      113.53,
+      725.4,
+      475.74,
+      743.26
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 1,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:001:010",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

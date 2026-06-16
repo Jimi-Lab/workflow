@@ -1,0 +1,117 @@
+2220
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+address failures from Filtering Ghosts, Da Costa et al. [12]
+propose a framework to ﬁlter out suspicious commits.
+Motivation: While there has been extensive research over
+two decades aiming to improve the precision of the SZZ algo-
+rithm [2], [12], [13], [14], [15], [16], discussions on enhancing
+recall are relatively limited. This analysis gap is critical because
+overlooking certain buggy patterns can impact downstream
+tasks dependent on this algorithm, such as defect prediction [5],
+[6], [11], [20], [21], [22], [23], [24] and the analysis of factors
+related to software quality [9], [10], [11], [25], [26], [27]. The
+closest work is that of Sahal et al. [19] and Rezk et al. [17], who
+use a syntax-based method [19] and context-aware data ﬂow
+analysis [17] to address Remove Mapping Ghosts. However,
+their work only partially addresses one possible scenario where
+SZZ fails to identify bug-inducing commits. Moreover, there is
+a lack of comprehensive examination of the full range of sce-
+narios where the SZZ algorithm falls short, such as cases where
+ﬁles are not shared between the bug-inducing and bug-ﬁxing
+commits. Therefore, our work aims to present a whole picture
+of the recall challenges faced by all current SZZ algorithms.
+The wide use of the SZZ algorithm and the introduction of its
+many variants raises the need to evaluate the algorithms fairly.
+The original SZZ lacked an empirical evaluation [1], while vari-
+ants of SZZ were manually assessed by the authors themselves,
+rather than by domain experts. As noted by da Costa et al. [12]
+and Rosa et al. [28], due to a lack of developer-labeled data,
+evaluations of SZZ variants mostly rely on researchers’ manual
+analysis of small datasets [1], [2], [14], [15], [16]. As the
+researchers are not developers of the projects being analyzed,
+their judgement on bug-introducing commits may not always be
+correct. The cost of manual analysis is also overwhelming. To
+avoid the need for manual analysis, while at the same time ben-
+eﬁting from the expertise of project developers, Rosa et al. [28]
+proposed an automation-based methodology to build a high-
+quality dataset from commits where the log message indicates
+both that the commit ﬁxes a bug and the identity of the bug-
+inducing commit. Still, the resulting dataset only takes a few
+commits from each of many projects, which might not provide
+a realistic view. For instance, in Rosa et al.’s dataset, there exist
+just three bug-ﬁxing commits from FFmpeg despite FFmpeg
+having over a hundred thousand commits.
+There does exist, however, a large, developer-created dataset
+linking bug-ﬁxing commits to the corresponding bug-inducing
+commits, as is needed to evaluate SZZ algorithms. Since
+October 2013, Linux kernel developers have been annotating
+bug-ﬁxing patches with the keyword “Fixes:” followed by the
+commit id of the bug-inducing commit and the subject-line of
+the corresponding log message. Starting with fewer than 200
+such annotated commits in 2013, the practice has steadily grown
+over the years, until reaching a steady state of 11-13K such
+commits per year, since 2019. Kernel developers include Fixes:
+annotations in their submitted patches, and the annotations are
+subject to the kernel code-review process. This dataset intro-
+duces the possibility of evaluating the SZZ algorithms at a large
+scale, and accurately measuring the impact of ghost commits.
+Main Findings: In this paper, we collect a dataset of com-
+mits from the Linux kernel, named the Linux Kernel Fixing
+Commits (KFC) dataset. The KFC dataset has more than 76K
+“Fixes:” commits over the last nearly 10 years of Linux kernel
+development to evaluate the SZZ algorithm and ﬁve of its vari-
+ants. We ﬁnd that all of the considered algorithms have recall
+and precision between 0.40 and 0.60, with some algorithms
+having higher recall, while others have higher precision, leading
+to an F1 score in all cases of around 0.50. The average recall for
+all SZZ algorithms evaluated in our dataset is 13.8% lower than
+that observed by Rosa et al. on their dataset, and the differences
+between individual SZZ algorithms are less pronounced.
+Using the KFC dataset, we can additionally assess previous
+work on the frequency of ghost commits. Rezk et al. [17] have
+done a large scale study of the prevalence of ghost commits,
+focusing on 14 Apache projects. They found a median rate of
+7.64% of occurrences of Remove Mapping Ghost (bug-ﬁxing
+commits that have no removed lines, and thus have no changed
+lines to map back to bug-inducing commits) over the considered
+projects. In the Linux Kernel dataset, we ﬁnd a much higher
+percentage, 17.65%. We also ﬁnd a higher percentage than Rezk
+et al. of occurrences of Add Mapping Ghost (commits over the
+whole Linux commit history that have no added lines), with a
+rate of 5.3% for the Linux kernel as compared to a median of
+2.68% for the applications in Rezk et al.’s dataset. Indeed, Rezk
+et al. lack a ground truth for the set of bug-inducing commits,
+and thus compute the rate of all commits that contain no added
+code as compared to the complete set of commits. In the case of
+the Linux kernel, we can also assess the rate of Add Mapping
+Ghost commits among the bug-inducing commits labelled by
+the developer. We ﬁnd that Add Mapping Ghost bug-inducing
+commits account for only 0.7% of all bug-inducing commits
+(585 out of 79649). Thus, the results for the Linux kernel show
+that the ﬁndings of Rezk et al. across the entire code history do
+not reﬂect the actual rate at which commits that have no added
+lines are bug-inducing commits.
+We furthermore ﬁnd that ghost commits are not the only rea-
+son for failures (lower recall) of the SZZ algorithms. Indeed, we
+ﬁnd that the bug-inducing commit is often not the most recent
+previous commit on any of the lines changed by the bug-ﬁxing
+commit. And that over 13% of bug-inducing commits share
+no ﬁles in common with the subsequent bug-ﬁxing commits.
+The ﬁles modiﬁed in the cross-ﬁle bug-inducing commits are
+present in the version control history but are different from the
+ﬁles in the bug-ﬁxing commits. An example of a cross-ﬁle bug-
+ﬁxing commit is commit 79b591c, which does not share any
+ﬁle with its bug-inducing commit. The bug-inducing commit
+modiﬁed a constant shared between multiple ﬁles, requiring a
+necessary unit conversion to be applied in each ﬁle that uses the
+constant. The bug was introduced as the bug-inducing commit
+neglected to update a relevant ﬁle. The correct unit conversion
+in this ﬁle was later introduced in the bug-ﬁxing commit. The
+SZZ algorithms are founded on the assumption that “a bug-
+inducing change adds lines that are later removed by a ﬁx.” In
+the context of the git version control system, this means that
+SZZ algorithms use the git blame command just once for each
+removed line to identify the most recent change. To increase
+the recall, admittedly at the expense of precision, we examine
+whether bug-inducing commits might not always be in the most
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,114 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 391
+B. Comparison With Dynamic Analysis
+While dynamic analysis through PoC testing provides deﬁni-
+tive evidence of vulnerability existence, several limitations ren-
+der it insufﬁcient for comprehensive and efﬁcient identiﬁcation
+of vulnerable versions at scale. Our analysis of CVEs published
+in the NVD from 1999 to 2025 reveals that only 24% of CVEs
+provide publicly available exploit links, and these exploit re-
+ports do not guarantee successful reproduction across different
+software versions.
+The portability of PoCs across different software ver-
+sions presents anot her critical challenge for dynamic analy-
+sis approaches. Previous studies have demonstrated that PoC
+reproducibility across different environments and versions is a
+signiﬁcant technical hurdle [4], [7]. During the construction of
+our ground-truth dataset, we encountered these challenges ﬁrst-
+hand when attempting to vali date vulnerabilities through PoC
+execution. Of the available PoCs in our dataset, only 55% could
+be successfully executed across multiple versions without mod-
+iﬁcation. The remaining cases failed to trigger the vulnerability
+due to environmental dependencies, compilation differences, or
+version-speciﬁc behavioral changes, which required substantial
+manual code-level analysis for veriﬁcation.
+The temporal cost of dynamic analysis further limits its prac-
+tical applicability for large-scal e vulnerable version identiﬁca-
+tion. Our experience during dataset construction revealed that
+each CVE required an average of 3 hours for environment setup,
+dependency resolution, and PoC execution across different ver-
+sions, excluding the time needed for manual veriﬁcation when
+PoCs failed. For our complete dataset of 122 CVEs spanning
+1,111 versions, comprehensive dynamic testing would require
+approximately 30 days compared to 28.61 seconds per CVE for
+our static approach. This represents a 742x time difference in
+favor of static analysis, making dynamic approaches impractical
+for real-world deployment s cenarios where rapid vulnerability
+assessment is crucial.
+C. Threats to Validity
+1) Internal Validity: Static–analysis precision. V
+ERCATION
+relies on the Joern parser to build code-property graphs that
+combine an AST, control-ﬂow graph, and data-dependency
+graph. Joern struggles with certain C/C ++ constructs, notably
+complex pointer arithmetic, overloaded constructors, and indi-
+rect calls, so some data ﬂows and constructor edges are missed.
+Our AST expansion step further inherits the classic limitations
+of method outlining: it cannot al ways disambiguate targets
+reachable via function pointers, callbacks, or C ++ virtual dis-
+patch, which static analysis alone cannot resolve deﬁnitively
+[67], [68]. These imprecisions may hide or mislocate refactor-
+ing patterns.
+Inter-procedural dependencies. In multi-function patches,
+V
+ERCATION currently analyses each affected function indepen-
+dently and then merges the results. Although effective for most
+cases, this strategy may overlook vulnerability patterns that
+hinge on data/control ﬂows spanning several functions.
+LLM variability and reproducibility. As LLMs continue to
+evolve rapidly, the performance of V ERCATION might change
+with newer versions of these models. This could affect the long-
+term consistency of our results . Additionally, LLMs may have
+biases or limitations in their training data that could inﬂuence
+their ability to understand certa in types of vulnerabilities or
+code structures. To m itigate this, we have provided detailed
+information about the LLM versions and prompts used in our
+study, but future research may need to account for potential
+variations in LLM capabilities andperformance as these models
+continue to develop.
+2) External Validity: Language generalisability.
+V
+ERCATION’s core methodology is language-agnostic and
+can be adapted to other programming languages. The program
+slicing tool Joern inheren tly supports mu ltiple l anguages,
+including Java, Python, JavaScript, and PHP. The main
+adaptations required would be updating the sensitive function
+table for language-speciﬁc vulnerability patterns and modifying
+AST generation rules according to the target language’s
+syntax and semantics. Future work could involve extending
+V
+ERCATION to support a broader range of programming
+languages and verifying its effectiveness across different
+language paradigms.
+Repository branching complexity. While our approach han-
+dles common merge [69] and branching patterns effectively,
+complex branching scenarios, such as when the same vulner-
+able code is independently modiﬁed in multiple parallel fea-
+ture branches before being merged (creating diamond-shaped
+merge patterns), may require more sophisticated graph traversal
+algorithms to accuratel y determine the earliest vulnerability
+introduction point [59], [9].
+VII. R
+ELATED WORK
+A. Vulnerability Fixing Commit Analysis
+Several studies have focused on analyzing vulnerability ﬁx-
+ing commit (VFC) to extract vulnerability features, which can
+be used for various purposes such as vulnerability detection,
+classiﬁcation, and affected version identiﬁcation. VulPecker
+[70] extracts code patterns from VFC to detect similar vul-
+nerabilities in other software versions. SySeVR [71] uses a
+systematic approach to extract syntax- and semantic-based vul-
+nerability features from patches. VulDeePecker [72] leverages
+deep learning t echniques to learn vulnerability patterns from
+code gadgets extracted from vulnerability ﬁxing commits. Most
+existing VFC analysis methods rely heavily on predeﬁned rules
+or patterns, which may not capture the full context of vulner-
+abilities. V
+ERCATION incorporates VFC analysis by leveraging
+LLMs to understand the context of code changes in ﬁxing com-
+mits, potentially capturing more nuanced vulnerability features.
+B. Vulnerable Version Detection for OSS
+Several approaches have been proposed for vulnerable ver-
+sion identiﬁcation. V-SZZ [17] uses the SZZ algorithm to back-
+track vfcs and identify vulnerability-introducing changes. MVP
+[12] employs program slicing to extract vulnerability and patch
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

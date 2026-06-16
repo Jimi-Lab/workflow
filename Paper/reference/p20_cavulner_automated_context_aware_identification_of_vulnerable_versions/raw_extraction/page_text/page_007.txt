@@ -1,0 +1,97 @@
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 7
+post-fix version of files modified by the commit. 𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 : The set of methods containing
+deleted lines of code from the fix commit (identified based on the pre-fix version). 𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 :
+The set of methods containing added lines of code from the fix commit (identified based on
+the post-fix version). We classify method changes into five types based on these sets to reduce
+irrelevant information and enhance the LLM’s focus. ① Methods with only line deletions: 𝑚 ∈
+(𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 )\ 𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 . ② Completely deleted methods: 𝑚 ∈𝑀𝑝𝑟𝑒 \𝑀𝑝𝑜𝑠𝑡 . ③
+Methods with only line additions: 𝑚 ∈(𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 )\𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 . ④ Methods with
+both line additions and deletions: 𝑚 ∈𝑀𝑝𝑟𝑒 ∩𝑀𝑝𝑜𝑠𝑡 ∩𝑀𝑑𝑒𝑙 _𝑙𝑖𝑛𝑒𝑠 ∩𝑀𝑎𝑑𝑑_𝑙𝑖𝑛𝑒𝑠 . ⑤ Newly added
+methods: 𝑚 ∈𝑀𝑝𝑜𝑠𝑡 \𝑀𝑝𝑟𝑒 .
+•CVE (Common Vulnerabilities and Exposures). CVE is a standardized identifier for publicly
+disclosed security vulnerabilities. Each known security vulnerability is assigned a unique ID,
+and a standardized description is provided, detailing the characteristics of the vulnerability.
+•CWE (Common Weakness Enumeration). CWE is a community-maintained classification
+standard for software and hardware security weaknesses, aimed at systematically describing
+common weaknesses in code, design, or logic (e.g., root causes of vulnerabilities). It reveals the
+mechanism behind the vulnerability.
+Guided Prompt Construction. We employ a guided prompting mechanism that integrates role
+assignment, multi-source context and an expert analysis framework to direct the LLM’s reasoning.
+•Role Assignment. The LLM is assigned the role of a senior Java vulnerability analysis expert
+and is tasked with performing logical inference based on the provided multi-source context.
+•Multi-source Context. This consists of method change types, CVE ID, CVE description, CWE
+ID and CWE name.
+•Expert Analysis Framework. We prompt the LLM to consider how different MCTs may be
+related to the remediation of vulnerabilities (e.g., line additions might indicate the introduction
+of new security checks). The model is guided to integrate multi-source data with its reasoning
+capabilities in order to identify the methods most associated with vulnerability and explain the
+rationale behind its conclusions.
+•Output. The LLM outputs the signatures of the methods it has identified as vulnerable, which
+serve as part of the input to the subsequent fine-grained vulnerable code block identification
+module.
+3.1.2 Fine-grained Vulnerable Code Block Identification.This submodule builds on the vulnerable
+candidate methods identified in the previous coarse-grained submodule by using the LLM to perform
+a fine-grained analysis. The goal is to identify vulnerable code blocks within these methods.
+Specifically, for each vulnerable candidate method, we extract its complete code content before
+and after the fix and generate a diff between them. Compared to analyzing the full diff of a fix
+commit, which may contain much non-security content, this method-level organization significantly
+reduces the processing burden on the LLM and improves the accuracy of its analysis. Additionally,
+we provide the LLM with two supplementary inputs: the CWE description and the commit message
+for the fix. The CWE description highlights common vulnerability patterns and root causes, and the
+commit message explains the developer’s intention behind the fix. Together, these inputs enable
+more accurate vulnerability analysis.
+Prompt Construction and LLM Reasoning Process. We design prompts for the LLM that
+include the following information and guide it through a specific reasoning process.
+•Input Information. This includes the complete source code of the vulnerable candidate method
+in both its pre-fix and post-fix versions, along with the corresponding code differences. Addi-
+tionally, it contains the CWE description and the fix commit description.
+, Vol. 1, No. 1, Article . Publication date: January 2018.

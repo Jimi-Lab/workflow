@@ -1,0 +1,85 @@
+Project CVEs Li & Paxson our approach (VCCFinder) our approach (w. average) Lifetime
+Mean error St. dev Mean error St. dev Mean error St. dev Mean
+Linux (kernel) 885 -323.74 1,033.27 157.51 1,127.60 163.11 994.01 1,330.85
+Chromium 226 -370.32 747.51 -15.54 754.19 -38.44 633.45 754.22
+Httpd 60 -599.80 1,160.05 257.45 915.81 22.40 868.91 1,890.23
+All CVEs 1,171 -346.88 993.72 129.24 1,057.9 117.00 932.52 1,248.22
+Table 2: Comparison of heuristic performance for the lower-bound approach of Li&Paxson, our approach based on a repurposed version of the
+VCCFinder heuristic [31], and our optimized heuristic (weighted average). All against ground truth data and measured in days.
+tuitively, this means that the errors “automatically” cancel
+out. For example, an alternative approach to have more ac-
+curate estimations of the lifetime would be to find a suitable
+“perfect constant” to add to the lower bound estimation as
+computed by the Li & Paxson approach. However, we found
+that depending on the data sampled, a perfect constant gen-
+erally performs worse than our weighted average approach.
+Taking Chromium as an example, calculating a constant up
+to some date X and then adding it to the output of the lower
+bound estimation approach, does not provide a good estimate
+compared to the weighted average heuristic. For example, as-
+sume the available data for Chromium is split into two subsets
+with fixing commits before 2014, and with fixing commits
+in 2014 and after. Calculating a perfect constant on the first
+dataset and applying it to the second, results in an average
+underestimation of 228.58 days, while the weighted average
+heuristic underestimates the correct lifetime by 33.56 days.
+Also, the calculated constants between the Linux kernel and
+Chromium differ drastically (the kernel constant would be up
+to 6 times larger), which shows that this approach cannot be
+transferred between different projects, whereas our approach
+does not require tuning and provides good results for all three
+projects with ground truth data that are available.
+Can we use the heuristic to assess trends and distri-
+butions? Figure 3 shows the (ground truth) lifetimes of
+Linux kernel15 vulnerabilities in our ground truth dataset (867
+CVEs), per year from 2011 to 2020. For the same CVEs, it
+also shows the estimate by our weighted average heuristic, in
+addition to the best linear fits for the trend in each case. Visual
+inspection of the plot as well as the relatively small difference
+in the calculated best linear fits (gradient of 163 days/year
+for heuristic, 155 days/year for ground truth) supports the as-
+sertion that the heuristic can be used to study lifetime trends
+over time.
+To assess whether the heuristic is also suitable for estimat-
+ing the distribution of vulnerability lifetimes, we plot and
+compare the histograms of the ground truth data and the out-
+put of the heuristic for the same CVEs (Figure 4). The his-
+tograms showcase similar characteristics and the exponential
+15We use the Linux kernel for this investigation, since it is the project with
+the most data points in our ground truth dataset (see Table 2). However, the
+same conclusion can be made by using the ground truth data for Chromium.
+2011 2012 2013 2014 2015 2016 2017 2018 2019 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Heuristic Lifetime
+Groundtruth lifetime
+Figure 3: Comparison of heuristic vs ground truth values for historic
+trend of vulnerability lifetimes in the linux kernel. Linear OLS fit.
+distribution appears to be a good fit to both the heuristic and
+ground truth data for most of the data range (see Q-Q plots in
+Figure 4). Overall, our experiments support the assertion that
+the heuristic can be used to study the distribution of lifetimes.
+5 Results
+In this section, we present the results of applying our weighted
+average heuristic for lifetime estimation on a large dataset of
+5,914 CVEs with available fixing commits 16. For 1,171 of
+those data points we use ground truth data, and for the rest
+we use the approach described in Section 4 to approximate
+their lifetimes.
+5.1 General
+Table 3 shows an overview of the computed lifetimes for each
+project, as well as for the dataset as a whole. In general, vul-
+nerabilities live in the code for long periods of time (over
+1,900 days on average). This fact has also been indicated by
+previous research [1, 10, 11, 28]. We observe large differences
+between projects (TCPDump has 4 times the average lifetime
+of Chromium). There can be multiple possible explanations
+for these differences (e.g. better security protocols, general
+16Due to the restrictions of the heuristic (e.g. only consider changes in
+C/C++ files) the total number of CVEs with an estimated or ground truth
+lifetime is 5,436.

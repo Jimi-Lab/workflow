@@ -1,0 +1,23 @@
+of the key components in our approach. SEM-SZZ incorporates
+two primary designs for identifying buggy statements and one
+for pinpointing bug-inducing commits.
+The first design involves comparing path constraints between
+the previous and current versions of the program. Here, the
+previous version refers to the first commit preceding the bug-
+fixing commit, while the current version refers to the bug-fixing
+commit itself. The second design involves comparing the data
+flow of each variable in both versions. In the third design, we
+utilize line similarity comparisonto identify the earliest commit
+Fig. 11. The impact of line similarity threshold.
+that introduces the statements contributing to the bug, marking
+it as the bug-inducing commit.
+To do the ablation study, we first use DATASET -FA and
+compare S EM-SZZ with three of its variants: S EM-SZZ-c,
+SEM-SZZ-d, and SEM-SZZ-l, each missing one key component.
+Then we change the line similarity threshold and evaluate its
+impact on the SEM-SZZ’s performance. In SEM-SZZ-c, we only
+compare the constraints and drop the comparison of data flow.
+Similarly, S
+EM-SZZ-d only focuses on comparing the data flow
+and drops the comparison of constraints. Both variants would
+cause fewer buggy statements

@@ -1,0 +1,18 @@
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3041
+Fig. 4. Candidate selection.
+Algorithm 1: obtaining the program’s state after exe-
+cuting the path.
+Input : path, the input path
+Output: state, the program’s state for the execution
+path.
+1 for statement in path do
+2 if statement.type in {while, if, switch, for} then
+3 state.constraints.add(statement)
+4 if statement.type in {expression} then
+5 variables ←−extractVars(statement)
+6 for variable in variables do
+7 state.variable.dataflow.append(statement)
+8 return state
+path constraints, signifying all branch conditions taken to reach
+each statement in the path. Given that our goal is to discern
+the differences between the s

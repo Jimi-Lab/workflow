@@ -1,0 +1,97 @@
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 3
+•We propose a novel LLM-driven vulnerable version identification approach, CaVulner, which
+integrates multi-source context and leverages the capabilities of LLMs in vulnerability analysis
+and code understanding. The evaluation results demonstrate that CaVulner significantly outper-
+forms state-of-the-art methods including V-SZZ, VERJava and LLM4SZZ. It achieves at least a
+35.80% improvement in accuracy at the CVE level. At the version level, precision increases by at
+least 10.40%, recall by 14.59% and F1-score by 23.94%.
+•We manually audited all 176 CVEs and identified the vulnerable versions, constructing a high-
+quality ground truth dataset containing 17,436 of these.
+•We have releasedCaVulner and related experiment datasets on our website [1] to facilitate further
+research.
+2 Preliminaries
+In this section, we introduce the concepts of vulnerability-inducing commit, and a motivating
+example.
+2.1 Vulnerability-Inducing Commit
+The concept of Vulnerability-Inducing Commit (VIC) is conceptually derived from the well-
+established and widely studied notion of Bug-Inducing Commit (BIC) [ 39], which is formally
+defined as the commit in a version control system where a software defect is first introduced.
+Building on this foundational premise, a considerable number of researchers have dedicated ef-
+forts to proposing and refining improved techniques for identifying BICs, most notably through
+the development and refinement of various SZZ-based algorithms [14, 24, 32]. The original SZZ
+algorithm fundamentally operates by systematically tracing backward through the version control
+history starting from a known bug-fixing commit, with the objective of precisely identifying and
+isolating the specific earlier commits that were responsible for introducing the particular lines
+of code that were later modified or deleted in that fix, a process typically and effectively using
+built-in version control annotation or blame mechanisms. These subsequent variants of the SZZ
+methodology significantly enhance the original method by addressing common issues such as
+noise, inaccurate line mapping, and commit granularity.
+Furthermore, with the recent and rapid emergence of powerful large language models, a growing
+body of recent studies has actively explored their potential integration into and enhancement
+of traditional SZZ-based workflows. For example, Tang et al. introduced LLM4SZZ [ 43], which
+leverages the semantic capabilities of language models to more accurately detect bug-inducing
+commits based on patch content and commit messages. By understanding the contextual meaning
+of code changes and commit descriptions, LLM4SZZ reduces false positives and identify extra
+commits that all baselines cannot.
+Given the success of SZZ in the bug localization domain, it has subsequently been adapted for
+vulnerability analysis, particularly in identifying vulnerability-inducing commits and inferring
+vulnerability-affecting version ranges. One notable and direct adaptation of this methodology is
+exemplified by V-SZZ [9], which operates by attempting to systematically trace backwards from a
+known vulnerability-fixing commit in order to identify and pinpoint the specific earlier commit
+that originally introduced the security flaw, primarily through the analysis of lines of code that
+were deleted within the fix patch. However, this direct adaptation introduces significant limitations.
+Specifically, V-SZZ assumes all deleted lines are vulnerable and fails to address fix commits that
+only contain added lines.
+More importantly, despite the shared conceptual basis, there are fundamental differences between
+bugs and vulnerabilities that are often not well accounted for in these approaches. For instance, while
+bugs are frequently introduced in recent commits and can often be detected within a short temporal
+, Vol. 1, No. 1, Article . Publication date: January 2018.

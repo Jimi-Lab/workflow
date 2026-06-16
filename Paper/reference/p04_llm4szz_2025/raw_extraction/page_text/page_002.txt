@@ -1,0 +1,49 @@
+ISSTA016:2 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+ACM Reference Format:
+Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao. 2025. LLM4SZZ: Enhancing SZZ
+Algorithm with Context-Enhanced Assessment on Large Language Models. Proc. ACM Softw. Eng. 2, ISSTA,
+Article ISSTA016 (July 2025), 23 pages. https://doi.org/10.1145/3728885
+1 Introduction
+Having been proposed in 2005, the SZZ algorithm [Śliwerski et al. 2005] and its variants have been
+widely used in finding bug-inducing commits from bug-fixing commits. The original SZZ algorithm
+assumes that the deleted lines in the bug-fixing commit cause the bug. It first locates the deleted
+lines in the bug-fixing commit. Then, it uses the annotate command from the version control
+system to trace back the commits that most recently added or modified these lines. Finally, it marks
+the identified commits as bug-inducing commits. Many downstream tasks can be performed based
+on bug-inducing commits, such as analyzing why the bugs occur [Aman et al. 2019; Bavota and
+Russo 2015], predicting defects [Fan et al. 2019; Hata et al. 2012; Yan et al. 2020], and measuring the
+factors that influence software quality [Chen and Jiang 2019; Tufano et al. 2017].
+Although the SZZ algorithm has achieved great success, it still suffers from low precision.
+Consequently, many variants have been proposed [Da Costa et al. 2016; Davies et al. 2014; Kim
+et al. 2006; Neto et al. 2018; Tang et al. 2023] to address this problem. Some methods [Da Costa
+et al. 2016; Kim et al. 2006; Neto et al. 2018] attempted to improve precision by removing noise
+in bug-fixing commits using static analysis. Noise refers to changes that do not influence the
+program’s behavior, such as blank lines, comments, or refactoring operations. These irrelevant
+changes are unrelated to the bug, and tracing them back can lead to false positives in the output.
+Other methods [Davies et al. 2014] try to improve precision by treating the commits identified by the
+original SZZ algorithm as candidates and selecting the final bug-inducing commit from them. They
+choose the final bug-inducing commit by considering factors such as commit dates or the number
+of changed lines. To further improve precision, Tang et al. [Tang et al. 2023] introduced a deep
+learning method that embeds changed lines based on their semantic meanings and relationships,
+training a ranking model to identify the deleted lines most likely to cause the bug. However, this
+approach significantly sacrifices recall.
+Although previous studies have made some advancements, several limitations still exist. Limi-
+tation 1: These methods overlook the commit message of the bug-fixing commit. Typically, the
+commit message contains essential information on why the changes were made [Mockus and Votta
+2000; Yan et al. 2016] and many of these messages describe how the bug occurs and how the commit
+fixes it. This information is vital for understanding the commit and accurately locating buggy
+statements. Limitation 2: These methods assume that only deleted lines cause bugs [Kim et al.
+2006; Śliwerski et al. 2005; Tang et al. 2023], making them inapplicable to bug-fixing commits that
+contain only added lines. Limitation 3: These methods focus solely on changed lines, ignoring the
+context of the entire patch. Previous studies have shown that the context, including unmodified
+lines near the changes, can provide crucial information for the model to understand the code [Chen
+et al. 2019; Xia et al. 2023]. Sometimes, it might be the unmodified lines themselves that lead to the
+bug, rather than the changed lines [Rosa et al. 2021]. Limitation 4: Methods that select the final
+bug-inducing commit from a set of candidates often rely on heuristic assumptions [Davies et al.
+2014], such as commit dates or the number of changed lines. These assumptions may not work in
+all scenarios [Bao et al. 2022]. Ideally, we should determine the final bug-inducing commit based
+on the root cause of the bug and the content of the candidate commit.
+The emergence of Large Language Models (LLMs) presents an opportunity to address the
+aforementioned limitations. Previous studies indicate that LLMs can effectively understand code
+changes and commit messages [Li et al. 2024b; Xue et al. 2024]. One fundamental improvement is
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

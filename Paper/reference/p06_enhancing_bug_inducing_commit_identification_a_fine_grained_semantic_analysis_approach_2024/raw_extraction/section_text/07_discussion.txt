@@ -1,0 +1,250 @@
+VI. D
+ISCUSSION
+A. Analysis for the Failure Case
+In this section, we aim to analyze the reasons behind the
+failures observed in some cases. We randomly select 100 cases
+to analyze the reasons for the failures. After analysis, the failed
+reasons can be summarized as follows:
+Line similarity fails to determine whether a commit is
+buggy. Out of the 100 cases analyzed, 28 cases fail because
+S
+EM-SZZ fails to determine whether a commit is buggy.
+The main reason for this is the line similarity matching pro-
+tocol used in our method. In our approach, for each statement
+contributing to the bug, if there all exists a line with string
+similarity beyond a threshold, we assume that the commit is
+influenced by the buggy. However, this method sometimes fails
+to accurately identify the bug-inducing commits. For instance,
+consider the commit 15273ffd7ef [38], which adds a new
+line ret = 0;. Our method generates two buggy statements:
+if (!ret) and return ret;. However, when locating
+the bug-inducing commit, the method encounters many state-
+ments like if (ret), which exhibit high line similarity but
+have completely different semantic meanings. This can lead to
+incorrect judgments and result in finding false bug-inducing
+commits. This issue is particularly prevalent when the buggy
+statements contain many short statements.
+Fig. 13. An example to show the effectiveness of program slicing.
+Failing to point out buggy statements correctly. Another
+main reason for the failure is that our method fails to point out
+buggy statements correctly. This issue is responsible for most of
+the remaining failing cases. F or instance, while the added line
+may influence the variable’s data flow, analyzing the affected
+variable’s data flow may not yield correct results.
+Consider the commit 072b30642f9[39], illustrated in Fig.12.
+This commit introduces a new code line at line 2, highlighted in
+green, impacting the data flow of the variabledrv. Our method,
+accordingly, compares its data flow with the previous version
+and identifies lines 1 and 3 as buggy statements. However,
+tracing back these unmodified lines does not lead us to the bug-
+inducing commit, resulting in the failure of our method in this
+scenario.
+After carefully analyzing the bug-fixing commit and the bug-
+inducing commit, we find that the bug occurs because the
+bug-inducing commit attempts to introduce a new function
+in the program but forgets to use it. Specifically, it creates
+the iwl_load_fw_dbg_tlv function. However, the bug-
+inducing commit only defines the function and forgets to use
+it. Consequently, the bug-fixing commit fixes the bug by using
+the iwl_load_fw_dbg_tlv function in line 2. Therefore,
+we can conclude that the bug has nothing to do with the data
+flow of the drvvariable. As a result, S
+EM-SZZ fails to identify
+the bug-inducing commit in this case.
+B. Effectiveness of Program Slicing in Finding
+Bug-Inducing Commits
+Although tracing back the unmodified lines near the added
+lines is an effective approach for finding bug-inducing com-
+mits if we do not consider precisi on, there are still some bug-
+inducing commits that cannot be found in this way. In this
+section, we discuss whether program slicing, which explores N
+basic blocks near the added lines, helps find more bug-inducing
+commits that the baselines cannot detect.
+In the experiment, we try to find bug-inducing commits that
+S
+EM-SZZ can detect but baselines can not. The experimental
+result shows that S EM-SZZ does find bug-inducing commits
+that the baselines cannot detect, accounting for 1.4% of the
+total test cases. One typical example is the commit bfab7c8ff89
+[40], shown in Fig. 13. In this case, the bug occurs because
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 013 =====
+
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3049
+Fig. 14. The impact of parameter N.
+the previous version of the program does not call the fwn-
+ode_handle_putfunction before returning. If we trace back
+the two nearest lines between the added line, we cannot find the
+bug-inducing commit. However, by comparing the differences
+in the data flow of the variable fwnode, we can locate lines 1
+and 3. Tracing back from these lines allows us to successfully
+identify the bug-inducing commit.
+C. Impact of the Maximum Search Step
+In this section, we aim to investigate the impact of the maxi-
+mum search step parameter N. As mentioned earlier, given that
+most bug-inducing commits can be identified by tracing back
+nearby lines, we set the maximum search step parameter N
+to three. This parameter dictates that for each added line, we
+search three basic blocks above and below it.
+In this section, we vary the parameter N from 1 to 5 to
+assess the performance of S
+EM-SZZ under different settings.
+Our evaluation focuses on key aspects such as F1-score and time
+efficiency. Here, to show the influence of the maximum search
+step on time efficiency more clearly, we exclude the time of
+extracting source files.
+Fig. 14 presents the results of the experiment. It is evident
+that varying the number of the maximum search step does
+not significantly impact time efficiency. While there is a slight
+increase in time cost as the number of maximum search steps
+grows, the increase is not substantial. Similarly, varying the
+number of the maximum search steps does not significantly
+impact the F1-score. It increases from a maximum search step
+of 1 to 3, then decreases from 4 to 5. The reason for growth
+is pretty easy to understand. As the number of the maximum
+search step grows, S
+EM-SZZ can expand the search scope and
+analyze more basic blocks. However, as mentioned earlier, most
+bug-inducing commits can be identified by tracing back nearby
+lines. Therefore, we can assume that if a basic block is far
+from the added lines, it is unlikely to contain lines that can be
+traced back to find bug-inducing commits. Consequently, if the
+parameter N is set too large and the search scope is too broad,
+there is a high probability of including irrelevant statements in
+the identified buggy statements, even if these statements have
+data flow or control flow relationships with the added lines.
+Finally, the inclusion of irrelevant statements in the identified
+buggy statements can adversely affect the bug-inducing commit
+localization process, resulting in false results.
+TABLE VI
+THE PERFORMANCE COMPARISONS BETWEEN SEM-SZZ
+AND BUGNNINGS
+Approach Precision Recall F1-score
+BUGNNINGS
+BUGNNINGS*
+0.51
+0.51
+0.35
+0.50
+0.41
+0.50
+SEM-SZZ 0.68 0.66 0.67
+A typical example is commit 5574d329044 [41]. When the
+parameter N is set to 3, S EM-SZZ successfully identifies the
+correct bug-inducing commit. However, when the parameter N
+is increased to 5, SEM-SZZ fails to find the correct bug-inducing
+commit. This failure occurs because, with N set to 5, the search
+scope becomes too large and includes the statement struct
+device *dev = &priv->udev->dev; as one of the
+statements contributing to the bug. This statement, located over
+100 lines away from the added line, is unrelated to the bug,
+despite its data flow relation with the added line.
+D. Comparison With Another Semantic-Based Approach
+In this section, we compare SEM-SZZ with another semantic-
+based approach called BUGNNINGS [42]. This method first
+builds program dependence graphs for both the bug-fixing ver-
+sion and the version preceding the bug-fixing commit. It then
+computes the differences between these two versions of the pro-
+gram dependence graph. This helps identify the code statements
+that have a dependent relationship with the code changes in the
+bug-fixing commit. Finally, the method traverses the commit
+history to identify the earliest version that introduced all code
+statements with a dependence relationship to the changes in the
+bug-fixing commit.
+The original implementation of BUGNNINGS is based on
+W ALA, a Java program analysis infrastructure, and requires
+compiling the program. However, compiling and analyzing a
+large program, such as the Linux kernel, takes a very long time.
+Considering that our dataset contains tens of thousands of bug-
+fixing commits, strictly following the implementation in the
+paper would result in unacceptable time consumption.
+To address this, we utilize a tool called Joern[43], which can
+build the program dependence graph (PDG) from the abstract
+syntax tree (AST). We first extract the file content of the two
+program versions and use Joern to build the PDG based on this
+content. Then, we compare the PDGs of the two versions to
+identify code statements that have a dependence relationship
+with the changes in the bug-fixing commit.
+The experimental result is shown in Table VI. The original
+result can be seen in the second row of the table. However,
+during implementation, we found that Joern failed to generate
+PDGs for some test cases. Therefore, we filtered out these test
+cases and obtained the result labeled BUGNNINGS*. Accord-
+ing to the table, S
+EM-SZZ outperforms BUGNNINGS in both
+precision and recall.
+The fundamental reason for this is that comparing the dif-
+ferences in PDGs is not suitable in this scenario. For example,
+consider the commit 7090abd6ad0[44] in Fig. 15. According to
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 014 =====
+
+3050 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 15. A failing example of the BUGNNINGS approach.
+the commit message, the bug occurs because the bug-inducing
+commit introduces the dma variable but does not set the burst
+size. In S EM-SZZ, the data flow of the lpss variable is com-
+pared, which correctly locates line 4, highlighted in yellow.
+Conversely, BUGNNINGS incorrectly locates the place where
+lpssis defined, which is line 1.
+In fact, BUGNNINGS often tends to locate line numbers far
+from the added lines based on PDGs. As mentioned earlier,
+most bug-inducing commits can be found by tracing back the
+lines near the added lines. This is the one main reason for its
+poor performance. Another reason is its analysis of control flow
+dependence. For instance, a newly addedifstatement can have
+the control flow dependent relationship with many lines in the
+program, often including many irrelevant lines.
+E. Threats to Validity
+Internal Validity.Threats to internal validity refer to causality,
+bias, and errors in the experiment. One potential threat is that we
+do not compile the entire source code of the program. Instead,
+we utilize the tree-sitter parser to implement fuzzy parsing[45],
+allowing us to analyze only part of the program. However,
+fuzzy parsing may not accurately reflect the behavior of the
+program, especially when the program contains many macros.
+This could potentially lead to errors when creating datasets
+and undermine the effectiveness of S
+EM-SZZ in comparison.
+Our implementation of BUGNNINGS faces the same issue,
+as we build program dependence graphs directly from abstract
+syntax trees. Another threat is the analysis of failure cases in
+the discussion. We only randomly selected a subset of failure
+cases for analysis which could also result in bias.
+External Validity. Threats to external validity refer to the
+applicability of our approach to other scenarios. One potential
+threat is that we only implemented and evaluated our approach
+on the projects in the C programming language. This limitation
+arises due to the lack of ghost commits in other programming
+languages. This r aises concerns about the portability of our
+approach to other programming languages. To enhance gen-
+eralization, we evaluate our approach on a larger dataset than
+those used in previous studies. Another threat is that, in our
+dataset, each bug-fixing commit typically corresponds to only
+one bug-inducing commit, which may not reflect real-world
+scenarios. In the future, we plan to extend our approach to
+more programming languages and collect additional datasets to
+address these issues.
+Construct Validity. Threats to construct validity refer to the
+accuracy of the measures used to represent the concepts in
+the study. Our approach might not perfectly encapsulate the
+complexities of real-world software development. For example,
+S
+EM-SZZ cannot handle test cases without changed lines in
+functions. Therefore, it is not applicable to the entire dataset.
+To mitigate this threat, we power a baseline with S
+EM-SZZ
+and apply it on the whole dataset when evaluating S EM-SZZ’s
+effectiveness.
+Conclusion Validity. Threats to conclusion validity refers to
+the accuracy of the conclusions drawn from the data. In our
+study, we draw conclusions based on a dataset from the Linux
+kernel, which may not fully represent other software develop-
+ment scenarios. Although we have analyzed the dataset and
+found that it includes both small and large commits, similar to
+those found in other developm ent contexts, there may still be
+limitations in generalizing our findings. To address this, we plan
+to extend our approach to include other programming languages
+and projects in the future.

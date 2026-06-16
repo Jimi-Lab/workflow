@@ -1,0 +1,107 @@
+Yamaguchi, et al. proposed a method named vulnerability
+extrapolation [26], and its generalized extension that exploits
+patterns extracted from the abstract syntax trees (ASTs) of
+functions to detect semantic clones [27]. When extracted
+ASTs are embedded in a vector space, their semantics can
+be identiﬁed by the latent semantic analysis technique. In
+particular, they perform a singular value decomposition on
+the embedded vectors, and obtain the structural patterns of
+functions. Although their method is capable of detecting Type-
+4 clones, they rely heavily on expensive operations, and the
+accuracy of detection is not precisely given in their analysis.
+We must note that techniques that adopt a considerably high
+level of abstraction (e.g., a function into a bag-of-tokens, or
+into syntax trees) might be effective for detecting clones, but
+they are not suitable for accurately detecting vulnerable code
+clones, because security issues are very context sensitive.
+4) File-level granularity: DECKARD [17] builds ASTs for
+each ﬁle, then extracts characteristic vectors from the ASTs.
+After clustering vectors based on their Euclidean distance,
+vectors that lie in proximity to one another within the Eu-
+clidean space are identiﬁed as code clones. Such tree-based
+approaches require extensive execution time, as the subgraph
+isomorphism problem is a well-known and time-consuming
+NP-Complete problem [28]. Furthermore, DECKARD does
+not guarantee sufﬁcient scalability to handle the Debian Linux
+OS Distribution, according to Jang, et al. [18]. In addition, it
+was pointed out [29] that DECKARD has a 90 % false positive
+rate, which again suggests that code fragments with similar
+abstract trees are not necessarily clones.
+FCFinder [30] removes comments, redundant whitespace,
+line breaks, and carriage returns, and then computes the MD5
+hash value of each preprocessed ﬁle. It creates a hash table
+in which the hash values and corresponding ﬁles constitute
+keys and values, respectively. The overlapping hash values are
+regarded as ﬁle clones. In contrast to DECKARD, FCFinder
+demonstrates extensive scalability. It detected 915 K ﬁle clones
+from FreeBSD ports collection, which contains over 7 K soft-
+ware projects, and required 17.16 hours to complete its work.
+This extended scalability results from their design choice to
+adopt ﬁle-level granularity. However, for the same reason, their
+approach is not resilient to minor or major changes within ﬁles.
+5) Hybrid granularity: Some techniques leverage a com-
+bination of various approaches. VulPecker [31] is a system
+for automatically checking vulnerability containment. It char-
+acterizes a vulnerability with a predeﬁned set of features, then
+selects one of the existing code-similarity algorithms (e.g.,
+[12], [18], [24]) which is optimal for the type of vulnerable
+code fragment. As it takes advantage of a variety of algorithms,
+it could detect 40 vulnerabilities which are not registered in the
+National Vulnerability Database (NVD). However, it required
+508.11 seconds to check the existence of CVE-2014-8547 in
+project Libav 10.1 (0.5 MLoC), which makes it improper to
+be used against massive open source projects.
+III. P ROBLEM AND GOAL STA TEMENT
+A. Problem formulation
+1) Clone detector: First, we deﬁne a clone detector. For-
+mally, letF be the set of all functions in a program (e.g., a
+C program). LetV ⊆ F, and T ⊆ F be a set of vulnerable
+functions, and a set of target functions, respectively. Then, a
+clone detectorC is a function of the type:
+C : F →{0,1} (1)
+which takes a program and returns 1 (i.e., vulnerable) or 0.
+Deﬁnition 1(Completeness). A clone detectorC is complete
+with respect toV and T iﬀ
+∀f ∈T : f ∈V ⇒C(f)=1 . (2)
+2) Abstract clone detector: Now, we denote the set of
+abstract functions byˆF, which is generated fromF by applying
+an abstraction functionα:
+α: F → ˆF (3)
+such thatα is deterministic for∀f,f ′ ∈F:
+f =f′ ⇒α(f)= α(f′). (4)
+With V ⊆ F being a set of vulnerable functions, we can
+deﬁne the abstract clone detectorˆC : F →{0,1} in terms of
+the abstraction functionα:
+ˆCV (f)≡∃f′ ∈V : α(f′)= α(f) (5)
+Obviously, the abstract clone detectorˆC is complete:
+∀f ∈F : f ∈V ⇒ ˆC(f)=1 . (6)
+B. Goals
+The goals of this research are as follows:
+1) Designing a clone detectorC that satisﬁes completeness.
+2) Designing an abstraction functionα and associated ab-
+stract clone detector ˆC, which is effective in detecting
+Type-1 and Type-2 code clones of known vulnerabilities.
+With a given vulnerable functionf, ˆC should detect its
+abstract clonesf′, such that ˆC(f)= ˆC(f′)=1 . This implies
+that ˆC completely detects exact clones of vulnerability, as
+well as clones in which variable names, identiﬁers, data types,
+comments, and whitespace are modiﬁed.
+Type-3 and Type-4 code clones have characteristics which
+make us exclude them from the scope of our abstract clone
+detector ˆC. Most importantly, Type-3 and Type-4 code clones
+can be subjective to the loss of syntactic information which
+are crucial for a vulnerability to be triggered, because security
+vulnerabilities are often very sensitive to the constants and the
+order of statements. For example, vulnerability that leverages
+race condition in thekeyctl_read_keyfunction in securi-
+ty/keys/keyctl.c of the Linux kernel before 4.3.4 (CVE-2015-
+7550) was ﬁxed by merely changing the order of statements
+within the function1. This incident implies that if the order
+information is lost after abstraction, the vulnerable condition
+is lost as well. Moreover, constants, referring to ﬁxed values
+that do not change during the execution of a program, are key
+elements in many types of vulnerabilities. Intuitively, even a
+1See commit b4a1b4f5047e4f54e194681125c74c0aa64d637d in the Linux
+kernel source tree.
+598
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

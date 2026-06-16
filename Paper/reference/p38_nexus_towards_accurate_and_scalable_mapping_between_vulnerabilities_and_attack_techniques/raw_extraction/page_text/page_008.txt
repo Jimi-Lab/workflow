@@ -1,0 +1,94 @@
+Model Micro Average Macro Average TP FP FNPrecision Recall F1-score Precision Recall F1-score
+BERT-Base-Uncased [41] 96.82% 97.00% 96.91% 97.29% 97.80% 97.54% 2,168,243 71,153 67,031
+BERT-Large-Uncased [56] 97.76% 97.92% 97.84% 98.15% 98.61% 98.38% 2,188,745 50,237 46,529
+RoBERTa-Base [42] 96.66% 96.84% 96.75% 97.07% 97.65% 97.36% 2,164,530 74,760 70,744
+RoBERTa-Large [57] 97.85% 98.02% 97.94% 98.25% 98.65% 98.45% 2,191,089 48,170 44,185
+SecureBERT [43] 96.66% 96.70% 96.68% 96.98% 97.42% 97.20% 2,161,568 74,757 73,706
+SecureBERT-Plus [58] 95.06% 94.22% 94.64% 95.17% 94.85% 95.01% 2,106,071 109,548 129,203
+TABLE I: CVE-to-TTP mapping accuracy of ﬁne-tuned LLMs on D1 dataset.
+three baseline groups. CVEMap, a supervised baseline, uses
+the ENISA dataset [16] (8,077 CVEs, 52 TTPs), expanded
+to 92,632 CVEs and 141 TTPs using our Ground Truth
+Building step; SecureBERT [43] is ﬁne-tuned on this expanded
+dataset, improving on earlier LabelPowerset approaches [6].
+Unsupervised baselines include SMET [3], [75], Ladder [9],
+[76], and AttacKG [11], [77]; SMET targets 185 TTPs, while
+Ladder and AttacKG handle broader threat-report mappings
+with unrestricted and 178 TTPs. Generative baselines—Llama-
+3.1-8B [35] and GPT-4o-mini [36]—are prompted (per Attack-
+SeqBench [37]) to score CVE-to-TTP relevance without task-
+speciﬁc training or coverage limits. All models are evaluated
+on D2–D5, using only TTPs supported by both the model and
+ground truth. We report micro/macro Precision, Recall, and
+F1, monitor loss curves for convergence, and analyze FP/FN
+rates for error proﬁling.
+B. CVE-to-TTP Mapping Accuracy
+This section evaluates NEXUS for CVE-to-TTP mapping
+with all training steps active: Ground Truth Building, Attack
+Pattern Extraction, Dataset Enhancement, and TTP Classiﬁer
+Model Building. Fine-tuning is performed on D1 (NEXUS
+Attack-Pattern Dataset) with pre-trained LLMs. Table I sum-
+marizes the results using micro- and macro-averaged Preci-
+sion, Recall, F1-score, and counts of true positives (TP), false
+positives (FP), and false negatives (FN). Precision measures
+correct predicted TTPs, Recall measures coverage of actual
+TTPs, and F1-score balances both. Micro- and macro-averages
+capture overall performance and class imbalance.
+As shown in Table I, all ﬁne-tuned LLMs achieve high
+accuracy, with micro-averaged F1-scores exceeding 94%.
+RoBERTa-Large performs best, achieving a micro-averaged
+F1-score of 97.94% and a macro-averaged F1-score of
+98.45%. SecureBERT shows competitive performance, while
+SecureBERT-Plus has the weakest results. These ﬁndings
+demonstrate that NEXUS training, combined with ﬁne-tuning
+on the enriched D1 dataset, enables strong generalization
+across 208 TTPs despite class imbalance.
+Figure 14 shows RoBERTa-Large ﬁne-tuning on D1. Train-
+ing and validation losses (Figure 14a) steadily decrease and
+stabilize over 15 epochs, indicating effective convergence. Val-
+idation Precision, Recall, and F1-score (Figure 14b) improve
+and plateau after 10 epochs. Figure 14c and 14d show low
+FPR and a slight FNR increase for higher-support TTPs due
+to semantic diversity. Overall, RoBERTa-Large achieves strong
+generalization across rare and frequent TTPs.
+(a) Training and validation loss
+curves over epochs.
+(b) Validation Precision, Recall,
+and F1-score over epochs.
+(c) FPR and FNR across TTP
+support groups.
+(d) Precision, Recall, and F1-
+score across TTP support groups.
+Fig. 14: Fine-tuning dynamics and evaluation of RoBERTa-
+Large on the D1 dataset.
+Solution TTP Cov. Precision Recall F1-score
+NEXUS 100% 94.71% 84.49% 89.31%
+CVEMap [6], [16] 67.78% 47.27% 92.20% 62.50%
+SMET [3] 40.86% 37.71% 7.85% 12.99%
+Ladder [9] 100% 32.67% 3.09% 5.65%
+AttacKG [11] 40.86% 30.53% 11.48% 16.69%
+AttackSeqBench [35], [37]
+(with Llama-3.1-8B) 100% 19.50% 58.74% 29.28%
+AttackSeqBench [36], [37]
+(with GPT-4o-mini) 100% 51.15% 100% 67.68%
+TABLE II: Comparison of NEXUS and baselines on D2 in
+terms of TTP Coverage, Precision, Recall, and F1-score.
+C. Comparison with State-of-the-Art Solutions
+To evaluate generalization, we compareNEXUS with super-
+vised, unsupervised, and generative baselines on four datasets
+(D2–D5), reporting Precision, Recall, F1, TPR, FPR, and
+FNR. Metrics are computed only over TTPs supported by both
+the model and ground truth. For D4 and D5, we also report
+results with Model Adaptation (Section IV-F).
+Table II shows CVE-to-TTP mapping results on D2.NEXUS
+achieves the highest F1-score (89.31%) with full TTP cover-
+age (100%), high Precision (94.71%), and Recall (84.49%).
+Other solutions have lower F1-scores and either limited TTP
+coverage (CVEMap: 67.78%, SMET: 40.86%) or lower Pre-
+cision/Recall despite full coverage(Ladder, AttackSeqBench
+with Llama-3.1-8B, and AttackSeqBench with GPT-4o-mini).
+AttackSeqBench with GPT-4o-mini achieves 100% Recall due
+to its role in Label Adjustment but lower Precision. Figure 15a
+shows NEXUS maintains high TPR with low FPR/FNR, while
+others show higher error rates.
+8

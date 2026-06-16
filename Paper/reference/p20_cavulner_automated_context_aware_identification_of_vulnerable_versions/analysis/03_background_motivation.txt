@@ -1,0 +1,31 @@
+Domain Concepts Introduced:
+- Overview of CaVulner commits, the approach determines the range of affected versions with improved accuracy, even in complex or long-lived vulnerability cases.
+- It begins with coarse-grained method localization, identifying methods likely associated with the vulnerability based on contextual signals such as CVE descriptions, commit messages, and surrounding code.
+- By combining these two stages, the module achieves both breadth and precision in identifying the code regions most relevant to the vulnerability.
+- Directly feeding raw fix commit diffs to the LLM often leads to hallucinations because the model may struggle to distinguish the actual remediation logic from irrelevant code churn.
+- To mitigate this issue, this submodule serves as a pre-filter to identify methods strictly relevant to the vulnerability and thereby reduces the search space for the subsequent fine-grained analysis.
+- However, effectively filtering these methods presents a challenge as developers frequently interleave security patches with non-security maintenance such as refactoring, formatting, or feature updates.
+- Unlike raw line-level diffs, MCT categorizes how a method is modified, establishing a correlation between the nature of the repair and the vulnerability type.
+- For instance, fixing a Missing Input Validation vulnerability typically involves adding conditional checks, whereas remediating an Information Exposure vulnerability involves deletions.
+Task Definition:
+- Inferred from title and extracted sections: identify vulnerability-introducing commits, bug-introducing commits, vulnerable/affected versions, or evidence useful for version validation. [NEEDS CITATION VERIFICATION]
+Threat Model / Assumptions:
+- [NEEDS EVIDENCE] not asserted unless explicitly stated in the paper.
+Motivating Case:
+- Overview of CaVulner commits, the approach determines the range of affected versions with improved accuracy, even in complex or long-lived vulnerability cases.
+- It begins with coarse-grained method localization, identifying methods likely associated with the vulnerability based on contextual signals such as CVE descriptions, commit messages, and surrounding code.
+- Formally, we guide the LLM in localizing potentially vulnerable methods by a vulnerability knowledge tuple 𝐾vul = (MCT,CVE,CWE), which is composed as follows: •MCT (Method Change Type).
+Why the Case Is Chosen:
+- [NEEDS EVIDENCE]
+Definitions Needed by Readers:
+- Vulnerability-introducing commit / bug-inducing commit, patch evidence, developer log, vulnerable version, SZZ-style tracing, depending on the paper scope.
+How Background Leads to Method:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- Furthermore, with the recent and rapid emergence of powerful large language models, a growing body of recent studies has actively explored their potential integration into and enhancement of traditional SZZ-based workflows.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- Given the success of SZZ in the bug localization domain, it has subsequently been adapted for vulnerability analysis, particularly in identifying vulnerability-inducing commits and inferring vulnerability-affecting version ranges.
+Writing Pattern:
+- Build from concrete artifact evidence toward why naive blame or simple version matching is insufficient.
+Relevance to Our Paper:
+- Useful for affected versions background and related-work positioning.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json

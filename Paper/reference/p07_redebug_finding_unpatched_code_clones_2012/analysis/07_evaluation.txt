@@ -1,0 +1,42 @@
+Main Results:
+The paper reports that ReDeBug scales to billions of lines, finds thousands of unpatched code clones, and confirms real bugs. Local reproduction was not requested.
+
+Per-RQ Findings:
+Attacker/patch-release question:
+- Released patches can expose many cloned vulnerable regions across large source corpora.
+OS responsiveness question:
+- Later distribution versions still contain unpatched code clones for older and newer security patches.
+Persistence question:
+- Unpatched clones can persist across distribution versions and across many years of patches.
+
+Ablation:
+The paper varies n and discusses clone counts under different n values. Exact counts require Table V repair [NEEDS TABLE REPAIR].
+
+Sensitivity Analysis:
+The paper studies database size/query-time scaling, number-of-diffs/query-time scaling, n sensitivity, and code similarity distribution.
+
+Case Study:
+The introduction uses Expat/CVE-2009-3720. Discussion gives examples where an unpatched code clone is present but not vulnerable due to signedness/type or alternative fix location. These are useful as failure cases.
+
+Efficiency:
+The paper emphasizes linear build/query scaling and fast query time. Exact numbers are in figures/tables and need repair for citation-ready use.
+
+Error Analysis:
+The paper distinguishes Bloom-filter errors removed by exact matching, dead-code filtering, and remaining false positives from over-aggressive normalization or non-exploitable context. It also notes missed clones from variable names/types and semantic differences.
+
+Statistical / Validity Notes:
+The paper validates reported clones and reports confirmed bugs, but local validation artifacts are absent [NEEDS ARTIFACT].
+
+How Claims Are Supported:
+The paper supports claims with large datasets, performance figures, patch/year tables, bug examples, and Deckard comparison.
+
+Unsupported or Weakly Supported Claims:
+- Claims about original evaluation performance cannot be supported by the local Python reimplementation alone.
+- Exact numeric claims from tables/figures need [NEEDS TABLE REPAIR] or [NEEDS FIGURE EXTRACTION].
+
+Agent Evidence Anchors:
+- raw_extraction/section_text/04_implementation_evaluation.txt
+- raw_extraction/section_text/05_discussion.txt
+
+Writing Pattern:
+Tie performance claims to operational workflow: build once, query many patches quickly, then verify/security-triage results.

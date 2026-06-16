@@ -1,0 +1,332 @@
+[
+  {
+    "page": 8,
+    "block_id": "page_008:block_001",
+    "block_type": "text",
+    "text": "CHENG et al.: V ERCATION : PRECISE VULNERABLE OPEN-SOURCE SOFTWARE VERSION IDENTIFICATION 383",
+    "bbox": [
+      37.58399963378906,
+      32.515296936035156,
+      551.68359375,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_002",
+    "block_type": "text",
+    "text": "TABLE I S ENSITIVE F UNCTIONS FOR S OME V ULNERABILITY T YPES",
+    "bbox": [
+      69.27345275878906,
+      65.57752990722656,
+      256.9580078125,
+      83.44530487060547
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_003",
+    "block_type": "text",
+    "text": "Vulnerability Type Sensitive Function",
+    "bbox": [
+      44.316001892089844,
+      95.18974304199219,
+      217.1890411376953,
+      104.37926483154297
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_004",
+    "block_type": "text",
+    "text": "Buffer overﬂow strcpy, strncpy, memcpy, memset, read, write, gets, gets_s, strcat",
+    "bbox": [
+      44.316001892089844,
+      109.65962219238281,
+      281.9262390136719,
+      127.51824188232422
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_005",
+    "block_type": "text",
+    "text": "Integer overﬂow add, multiple, bit-shifting, memcpy",
+    "bbox": [
+      44.316001892089844,
+      132.7986602783203,
+      268.9205017089844,
+      141.69329833984375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_006",
+    "block_type": "text",
+    "text": "Null pointer derefrence malloc, calloc, realloc, strdup",
+    "bbox": [
+      44.316001892089844,
+      146.97364807128906,
+      250.375,
+      155.8682861328125
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_007",
+    "block_type": "text",
+    "text": "Pointer out-of-bounds access memcpy, memmove",
+    "bbox": [
+      44.316001892089844,
+      161.13966369628906,
+      218.7392578125,
+      170.0343017578125
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_008",
+    "block_type": "text",
+    "text": "Use after free free, malloc, calloc",
+    "bbox": [
+      44.316001892089844,
+      175.3146514892578,
+      216.3657684326172,
+      184.20928955078125
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_009",
+    "block_type": "text",
+    "text": "Format string sprintf, printf, scanf",
+    "bbox": [
+      44.316001892089844,
+      189.48963928222656,
+      218.5885772705078,
+      198.38427734375
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_010",
+    "block_type": "text",
+    "text": "Arbitrary command execution fopen, popen, system",
+    "bbox": [
+      44.316001892089844,
+      203.65553283691406,
+      223.02951049804688,
+      212.5501708984375
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_011",
+    "block_type": "text",
+    "text": "authors with security expertise: the ﬁrst author proposed the ini- tial categorization, which was then independently reviewed and validated by the fourth and ﬁfth authors, with any discrepancies resolved through discussion. The result is the pre-deﬁned table (Table I ) of sensitive functions for various vulnerability types. We analyze each vulnerable statement extracted by the LLM. If a statement contains a direct call to any function listed in our sensitive function table, it is assigned a higher weight, marking it as a probable vulnerability trigger. For instance, in Listing 1 , Lines 21 and 25 are critical trigger lines. Furthermore, we conduct an inter-procedural analysis to identify customized functions that serve as variants of canonical sensitive functions. For instance, the av_calloc function on Line 21 is a variant of the calloc function. To discern whether the customized function F contains sensitive functions, we ﬁrst analyze the deﬁnition and implementation code of function F , then check if F ’s function body calls any sensitive functions from Table I . If such call relationships are found, F is also iden- tiﬁed as a sensitive function. Taking Listing 1 as an example, considering this is an overﬂow-type vulnerability, we recognize the av_calloc in Line 21 and avio_read function in line 25 as sensitive functions.",
+    "bbox": [
+      37.583953857421875,
+      239.15338134765625,
+      288.6504821777344,
+      501.3289794921875
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_012",
+    "block_type": "text",
+    "text": "Parameters. There are two parameters for the weight allocation of statements, i.e., W sensitive and W base , that could affect the effectiveness of V ERCATION : 1) W base is the base weight for initializing the weights of all statements. 2) W sensitive is the weight for the statements containing sensitive functions. We set W sensitive = 2 × W base , W base = 1 . 0 , the detailed weighting conﬁguration experiment is in Section V-B . 4) Code Clone Determination: We calculate the sim- ilarity_score for each code modiﬁcation of the previous commit with the backtrack. We set a threshold ϑ 3 , if similarity _ score < ϑ 3 , we determine that there is no code clone between the pre-modiﬁcation code of this previous com- mit and the vulnerable statements, thus conﬁrming that this commit introduced the vulnerability. Otherwise, we proceed with the commit backtrack process.",
+    "bbox": [
+      37.58395004272461,
+      507.7787780761719,
+      288.64764404296875,
+      686.6371459960938
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_013",
+    "block_type": "text",
+    "text": "similarity _ score = sim _ a × W sensitive + sim _ b × W base",
+    "bbox": [
+      39.951419830322266,
+      692.015380859375,
+      284.5816650390625,
+      710.5264282226562
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_014",
+    "block_type": "text",
+    "text": "a × W sensitive + b × W base where, W sensitive and W base are predeﬁned weights assigned to different types of statements; a and b are the total counts",
+    "bbox": [
+      37.58399963378906,
+      706.82177734375,
+      288.63751220703125,
+      744.7174682617188
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_015",
+    "block_type": "text",
+    "text": "of the statements in S v corresponding to these weight types; sim _ a and sim _ b are the counts of statements that were found to be similar, either through syntactic or structural analysis.",
+    "bbox": [
+      300.599609375,
+      63.788265228271484,
+      551.6586303710938,
+      98.81979370117188
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_016",
+    "block_type": "text",
+    "text": "C. Vulnerable Version Range Determination",
+    "bbox": [
+      300.60003662109375,
+      113.8792953491211,
+      481.8099060058594,
+      124.83815002441406
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_017",
+    "block_type": "text",
+    "text": "To precisely determine the range of software versions af- fected by a vulnerability, we employ a methodology based on the principle of commit reachability. The core premise is that a vulnerability, once introduced in a speciﬁc vic , is propagated to all subsequent commits in its lineage until it is ﬁxed by a vfc . The basis for our analysis is the concept of reachability, where a commit A is considered reachable from another commit B , if commit A is an ancestor of commit B in the project’s commit graph [17] . As version tags are essentially pointers to speciﬁc commits, they inherit the reachability properties of the commits they represent. This allows us to map the vulnerabil- ity’s presence from the commit level to software versions. Our methodology formally deﬁnes the set of vulnerable ver- sions ( V v ) as follows: First, we identify V i , the set of all version tags reachable from vic . Second, we identify V f , the set of all version tags reachable from vfc . The vulnerable version set V v is then derived from the set difference between these two sets: V v = V i − V f . We illustrate the procedure by the case of CVE-2021- 20294 in the Binutils project [51] . For this vulnerability, the set of versions containing the vic is [ binutils-2_35 , binutils-2_42 ], while the set of patched versions con- taining the vfc is [ binutils-2_36 , binutils-2_42 ], with binutils-2_42 being the latest version of the Binutils project. Therefore, we consider the version tags [ binutils- 2_35 , binutils-2_36 ) as vulnerable. This notation sig- niﬁes a range that includes binutils-2_35 but excludes binutils-2_36 .",
+    "bbox": [
+      300.5954284667969,
+      130.66729736328125,
+      551.7003784179688,
+      464.89056396484375
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_018",
+    "block_type": "text",
+    "text": "IV. E XPERIMENTAL S ETUP",
+    "bbox": [
+      372.3879089355469,
+      477.2393798828125,
+      479.8652038574219,
+      488.35845947265625
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_019",
+    "block_type": "text",
+    "text": "A. Dataset",
+    "bbox": [
+      300.6000061035156,
+      495.3258361816406,
+      345.1497497558594,
+      506.2846984863281
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_020",
+    "block_type": "text",
+    "text": "With conﬁrmation from the author of V-SZZ, it is established that V-SZZ assumes the deleted lines in the vfc as vulnera- ble codes and manually labels the ﬁrst introduction of deleted lines in a vfc as the vic to construct the dataset. However, as mentioned in Section II-C , deleted lines cannot fully capture the vulnerability logic. Additionally, it cannot be guaranteed that the identiﬁed software version will necessarily exhibit the vulnerability. Meanwhile, V-SZZ excludes the vfc s that only contain added lines of code in their vulnerability selection, as the SZZ algorithm relies on tracking deleted lines of code to locate vic and thus cannot handle such cases. Therefore, we need to construct a ground-truth dataset with labeled vulnerable versions or non-vulnerable versions of OSS, which are veriﬁed by a public PoC.",
+    "bbox": [
+      300.5989685058594,
+      512.1048583984375,
+      551.6686401367188,
+      678.6456298828125
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_021",
+    "block_type": "text",
+    "text": "Vulnerabilities. To build a reliable evaluation dataset, we for- mulate four vulnerability selection criteria: 1) The vulnerability must be a CVE reported in an OSS project; 2) The vulnerability must have publicly available PoCs and patches; 3) The PoC must be reproducible across different versions of the OSS and",
+    "bbox": [
+      300.5989990234375,
+      685.095458984375,
+      551.6636962890625,
+      744.3998413085938
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_022",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

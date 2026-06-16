@@ -1,0 +1,137 @@
+[
+  {
+    "page": 5,
+    "block_id": "page_005:block_001",
+    "block_type": "text",
+    "text": "Beyond Blame: Rethinking SZZ with Knowledge Graph Search 5",
+    "bbox": [
+      45.827999114990234,
+      60.6286735534668,
+      440.172607421875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_002",
+    "block_type": "text",
+    "text": "Table 1. Distribution of ground truth BIC categories across datasets.",
+    "bbox": [
+      116.48500061035156,
+      84.3469467163086,
+      369.2747497558594,
+      94.7569351196289
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_003",
+    "block_type": "text",
+    "text": "Dataset Cases BICs Blame Blame Anc. BFC Anc. Blameless Unreachable",
+    "bbox": [
+      73.4520034790039,
+      109.18866729736328,
+      412.5478210449219,
+      120.2033462524414
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_004",
+    "block_type": "text",
+    "text": "DS_LINUX 1,500 1,562 901 (57.7%) 170 (10.9%) 219 (14.0%) 268 (17.2%) 4 (0.3%) DS_APACHE 241 353 164 (46.5%) 48 (13.6%) 116 (32.9%) 15 (4.2%) 10 (2.8%) DS_GITHUB 361 357 234 (65.5%) 17 (4.8%) 67 (18.8%) 37 (10.4%) 2 (0.6%)",
+    "bbox": [
+      73.4520034790039,
+      124.15363311767578,
+      412.5478515625,
+      155.09329223632812
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_005",
+    "block_type": "text",
+    "text": "Total 2,102 2,272 1,299 (57.2%) 235 (10.3%) 402 (17.7%) 320 (14.1%) 16 (0.7%)",
+    "bbox": [
+      73.4520034790039,
+      159.04364013671875,
+      412.5477600097656,
+      170.05831909179688
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_006",
+    "block_type": "text",
+    "text": "these blame results. We define five mutually exclusive categories (see Figure 1 ). Blame includes BICs that appear directly in the blame set. Blame Ancestor includes BICs that are ancestors of blame commits and require backward traversal. BFC Ancestor includes BICs that are descendants of blame commits but precede the BFC, requiring traversal backward from the BFC. We also account for cases where standard traversal fails. Blameless captures cases where the BFC contains no deleted or modified lines (i.e., only new code was added and nothing to git blame ), rendering standard SZZ approaches inapplicable. Finally, Unreachable refers to BICs on parallel branches not reachable via backward traversal from blame commits. For example, suppose the BIC is on branch A while the blame commit is on branch B; after both branches merge, the buggy code is present, but git blame points to the branch B commit that last modified the same lines, making the true BIC on branch A unreachable through backward traversal. This classification determines the specific graph traversal capabilities required to identify the root cause. To determine whether broader history traversal is necessary and to quantify the search space, we analyze each BIC category with a tailored measurement strategy. For the Blame category, we study the number of blame commits per case to understand candidate complexity. For the Blame Ancestor and BFC Ancestor categories, we measure the file-history depth required to reach the BIC. Given the scale of commit graphs (e.g., Linux has over 1 million commits), we filter candidates to those that modified exactly the same files as the BFC, as file co-modification is a necessary condition for code-level bug introduction. This file-scoped traversal is far more tractable than full DAG distance (median 13,786 commits across our raw datasets vs. median 2 commits for file-history) and focuses on commits most likely to be relevant. For Blameless cases where no deleted lines exist, we analyze a fallback strategy that applies git blame to the context lines surrounding each addition (2 lines before and after each added hunk [ 36 ], i.e., contiguous block of added lines), under the assumption that the BIC likely modified code adjacent to where the fix adds new logic.",
+    "bbox": [
+      45.52899932861328,
+      189.9910430908203,
+      441.2674255371094,
+      478.7283935546875
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_007",
+    "block_type": "text",
+    "text": "3.3 Results",
+    "bbox": [
+      45.827999114990234,
+      487.5922546386719,
+      101.18021392822266,
+      500.4440002441406
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_008",
+    "block_type": "text",
+    "text": "57.2% of BICs are directly identifiable via git blame, while 28.0% require extended commit history traversal (Blame Ancestor or BFC Ancestor). Table 1 presents the category distribution across three datasets. The Blame category dominates with 57.2% of all BICs, confirming that git blame provides a strong baseline for BIC identification. However, a substantial portion of BICs require traversing the commit graph beyond blame commits: 10.3% are Blame Ancestors (requiring backward traversal from blame commits) and 17.7% are BFC Ancestors (requiring backward traversal from the BFC). Notably, 14.1% of cases are Blameless where traditional blame-based approaches cannot provide any candidates. These findings reveal that any approach relying solely on direct blame commits will miss nearly half of all BICs. Even for the majority Blame category, correctly identifying the true BIC among multiple blame candidates remains challenging. Even within the Blame category, identifying the correct BIC among multiple candi- dates is non-trivial. Figure 2 shows the joint distribution of deleted lines and blame commits across datasets. The heatmap reveals distinct complexity patterns across datasets. DS_LINUX and",
+    "bbox": [
+      45.827999114990234,
+      502.6259460449219,
+      441.9515380859375,
+      658.7503662109375
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_009",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      260.1289978027344,
+      671.4816284179688,
+      440.1734313964844,
+      682.496337890625
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

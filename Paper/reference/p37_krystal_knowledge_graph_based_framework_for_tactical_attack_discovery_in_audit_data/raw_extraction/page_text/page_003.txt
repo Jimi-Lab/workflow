@@ -1,0 +1,130 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+down strategy, i.e., they aim to identify attacks based on high- 
+level models of APT campaigns (e.g. techniques, tactics) and/or kill- 
+chain phases. HOLMES ( Milajerdi et al., 2019b ) introduced threat 
+scores and 16 techniques, tactics, procedures (TTP) proposed by 
+the authors to construct a high-level scenario graph (HSG) from 
+a provenance graph. This approach can mitigate dependence ex- 
+plosion and offers a map to TTP. However, its ability to identify 
+attacks with only a single APT stage is limited ( Hossain et al., 
+2020 ). RapSheet ( Hassan et al., 2020 ) is an attack graph con- 
+struction approach based on alert correlation from a commer- 
+cial Endpoint Detection and Response (EDR) tool. By incorporating 
+67 EDR rules, it can relate alerts into a tactical provenance graph 
+based on MITRE’s ATT&CK TTPs. For graph reduction, it implements 
+causality-preserved reduction (CPR) ( Xu et al., 2016 ) that merges 
+edges with identical operations and keeps only the edge with the 
+latest timestamp. Our approach also facilitates TTP mappings, but 
+we rather incorporate rules from open, standard and community- 
+driven detection rules (i.e., SIGMA Roth and Patzke, 2021 ), thus 
+avoiding a dependence on a commercial platform. 
+Another recently proposed approach ( Zou et al., 2020 ) uses 
+tactic-centric Advanced Persistent Threat (APT) recognition to de- 
+tect APT tactics based on APT techniques’ prerequisites (i.e., re- 
+quirements for techniques to be matched to a tactic) and post- 
+conditions (i.e., the result of a technique, e.g., malicious process 
+being created). The identiﬁed attack techniques are mapped to 
+speciﬁc tactics and ranked based on their tactic matching. This 
+approach shows the detected tactics and techniques, but it does 
+not represent the complete attack scenario, i.e., attack sequences, 
+causality and connections. 
+In our work, we propose a hybrid approach that facilitates both 
+bottom-up and top-down techniques for threat detection and at- 
+tack construction in a single, modular framework. Our approach 
+generates detailed attack graphs from low-level events but also fa- 
+cilitates linking and contextualization to existing high-level, tacti- 
+cal attack patterns such as MITRE ATT&CK TTPs. 
+Graph Queries A number of research efforts resulted in query- 
+based and graph-matching approaches to detect and construct 
+attack scenario graphs from historical audit log data stored in 
+databases. AIQL ( Gao et al., 2018b ) introduced a domain-speciﬁc 
+model and query language to analyze and investigate attacks. SAQL 
+( Gao et al., 2018a ) extends AIQL for stream-based querying over 
+system monitoring data. POIROT ( Milajerdi et al., 2019a ) proposed 
+an attack graph detection approach based on manually extracted 
+graph patterns from previously seen attacks, e.g., in threat intel- 
+ligence reports. In our approach, we rely on a semantic model, 
+which facilitates graph matching through semantic graph queries 
+(formulated in SPARQL). Furthermore, our RDF-based provenance 
+graph can be easily queried and linked to internal and external 
+background knowledge through SPARQL query federation. 
+Ontology-based Threat Detection A number of research ef- 
+forts investigated ontologies to support cybersecurity and threat 
+detection. Early work ( Pinkston et al., 2003 ) developed an on- 
+tology for the intrusion detection domain based on DAML+OIL 
+( Mcguinness et al., 2002 ) to extend simple IDS taxonomies with 
+machine-interpretable deﬁnitions. Ref. More et al. (2012) extended 
+this IDS Ontology to incorporate cybersecurity-related information 
+from heterogeneous resource (e.g., web texts, reports). 
+Uniﬁe Cybersecurity Ontology (UCO) ( Syed et al., 2016 ) in- 
+troduced a more instance-data driven approach to construct a 
+rich cybersecurity ontology by integrating cybersecurity standards 
+such as STIX (2021) , CyBox (2021) , CVE (2021) , CAPEC (2021) , 
+CVSS (2021a) , and CVSS (2021b) . UCO provides integration from 
+heterogeneous sources and supports reasoning (e.g. using prede- 
+ﬁned rules to infer attacks). However, UCO and other previously 
+proposed ontologies were designed to support intrusion detection 
+rather than attack graph construction. More recent works such as 
+Kenaza and Aiash (2016) proposed an ontology that supports IDS 
+alert correlation. Through the use of reasoning rules, it can infer 
+and classify IDS alerts (i.e., false alert, unclassiﬁed, plausible at- 
+tack) based on existing vulnerability information. As the focus is 
+solely on attack detection, however, this proposed approach does 
+not result in attack graphs. 
+In prior work, we proposed a modular ontology ( Ekelhart et al., 
+2018 ) that can harmonize and integrate heterogeneous log 
+sources (e.g., Syslog, Auth log, Apache log). Subsequent work 
+( Kiesling et al., 2019 ) facilitates forensic analyses of arbitrary 
+logs and contextualizes them with external background knowl- 
+edge (e.g. CPE, CVE, CVSS, CWE, and CAPEC) in a federated settings 
+( SPARQL, 2021 ). SLOGERT ( Ekelhart et al., 2021 ) extends this pre- 
+vious work with the ability to construct knowledge graphs auto- 
+matically from arbitrary raw log messages. It identiﬁes, links, and 
+enriches entities in log sources with background knowledge. In this 
+work, we extend and enhance our previous work on security on- 
+tologies to integrate events from heterogeneous log sources, repre- 
+sent them in attack scenario graphs, and link them to background 
+knowledge. 
+3. Background 
+In this section, we introduce knowledge graphs as a conceptual 
+foundation of our approach. 
+Knowledge Graph A knowledge graph is a directed, labeled 
+graph G = (V, E) where V is a set of vertices (nodes) and E is a 
+set of edges (properties). A single graph is usually represented as 
+a collection of triples T = < s p o > where s is a subject , p is a 
+predicate , and o is an object . 
+RDF, RDF-S, OWL Resource Description Framework (RDF) is a 
+W3C 5 standard data model to represent knowledge graphs. In RDF, 
+a subject is a resource identiﬁed by a unique identiﬁer (URI) or a 
+blank-node, an object can be both resource, blank-node or literal 
+(e.g. String, number), and predicate is a property deﬁned in an on- 
+tology and must be a URI. RDF-S (Resource Description Framework 
+Schema) 6 is a W3C standard data model for knowledge representa- 
+tion. It extends the basic RDF vocabulary with a set of classes and 
+RDFS entailment (inference patterns). 7 OWL (Ontology Web Lan- 
+guage) 8 is also a W3C standard for authoring ontologies. We use 
+RDF-S and OWL to represent our system-call provenance ontology. 
+We discuss this in more detail in Section 5.2 . 
+Semantic Reasoning One of the central ideas of both OWL and 
+RDF-S is that they enable reasoning over a knowledge graph. This 
+is an important aspect and enables us to automatically infer new 
+knowledge based on existing facts (entities and their relationships). 
+We leverage several built-in RDF-S and OWL reasoning rules in 
+our approach as discussed in Section 5.3 , which are based on the 
+foundation of description logics ( Horrocks, 2005 ). Furthermore, in 
+our approach, semantic reasoning is used to simplify RDF map- 
+pings during the provenance graph building process (discussed in 
+more detail in Section 6.1 ) and to reduce the query complexity, e.g., 
+for attack reconstruction i.e. backward-forward chaining mechanism 
+(discussed in Section 6.3 ). 
+SPARQL SPARQL 9 is a W3C query language to retrieve and ma- 
+nipulate data stored in RDF. It offers rich expressivity for com- 
+plex queries such as aggregation, subqueries, and negation. Fur- 
+thermore, SPARQL provides capabilities to express queries across 
+multiple distributed data sources through SPARQL query federa- 
+5 https://www.w3.org/standards 
+6 https://www.w3.org/TR/rdf-schema/ 
+7 https://www.w3.org/TR/rdf11-mt/ 
+8 https://www.w3.org/TR/owl2-overview/ 
+9 https://www.w3.org/TR/sparql11-overview/ 
+4

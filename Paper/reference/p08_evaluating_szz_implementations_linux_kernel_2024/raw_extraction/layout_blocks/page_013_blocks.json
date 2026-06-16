@@ -1,0 +1,197 @@
+[
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2231",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:002",
+    "block_type": "text",
+    "text": "TABLE VIII\nINDEPENDENT T-TEST RESULTS COMPARING TC-SZZ WITH\nOTHER SZZ ALGORITHMS IN TERMS OF RECALL,\nINCLUDING EFFECT SIZES",
+    "bbox": [
+      65.82,
+      65.58,
+      260.41,
+      101.37
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:003",
+    "block_type": "text",
+    "text": "Comparison\nT-Statistic\nP-Value\nEffect Size",
+    "bbox": [
+      61.01,
+      113.22,
+      265.23,
+      122.12
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:004",
+    "block_type": "text",
+    "text": "TC-SZZ vs B-SZZ\n10.3439\n< 0.0001\n4.876\nTC-SZZ vs AG-SZZ\n15.5688\n< 0.0001\n7.339\nTC-SZZ vs L-SZZ\n47.7760\n< 0.0001\n22.522\nTC-SZZ vs MA-SZZ\n18.6914\n< 0.0001\n8.811\nTC-SZZ vs PD-SZZ\n18.4269\n< 0.0001\n8.687\nTC-SZZ vs R-SZZ\n30.8874\n< 0.0001\n14.560",
+    "bbox": [
+      61.01,
+      127.39,
+      258.31,
+      181.38
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:005",
+    "block_type": "text",
+    "text": "in recall between TC-SZZ and other SZZ algorithms, with all\np-values signiﬁcantly less than 0.05. Furthermore, we calcu-\nlated the effect size using Cohen’s d [54], as reported in the\nfourth column of Table VIII. The effect sizes are notably large\nacross all comparisons—with Cohen’s d values exceeding 2.0—\nsignifying substantial differences in recall between TC-SZZ and\nthe other SZZ algorithms. Our analysis reveals that there is a\nsigniﬁcant difference every year between the performance of\nTC-SZZ and the other SZZ variants.\nGiven that TC-SZZ can resolve 17.7% of failure cases, we\ncheck whether we can pinpoint even more bug-inducing com-\nmits by using a TC-SZZ-like approach. We apply git log to\nall ﬁles affected by the bug-ﬁxing commit, and then apply\ngit log -L to all code lines within the function containing the\ndeleted/modiﬁed lines from the bug-ﬁxing commit.\nWe further deﬁne three new types of failure cases:\n(1) Function-Log Detection: This refers to situations where the\nbug-inducing commit is located in the history of the function\ncontaining deleted code, as identiﬁed using the command git log\n-L. For instance, in the bug-ﬁxing commit cbcf099,14 two lines\nwere deleted and two lines were added. Despite this, neither the\nSZZ algorithm (B-SZZ) nor the use of git blame on all of the\nlines in the function that contains the deleted line can identify\nthe bug-inducing commit. However, by applying git log -L to\nall of the lines in the function that contains the deleted lines,\nwe are able to successfully identify the bug-inducing commit.\n(2) Within-File Detection: This term refers to the identiﬁcation\nof bug-inducing commits within the history of a speciﬁc ﬁle,\nparticularly the one that was modiﬁed in a bug-ﬁxing commit\nwhere lines of code were deleted. For example, in commit\nd53c51f,15 methods like the SZZ algorithm and the use of git\nlog -L on the function that contains the deleted lines can not\nidentify the bug-inducing commit. Speciﬁcally, the line of code\nintroduced by the bug-inducing commit is not the same as the\none modiﬁed in the bug-ﬁxing commit, although they are in the\nsame ﬁle. In contrast, by applying git log to the entire ﬁle that\nencompasses these deleted lines, we can successfully uncover\nthe bug-inducing commit.\n(3) Cross-File\nDetection: This term describes instances\nwhere the ﬁles are not shared between the bug-inducing",
+    "bbox": [
+      37.58,
+      211.24,
+      288.65,
+      688.61
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:006",
+    "block_type": "text",
+    "text": "14https://github.com/torvalds/linux/commit/cbcf0999ae33e7a8e1dba7ca9355\n56634f679ccf\n15https://github.com/torvalds/linux/commit/d53c51f26145657aa7c55fa396f9\n3677e613548d",
+    "bbox": [
+      37.58,
+      706.25,
+      290.85,
+      743.96
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:007",
+    "block_type": "text",
+    "text": "and bug-ﬁxing commits. Speciﬁcally, the bug-inducing com-\nmit cannot be located within the same ﬁle as the deleted\ncode when using the git log -L command. As a result,\nsince the ﬁles between bug-inducing and bug-ﬁxing com-\nmits are not shared (as required by SZZ), it is challeng-\ning to reach such bug-inducing commits given the bug-ﬁxing\ncommits. For example, in the bug-ﬁxing commit d15d731,16",
+    "bbox": [
+      300.6,
+      63.79,
+      551.66,
+      146.64
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:008",
+    "block_type": "text",
+    "text": "all modiﬁcations (both additions and deletions) occur in the\nﬁle “drivers/base/ﬁrmware_loader/main.c”. However, the bug-\ninducing commit f531f0517 only modiﬁes the ﬁle “driver-\ns/base/ﬁrmware_class.c”. This discrepancy prevents the SZZ\nalgorithm from identifying the bug-inducing commit. As a re-\nsult, we introduce a new category of Mapping Ghosts known as\n“Cross-File Mapping Ghosts” to capture these scenarios where\nthe bug-inducing changes are not found in the same ﬁle as the\nbug-ﬁxing changes.\nThe results in Table VII reveal that out of the remaining\n14,437 failure cases, 4,994 (34.6%) are Function-Log De-\ntection, 3,965 (27.5%) are Within-File Detection, and 5,478\n(37.9%) are Cross-File Detection. Note that the category\nWithin-File Detection comprises only cases that are in the ﬁle\nhistory but are not in the function history. For the 37.9% of\nfailure cases that are not present in the ﬁle history, unless the\nbug-ﬁxing commit explicitly mention the bug-inducing com-\nmits or specify a particular ﬁle, it becomes challenging for a\nresearcher without domain expertise to correctly identify the\nbug-inducing commits. This task becomes even more difﬁcult\nfor an automated approach.",
+    "bbox": [
+      300.6,
+      147.48,
+      551.67,
+      397.7
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:009",
+    "block_type": "text",
+    "text": "RQ3 Findings: Our ﬁndings show that our pro-\nposed TC-SZZ can successfully address 17.7% of\nfailure cases. 5,478 of 14,437 (37.9%) failure cases\nhave bug-inducing commits that are not in the ﬁle\nhistory, making them hard to resolve.",
+    "bbox": [
+      316.19,
+      412.46,
+      536.07,
+      471.78
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:010",
+    "block_type": "text",
+    "text": "VII. CLASSICAL MEETS MODERN: ENHANCING\nSZZ WITH CHATGPT",
+    "bbox": [
+      330.86,
+      490.35,
+      521.4,
+      513.43
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:011",
+    "block_type": "text",
+    "text": "In this section, we attempt to address three types of failure\nsituations (i.e., Function-Log Detection, Within-File Detection,\nand Cross-File Detection) utilizing ChatGPT, based on the GPT-\n4 version, which is one of the most sophisticated Large Lan-\nguage Models (LLMs) currently available.\nGiven that ChatGPT is adept at addressing Software Engi-\nneering tasks [31], [32], we aim to investigate whether it can\nassist researchers or developers in more effectively identifying\nbug-inducing commits. We interacted with GPT-4 through web\nchat using the default settings. OpenAI does not release the\nspeciﬁc settings it employs for the web chat. Both the prompt\nand the corresponding results from ChatGPT are available in the\nreplication package. We conducted the experiment from June\n28th to July 4th, 2023 and from November 30th, 2023 to Jan\n3rd, 2024.",
+    "bbox": [
+      300.6,
+      520.24,
+      551.72,
+      698.73
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:012",
+    "block_type": "text",
+    "text": "16https://github.com/torvalds/linux/commit/d15d7311550983be97dca44ad68\ncbc2ca001297b\n17https://github.com/torvalds/linux/commit/f531f05ae9437df5ba1ebd90017e\n4dd5526048e9",
+    "bbox": [
+      300.6,
+      706.25,
+      553.9,
+      743.96
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:013:013",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

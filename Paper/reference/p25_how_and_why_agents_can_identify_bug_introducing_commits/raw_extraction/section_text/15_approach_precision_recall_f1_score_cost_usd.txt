@@ -1,0 +1,18 @@
+Approach Precision Recall F1-Score Cost (USD)
+Stage 1 Only 0.48 0.47 0.48$0.18
+Stage 2 Only 0.77 0.76 0.76 $1.20
+SZZ-Agent 0.81 0.80 0.81 $0.67
+not meaningfully improve its F1-score (0.64→0.61 →0.65). In con-
+trast, SZZ-Agent with the same Claude Opus 4.5 backbone achieves
+0.77. This demonstrates that SZZ-Agent’s advantage stems from its
+agentic approach rather than from using a better LLM.
+Finding 1:SZZ-Agent outperforms all previous approaches by at
+least 12 percentage points in F1-score on three established datasets
+(RQ1). This improvement cannot be explained by data leakage
+(RQ2a) or by the use of a more capable LLM backbone (RQ2b), but
+stems from the agentic approach itself.
+3.3.4 RQ2c: Context Ablation.We investigate which contextual in-
+formation enables SZZ-Agent to identify bug-introducing commits.
+Setup.We ablate the fix commit message and the fix commit diff by
+selectively withholding them from the agent. We run all variants
+on DS_LINUX-26 with Claude Opus 4.5.

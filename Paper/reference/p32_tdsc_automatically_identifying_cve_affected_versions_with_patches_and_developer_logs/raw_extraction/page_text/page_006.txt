@@ -1,0 +1,114 @@
+910 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+version V i.j.U in each version branch,R3 is to ﬁnd theactual
+last versionV upto of the entire version tree, which could be later
+than theupto version reported in NVD.
+Generally, there are one or more patches to ﬁx a CVE. In
+most cases, a CVE-ID corresponds to one git log, and a git log
+is identiﬁed by a commit-id. But sometimes there are more than
+one commit-id to ﬁx a CVE when there are several patches for
+the CVE. As long as the changed code (vulnerability ﬁxes, bug
+ﬁxes, etc.) is submitted, git logs will be created. Therefore, each
+patched version is uniquely identiﬁed by a commit-id or several
+commit-ids. We ﬁrst obtain the commit-ids corresponding to
+the CVE-ID, and then explore the changelog information. A
+changelog corresponds to the release of a new version, and it
+records all modiﬁcations to the previous version. Therefore,
+a changelog typically records many different git logs, so it is
+shorthand format for git logs. Although each change log is not
+completely consistent with the writing structure of a git log,
+there is no difference in key content information such as the
+commit-ids. If all commit-ids of a CVE are included in the
+changelog, it indicates that the CVE vulnerability has been
+patched in the current version. Thus, we use the commit-ids
+located by CVE-ID to traverse all changelogs available to obtain
+the committed (i.e., patched) version set. We regard them as the
+known patched versions.
+As a running example, let us assume the three versions in
+green dashed circles in Fig.4 form the committed version set of
+this CVE-ID, in whichV3.0.6 and V4.0.4 are the minimum and
+maximum committed version, respectively. However, not every
+branch corresponds to a committed version, and the reason will
+be introduced in SectionIV-C.
+B. Determine the Last Vulnerable V ersion of CVE-ID (R1)
+As the maximum committed version recorded by the changel-
+ogs, canV4.0.4 be used asVu p t oof this CVE-ID? Is the same
+vulnerability deﬁnitely gone afterV4.0.4? The answer isno.
+In this section, We will combine developer logs and patches to
+determine Vu p t o. To make it easier to understand, we ﬁrst give
+two examples to illustrate the problem. During our research, we
+ﬁnd an interesting phenomenon: starting from a certain version
+after the maximum committed version, the code may be restored
+to its previous unpatched state. Let us take CVE-2014-9715 as an
+example. The reason for its existence is that insufﬁciently large
+data type was used for certain extension data, which allows local
+users to cause a denial of service. From changelogs, we know that
+its maximum committed version isV3.14.5. However, we ﬁnd that
+starting fromV4.12, the code returned to the original unpatched
+state. According to the git log of CVE-2014-9715, this patch
+solves thedenial of servicevulnerability by reducing the size of
+the “ecache extension”. However,in its git log, the committers
+regarded that the previous patch released three years ago did not
+ﬁx this vulnerability well. Therefore, they restored the code to its
+unpatched state, and put forward the method of “compile-time
+assertion” to repatch the vulnerability. This illustrates the case
+that although the code is unpatched, the vulnerability corre-
+sponding to this CVE-ID no longer exists. In another example
+with CVE-2015-8558, unpatched code also reappeared in the
+version after the maximum committed version. Similarly, from
+the description of the log information, the developers said that
+they used a new approach to patch the previous vulnerability,
+different from the ﬁrst patch.
+Patches are developed and used to ﬁx bugs. However,
+some patches are correct but do not perform as good as ex-
+pected(correct but not good), or do not ﬁx the bugs com-
+pletely(incomplete), or introduce new bugs(wrong). Conse-
+quently, the earlier committed patches may be totally unpatched
+or patially unptached, and then newer patches are commited
+(“repatch”). According to our study, the repathes is an inevitable
+issues through all versions of Linux Kernel and the number of
+repatches is signiﬁcant. In order to achieve high precision of
+identifying the affected versions, it is important to consider the
+phenomenon, otherwise, the errors are non-negligible and not
+acceptable. Our tool is based on the assumption of correctness
+of patches, so that we only consider repatches that the earlier
+patches are correct, then unpatched totally or partially, ﬁnnaly
+repatched with better patches. We do not consider wrong or
+incomplete patches.
+For a given CVE-ID, patch-based detection[19], [20] will
+mistake the above repatch cases as “vulnerability reappearance”,
+so how do we verify whether the unpatched code has a real
+vulnerability? We already know that the information in the
+changelog is sometimes incomplete, so it is not enough to rely
+only on it. For example, for CVE-2018-21008, the NVD report
+shows that the last vulnerable version is 4.16.6, and the maxi-
+mum committed version based on the changelogs is 4.14.166,
+but there are still unpatched versions after 4.16.6. Our solution is
+to use both the patches and developer logs to accurately identify
+the unpatched code. In the case of repatch, our research found
+that it always includes the following two operations in the git
+log: (1) unpatch, consisting of complete unpatch and partial
+unpatch. Complete unpatch restores the previous unpatched state
+and changing the ‘-’ in diff hunk to ‘+’ and ‘+’ to ‘-’, which is
+an inverse process of patching. Patial unpatch is a partial inverse
+process of patching. It is similar to complete unpatch except that
+it only includes part of the diff hunk. (2)repatch, applying a new
+patch to the unpatched code.
+We cannot easily locate the diff hunks of repatched code
+through a CVE because a repatch is not released as a new
+CVE. Fortunately, the git log of a repatch clearly and accurately
+describes which previous patch(es) is(are) replaced by including
+the commmit-id of the previous git log in the title or the text
+body of the new git log for the repatch. We notice that the two
+operations of repatch,unpatch and repatch, may be carried out
+in one commit, resulting in a single git log. Compared with a
+previous patch, the location of a repatch may be the same code
+block in the same ﬁle, such as the repatch of CVE-2017-7477.
+It can also ﬁx code blocks in different locations of the same ﬁle,
+such as the repatch of CVE-2018-5873. It may also ﬁx code
+blocks in different ﬁles, such as the repatch of CVE-2014-9715.
+The two operations of repatch may also be carried out in two
+separate commits, resulting in two different git logs. The git
+log for the repatch operation can be located in the same git
+log list indexed by the same vulnerable ﬁle, the author, or the
+committer of the patch. Again, we can get the diff hunks of
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

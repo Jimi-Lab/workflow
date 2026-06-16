@@ -1,0 +1,17 @@
+Results.Table 5 shows the results. Stage 1 alone achieves only 0.48
+F1-score at $0.18 per fix commit, while Stage 2 alone reaches 0.76 at
+$1.20. The combined pipeline achieves the best F1-score of 0.81 at
+$0.67, demonstrating that both stages are complementary: Stage 1
+cheaply resolves straightforward cases, reducing the number of
+entries that require the more expensive Stage 2.
+Finding 3:Stage 1 and Stage 2 are complementary. Stage 1
+cheaply resolves straightforward cases, while Stage 2 handles the
+remaining difficult cases. Their combination achieves the best
+F1-score at moderate cost.
+3.3.6 RQ2e: Commit Selection Threshold.We investigate how the
+commit selection threshold—the number of remaining candidates
+at which Stage 2 switches from binary search to direct selection—
+affects performance and cost.
+Setup.We vary the threshold across values of 8, 32, 128, 512, and
+∞(no binary search, always direct selection). All experiments use
+DS_LINUX-26 with Claude Opus 4.5.

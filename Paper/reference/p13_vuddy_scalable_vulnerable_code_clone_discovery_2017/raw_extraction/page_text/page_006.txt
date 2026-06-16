@@ -1,0 +1,127 @@
+Level 0: No abstraction.
+1 void avg (float arr[], int len){
+2 static float sum = 0;
+3 unsigned int i;
+4 for (i = 0; i < len; i++);
+5 sum += arr[i];
+6 printf("%f %d",sum/len,validate(sum));
+7 }
+Level 1: Formal parameter abstraction.
+1 void avg (floatFPARAM[], intFPARAM) {
+2 static float sum = 0;
+3 unsigned int i;
+4 f o r( i=0 ;i< FPARAM; i++)
+5 sum += FPARAM[i];
+6 printf("%f %d",sum/FPARAM,validate(sum);
+7 }
+Level 2: Local variable name abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 static floatLVAR = 0;
+3 unsigned intLVAR;
+4 for (LVAR = 0; LVAR < FPARAM;LVAR++)
+5 LVAR += FPARAM[LVAR];
+6 printf("%f %d",LVAR/FPARAM,validate(LVAR));
+7 }
+Level 3: Data type abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 DTYPE LVAR = 0;
+3 unsigned DTYPE LVAR;
+4 for (LVAR = 0; LVAR < FPARAM; LVAR++)
+5 LVAR += FPARAM[LVAR];
+6 printf("%f %d",LVAR/FPARAM,validate(LVAR));
+7 }
+Level 4: Function call abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 DTYPE LVAR = 0;
+3 unsigned DTYPE LVAR;
+4 for (LVAR = 0; LVAR < FPARAM; LVAR)
+5 LVAR += FPARAM[LVAR];
+6 FUNCCALL("%f %d",LVAR/FPARAM,FUNCCALL(LVAR));
+7 }
+Fig. 2: Level-by-level application of abstraction schemes on a
+sample function.
+2-tuple. The length of the normalized function body string
+becomes one element, and the hash value of the string becomes
+the other. Fig. 3 shows the ﬁngerprinting of example functions.
+After ﬁngerprinting, VUDDY stores the tuples in a dictio-
+nary that maps keys to values, where the length values (i.e.,
+the ﬁrst element of a tuple) are keys, and the hash values that
+share the same key are mapped to each key. Fig. 4 shows how
+the example functions of Fig. 3 are classiﬁed and stored in a
+dictionary.
+In the dictionary shown in Fig. 4, the two functions in Fig. 3
+(sumand increment) are classiﬁed under the same integer
+key, because the length of their abstracted and normalized
+bodies are identical as 20. The ﬁngerprint of the other function
+(printer) is assigned to another key, 23, in the dictionary. In
+practice, we ignore functions of which the lengths are shorter
+than 50, to prevent VUDDY from identifying short functions
+as clones. Intuitively, short functions are hardly vulnerable by
+themselves. Further discussion on a proper threshold setting
+is provided in subsection V-A.
+B. Clone detection
+VUDDY detects code clones between two programs, by
+performing at most two membership tests for each prepro-
+Original: int sum (int a, int b){
+returna+b ;
+}
+Preprocessed: returnfparam+fparam;
+Length: 20
+Hash value: c94d99100e084297ddbf383830f655d1
+Fingerprint: {20, c94d99100e084297ddbf383830f655d1}
+Original: void increment (){
+int num = 80;
+num++; /* no return val*/
+}
+Preprocessed: dtypelvar=80;lvar++;
+Length: 20
+Hash value: d6e77882a5c55c67f45f5fd84e1d616b
+Fingerprint: {20, d6e77882a5c55c67f45f5fd84e1d616b}
+Original: void printer (char* src) {
+printf("%s", src);
+}
+Preprocessed: funccall("%s",fparam);
+Length: 23
+Hash value: 9a45e4a15c928699afe867e97fe839d0
+Fingerprint: {23, 9a45e4a15c928699afe867e97fe839d0}
+Fig. 3: Example functions and corresponding ﬁngerprints.
+20: {
+‘c94d99100e084297ddbf383830f655d1’,
+‘d6e77882a5c55c67f45f5fd84e1d616b’
+}
+23: {
+‘9a45e4a15c928699afe867e97fe839d0’
+}
+Fig. 4: A dictionary that stores the ﬁngerprints of the example
+functions. A set containing two hash values is mapped to the
+key 20, which is the length value, and another set is mapped
+to the key 23.
+cessed, length-classiﬁed ﬁngerprint dictionary: a key lookup,
+and a subsequent hash lookup. This approach is based on the
+fact that two identical functions are required to have the same
+lengths after abstraction and normalization, even if variables
+are renamed and comments are changed.
+S4. Key lookup: VUDDY performs the ﬁrst membership
+testing, by iterating over every key in a source dictionary, and
+looking for the existence of the key (i.e., the length of the
+preprocessed function) in the target ﬁngerprint dictionary. If
+the key lookup fails, then VUDDY concludes that there is no
+clone in the target program. If it succeeds to ﬁnd the existence
+of the same integer key, then it proceeds to the next substep:
+Hash lookup.
+S5. Hash lookup: As a last substep of clone detection,
+VUDDY searches for the presence of the hash value in the
+set mapped to the integer key. If the hash value is discovered,
+then the function is considered to be a clone.
+For example, when comparing dictionary A and B, VUDDY
+iterates S4 over every key in dictionary A, searching for the
+key in dictionary B. For each key shared by dictionary A and
+B, VUDDY performs S5 to retrieve all shared hash values,
+which are the clones we are looking for.
+This design of VUDDY accelerates the process of clone
+searching by taking advantage of the following two facts:
+1) The time complexity of an operation that checks the
+existence of a value from a set of unique elements is
+O(1) on average, andO(n) in the worst case.
+600
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

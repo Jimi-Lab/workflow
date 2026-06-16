@@ -1,0 +1,26 @@
+Paper ID: p11_vccfinder_finding_potential_vulnerabilities_in_open_source_projects_to_assist_code_audits_2015
+Title: VCCFinder: Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder：Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+System Overview: VCCFinder builds a vulnerable commit database and learns a classifier over heterogeneous code/repository features to prioritize audit targets.
+Pipeline Stages:
+1. Select GitHub C/C++ projects and collect CVEs/fixing commits.
+2. Use a blame heuristic to map fixing commits to VCCs.
+3. Extract project/author/commit/file/function/text features.
+4. Convert heterogeneous features into a generalized bag-of-words representation.
+5. Train a linear SVM classifier.
+6. Use classifier scores/explanations to prioritize commits for audit.
+Core Algorithm: The paper's VCC heuristic ignores documentation, blames deleted lines, blames neighbors around inserted blocks, then marks the most-blamed commit(s) as vulnerable-contributing.
+Data Structures: CVE/commit/repository database tables are mentioned by the paper, but local dump/database is absent. [NEEDS ARTIFACT]
+Model / Agent Components: linear SVM; no LLM/agent component.
+Design Choices: temporal split for realistic evaluation, generalized bag-of-words for heterogeneous features, linear SVM for scalability/explainability.
+Why Each Choice Is Needed: Heterogeneous metadata/code features need one representation; audit teams need interpretable ranking, not opaque binary alerts.
+Failure Handling: Label noise from blame heuristic and unknown vulnerability labels are explicitly discussed as limitations.
+Complexity / Cost Discussion: The paper emphasizes scalability to large repositories, but runtime reproduction is not checked. [EXECUTION NOT REQUESTED]
+Pseudocode or Algorithm Blocks: no formal pseudocode block was extracted; heuristic is textual. [NEEDS EVIDENCE]
+Static Reproducibility Signals: local source has 1_vccfinder.py, abstract_szz.py, comment_parser.py, 2_gen_vuln_version.py, config.py; source_static_symbols.json confirms VCCFinder, patchCommit, AbstractSZZ, BlameData, GitLog symbols.
+Agent Evidence Anchors: raw_extraction/section_text/04_methodology.txt; raw_extraction/section_text/05_learning_based_detection.txt; raw_extraction/source_static_inventory.txt.
+Writing Pattern: Put data construction before model design; make label-generation uncertainty explicit before evaluation.

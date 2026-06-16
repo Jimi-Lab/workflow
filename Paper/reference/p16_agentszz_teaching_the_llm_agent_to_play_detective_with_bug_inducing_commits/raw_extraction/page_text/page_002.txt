@@ -1,0 +1,112 @@
+Preprint, Under Submission, Arxiv Lyu et al.
+Agent-based approaches are a natural fit for this problem, as
+they can simulate developers’ dynamic and interactive investiga-
+tion processes, enabling models to actively explore repositories and
+follow information scents [47, 49, 50]. However,they are not a sil-
+ver bullet. Our exploration with mini-SWE-Agent [47], a powerful
+SWE agent with flexible bash interaction, shows poor performance.
+Several challenges remain: ❶ agents struggle with tool selection, ❷
+actions lack domain-specific guidance, and ❸ tool outputs can be
+large, leading to excessive token consumption, increased latency,
+and noisy context that may hinder reasoning.
+To address these challenges, we proposeAgentSZZ, as shown
+in Figure 1, an agent-based framework that uses LLM-driven agents
+to interact with repositories and identify bug-inducing commits
+akin to a detective. Unlike prior approaches that rely primarily
+ongit blame,AgentSZZinteracts with repositories through five
+task-specific tools designed for bug-inducing commit identifica-
+tion. Given a fix commit, it iteratively explores the repository via
+a ReAct-style loop [48], using GPT-5-mini as the backbone model
+with a maximum of 15 interaction turns, leveraging these tools and
+domain knowledge to trace causal evidence. A structured compres-
+sion module further improves efficiency by reducing redundant
+and noisy context while preserving key information.
+The evaluation results on three widely used datasets show that
+AgentSZZconsistently outperforms SOTA SZZ algorithms across
+all settings.AgentSZZachieves substantial gains, improving F1-
+score by up to 27.2% over prior SOTA LLM4SZZ, and maintains
+strong performance even under the same backbone model, indi-
+cating that the improvements stem from the agent design rather
+than the choice of LLM. These gains are especially pronounced in
+challenging scenarios such as cross-file and ghost commits, where
+recall improves by up to 300% and 60%, respectively, highlighting
+the ability ofAgentSZZto improve the fundamental limitations
+of blame-based methods. Ablation studies further reveal that task-
+specific tools and domain knowledge are central to performance,
+while the compression module significantly improves efficiency by
+reducing token consumption by over 30% with negligible impact.
+AgentSZZalso generalizes well across datasets and programming
+languages without dataset-specific tuning.
+In summary, we make the following contributions: (1) We pro-
+poseAgentSZZ, an agent-based framework that leverages LLM-
+based agents to interact with repositories and identify bug-inducing
+commits, enablingadaptive and causal tracingbeyond the limi-
+tations of existing SZZ algorithms. (2) We design five task-specific
+tools, encode domain knowledge, and introduce a structured com-
+pression module to improve the agent’s reasoning capability and
+efficiency in repository exploration. (3) We conduct extensive ex-
+periments on three widely used datasets, showing thatAgentSZZ
+significantly outperforms SOTA SZZ algorithms, particularly in
+challenging scenarios such as ghost commits and cross-file cases.
+(4) We provide a replication package including code and data.
+The remainder of this paper is organized as follows. Section 2
+provides background on SZZ algorithms and LLM-based agents for
+software engineering. Section 3 presents the design ofAgentSZZ,
+Section 5 describes the experimental setup, and Section 5 reports the
+evaluation results. Section 6 offers further analysis and discussion,
+and Section 7 concludes the paper.
+2 Background and Related Work
+2.1 SZZ Algorithms
+The SZZ algorithm [33] is the foundational approach for automated
+BIC identification. Given a bug-fixing commit, it traces deleted or
+modified lines back to the commits that last touched them, treating
+those commits as BIC candidates. The original implementation
+operates on CVS repositories using the annotate command; modern
+implementations adapt this principle to Git viagit blame. While
+conceptually simple, the algorithm suffers from false positives, as
+not all changes to the fixed lines are semantically meaningful.
+A series of refinements have been proposed to address these
+limitations. AG-SZZ [18] filters cosmetic changes such as blank
+lines and comments, and introduces annotation graphs to track
+line origins more precisely across revisions. MA-SZZ [10] extends
+this by excluding meta-changes (e.g., branch merges and property
+changes) that do not alter program behavior. RA-SZZ [24] further
+detects and filters refactoring operations using RefDiff [ 32] and
+Refactoring Miner [38], though this capability is limited to Java.
+When multiple candidates remain, R-SZZ and L-SZZ [ 12] apply
+simple heuristics, selecting the most recent commit or the one with
+the most changed lines, respectively.
+More recent work shifts from heuristic filtering to learned or
+model-based ranking. Neural-SZZ [35] embeds changed lines using
+CodeBERT [14] and ranks candidates via a heterogeneous graph
+attention network, capturing semantic relationships beyond rule-
+based methods. LLM4SZZ [ 36] further leverages LLMs to assess
+blame candidates with expanded context, achieving state-of-the-art
+results across multiple datasets. However, it still operates as a static
+pipeline without iterative investigation.
+2.2 LLM-Based Agents for Software Engineering
+The application of LLMs in SE has evolved from static, single-turn
+code generation to dynamic, autonomous agents [16, 21]. Unlike tra-
+ditional LLM applications that rely solely on internal model weights,
+LLM-based agents are augmented with reasoning frameworks (e.g.,
+ReAct [48]), memory mechanisms, and the ability to interact with
+external environments via tools [43]. This evolution enables agents
+to tackle complex SE tasks across the Software Development Life
+Cycle, shifting from snippet-level synthesis to repository-level rea-
+soning and maintenance [21].
+Recent work on agents designed to navigate large codebases
+and resolve real-world issues, as exemplified by SWE-bench [17].
+Systems such as Devin [9] and OpenHands [41] demonstrate end-to-
+end patch generation, while SWE-agent [47] introduces an Agent-
+Computer Interface (ACI) to bridge LLMs and terminal environ-
+ments by structuring tool interactions. Lightweight variants such as
+mini-SWE-agent (a lightweight variant of SWE-agent) [47] demon-
+strate that minimal bash-based agents can achieve competitive
+performance. Other approaches enhance repository interaction
+through structured search or execution mechanisms, including
+AST-based navigation (AutoCodeRover [50]) and executable action
+spaces (CodeAct [40]). In contrast, pipeline-based methods such as
+Agentless [44] simplify execution by replacing autonomous plan-
+ning with a fixed pipeline. Despite these advances, existing agents
+either rely on general-purpose exploration (e.g., bash-based inter-
+action) or predefined pipelines, lacking task-specific tool design

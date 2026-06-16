@@ -1,0 +1,129 @@
+[73] (2025) APT38: Details on north korea’s cyber heist group.
+Mandiant. [Online]. Available: https://www.mandiant.com/sites/default/
+ﬁles/2021-09/rpt-apt38-2018-web v5-1.pdf
+[74] (2025) Lazarus killdisk malware targets central american casino. ESET
+WeLiveSecurity. [Online]. Available: https://www.welivesecurity.com/
+2018/04/03/lazarus-killdisk-central-american-casino/
+[75] (2025) SMET: A Benchmark Suite for Security-focused Language
+Model Evaluation. GitHub. [Online]. Available: https://github.com/
+basel-a/SMET
+[76] (2025) LADDER: Language models for adversarial and defensive
+cybersecurity research (github repository). AIforSec on GitHub.
+[Online]. Available: https://github.com/aiforsec/LADDER
+[77] (2025) Knowledge-Enhanced Attack Graph (GitHub Repository).
+Li Zhenyuan on GitHub. [Online]. Available: https://github.com/
+li-zhenyuan/Knowledge-enhanced-Attack-Graph
+[78] (2020) Druva inSync Windows Client 6.6.3 - Local Privilege
+Escalation (PowerShell). Exploit Database. [Online]. Available: https:
+//www.exploit-db.com/exploits/49211
+[79] (2020) Druva inSync Windows Client 6.6.3 - Local Privilege Escalation.
+Exploit Database. [Online]. Available: https://www.exploit-db.com/
+exploits/48505
+[80] (2020) CVE-2020-5752. NIST. [Online]. Available: https://nvd.nist.gov/
+vuln/detail/cve-2020-5752
+[81] (2025) MITRE Cyber Analytics Repository. MITRE. [Online].
+Available: https://car.mitre.org/coverage/
+[82] (2025) Sigma rules for t1059. MITRE. [Online]. Avail-
+able: https://github.com/search?q=repo%3ASigmaHQ%2Fsigma+attack.
+t1059&type=code
+[83] (2025) Sigma Rule: Potential CommandLine Path Traversal Via
+Cmd.EXE. MITRE. [Online]. Available: https://github.com/SigmaHQ/
+sigma/blob/master/rules/windows/process
+creation/proc creation win
+susp commandline path traversal evasion.yml
+[84] (2022) APT42: Crooked Charms, Cons, and Compromises. Google
+Mandiant. [Online]. Available: https://services.google.com/fh/ﬁles/misc/
+apt42-crooked-charms-cons-and-compromises.pdf
+[85] O. Rozmann, A. Koksal, A. Hernandez, S. Bock, and J. Leathery.
+(2024) Uncharmed: Untangling Iran’s APT42 Operations. Google
+Mandiant. [Online]. Available: https://cloud.google.com/blog/topics/
+threat-intelligence/untangling-iran-apt42-operations
+[86] (2024) Iranian backed group steps up phishing cam-
+paigns against Israel, U.S. Google Threat Analysis
+Group. [Online]. Available: https://blog.google/threat-analysis-group/
+iranian-backed-group-steps-up-phishing-campaigns-against-israel-us/
+[87] S. Sangrattanapitak. (2025) APT42. MITRE. [Online]. Available:
+https://attack.mitre.org/groups/G1044/
+[88] M. Lv, H. Gao, X. Qiu, T. Chen, T. Zhu, J. Chen, and S. Ji, “TREC: Apt
+tactic/technique recognition via few-shot provenance subgraph learning,”
+in ACM CCS, 2024, pp. 139–152.
+[89] S. M. Milajerdi, R. Gjomemo, B. Eshete, R. Sekar, and V . Venkatakrish-
+nan, “Holmes: real-time apt detection through correlation of suspicious
+information ﬂows,” inIEEE SP. IEEE, 2019, pp. 1137–1152.
+[90] A. Haddad, N. Aaraj, P. Nakov, and S. F. Mare, “Automated mapping
+of cve vulnerability records to mitre cwe weaknesses,”arXiv preprint
+arXiv:2304.11130, 2023.
+[91] Z. Hao, C. Li, X. Fu, B. Luo, and X. Du, “Leveraging hierarchies:
+HMCAT for efﬁciently mapping cti to attack techniques,” inESORICS.
+Springer, 2024, pp. 65–85.
+APPENDIX A
+ALGORITHMS
+The corresponding algorithms to the Data Preprocessing,
+Label Adjustment, and Model Adaptation sub-steps are pre-
+sented in Algorithms 1, 2, and 3, respectively.
+APPENDIX B
+APD MODEL WITH ADDITIONAL EPOCHS
+To validate APD model robustness, we ﬁne-tune Secure-
+BERT [43] for 15 epochs. As shown in Table XIII and
+Figure 25, training loss decreases, but validation loss rises
+after 5 epochs, indicating overﬁtting. Precision, Recall, and
+Algorithm 1: Data Preprocessing Sub-step
+Input: cve text, srl model
+Output: sub sentences dic list
+1 tokenized_sentences ↑ Clean and tokenizecve_text
+2 foreach sentence in tokenized_sentences do
+3 sentence_srl_tags ↑ Get SRL tags;
+4 if SRL tags existthen
+5 Extract verbs_list and words;
+6 foreach verb in verbs_list do
+7 Collect non-empty tag indexes;
+8 if tags contain ARG1-ARG5then
+9 Formulate sub_sentence and append to list;
+10 if sub_sentence_list not empty then
+11 Create directed graph;
+12 foreach sub-sentence pair (A, B)do
+13 if A’s verbs⇑ B’s verbs and B has more verbsthen
+14 A ≃ child of B;
+15 else ifB’s verbs⇑ A’s verbs and A has more verbsthen
+16 A ≃ parent of B;
+17 Append to sub_sentences_dic_list;
+18 return sub_sentences_dic_list
+Algorithm 2: Label Adjustment Sub-step
+Input: CVEs with attack patterns and missing TTPsZCV Ei
+Output: Updated TTP labels per attack pattern
+1 foreach CVE in datasetdo
+2 Get description, patterns, andZCV Ei;
+3 foreach pattern in CVEdo
+4 foreach TTP in ZCV Ei do
+5 Ask GPT-4o-mini if TTP is relevant;
+6 if “Yes” then
+7 Assign TTP to pattern;
+8 Label veriﬁcation with dependency graph;
+9 foreach node in graphdo
+10 foreach direct child do
+11 if child TTPs ⇓⇔ parent TTPs then
+12 Remove extra TTPs from child;
+13 return Updated labels;
+Algorithm 3: Model Adaptation Sub-step
+Input: AP, Pred(AP), Feedback DB, Cluster Dictionary, LLM
+Output: AdaptedPred(AP)
+1 exact sig ↑ SHA-256(AP + <CONTEXT> + CVE);
+2 behav sig ↑ ClusterIDs(Pred(AP), Cluster Dictionary);
+3 Retrieve exact and behavioral feedback from DB using exactsig and
+behav sig (with coverageS and threshold ε);
+4 Apply exact feedback and tentatively apply behavioral feedback to Pred(AP);
+5 if LLM enabled then
+6 foreach TTP in behavioral feedbackdo
+7 Prompt LLM with (AP, TTP description);
+8 if (TP or FN and LLM =‘‘Yes’’) or (FP and LLM =‘‘No’’)
+then
+9 Update Pred(AP);
+10 return AdaptedPred(AP)
+Model Epochs Precision Recall F1-score
+SecureBERT [43] 5 95.99% 95.73% 95.86%
+SecureBERT [43] 15 93.60% 93.60% 93.60%
+TABLE XIII: Impact of extending SecureBERT [43] ﬁne-
+tuning from 5 to 15 epochs on APD model performance.
+F1-score drop, conﬁrming that 5 epochs are sufﬁcient for this
+dataset.
+17

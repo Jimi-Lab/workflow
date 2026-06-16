@@ -1,0 +1,38 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ
+Analysis Mode: static-only [EXECUTION NOT REQUESTED]
+Repository / File Layout Observed:
+- Root README describes a replication package for the TSE paper.
+- dataset/: abnormal_commits.csv, common_hashes.txt, filtered_data.json. README claims dataset_linux.json and sorted_sampled_dataset.json, but local names differ or are absent in this snapshot. [NEEDS ARTIFACT]
+- verify_dataset/: annotation_383cases.csv and LabelingGuideline.pdf are visible; sorted_sampled_dataset.json was not observed. [NEEDS ARTIFACT]
+- pyszz/: Python implementation folder with main.py, szz variants, Dockerfile, requirements.txt, run_docker.sh, time.txt.
+- chatgpt_result/: xlsx summaries plus generated prompt/output text directories for codegen2 and codet5+.
+Primary Files:
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\README.md
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\README.md
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\main.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\requirements.txt
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\Dockerfile
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\szz\core\abstract_szz.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\szz\tc_szz.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\szz\tc_szz_1.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\pyszz\szz\tc_szz_2.py
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\dataset\filtered_data.json
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\dataset\abnormal_commits.csv
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\verify_dataset\annotation_383cases.csv
+- E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\TC-SZZ\TC-SZZ\verify_dataset\LabelingGuideline.pdf
+Key Static Evidence:
+- pyszz/main.py dispatches among b/ag/ma/r/tc/l/ra SZZ implementations and routes TC-SZZ to TCSZZ with blame_times_target and mode parameters.
+- szz/core/abstract_szz.py defines AbstractSZZ, impacted-file parsing through PyDriller, git blame wrapper, comment skipping, and line-range parsing.
+- szz/tc_szz.py defines TCSZZ.find_bic, iterative blame tracing, map_modified_line, whitespace-normalized Levenshtein line matching, and mode 2 duplicate removal.
+Static Consistency Notes:
+- Paper-level TC-SZZ claim that tracing follows changed-line history is partially supported by tc_szz.py static code.
+- Paper/README claim of a dataset of 76,046 pairs is supported by README text, but dataset_linux.json is not visible by that exact name. [NEEDS ARTIFACT]
+- README run instructions mention conf/tcszz.yml, but no pyszz/conf directory was visible. [NEEDS ARTIFACT]
+- main.py contains a hard-coded CVE target list, so this local copy may be adapted.
+Observed Local Output / Data Artifacts:
+- chatgpt_result contains xlsx files and many model output text files.
+- dataset contains CSV/TXT/JSON files; verify_dataset contains annotation CSV and labeling guideline PDF.
+Missing Data / Missing Entrypoints:
+- conf directory and named tcszz.yml not observed. [NEEDS ARTIFACT]
+- README-mentioned dataset_linux.json and sorted_sampled_dataset.json not observed. [NEEDS ARTIFACT]
+- Runtime behavior and reported metrics were not reproduced. [EXECUTION NOT REQUESTED]

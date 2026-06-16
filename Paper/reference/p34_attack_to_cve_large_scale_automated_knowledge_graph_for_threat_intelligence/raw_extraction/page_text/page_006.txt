@@ -1,0 +1,92 @@
+// Adamic Adar
+MATCH (c1:cwe{id: "308"})
+MATCH (c2:capec{id: "151"})
+RETURN gds.alpha.linkprediction.adamicAdar(c1, c2) AS
+score
+// Common Neighbors
+MATCH (c1:cwe{id: "308"})
+MATCH (c2:capec{id: "151"})
+RETURN gds.alpha.linkprediction.commonNeighbors(c1, c2) AS
+score
+Fig. 6. Cypher queries for selected link discovery algorithms between CWE
+and CAPEC nodes.
+Notations: u and v denote two nodes in the knowledge graph,
+and Γ(u) represents the set of neighbors directly connected to
+node u.
+• |Γ(u)| is the degree of node u (i.e., the number of its
+neighbors).
+• Γ(u) ∩ Γ(v) is the set of common neighbors of u and v.
+• w is an individual node belonging to the set of common
+neighbors.
+• The functions assign similarity scores, where a higher score
+indicates a greater structural proximity between u and v,
+and thus a higher likelihood of an unobserved link.
+Other metrics such as Preferential Attachment (which as-
+sumes high-degree nodes are more likely to connect), Resource
+Allocation (a variant of Adamic–Adar that weights neighbors
+by the inverse of their degree), Same Community (binary score
+based on graph community detection), and T otal Neighbors
+(combined neighborhood size) can also be applied to enrich
+the analysis.
+By applying these measures, we can infer plausible but
+unobserved relationships—such as identifying CWEs that may
+be associated with CAPECs. These insights enable analysts
+to anticipate potential threat paths before they are explicitly
+reported in advisories, supporting proactive defense.
+IV . E M P I R I C A L EV A L UAT I O N
+W e demonstrate how our knowledge graph enables com-
+prehensive and actionable cyber threat intelligence analysis,
+supporting end-to-end workﬂows. W e highlight mappings from
+top software weaknesses to A TT&CK techniques; technique-
+centric views that connect to groups, tools, and mitiga-
+tions; and group-to-vulnerability traversals for Scattered Spi-
+der (G1015) and V olt T yphoon (G1017). Case studies on CISA
+advisories and link scoring further demonstrate how the graph
+discovers missing relationships.
+A. T op 25 Software CWEs to ATT&CK T echniques
+W e leveraged our automated knowledge graph pipeline to
+connect CWEs with MITRE A TT&CK techniques through
+CAPEC attack patterns. In particular, we focused on the CWE
+T op 25 Most Dangerous Software W eaknesseslist, an annually
+curated resource maintained by the MITRE Corporation in
+collaboration with the U.S. Department of Homeland Secu-
+rity (DHS) and the Cybersecurity and Infrastructure Security
+Agency (CISA). This list highlights the most common and
+impactful software weaknesses, based on real-world data such
+as CVEs, CVSS scores, and their prevalence in vulnerability
+databases. It helps developers and security teams prioritize
+mitigation efforts by identifying the most frequently exploited
+programming ﬂaws and guiding secure software design. Using
+automated graph traversals, we observe that not all 25 CWEs
+yield direct mappings to A TT&CK techniques.
+As an illustrative example, shown in Fig. 7 and T able II,
+consider CWE-20 (Improper Input V alidation). It is linked to
+multiple A TT&CK techniques such as T1539: Steal Web
+Session Cookie and T1027: Obfuscated Files
+or Information. This mapping underscores the critical-
+ity of input validation failures: adversaries routinely exploit
+unchecked inputs to manipulate control ﬂow , inject malicious
+payloads, or bypass security mechanisms, making this CWE
+foundational to a wide range of attacks. Similarly , CWE-
+94 (Code Injection) maps directly to T1027.006: HTML
+Smuggling, highlighting how code injection vulnerabilities
+directly enable adversaries to deliver and execute obfuscated
+malicious code, often as part of initial access or delivery
+phases. These cases illustrate how our knowledge graph pro-
+duces multi-hop paths from critical software weaknesses to
+threat actor methodologies, bridging the gap between software
+engineering errors and operational TTPs.
+By enumerating and analyzing such mappings, defenders
+can proactively prioritize mitigation efforts around weakness
+classes most commonly tied to adversary behaviors, ensuring
+that secure coding practices, patching strategies, and monitor-
+ing controls align with real-world attack techniques.
+Fig. 7. Mapping of a top software CWE (CWE-287) to its corresponding
+CAPECs (light blue circles) and A TT&CK T echniques (light green circles).
+B. ATT&CK T echniques, Groups, and Mitigations
+Our pipeline centers each A TT&CK technique within its
+surrounding ecosystem by materializing typed, cross-domain
+relationships to the entities that cyber analysts regularly
+use: adversary groups (intrusion sets and campaigns), op-
+erational capabilities (tools and malware), and defensive
+knowledge (courses of action/mitigations, data sources, and

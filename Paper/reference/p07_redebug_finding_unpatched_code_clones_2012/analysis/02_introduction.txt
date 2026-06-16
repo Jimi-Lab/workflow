@@ -1,0 +1,79 @@
+Opening Context:
+The introduction opens with a concrete patch example for Expat and CVE-2009-3720, showing how a simple fix in one location can leave hundreds of cloned buggy instances elsewhere.
+
+Why the Problem Matters:
+Unpatched code clones can preserve known vulnerabilities after disclosure. The introduction frames this as both a defender problem and an attacker opportunity after patch release.
+
+Concrete Pain Point:
+Patches are often not propagated through copied code in real distributions. In the motivating example, the paper states that hundreds of clone locations still had the buggy code.
+
+Motivating Example:
+The Expat bounds-checking patch demonstrates both deletion/replacement and missing-check repair patterns. It motivates why searching only changed lines may be insufficient and why context matters.
+
+Prior Work Framing:
+The paper positions existing clone detectors as more thorough but expensive, language-dependent, parser-heavy, or high false-detection systems.
+
+Why Prior Work Is Insufficient:
+The introduction identifies three practical limitations: scalability to hundreds of millions/billions of lines, language coverage across distribution code, and high false detection rates that make manual inspection expensive.
+
+Technical Challenges:
+- Need to scan OS-distribution-scale code.
+- Need to support many languages without robust parsers for each language.
+- Need to keep false detections low enough to make reports actionable.
+- Need to use released patches to find lingering buggy code quickly.
+
+Key Insight:
+For unpatched-code-clone detection, the system can search only for clones of patched buggy code instead of solving all-pairs clone detection.
+
+System / Method Preview:
+ReDeBug uses a lightweight syntax-based approach with normalization, token windows, Bloom filters, exact-match filtering, and report generation.
+
+Contribution List:
+- Large-scale analysis of OS distributions/source corpora for unpatched code clones.
+- A scalable, language-agnostic syntax-based clone detector.
+- Empirical measurement of copied code in large OS distributions.
+
+Claim-Evidence Structure:
+The introduction introduces the concrete example, then sets design tradeoffs, then provides large-scale headline numbers, then enumerates contributions.
+
+Agent Evidence Anchors:
+- raw_extraction/section_text/02_introduction.txt
+- raw_extraction/figures/figure_001_caption.txt
+- raw_extraction/tables/table_001.txt through table_006.txt
+
+Paragraph Map:
+P1:
+  Function: establish concrete patch propagation failure.
+  Main Claim: a patch may fix one project but leave vulnerable code clones elsewhere.
+  Evidence Type: CVE/listing example.
+  Transition: define unpatched code clones.
+P2:
+  Function: introduce ReDeBug and research questions.
+  Main Claim: a syntax-based system can identify unpatched code clones at scale.
+  Evidence Type: system preview.
+  Transition: compare with prior clone detection.
+P3:
+  Function: critique prior work.
+  Main Claim: scalability, language support, and false detection rate limit existing methods.
+  Evidence Type: design-space discussion and prior-work examples.
+  Transition: explain ReDeBug's design point.
+P4:
+  Function: present tradeoff.
+  Main Claim: ReDeBug trades fuzzy completeness for speed, scalability, language agnosticism, and fewer matching errors.
+  Evidence Type: design rationale.
+  Transition: report evaluation scale.
+P5:
+  Function: summarize scale and findings.
+  Main Claim: large source corpora and security patches expose many unpatched code clones.
+  Evidence Type: headline results.
+  Transition: discuss attacker/defender implication.
+P6:
+  Function: contribution list.
+  Main Claim: empirical study + system + copied-code measurement.
+  Evidence Type: enumerated contributions.
+
+Reusable Moves:
+Use one patch/CVE as an anchoring example, then generalize into a system problem and a design tradeoff.
+
+Risks for Our Paper:
+If we compare against ReDeBug, emphasize it detects syntactic clones of patched buggy code; it is not a semantic affected-version verifier.

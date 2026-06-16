@@ -1,0 +1,541 @@
+IV. V ULTURE
+A. TPLF ILTER
+To detect 1-day vulnerabilities introduced by TPL reuses,
+VULTURE must 1) identify the reused TPLs in the target
+program; 2) verify whether the reused TPL version is vulner-
+able; 3) suggest if any potential patch is available. Therefore,
+VULTURE is required to construct a database, containing the
+TPLs commonly used by a platform and the corresponding
+vulnerable and patch information as a detection reference.
+1) TPL Selection: As TPLs vary across different plat-
+forms, VULTURE executes TPLF ILTER to construct a database
+containing TPLs specific to the targeted platform (e.g., IoT
+firmware, Android, iOS). Since most open-source projects are
+maintained and operated on GitHub, TPLF ILTER first collects
+all prevalent libraries from GitHub or existing TPL databases,
+such as OpenWRT [9] and Awesome Android [1]. To select
+TPLs specific to the target platform, we manually created
+a keyword list of the most commonly used keywords for
+describing the target platforms. Through the keyword list,
+TPLF ILTER performs keyword matching to determine if the
+titles, tags, and descriptions of each collected TPL contain
+any of the specified keywords. Additionally, TPLF ILTER
+scans the project metadata, official websites of projects, and
+README files to identify the keywords (e.g., system, server,
+firmware) for non-library project exclusion. For each selected
+TPL, TPLF ILTER clones them from GitHub and lists all the
+published versions through git tag.
+2) Component Segment Construction: Within the database,
+TPLF ILTER gathers detailed information on each selected TPL
+to construct the component segment. GitHub repositories and
+official websites may provide a variety of information about the
+TPL, including details about their functions, file names, license
+information, and the creation time of each library (i.e., birth
+time). However, we observed that file names are not unique
+to every TPL and licenses are not formally organized by all
+target programs, which may negatively affect the effectiveness
+of TPL reuse detection. Alternatively, TPLF ILTER analyzes
+functions declared in each TPL and their birth times to
+build the database, For efficiency, rather than storing all the
+complicated details of functions, TPLF ILTER calculates a hash
+value for each function and stores them in the component
+segment.
+To minimize false alarms arising from string-matching in
+the handling of custom patches, TPLF ILTER employs LSH to
+process each function. LSH is a fuzzy hashing technique that
+hashes similar input items into the same “buckets” with high
+probability, thereby enhancing the accuracy of data compari-
+son [25]. Hence, TPLF ILTER analyzes each TPL version and
+extracts all functions with ctags. Then, it calculates the hash
+value of each function.
+Simultaneously, it executes git log to identify the birth
+time of each function from the commit histories. Each function
+is then represented as fc =< H, Birth >, where H is the
+hash value of the function and Birth refers to its birth time.
+Hence, each version of a TPL is comprised of the functions,
+represented as FC = {fc(i)|1 ≤ i ≤ n}, where n is the
+maximum number of functions included in the TPL version.
+As a TPL A may invoke functions from another TPL B (i.e.,
+A depends on B), such dependencies may lead to redundant
+comparisons when analyzing function similarities.
+Although some previous works (e.g., Centris [48] and
+OSSFP [49]) also utilize LSH to calculate hash values, these
+works identify redundant functions with hash value similar-
+ity comparison rather than exact match identification. Such
+schemes become inefficient when comparing functions on a
+large scale. To eliminate redundant comparisons, TPLF IL-
+TER employs a hashing-index based elimination method that
+narrows down the scope by searching for functions with
+identical hash values. Specifically, TPLF ILTER first identifies
+the functions fc(i) and fc(j) by comparing hash values H(i)
+and H(j). Among all the functions with the same hash values,
+it selects the function with the earliest birth time and removes
+the other functions.
+3) Vulnerability Segment Construction: To support the de-
+termination of whether the reused versions of TPLs contain
+any vulnerabilities, TPLF ILTER collects all vulnerabilities
+5
+
+===== PAGE 006 =====
+associated with each version of the TPLs in the component
+segment. As some developers may patch vulnerabilities on
+their own without updating TPL versions, TPLFILTER assesses
+security patches, instead of TPL version, to identify whether
+a vulnerability affects the target program. Hence, TPLF ILTER
+collects security patches of each collected vulnerability, and
+compiles these vulnerabilities and their respective security
+patches in the vulnerability segment.
+Vulnerability detail collection. As the majority of vulnera-
+bility reports are typically listed on CVE and NVD, V ULTURE
+crawls the vulnerability reports from these websites. Within
+these reports, each vulnerability is assigned a unique CVE ID
+for identification and is described using a CPE (Common Plat-
+form Enumeration) to specify the software versions affected.
+Given each TPL stored in the component segment, V UL-
+TURE first filters the vulnerability reports whose descriptions
+contain the TPL name at a coarse level by invoking the
+NVD API with keywordSearch1 . Nonetheless, vulnerabil-
+ity descriptions encompass not only the names of vulnerable
+libraries but also the names of other software impacted by these
+vulnerable libraries, rendering keyword searches less precise.
+Therefore, VULTURE conducts a CPE-guided matching to filter
+vulnerability reports for effective vulnerability identification.
+Specifically, to determine whether a vulnerability affects a
+target TPL, it retrieves the CPE information in the vulnera-
+bility report and checks whether the target TPL name is the
+substring of the CPE string. If the target TPL name is matched,
+VULTURE regards that the vulnerability affects the target TPL
+and records the corresponding information of the CVE ID,
+its CPE, and the vulnerable TPL version(s). Typically, CPE
+manages the vulnerable software versions in two ways: through
+enumerations or version intervals. For enumeration, V ULTURE
+directly extracts all vulnerable version numbers. In the case
+of interval specification, V ULTURE first obtains and ranks all
+versions of a TPL in ascending order, and then determines the
+start and end versions that fall within the specific vulnerable
+version interval.
+Unfortunately, we inspected that some vulnerability reports
+are informally written, thus these vulnerabilities might be over-
+looked by keyword searches and CPE matching. To address
+such issues, V ULTURE extracts additional vulnerability reports
+from public databases including SNYK [12] and the official
+websites of TPLs [7] [4] for further detail matching.
+Security patch collection. VULTURE collects security patches
+for each vulnerability to support accurate 1-day vulnerability
+detection and examine whether a reused TPL in the target
+programs has been patched. Although CVE/NVD includes patch
+information for some vulnerabilities, a significant portion of
+the patch information is not updated timely or maintained
+properly [6], [36]. Alternatively, TPLs maintained on GitHub
+frequently release security patches as GitHub commits, which
+typically include descriptions of vulnerabilities as well as
+detailed code changes.
+To effectively and comprehensively obtain the vulnera-
+bility patches, V ULTURE constructs an LLM-based multi-
+sliced patch searching approach to locate the specific security
+1https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={*}, where
+element * refers to the name of the target TPL.
+patches of each vulnerability. Given the CVE description main-
+tained by CVE/NVD and the repository commits maintained by
+GitHub of each TPL, V ULTURE proceeds with the following
+four steps:
+1) LLM-based description parsing: The vulnerability detail
+provided by CVE/NVD typically consists of the vulnerability
+description (e.g., vulnerability type, vulnerable files, vulnerable
+functions, vulnerable variables, and some specific vulnerable
+features), and CPE describing the affected TPL information
+(e.g., vendor(s) of the TPL, TPL name and versions). Corre-
+spondingly, VULTURE employs a LLM by invoking GPT3.5 to
+parse the vulnerability description and then extracts the vul-
+nerable elements affected by the vulnerability, i.e., vulnerable
+files, vulnerable functions, and vulnerable variables.
+2) Slice-based commit filtering: As a vulnerable TPL repos-
+itory may contain numerous commits that cover document
+changes, routine common bug fixes, feature modifications, and
+vulnerability patches, it is time-consuming and error-prone
+to analyze those commits one by one. Therefore, V ULTURE
+conducts a date-specific commit slicing to exclude the commits
+confirmed to be irrelevant to the vulnerabilities at a coarse-
+grained level. Specifically, V ULTURE first identifies all the
+vulnerable versions from the vulnerability description and CPE
+information. Since the version released immediately after the
+last vulnerable version is typically the first patched version
+of a vulnerability, V ULTURE extracts the timestamps of when
+the last vulnerable version and the first patched version were
+published. Correspondingly, all the commits generated within
+the time range between these two timestamps are considered
+as potential patch commits. Then, it divides the potential patch
+commits into multiple slices based on average partitioning
+(i.e., each slice contains k commits. Within each slice i,
+VULTURE calculates a code diff diffi between the first and the
+last commits. If diffi contains any of the vulnerable elements,
+VULTURE labels the slice i as a candidate slice, indicating that
+at least one commit within this slice contains modifications
+related to vulnerability-specific code elements. Otherwise, it
+continues analyzing the next slice i + 1.
+3) Candidate commit selection: After locating the candidate
+slice, V ULTURE performs fine-grained analysis to select the
+candidate commits that are related to the vulnerability. It
+compares vulnerable code with each patch to generate a code
+diff. If the code diff includes any of the vulnerable elements,
+VULTURE labels the commit as a candidate commit and
+advances to step (4) for further confirmation.
+4) LLM-based patch commit mapping: VULTURE employs
+LLM to confirm the patch commits. On one hand, some
+commits within the candidate commits may also modify the
+vulnerable elements yet are not the patch regarding the target
+vulnerability, requiring V ULTURE to exclude these commits;
+on the other hand, some CPE information provided by NVD
+is incorrect [24] which may lead to false alarms. To address
+the challenges, V ULTURE takes as input the CVE description
+and each candidate commit (i.e., commit description and the
+modified code), and invokes GPT4.0 to infer whether the CVE
+and the commit are relevant. It is important to note that only
+minor candidate commits are needed to be analyzed here, thus
+GPT4.0 incurs minimal costs to calculate the correlations.
+A detailed example of patch commit mapping is illustrated
+6
+
+===== PAGE 007 =====
+in Appendix A.
+B. TPL Reuse Identification
+To determine what TPLs are reused in each target pro-
+gram, V ULTURE takes as input the component segment of
+the database to check whether these TPLs are invoked. It first
+employs an LSH algorithm to generate a list of TPL candidates
+that the target program may use. Subsequently, it refines the
+identification process by incorporating additional information
+for further confirmation.
+1) Candidate Library Detection: As TPLs may be reused
+either exactly or in a custom manner, relying solely on match-
+ing function names and code statements may overlook such
+custom cases. Hence, V ULTURE leverages the LSH algorithm
+to conduct code similarity analysis.
+Specifically, V ULTURE first extracts all files along with
+their paths from the target program and then proceeds with
+these files one by one. Then, VULTURE divides each file within
+the target program into target function snippets based on the
+declared functions. Given each function snippet, it uses Python
+TLSH, an LSH-based fuzzy matching library, to generate a
+unique hash value, Each target function snippet i can be rep-
+resented by a 2-tuple: ft(i) =< Hash(i), Func path(i) >,
+where Hash is the hash value of the target function snippet
+i and Func path represents the file path where the function
+snippet i is defined. V ULTURE then computes the similarity
+between the target function snippets and TPL functions in
+the component segment. For each target function snippet i,
+VULTURE compares it with each function j from the TPL
+iteratively. In particular, it takes as input Hash(i) and H(j)
+and leverages TLSH to calculate a similarity score between
+functions i and j. If the similarity score falls below a hash
+threshold THhash, the function pair of i and j is consid-
+ered similar. After all target function snippets are analyzed,
+VULTURE calculates the total number of similar function
+pairs. When the total number exceeds a similarity threshold
+THsim, it represents that the corresponding TPL may be
+used. Since different versions of a TPL may vary significantly,
+VULTURE identifies the version with the highest number of
+similar function pairs as a TPL prevalent version and then
+captures the information of the TPL (i.e., TPL name, hash
+value of the function in the TPL, TPL version, and the file path
+where the TPL is reused in the target program) to store in the
+candidate TPL list. It is important to note that when multiple
+TPL versions have the same number of similar function pairs,
+VULTURE randomly selects one version as the TPL prevalent
+version. V ULTURE iteratively analyzes all functions in the
+target program and collects a list of candidate TPLs that are
+potentially reused.
+2) Identification Optimization: The common similarity-
+based approaches, such as Centris, may produce a signifi-
+cant number of false positives because 1) TPLs with similar
+functionalities may employ the same functions; 2) the inter-
+dependencies among TPLs may result in a high degree of
+function overlap between TPLs. To accurately select which
+TPL is reused, V ULTURE leverages auxiliary information, i.e.,
+file paths and birth time, to optimize the candidate list.
+Some existing approaches (e.g., SNYK [12]) use TPL
+licenses to identify reuses because the target program must
+declare a TPL license either in a LICENSE file or through
+an annotation when reusing. However, we observed that these
+TPL licenses are usually written inconsistently and informally,
+without adhering to standards. V ULTURE may overlook the
+declared TPLs when using such information. Hence, VULTURE
+examines file paths illustrating where TPLs are reused in the
+target program and the birth time of each TPL as the indicators.
+Generally, the target program places code that reuses TPLs
+under a separate directory and then names the directory with
+a title similar to the TPL name. The birth time is used to
+pinpoint the first invocation of the reused function, thereby
+eliminating the redundant TPL dependencies involved during
+function comparison.
+To confirm the reused TPLs, V ULTURE first groups TPL
+candidates together when they share the same file path in the
+target program. For the TPL candidates in the same group,
+a path tokenizer is used to divide each file path into tokens
+based on the separators (e.g., space, backslash, and colon).
+Then V ULTURE compares each token with the name of each
+TPL candidate and calculates a Jaccard similarity score [34],
+and selects the TPL candidate(s) with the highest Jaccard
+similarity score as the confirmed reused TPL. Note that a
+file may invoke functions from multiple TPLs, thus several
+TPLs can have the same Jaccard similarity score. V ULTURE
+further addresses the inheritance cases where several TPLs
+share the same score to locate the confirmed reused TPL. First,
+VULTURE gathers the remaining TPL candidates sharing the
+same hash value H into a group, indicating that these TPLs
+are related. Within each group, V ULTURE compares the birth
+time of each TPL and identifies the one with the earliest birth
+time as the parent TPL of the group (i.e., the confirmed TPL of
+the target program). All the remaining TPL candidates in the
+group are then removed. For each target program, V ULTURE
+eventually generates a TPL reuse report containing all the
+confirmed reused TPLs.
+C. 1-day Vulnerability Detection
+When the TPL reuse report discloses that a vulnerable
+version of TPL has been reused, V ULTURE then determines
+whether any vulnerable functions are being invoked exactly
+or in a custom way. Hence, V ULTURE implements a dual
+analysis strategy at the function level, utilizing version-based
+and chunk-based analyses to distinguish exact and custom
+reuses, respectively.
+1) Version-based analysis: By inspecting the reused TPLs,
+we found that some developers may reuse a vulnerable TPL
+version, but patch the vulnerable code snippets themselves.
+Therefore, V ULTURE utilizes a diff-inspired version-based
+analysis to examine a TPL reuse from three aspects: 1) whether
+reuse is exact or customized in terms of TPL reuses; 2) whether
+the reused TPL version is vulnerable; and 3) whether the
+exploited vulnerabilities are patched.
+In detail, VULTURE first takes the TPL reuse report as input
+to extract the reused TPL and its version. According to the
+TPL name and the version, it queries the vulnerability segment
+of the database to verify if the reused version of the TPL
+was linked to any CVE report. If a CVE report is identified,
+VULTURE extracts the vulnerable and patched version of the
+code related to the CVE, and then utilizes diff to locate the
+7
+
+===== PAGE 008 =====
+code diff Diffvp. Subsequently, V ULTURE analyzes the Diffvp
+to determine if the modified items in Diffvp are functions
+or global declarations (e.g., global variables, structures, and
+macros). For functions, V ULTURE extracts and records the
+entire function of both the vulnerable and patched code as
+the vulnerable and patched functions, respectively; while for
+global declarations, V ULTURE records them as the vulnera-
+ble and patched global declarations. Then, within the target
+program, leveraging ctags, V ULTURE specifically labels each
+code snippet as either a function or a global declaration and
+compares them with vulnerable/patched functions/declarations,
+respectively.
+As a result, V ULTURE distinguishes TPL reuses in the
+target program into four groups and processes each group with
+function-level granularity, ensuring that unused functions in the
+TPLs do not affect the detection accuracy:
+G1: No vulnerable reuse. It indicates a target program
+reuses the vulnerable version of a TPL without involving any
+vulnerable functions or vulnerable global declaration.
+• Analysis: When all the target code snippets are exactly
+equal to the patched function or the patched global
+declaration, V ULTURE regards the target program as G1.
+The target programs in this group are considered secure.
+G2: Vulnerable global declaration reuse. It represents that
+a target program only reuses vulnerable global declarations.
+• Analysis: When any of the global declarations in a target
+code snippet exactly equals to that of the vulnerable
+global declarations, V ULTURE regards the target program
+as G2.
+• Confirmation: VULTURE employs line matching to iden-
+tify the vulnerable declarations. If a global declaration
+that is deleted from the vulnerable TPL continues to
+appear in the target code snippet, V ULTURE considers
+that a vulnerability is identified. Furthermore, when a
+global declaration added to the patched TPL does not
+appear in the target code snippet, V ULTURE considers
+the target program as vulnerable. A 1-day vulnerability is
+then identified.
+G3: Exact vulnerable reuse : It represents that a target pro-
+gram exactly reuses the vulnerable function of a TPL without
+providing any patches.
+• Analysis: VULTURE labels the target program as G3 if
+any target functions are equal to the vulnerable functions.
+• Confirmation: VULTURE utilizes TLSH to compute the
+hash values of the vulnerable function and the target
+function snippet. If any function in the target program
+shares the same hash value as the vulnerable function,
+VULTURE considers it unpatched and classified to G3. A
+1-day vulnerability is then identified.
+G4: Custom reuse: It represents that a target program reuses
+the vulnerable or patched functions with custom modifications.
+• Analysis: VULTURE labels the target program as G4
+if any target functions are similar to the vulnerable or
+patched functions. If the similarity score for any pair of
+functions exceeds THsim, V ULTURE classifies the target
+program as G4.
+• Confirmation: VULTURE uses TLSH to compare the hash
+values of each function in the target program with those
+of the vulnerable function. Since it involves custom reuse,
+it is uncertain whether the target program is secure; thus,
+VULTURE confirms the vulnerable custom reuses via a
+chunk-based analysis.
+2) Chunk-based analysis: To preserve the semantic and
+syntactic information that is overlooked by function [28] and
+line matching [46], static analysis has traditionally been used,
+but it comes with significant challenges. First, static analy-
+sis requires compilable code, which is problematic because
+patches are often provided as isolated snippets that cannot
+be compiled directly. Second, static analysis demands an
+extensive environment setup for compilation, which is both
+time-consuming and resource-intensive.
+To resolve the issues brought by the traditional static
+analysis, V ULTURE utilizes chunk-based code analysis to
+examine custom reused functions, striking a balance between
+efficiency and accuracy in semantic information extraction
+without the reliance on compilation. For these customized
+functions, V ULTURE verifies whether these custom modifica-
+tions provide the same security functionality as those in the
+official patches released by TPL contributors. Specifically, for
+chunk-based analysis, a chunk represents a group of modified
+lines focused on a specific functionality. In a given function,
+the lines within the same chunk are either governed by the
+same control structures (e.g., if-else, while, for) or
+operate on the same set of variables. A chunk preserves both
+the semantic meaning and contextual relationships embedded
+within the patch code, ensuring an accurate assessment of
+custom adaptations.
+Taking as input the information of CVE ID, vulnerable
+code snippets, patched code snippets, Diffvp, and target code
+snippets, V ULTURE proceeds with the following steps:
+Chunk construction. When reusing TPLs, the target program
+might alter the format of the reused code. Thus, VULTURE first
+standardizes all code snippets, including target code snippets,
+vulnerable code, and the patched code. According to the LLVM
+coding standard2, VULTURE removes unnecessary entities such
+as leading spaces, comments, and constant strings.
+After normalization, V ULTURE separately initiates code
+diff among the target, vulnerable, and patched code snippets.
+The comparison correspondingly yields three code diff (i.e.,
+Diffvt, Diffpt, and Diffvp), where Diffvt is the code diff between
+the target and vulnerable code snippets, Diffpt is the code diff
+between the target and patched code snippets, and Diffvp is the
+code diff between the vulnerable and patched code snippets.
+Each line in the above code diff is treated as an individual
+chunk. We manually predefined 40 regular expressions, cov-
+ering all types of statements (e.g., call expressions, binary
+operations). Using these regular expressions, V ULTURE then
+extracts the variables and operations involved in each chunk.
+It further adopts a disjoint-set union algorithm to identify the
+data-dependent chunks when 1) the chunks are part of the
+same control block without any nested control structures, or 2)
+chunks share the same variable. Eventually, all related chunks
+2LLVM Coding Standard: https://llvm.org/docs/CodingStandards.html
+8
+
+===== PAGE 009 =====
+are merged, while those unmerged chunks remain independent
+from each other.
+Vulnerability detection. After constructing the chunks, V UL-
+TURE uses chunk matching to determine if variables in the
+target code snippet have been patched. Initially, VULTURE con-
+ducts disjoint checking by pairwisely comparing each chunk
+in Diffvt and Diffpt with the chunks from Diffvp to determine
+whether the patches have been applied to the target program.
+If both sets of Diffvt and Diffpt share the same variables
+with Diffvp, V ULTURE further performs line matching. A
+vulnerability is considered “patched” if all lines in Diffvp
+appear in Diffvt, but disappear in Diffpt. Otherwise, V ULTURE
+further executes operation match. When all operations in Diffvp
+appear in Diffvt, but disappear in Diffpt, it indicates that the
+vulnerability has been patched via customized modifications.
+If both matching conditions are failed, a 1-day vulnerability is
+considered to be “found”.
+A detailed example for chunk-based detection is depicted
+in Figure 4. The code snippet A at the top represents the
+patch code, while code snippet B at the bottom shows the
+customized patch. To construct chunks, V ULTURE initially
+treats each added line in the patch and reused code as an
+individual chunk. Next, V ULTURE merges these chunks based
+on semantic relationships and context. For instance, in the
+patch code snippet A, the first four lines are merged into a
+single chunk because they share the same variable, cmaplen.
+Similarly, the last two lines are incorporated into another chunk
+as the same control block governs them.
+After constructing the chunks, V ULTURE starts to process
+chunk matching. In the above example, chunk C pairs with
+chunk E, and chunk D pairs with chunk F. Code B is classified
+as patched, since the line match was unsuccessful (indicated
+by the highlighted lines on the left side), the operation match
+succeeded (indicated by the highlighted lines on the right side).
+This scenario of custom patch may lead to false positives
+in other systems like V1SCAN, but V ULTURE can accurately
+identify the patch.
+A
+B
+C
+D
+METHODDEF(JDIMENSION) get_8bit_row(...){
+    
+  +   int cmaplen;
+    ...
+  +  cmaplen = source->cmap_length;
+    ...
+  + if (t >= cmaplen)
+  +   return 1;
+    output++ = colormap[0][t];
+    ...
+  + if (getUsed(bitClrUsed))
+  +     return 1;
+    ...
+}
+METHODDEF(JDIMENSION) get_8bit_row(...){
+    
+  +   int cmaplen = source->cmap_length;
+    ...
+  + if (t >= cmaplen)
+  +    return 1;
+    output++ = colormap[0][t];
+    ...
+  + if (getUsed(bitClrUsed))
+  +    return 1;
+    ...
+}
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+F
+REUSE
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+E
+Fig. 4: Chunk extraction and match
+After processing all potential vulnerabilities for the tar-
+get program through version-based and chunk-based analysis,
+VULTURE will generate a comprehensive vulnerability report.
+This report not only includes the CVE-ID of the vulnerability
+but also provides the patch commit URL from our vulnerability
+segment of the database, along with details of the chunks
+involved in the detection process, to facilitate further patching
+on 1-day vulnerabilities by developers.

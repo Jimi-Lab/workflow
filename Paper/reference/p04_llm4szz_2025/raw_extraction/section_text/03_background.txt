@@ -1,0 +1,137 @@
+2 Background
+In this section, we first introduce the SZZ algorithm’s variants. Then we present our motivation
+examples.
+2.1 SZZ Algorithms
+AG-SZZ. The AG-SZZ algorithm was proposed by Kim et al. [Kim et al . 2006]. They observed
+that some changes in bug-fixing commits, such as blank lines, comments, and cosmetic changes,
+do not affect the program’s behavior. Therefore, they excluded these changes when tracing back
+deleted lines. Additionally, they utilized the annotation graph instead of simply using the annotate
+command, as the annotation graph provides more detailed information about line changes and
+movements.
+MA-SZZ. Da Costa et al. proposed the MA-SZZ algorithm. [Da Costa et al. 2016]. They found that
+the AG-SZZ algorithm mistakenly identifies commits with only meta-changes as bug-inducing
+commits. Meta-changes refer to branch changes, merge changes, and property changes. Da Costa et
+al. addressed this issue by connecting all meta-change nodes in the annotation graph to their prior
+changes, ensuring that the MA-SZZ algorithm does not include meta-changes as bug-inducing
+commits.
+R-SZZ and L-SZZ. L-SZZ and R-SZZ, both based on the AG-SZZ algorithm, were proposed by
+Davies et al. [Davies et al . 2014]. They improved the AG-SZZ algorithm by selecting only one
+commit as the bug-inducing commit from the results produced by the AG-SZZ algorithm. R-SZZ
+selects the commit with the most recent date, while L-SZZ selects the commit with the most changed
+lines.
+RA-SZZ. Neto et al. [Neto et al . 2018] proposed the RA-SZZ algorithm after discovering that
+previous SZZ algorithms trace back changed lines related to refactoring operations when locating
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 005 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:5
+1    static void deferred_probe_timeout_work_func(struct work_struct *work)
+2    {         
+3   -          struct device_private *private, *p;
+4   +         struct device_private *p;
+5              driver_deferred_probe_timeout = 0;
+6              driver_deferred_probe_trigger();
+7              flush_work(&deferred_probe_work);
+8   -          list_for_each_entry_safe(private, p, &deferred_probe_pending_list, deferred_probe)
+9   -                     dev_info(private->device, "deferred probe pending\n");
+10 +         mutex_lock(&deferred_probe_mutex);
+11 +         list_for_each_entry(p, &deferred_probe_pending_list, deferred_probe)
+12 +                      dev_info(p->device, "deferred probe pending\n");
+13 +         mutex_unlock(&deferred_probe_mutex);
+14 +         wake_up_all(&probe_timeout_waitqueue);
+15    }
+16    static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+17          deferred_probe_timeout_work_func);
+Fixing Commit: eed6e41813d in linux
+driver core: Fix locking bug in deferred_probe_timeout_work_func(). list_for_each_entry_safe() is only useful if we are 
+deleting nodes in a linked list within the loop. It doesn't protect against other threads adding/deleting nodes to the list in 
+parallel.
+1 files changed, 5 additions(+) and 3 deletions(-)
+dd.c
+Fig. 1. Motivation example one
+bug-inducing commits. Since refactoring operations do not affect the program’s behavior, including
+them may introduce noise. Therefore, they used two tools RefDiff [Silva and Valente 2017] and
+Refactoring Miner [Tsantalis et al. 2018] to exclude refactoring modifications before tracing back
+lines. However, this algorithm is limited to Java projects, as the two tools mentioned above cannot
+work on other programming languages.
+Neural-SZZ. Neural-SZZ, proposed by Tang et al. [Tang et al. 2023], is based on deep learning.
+They observed that the previous methods fail to consider the semantic meaning of changed lines
+and the relationships between them. To address this, they utilize the CodeBERT [Feng et al. 2020]
+model to embed the changed lines, capturing their semantic meanings. Additionally, they use a
+heterogeneous graph attention network (HAN) [Wang et al . 2019] to capture the relationships
+between changed lines. After obtaining the embeddings of the changed lines, they employ the
+RankNet [Burges 2010] model to select the deleted lines that are most likely to be the root cause of
+the bug. Finally, they trace back the top N lines in the ranked list to locate bug-inducing commits.
+The authors implemented the algorithm only for the Java programming language.
+2.2 Potential and Limitations of LLMs
+In this subsection, we present motivation examples to demonstrate the potential and limitations
+of LLMs in locating bug-inducing commits. We utilize the LLM GPT-4o-mini [OpenAI 2024] to
+illustrate these examples.
+LLMs have the potential to identify the root cause of the bug from the bug-fixing
+commit and reduce false positives by pinpointing the bug-inducing commit from a set of
+candidates. We illustrate this with the example presented in Figure 1, which involves a bug-fixing
+commit 𝑒𝑒𝑑6𝑒41813𝑑in Linux. We feed the prompt, "Based on the content of the bug-fixing commit,
+analyze the root cause of the bug and output the code statements leading to the bug", along with
+the content of the bug-fixing commit to the LLM. The LLM successfully predicts that the bug occurs
+because the function list_for_each_entry_safe fails to protect the list when multiple threads
+add or delete nodes in parallel. It identifies lines 8 and 9 as buggy statements, filtering out line 3.
+Tracing back these two lines will yield two candidate bug-inducing commits, 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 and
+25𝑏4𝑒70𝑑𝑐𝑐𝑒. We then use the LLM to determine which candidate commit introduces the bug. The
+LLM finds that the commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 introduces line 9 but only modifies the second parameter
+of the dev_infofunction, which does not affect the existence of the bug. Consequently, we filter
+out commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 and identify 25𝑏4𝑒70𝑑𝑐𝑐𝑒 as the final bug-inducing commit.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 006 =====
+ISSTA016:6 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+1      ZooKeeperInstance(Configuration config, ZooCacheFactory zcf) {
+2          ArgumentChecker.notNull(config);
+3          if (config instanceof ClientConfiguration) {
+4            this.clientConf = (ClientConfiguration) config;
+5          } else {
+6            this.clientConf = new ClientConfiguration(config);
+7          }
+8          this.instanceId = clientConf.get(ClientProperty.INSTANCE_ID);
+9      this.instanceName = clientConf.get(ClientProperty.INSTANCE_NAME);
+10      if ((instanceId == null) == (instanceName == null))
+11          throw new IllegalArgumentException("Expected exactly one of instanceName and instanceId to be set");
+12        this.zooKeepers = clientConf.get(ClientProperty.INSTANCE_ZK_HOST);
+13        this.zooKeepersSessionTimeOut = (int)AccumuloConfiguration.getTimeInMillis(clientConf.get(ClientProperty.INSTANCE_ZK_TIMEOUT));
+14        zooCache = zcf.getZooCache(zooKeepers, zooKeepersSessionTimeOut);
+15 +     if (null != instanceName) {
+16 +     // Validates that the provided instanceName actually exists
+17 +       getInstanceID();
+18 +     }
+19     }
+Fixing Commit: c5153331c in Accumulo
+Enforce a valid instance name on ZKI creation by calling getInstanceID(), which would throw a RuntimeException if the user passed in an 
+instance name which did not exist in the zookeepers provided..….
+4 files changed, 29 insertions(+), 8 deletions(-)
+ZooKeeperInstance.java
+Fig. 2. Motivation example two
+However, LLMs face challenges when handling large bug-fixing commits, so it is benefi-
+cial to filter out irrelevant files before identifying buggy statements. This is demonstrated in
+the second motivation example illustrated in Figure 2. This commit modifies four files, introducing
+twenty-nine insertions and making eight deletions. Due to page limits, we only show the most
+important part related to the identification of bug-inducing commits. The lines highlighted in
+blue are added by us and are not in the original patch content. According to the commit message,
+the bug arises because the program fails to call the getInstanceId function to enforce a valid
+instance name and the bug is only related to the instanceNamevariable. If we directly input the
+whole patch into the LLM and require it to identify the code statements leading to the bug, it
+erroneously points the @Test(expected = RuntimeException.class)statement in another file
+named ZooKeeperInstanceTest.java.
+This example also demonstrates that LLMs have the potential to understand commit
+messages and accurately locate buggy statements, but they need sufficient context. If we ex-
+clude the other files and only feed the LLM with changes in the correct file ZooKeeperInstance.java,
+the LLM still cannot output the correct code statements. Concretely, if we provide the LLM with the
+commit message and the original patch content (lines 12 to 19 in Figure 2), it still incorrectly identifies
+line 14 as buggy code statements. This is due to insufficient context. According to the commit mes-
+sage, the bug is related to the variable instanceName. However, in the original patch content(lines
+12 to 19), the only code statement related to the variable instanceNameis line 15, which is used to
+fix the bug. The full content of theZooKeeperInstance constructor(lines 1 to 19 in Figure 2) con-
+tains the statementthis.instanceName = clientConf.get(ClientProperty.INSTANCE_NAME),
+which relates to the instanceName variable. But this statement is not displayed in the original
+patch. By providing the expanded context(lines 1 to 19), which includes the entire constructor, the
+LLM can correctly identify the code statement in line 9.

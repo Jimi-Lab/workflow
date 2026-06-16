@@ -1,0 +1,13 @@
+diff --git a/hw/net/sungem.c b/hw/net/sungem.c
+index 33c3722df6..3684a4d733 100644
+--- a/hw/net/sungem.c
++++ b/hw/net/sungem.c
+@@ -306,7 +306,7 @@ static void sungem_send_packet(SunGEMState *s, const uint8_t *buf,
+     NetClientState *nc = qemu_get_queue(s->nic);
+ 
+     if (s->macregs[MAC_XIFCFG >> 2] & MAC_XIFCFG_LBCK) {
+-        nc->info->receive(nc, buf, size);
++        qemu_receive_packet(nc, buf, size);
+     } else {
+         qemu_send_packet(nc, buf, size);
+     }

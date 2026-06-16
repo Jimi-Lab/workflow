@@ -1,0 +1,103 @@
+378 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+Fig. 1. Function timeline from vulne rability introduction to vulnerability
+ﬁxing.
+across 12 OSS projects and underwent meticulous labeling
+through a combination of PoC input validation and manual
+veriﬁcation.
+• We have implemented a prototype of our approach and
+assessed its performance using our dataset, achieving the
+F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+We also evaluated three contrasting LLMs — a commer-
+cial, closed model (GPT-4) and open models (CodeLlama
+and DeepSeek-V3) — in our approach and reported that
+they achieved similar performances in our context when
+appropriate prompting strategies were applied. More im-
+portantly, by applying our approach, we have detected 202
+incorrect vulnerable OSS versions in NVD reports.
+The source code of V
+ERCATION and our curated dataset are
+publicly available at https://github.com/Veronica-L/Vercation.
+II. B ACKGROUND AND MOTIVATION
+In this section, we clarify the target problem, introduce the
+LLM and discuss the motivation with two examples.
+A. Problem Statement
+Commits serve as comprehensive records of OSS develop-
+ment, functioning as vital checkpoints for tracking the chrono-
+logical evolution of code changes. They enable developers to
+revisit speciﬁc points on a particular date or time. This paper
+centers on vulnerable version identiﬁcation in OSS vulnerabil-
+ities. Within the development of an OSS, certain commits in-
+troduce vulnerabilities, referred to as vulnerability-introducing
+commits (vic), which are later ﬁxed in vulnerability ﬁxing com-
+mits (vfc). The vulnerable version analysis aims to pinpoint the
+vic, allowing us to assess which versions are susceptible to the
+vulnerabilities.
+We posit that the initial function undergoes modiﬁcation by
+a vic and transforms into a vulnerable function F
+v. There prob-
+ably exists some subsequent commits such as feature-adding
+commits and refactoring commits to optimize the function code,
+which is denoted as Fvr. Ultimately, software analysts discover
+the vulnerability and ﬁx the code in thevfc, resulting in the ﬁnal
+function Ff. An illustrative timeline is presented in Fig. 1.
+B. Large Language Model
+Large Language Models (LLMs) have revolutionized nat-
+ural language processing and have demonstrated remarkable
+capabilities in various code-relate d tasks. These models, ex-
+tensively trained on vast amounts of text and code reposito-
+ries, can understand and generate human-like text and code.
+Recent advancements in LLMs, such as GPT-3 [34],G P T - 4
+[30], DeepSeek [35] and CodeLlama [31], have demonstrated
+impressive performance in code generation [19], [20], code
+summarization [21], [22] and program repair [36], [37].
+The success of LLMs in code-related tasks can be attributed
+to their ability to capture compl ex patterns and contextual re-
+lationships in code [31], [38]. Through Pattern Recognition,
+LLMs learn correlations and patterns between code snippets
+from large-scale training data, enabling them to identify code
+with different syntax but sim ilar functionality. Additionally,
+LLMs can infer the purpose of code snippets based on their
+context. This makes them particularly suitable for tasks that
+require a deep understanding of code structure and function-
+ality like vulnerability detection. However, the effectiveness of
+LLMs heavily depends on the quality of prompts used to guide
+their responses. Prompt engineering, the process of designing
+effective prompts, has become a crucial area of research in
+leveraging LLMs for speciﬁc tasks [39], [40].
+Despite their reasoning capab ilities, LLMs also face chal-
+lenges in code analysis tasks such as handling very long code
+sequences. Therefore, in our work, instead of blindly applying
+LLM as a standalone tool, we ﬁrst use static analysis to extract
+candidate vulnerability-related codes and then leverage the se-
+mantic capturing capabilities of LLMs to improve the accuracy
+of extracted codes.
+C. Motivating Examples
+We present two examples of disclosed vulnerable code in
+two distinct scenarios, which motivate our work. Both of these
+vulnerabilities have now been effectively r esolved by the de-
+velopment team. The key points we wish to underscore are
+as follows: 1) The signiﬁcance of understanding vulnerability
+behavior in the process of discovering vic. 2) The challenge of
+accurately pinpointing vic due to the code structural modiﬁca-
+tions introduced by the intermediate commits.
+Example 1) A vulnerability in FFmpeg (CVE-2017-14169
+[41]) shows the limitation of existing approaches in terms
+of capturing vulnerability l ogic. The code snippet of vfc is
+shown in Listing 1. A sanitizing check was added at Line
+13 for the item_num. Without this check, a remote at-
+tacker can make a crafted ﬁle with a large item_num ﬁeld
+such as 0xffffffff, causing a buffer overﬂow issue in the
+avio_read function at Line 25 and potentially leads the
+application to exhibit incorrect behavior or crash.
+V-SZZ[17] assumes the deletion lines in the security patch as
+vulnerable codes and the basic idea of it is to pinpoint the earli-
+est commit introducing the deletion lines as vic. However, vul-
+nerability logic is composed of various vulnerable codes, such
+as Lines 21 and 25 in Listing 1. V-SZZ only considers tracing
+back deleted line (Line 12) and overlooks the real vulnerability
+behavior, leading to incorrect identiﬁcation of vic. V0Finder
+[16] attempts to identify vulnerable versions using code clone
+detection. It generates hash values for the entire vulnerability
+function and identiﬁes code clones according to the distance
+value of two hashes. This method may still introduce excessive
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

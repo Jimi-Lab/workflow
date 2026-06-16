@@ -1,0 +1,65 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\ReDeBug\ReDeBug
+Analysis Mode: static-only
+Execution Status: [EXECUTION NOT REQUESTED]
+
+Repository / File Layout Observed:
+- common.py (3242 bytes)
+- common.pyc (3749 bytes)
+- LICENSE (1070 bytes)
+- patchloader.py (9208 bytes)
+- patchloader.pyc (6644 bytes)
+- README.md (1320 bytes)
+- redebug.py (3110 bytes)
+- redebug_origin.py (2977 bytes)
+- reporter.py (6852 bytes)
+- reporter.pyc (6167 bytes)
+- sourceloader.py (8511 bytes)
+- sourceloader.pyc (6570 bytes)
+
+Primary Files and Static Symbols:
+- common.py
+  classes: FileExt
+  functions/methods: file_type, verbose_print, fnv1a_hash, djb2_hash, sdbm_hash
+  imports: os, re, collections: namedtuple
+- patchloader.py
+  classes: PatchLoader
+  functions/methods: __init__, traverse, _process, _normalize, _build_hash_list, _get_file_type, items, length
+  imports: os, re, time, mimetypes, common
+- redebug.py
+  classes: (none)
+  functions/methods: parse_args
+  imports: sys, os, re, time, common, patchloader, sourceloader, reporter, argparse, magic
+- redebug_origin.py
+  classes: (none)
+  functions/methods: parse_args
+  imports: sys, os, re, time, common, patchloader, sourceloader, reporter, argparse, magic
+- reporter.py
+  classes: Reporter
+  functions/methods: __init__, _exact_match, _html_escape, output
+  imports: time, collections: defaultdict, common, patchloader, sourceloader
+- sourceloader.py
+  classes: SourceLoader
+  functions/methods: __init__, traverse, _process, _normalize, _query_bloomfilter, _get_file_type, items, length, match_items
+  imports: sys, os, re, time, collections: defaultdict, common, bitarray
+
+README / License Evidence:
+- README.md: says this is a Python reimplementation for usability/adaptability and is different from the original faster C implementation used in IEEE S&P evaluation.
+- LICENSE
+
+Key Static Evidence:
+- redebug.py is the CLI entrypoint; it parses patch_path, source_path, output_file, n-gram size, context lines, and verbose mode.
+- patchloader.py defines PatchLoader.traverse/_process/_normalize/_build_hash_list/_get_file_type for unified-diff ingestion, deleted/context-line extraction, normalization, and multi-hash n-gram signatures.
+- sourceloader.py defines SourceLoader.traverse/_process/_normalize/_query_bloomfilter/_get_file_type for source traversal, normalization, Bloom-filter candidate matching, and source match indexing.
+- reporter.py defines Reporter._exact_match/_html_escape/output for exact-match verification after Bloom-filter candidate generation and HTML report output.
+- common.py defines FileExt, PatchInfo, SourceInfo, ContextInfo, normalization regexes, global ngram/context settings, and hash functions.
+
+Static Consistency Notes:
+- Local Python source supports the paper's syntax-based unpatched code clone workflow at a structural level.
+- Local Python source does not support claims about the original S&P implementation performance because README states the evaluated system used a different faster C implementation.
+- Local target does not include the Debian/Ubuntu/SourceForge/Linux datasets, security patch corpus, generated databases, or report outputs. [NEEDS ARTIFACT]
+- Runtime behavior, scalability, and detection results remain [EXECUTION NOT REQUESTED].
+
+Missing Data / Missing Entrypoints:
+- Original faster C implementation used in the IEEE S&P evaluation is absent. [NEEDS ARTIFACT]
+- Large-scale source corpus and security patch dataset are absent. [NEEDS ARTIFACT]
+- Dependency lockfile/environment file is absent; README lists dependencies only.

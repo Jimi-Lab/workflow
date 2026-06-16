@@ -1,0 +1,32 @@
+Page: 9
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2227
+commits are not the most recent changes before the bug ﬁx, but
+rather appeared earlier in a deleted or modiﬁed line’s change
+history.
+For example, Fig. 1 shows a line’s change history (i.e., it-
+eratively using git blame until the initial commit) of the bug-
+ﬁxing commit 68ad6d.11 Following Bao et al. [48], we call the
+immediately preceding the lines changed in the ﬁxing commit
+the previous commits (i.e., commit 53c13b in Fig. 1) and all
+commits (except the initial one) that previously modiﬁed these
+lines as the descendant commits (i.e., commit 8c49d9, 40747f,
+61a492 in Fig. 1). We refer to the commit at which tracing
+can no longer continue as the initial commit (i.e., commit
+454ede in Fig. 1). B-SZZ identiﬁed the previous commit as the
+bug-inducing commit, relying on using git blame once. Other
+algorithms, such as AG-SZZ and MA-SZZ, which improve on
+B-SZZ, access the rest of the descendant commits, identifying
+bug-inducing commits from other commits by considering cri-
+teria such as whether the commit is a meta-change. However, no
+existing algorithm comprehensively examines the line change
+history to identify the bug-inducing commit.
+Therefore, we propose the Tracing-Commit-SZZ (TC-SZZ)
+algorithm, which assumes a distinct function as compared to
+previous SZZ algorithms. Unlike the six SZZ algorithms dis-
+cussed in this paper, which normally identify only the pre-
+vious commit as the bug-inducing commit, and V-SZZ [48],
+which considers the initial commit based on the observation
+that vulnerabilities are often foundational, TC-

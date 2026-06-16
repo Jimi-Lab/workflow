@@ -1,0 +1,48 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:17
+Table 6. The performance comparisions between all methods in extended datasets
+Method DS_LINUX DS_GITHUBPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.443 0.5920.507 0.416 0.6690.513
+AG-SZZ 0.480 0.532 0.505 0.480 0.581 0.526
+MA-SZZ 0.407 0.532 0.461 0.401 0.595 0.479
+R-SZZ 0.601 0.458 0.519 0.621 0.520 0.566
+L-SZZ 0.564 0.430 0.488 0.548 0.459 0.500
+LLM4SZZ0.642 0.579 0.609 0.646 0.604 0.624
+Failing to choose the correct bug-inducing commit among all candidates. The remaining
+12 test cases fail because LLM4SZZ does not identify the correct bug-inducing commit among
+all candidates. The main reason is that LLM4SZZ fails to determine whether a commit contains
+the bug. The bug-fixing commit 0𝑏136454741 in Figure 8 is a typical example. From the commit
+message, LLM4SZZ first locates two buggy statements, lines 2 and 4, resulting in two candi-
+date commits: 𝑒387𝑓7𝑑5𝑓𝑐𝑐 and 7907𝑓23𝑎𝑑𝑐1. Commit 𝑒387𝑓7𝑑5𝑓𝑐𝑐 introduces line 4 and re-
+places the former function unregister_netdevice_notifier_dev_netwith the current function
+unregister_netdevice_notifier_net. The LLM determines that although returning from the
+function unregister_netdevice_notifier_dev_net requires setting the notifier_cal field to
+null, this does not imply the same for the functionunregister_netdevice_notifier_netas they
+are different functions. Therefore, it determines that commit 𝑒387𝑓7𝑑5𝑓𝑐𝑐ˆ1 does not contain the
+bug, and LLM4SZZ incorrectly identifies 𝑒387𝑓7𝑑5𝑓𝑐𝑐 as the bug-inducing commit.
+6.2 Data Leakage
+Since all three datasets were collected before the release of LLMs like GPT-4o-mini [OpenAI
+2024], there is a potential issue that the performance improvement of LLM4SZZ may result from
+data leakage. To address this concern, we extend two of the datasets. To extend DS_GITHUB,
+we follow the same approach as the original paper [Rosa et al . 2021]. Specifically, we iterate
+through all commits in the dataset’s projects, identifying those whose commit messages contain
+keywords such as "fix" "bug" and "introduce". These commits are added to a candidate list. As
+GPT-4o-mini’s knowledge is limited to data available up to October 2023 [OpenAI 2024], we exclude
+all commits dated before this cutoff. We initially identify 186 candidate commits. Each commit
+is then manually reviewed to confirm its relevance to bug fixing and to ensure the existence of
+corresponding bug-inducing commits. After this filtering process, we obtain 148 verified bug-fixing
+commits and their associated bug-inducing commits. To extend the DS_LINUX dataset, we adopt
+the method used in the original study [Lyu et al . 2024]. Bug-fixing commits in Linux typically
+include the keyword "Fixes:" followed by the commit ID of the bug-inducing commit. Using a
+regular expression, we identify commits with this pattern. Commits dated before October 2023 are
+excluded, resulting in 9,913 bug-fixing commits. From these, we randomly sample 500 commits
+for the experiment, ensuring a 95% confidence level and a margin of error under 5%, the same
+as section 4.2. For DS_APACHE, extending the dataset is more challenging as it is based on bug
+reports that lack a fixed format for identifying bug-inducing commits. In the original study, all bug
+reports were manually analyzed, which required significant human effort. Given that our objective
+is to demonstrate that the performance improvement of LLM4SZZ is not due to data leakage, the
+extended datasets of DS_GITHUB and DS_LINUX are sufficient for this purpose. Therefore, we opt
+not to extend DS_APACHE.
+Table 6 presents the experimental results of LLM4SZZ and the baselines for identifying bug-
+inducing commits across the extended datasets. The best results are highlighted in bold. Among
+the baselines, the R-SZZ algorithm achieves the best performance in two datasets. In DS_LINUX,
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

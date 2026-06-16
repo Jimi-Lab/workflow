@@ -1,0 +1,510 @@
+5 Results
+In this section, we present the results of applying our weighted
+average heuristic for lifetime estimation on a large dataset of
+5,914 CVEs with available fixing commits 16. For 1,171 of
+those data points we use ground truth data, and for the rest
+we use the approach described in Section 4 to approximate
+their lifetimes.
+5.1 General
+Table 3 shows an overview of the computed lifetimes for each
+project, as well as for the dataset as a whole. In general, vul-
+nerabilities live in the code for long periods of time (over
+1,900 days on average). This fact has also been indicated by
+previous research [1, 10, 11, 28]. We observe large differences
+between projects (TCPDump has 4 times the average lifetime
+of Chromium). There can be multiple possible explanations
+for these differences (e.g. better security protocols, general
+16Due to the restrictions of the heuristic (e.g. only consider changes in
+C/C++ files) the total number of CVEs with an estimated or ground truth
+lifetime is 5,436.
+
+===== PAGE 009 =====
+0 1000 2000 3000 4000 5000 6000
+Heuristic lifetime (days)
+0.0000
+0.0002
+0.0004
+0.0006Density
+Exponential fit
+Median
+Mean
+(a) Histogram for heuristic data
+0 1000 2000 3000 4000 5000 6000
+Ground truth lifetime (days)
+0.0000
+0.0005
+0.0010Density
+Exponential fit
+Median
+Mean (b) Histogram for groundtruth data
+0 1000 2000 3000 4000 5000 6000
+Exponential theoretical quantiles
+0
+2000
+4000
+6000Heur. quant.
+(c) Q-Q plot for heuristic data
+0 1000 2000 3000 4000 5000 6000
+Exponential theoretical quantiles
+0
+2000
+4000
+6000GT quant.
+ (d) Q-Q plot for ground truth data
+Figure 4: Comparison of histograms of lifetime distributions between heuristic and ground truth data for the same CVEs. The exponential fit
+to the histograms and the corresponding Q-Q plots are also provided.
+development, code churn) that we further touch upon in the
+following subsections. Also, we observe that the median is
+generally lower than the mean. This gives an indication re-
+garding the distribution of lifetimes within a project. This
+issue is specifically tackled in the following subsection.
+Project Lifetime
+Average Median
+Linux (kernel) 1,732.97 1,363.5
+Firefox 1,338.58 1,082.0
+Chromium 757.59 584.5
+Wireshark 1,833.86 1,475.0
+Php 2,872.40 2,676.0
+FFmpeg 1,091.99 845.5
+OpenSSL 2,601.91 2,509.0
+Httpd 1,899.96 1,575.5
+Tcpdump 3,168.58 3,236.0
+Qemu 1,743.86 1,554.0
+Postgres 2,336.56 2,140.0
+Average of projects 1,943.48 1,731.0
+All CVEs 1,501.47 1,078.0
+Table 3: Overview of average lifetimes per project (ordered by
+number of CVEs)
+5.2 Distribution
+Figure 5 shows the distribution of lifetimes for all CVEs,
+along with an exponential fit. Upon initial visual inspection of
+the histogram of Figure 5, we selected the exponential distri-
+bution as a potentially good fit to the data. Then, by employing
+a Q-Q plot [39] we verified that the exponential distribution
+is indeed an excellent fit for lifetimes of up to around 4,200
+days (Figure 6), accounting for 94% of our data. Then, the
+0 1000 2000 3000 4000 5000 6000 7000
+lifetime
+0.0000
+0.0002
+0.0004
+0.0006Density
+Exponential fit
+Median
+Mean
+Figure 5: Distribution of vulnerability lifetimes. Equally sized bins.
+distribution of the empirical values is a bit denser than the
+theoretical at around 5,000 days, and sparser for higher life-
+times (over 6,000 days). We assess that the exponential is still
+a good fit – and thus useful for calculations – for lifetimes
+up to around 5,000 days (98% of our data). We expected the
+existence of a cut-off point for the fit on the tail of the data
+since the exponential continues generating some small – yet
+non-negligible – mass for very high values (since it goes to
+infinity), while the lifetimes in our empirical dataset are natu-
+rally constrained by the age of the code. We then employed
+the Kolmogorov-Smirnov test as described in the seminal
+methodology of Clauset et al. [9] to statistically compare the
+fit of the exponential to other candidate distributions, such as
+the power law or the lognormal. We found the exponential to
+be a statistically significant better fit. Further evidence sup-
+porting the goodness of fit of the exponential can be found in
+Appendix A.2.
+Given the above, the distribution for the lifetimes can be
+approximated by the probability density function below17:
+f (x) = 1
+1501.47e− 1
+1501.47 x (2)
+17For most of the probability mass, except the tail (>5,000 days) as dis-
+cussed above.
+
+===== PAGE 010 =====
+0 1000 2000 3000 4000 5000 6000
+Exponential theoretical quantiles
+0
+1000
+2000
+3000
+4000
+5000
+6000Sample quantiles
+Figure 6: Q-Q Plot comparing theoretical exponential distri-
+bution and our data (blue points). The fit is excellent up to
+a lifetime of around 4,200 days and then gradually diverges.
+We can say it remains a good fit up to a lifetime of around
+5,000 days.
+This distribution has an average value of 1,501.47 days
+and a median (referred to as half-life in nuclear physics) of
+ln2·1, 501.47 = 1, 040.74 days. This is the amount of time
+required for half of the vulnerabilities to be fixed. Conversely,
+63% of vulnerabilities are fixed before the average lifetime of
+1,501.47 days. Exponential distributions also provide satisfac-
+tory fits for the vulnerability lifetimes of single projects, when
+considered in isolation (with small variations). This can also
+be observed in the average and median values of Table 3. For
+most projects (especially the ones with many data points avail-
+able), the median is close to ln2 (~0.69) times the average.
+According to our analysis, for all intended purposes of this
+paper, the empirical distribution of lifetimes in a project can
+be adequately approximated by an exponential distribution.
+5.3 Trends over time
+To investigate the progression of vulnerability lifetimes over
+time, we grouped CVEs by their fixing year (year of their
+last fixing commits, as also discussed in Section 2.2) and cal-
+culated the average lifetime for each year. Figure 7 shows
+how vulnerability lifetimes progressed over the years for the
+dataset as a whole, as well as for Firefox, Chromium and
+Linux. These were the projects that had enough CVEs (>20)
+for each year to confidently assess their lifetime over an ex-
+tended period. Specifically, the grey area in the plots covers
+the years before the first year when at least 20 CVEs with
+fixing commits were available for the project.
+Overall (Figure 7a), vulnerability lifetimes show a sign of
+increase over the years with some fluctuation. When consid-
+ering all CVEs, their average vulnerability lifetime increases
+by 42.78 days per year.
+Considering the other 3 selected projects in particular, for
+Chromium (Figure 7c) and Linux (Figure 7d) we can observe
+clear increasing trends, whereas for Firefox (Figure 7b), vul-
+nerability lifetimes are stable, even with a slight decreasing
+trend. It is interesting to note that although the overall increas-
+ing trends for Chromium and Linux are similar, lifetimes for
+Chromium can fluctuate significantly over the years, while
+the values for Linux fluctuate less. For the other projects that
+do not have enough datapoints for year-by-year analysis, we
+group CVEs per 2 or more years (for additional figures refer
+to the full version of the paper). In total, out of the 11 projects
+in our study: 3 (Chromium, Linux, httpd) have a clear and sig-
+nificant (ordinary least squares linear fit factor > 0 with 95%
+confidence) increasing trend; 4 (Qemu, OpenSSL, Php, Post-
+gres) show an increase but with fewer data points available; 4
+(Firefox, Wireshark, Tcpdump, FFmpeg) do not exhibit any
+particular trend.
+Does increasing vulnerability lifetimes mean that code
+quality is getting worse over time? We came up with two
+possible conflicting explanations for increasing vulnerability
+lifetimes. The first is optimistic: we are fixing vulnerabili-
+ties faster than we are introducing them, and thus, there are
+less new vulnerabilities to find and the average age of those
+we are fixing is increasing, as we are “catching up”. As put
+forward by Corbet in 2010 [11] regarding the Linux kernel
+“[a prominent kernel developer told me that] the bulk of the
+holes being disclosed were ancient vulnerabilities which were
+being discovered by new static analysis tools. In other words,
+we are fixing security problems faster than we are creating
+them”. The pessimistic explanation is that we are introducing
+vulnerabilities at a similar or even greater rate than we are
+fixing them, and that the average age of those that are fixed is
+increasing, along with the age of the codebase. The optimistic
+explanation would require a gradual change of the shape of
+the distribution of lifetimes. As can be seen in Figure 8, the
+distribution remains exponential, with gradually increasing
+mean over time. Thus, the optimistic explanation is not sup-
+ported by the empirical measurements, making the pessimistic
+explanation more likely. However, deeper investigation into
+the relationship between vulnerability age and code age in
+general is required. We present this in the next section.
+5.4 Code age
+To compute the overall code age of a project at a given point
+in time, we employed the following method. For each year X,
+we consider the state of the repository on the 1st of July in
+that year (half-way point). Subsequently, we “blame” (getting
+the point in time a line was last changed) every line in the
+repository. We consider the time-span between the last change
+and the half-way point to be the regular code age for that line
+in year X. To analyze the relation between regular code age
+and fixed vulnerable code age (vulnerability lifetime), we
+calculate the average code age for each year that we have
+vulnerability lifetime data for, and plot the result in Figure 9
+
+===== PAGE 011 =====
+2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Lifetime
+Li&Paxson estimate
+(a) All CVEs
+2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Lifetime
+Li&Paxson estimate (b) Firefox
+2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Insufficient data
+Lifetime
+Li&Paxson estimate
+(c) Chromium
+2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Insufficient data
+Lifetime
+Li&Paxson estimate (d) Linux
+Figure 7: Average Lifetime trend (computed with our weighted average approach) for all CVEs, as well as for Firefox, Chromium and Linux,
+in isolation. A lower bound computed similarly to Li and Paxson’s approach is included for completeness.
+0 1000 2000 3000 4000 5000 6000 7000
+0.0000
+0.0002
+0.0004
+0.0006
+0.0008
+Exponential fit <= 2013
+Exponential fit <= 2015
+Exponential fit <= 2017
+Exponential fit <= 2020
+Figure 8: Distribution fit of lifetimes by year of fix
+for Firefox, Chromium, Linux, and Httpd.
+We observe a close correlation between average code age
+and average vulnerability lifetime for all projects. Both quanti-
+ties have an increasing trend over time for all projects, except
+for Firefox, for which there is a slightly decreasing trend for
+both quantities. We can make two general key observations
+here. First, vulnerability lifetime is lower than regular code
+age. Second, although for most projects the spread between
+“vulnerable code” and “all code” appears to remain constant
+over time, for some projects (e.g. Chromium – see Figure 9b),
+this spread increases. These observations and their interpre-
+tation carry significant insights that we discuss in Section 6.
+But first, in the following subsection, we investigate whether
+there is a relation between the lifetime of a vulnerability and
+the type of bug that introduced it.
+5.5 Types
+CVE entries in the NVD are assigned a Common Weakness
+Enumeration identifier (CWE) [22] that denotes the type of
+error that led to the vulnerability. However, these identifiers,
+in their raw form, are not suited for studies involving multiple
+projects, since (a) different analysts may assign CWEs on
+different depths in the CWE hierarchy18, and therefore CWEs
+are not directly comparable, (b) one CWE can have multiple
+top-level (“root”) CWEs, making it difficult to compare on
+the root level, (c) depending on the CWE View chosen for the
+root level (e.g. CWE VIEW: Research Concepts CWE-1000),
+some of the CWEs in the NVD entries may not even be part
+of the hierarchy.
+Therefore, we created a mapping between CWE identifiers
+and 6 custom top level categories (see Table 4) that covers
+the most relevant research concepts. The categories are broad
+enough that each CWE can be assigned to one of them, and
+the number of total categories is low to allow for large enough
+sample sizes within each.
+Code Development Quality refers to vulnerabilities that
+are introduced due to violations of standard coding practices
+like infinite loops, division by zero, etc. Security Measures in-
+cludes cryptographic issues as well as flaws related to authen-
+tication, permission and privilege management. The Memory
+Management, Input Validation and Sanitization, and Concur-
+18CWE identifiers are organized in a hierarchical structure. More general
+identifiers, e.g. CWE-682: Incorrect Calculation, have multiple more specific
+“children”, e.g. CWE-369: Divide By Zero.
+
+===== PAGE 012 =====
+2006 2008 2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age
+(a) Firefox
+2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age (b) Chromium
+2010 2012 2014 2016 2018 2020
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Lifetime
+Regular code age
+(c) Linux
+2000 2002 2004 2006 2008 2010 2012 2014 2016 2018
+year of fixing commit
+0
+1000
+2000
+3000
+4000lifetime in days
+Vul lifetime
+Regular code age (d) Httpd
+Figure 9: Age of vulnerable code vs. all code, along with linear fits, for Firefox, Chromium, Linux (kernel) and Httpd. For Httpd, vulnerability
+lifetimes are calculated in 4 or 5-year intervals to guarantee confidence in the estimation.
+rency categories are self-explanatory. Others is the category
+that includes all CWEs that could not be matched to any
+of the five aforementioned categories. The exact mapping
+between CWE identifiers and our categories is available in
+Appendix A.1. The average vulnerability lifetime per category
+is shown in Table 4.
+ID Name Mean Median
+5 Others 1,345.64 984.0
+2 Input Validation and Sanitization 1,354.07 944.5
+4 Security Measures 1,384.05 996.5
+6 Concurrency 1,604.10 1,296.0
+1 Memory and Resource Management 1,633.60 1,129.0
+3 Code Development Quality 1,760.96 1,333.0
+Table 4: Vulnerability categories and their mean and median life-
+times (in days) for all CVEs
+Analysis of the data for all CVEs indicates a significant19
+difference in distribution, agreeing with previous results [18].
+More thorough analysis, however, reveals that this can
+be attributed to differences in the prevalence of different
+types in different projects, rather than some deeper relation
+(an instance of Simpson’s paradox). Specifically, for Linux,
+Chromium, and Firefox, no significant difference can be statis-
+tically observed20. As an example, the figures for Chromium
+19Kruskal-Wallis-H test with p-value of 2-91e-07 and 40% of pairwise
+comparisons sign. different (α = 0.05), even with Bonferroni correction.
+20Kruskal-Wallis-H test with p-values 0.492 (Chromium), 0.075 (Firefox)
+and 0.525 (Linux).
+are given in Table 5.
+ID Name Mean Median
+6 Concurrency 597.43 543.0
+3 Code Development Quality 647.36 700.0
+2 Input Validation and Sanitization 687.92 525.0
+5 Others 706.71 576.0
+1 Memory and Resource Management 770.25 618.0
+4 Security Measures 736.49 545.0
+Table 5: Vulnerability categories of Chromium, mean and median
+lifetimes in days
+5.6 Case study on impact of fuzzing
+To show the utility of vulnerability lifetime as a metric to
+study issues with practical implications, we investigate the
+effect of automated tools (esp. fuzzing tools) on vulnerabil-
+ity lifetimes. Although fuzz testing in general is not a new
+idea, “modern” coverage-guided fuzzing with fuzzers like
+AFL(++)21, libFuzzer22 and Honggfuzz23 (syzkaller24 for the
+kernel), combined with sanitizers (e.g. (K)ASan [35], MSan25,
+21https://github.com/google/AFL, https://github.com/
+AFLplusplus/AFLplusplus
+22https://llvm.org/docs/LibFuzzer.html
+23https://github.com/google/honggfuzz
+24https://github.com/google/syzkaller
+25https://clang.llvm.org/docs/MemorySanitizer.html
+
+===== PAGE 013 =====
+UBSan26) to expose latent bugs, started being widely used
+for FOSS in around 2016 (AFL introduced to the Linux com-
+munity in 2015 27, first syzkaller talk in 2016 28, OSSFuzz
+launched in late 201629). One may expect a measurable im-
+pact on vulnerability lifetimes by the adoption of fuzzing tools.
+Before approaching this question empirically, we discuss the
+theoretically expected impact on vulnerability lifetimes from
+the introduction of fuzzing tools. The introduction of fuzzers
+in long-lived projects would result in the discovery of some
+very old bugs, and thus we would expect an initial increase
+of the average lifetime of vulnerabilities for a short period of
+time. Then, considering these old bugs have been removed,
+we would expect continuous fuzzing to result in the discovery
+of bugs relatively quickly after their introduction, resulting in
+a drop in the average vulnerability lifetime. Overall, the ex-
+pected behaviour would be a surge followed by a considerable
+decline.
+We move on to empirically approach the question. Making
+the simplifying assumption that memory-related bugs are the
+traditional and natural targets of fuzzing, we plot the trend
+of Linux memory-related CVEs compared to Linux CVEs
+that fall into other categories (categories as presented in Sec-
+tion 5.5). Figure 10 shows no significant difference in the
+lifetime trend for the two sets of CVEs. Also, we do not ob-
+serve any behaviour consistent with our expectation. It seems
+that the introduction of “modern” fuzzing tools did not have
+any noticeable impact on Linux lifetimes.
+2011 2012 2013 2014 2015 2016 2017 2018 2019 2020
+year of fixing commit
+0
+500
+1000
+1500
+2000
+2500lifetime in days
+Memory vulnerabilities
+Others
+Figure 10: Lifetimes of memory-related vs. all other vulnera-
+bility categories for Linux.
+Why would this be the case? We continue the investi-
+gation by looking into the five longest-surviving CVEs in
+our ground truth dataset for any project. Four of them are
+Linux CVEs (CVE-2019-15291, CVE-2019-19768, CVE-
+2019-11810, CVE-2019-19524), each with a lifetime of
+around 5,000 days (more than 13 years). All CVEs describe
+26https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.
+html
+27https://lwn.net/Articles/657959/
+28https://github.com/google/syzkaller/blob/master/docs/
+talks.md
+29https://opensource.googleblog.com/2016/12/
+announcing-oss-fuzz-continuous-fuzzing.html
+memory-related issues. Interestingly, 2 of them (first and last)
+describe issues related to USB drivers discovered by syzkaller.
+Fuzzing of the USB subsystem of the kernel has a rich history.
+Andrey Konovalov reported a batch of Linux USB vulner-
+abilities in 201730, before reporting a new batch in 2019 31
+upon resumption of the USB fuzzing project. Moreover, Peng
+and Payer [30] (USBFuzz) used USB device emulation and
+coverage-guided fuzzing to discover a number of vulnerabil-
+ities in “already extensively fuzzed – versions of the Linux
+kernel”, showing that their approach is complementary to
+syzkaller. The progressive discovery of vulnerabilities in this
+one specific subsystem of the Linux kernel showcases that
+the notion of “already fuzzed” may be misleading, even for
+relatively small subsystems of complex systems. The lack of
+observable impact on memory-related CVE lifetimes upon
+the introduction of fuzzing tools supports this assertion as
+very old bugs continue to get discovered with (possibly new)
+fuzzing tools years after fuzzing has started on the specific tar-
+get. Our evidence suggests that fuzzing complex systems
+is not a “one-off” automated task, rather a complex ever-
+evolving process. A different but similar interpretation is that
+the “initial increase” in lifetimes that we expected due to the
+introduction of fuzzing is prolonged as new tools and tech-
+niques continuously enter the arsenal of testers (e.g. consider
+the new approaches to USB fuzzing referenced above).
+None of the above imply that fuzzing in general, or as car-
+ried out in the Linux kernel, does not significantly contribute
+to improving security. Continues fuzzing finds large numbers
+of bugs (e.g. >3,000 Linux bugs discovered by syzkaller and
+fixed32). Most of these bugs are not assigned CVEs due to
+several reasons, e.g. they are fixed before the next release of a
+version or their security implications are unclear. This might
+be a reason why no decrease in vulnerability lifetimes is ob-
+served in our dataset, which only includes CVEs. However our
+techniques are of general relevance and can be used to mea-
+sure the lifetimes of other bugs (e.g. discovered by syzkaller)
+as well. Furthermore, some of these bugs are not memory-
+related (e.g. KCSAN33 is a sanitizer for Linux concurrency
+bugs). Overall, this case study highlights the complicated
+nature of fuzzing and its relation to vulnerability lifetimes.
+Quantifying the impact of fuzzing in improving the security of
+codebases and its impact on lifetimes is still an open problem
+that needs further investigation.

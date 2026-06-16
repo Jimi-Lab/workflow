@@ -1,0 +1,143 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 1 
+Comparison of attack discovery approaches . ( DS ) refers to domain-speciﬁc, ( N/A ) refers to not available, ( ✓ ) refers to provided, ( ✗ ) refers to not provided. 
+Approaches Data Models 
+Detection 
+Techniques 
+Data Reduction 
+Techniques 
+Attack 
+Reconstruction 
+High-Level 
+Attack 
+Summarization 
+Background 
+Knowledge 
+Linking 
+Published 
+Prototype 
+Backtracking ( King and 
+Chen, 2003a ) 
+Custom Graph Naive 
+Backtracking 
+✗ ✓ ✗ ✗ N/A 
+AIQL ( Gao et al., 2018b ) Relational DB DS Query 
+Language 
+✗ ✗ ✗ ✗ N/A 
+SAQL ( Gao et al., 2018a ) Relational DB DS Stream 
+Query 
+✗ ✗ ✗ ✗ N/A 
+POIROT ( Milajerdi et al., 
+2019a ) 
+Custom Graph Graph 
+Alignment 
+✗ ✓ ✗ ✗ N/A 
+HOLMES ( Milajerdi et al., 
+2019b ) 
+Custom Graph HSG/Severity 
+Score 
+✗ ✓ ✓ ✗ N/A 
+RapSheet ( Hassan et al., 
+2020 ) 
+Custom Graph EDR/Threat 
+Score 
+CPR ( Xu et al., 2016 ) ✓ ✓ ✗ N/A 
+Zou et al. (2020) Custom Graph Pre/Post 
+Condition 
+✗ ✗ ✓ ✗ N/A 
+SLEUTH ( Hossain et al., 
+2017 ) 
+Custom Graph Tag 
+Propagation 
+✗ ✓ ✗ ✗ N/A 
+MORSE ( Hossain et al., 
+2020 ) 
+Custom Graph Tag 
+Propagation 
+CSR ( Hossain et al., 
+2018 ) 
+✓ ✗ ✗ N/A 
+CyGraph ( Noel et al., 2016 ) NoSQL Graph DS Query ✗ ✓ ✗ ✓ ✓ 
+UCO ( Syed et al., 2016 ) RDF Graph SPARQL Query ✗ ✗ ✗ ✓ ✓ 
+Ekelhart et al. (2018) RDF Graph SPARQL Query ✗ ✗ ✗ ✓ ✓ 
+Kurniawan et al. (2020) RDF Graph SPARQL Query ✗ ✓ ✗ ✓ ✓ 
+SLOGERT ( Ekelhart et al., 
+2021 ) 
+RDF Graph SPARQL Query HDT ( Fernández et al., 
+2013 ) 
+✗ ✗ ✓ ✓ 
+KRYSTAL RDF Graph Hybrid HDT ( Fernández et al., 
+2013 ) 
+✓ ✓ ✓ ✓ 
+linking to background knowledge (e.g., assets, vulnerabilities, cy- 
+berthreat intelligence, etc.); such contextualization can help ana- 
+lysts to identify and assess high-level attack scenarios in order to 
+understand their signiﬁcance, cause, and impact. (iv) We provide 
+an open source prototype of the system 4 and evaluate it on a well- 
+established large-scale dataset ( DAR, 2021 ). 
+The remainder of this paper is structured as follows: 
+Section 2 discusses related work in threat detection and attack 
+graph construction, Section 3 provides the necessary background 
+on knowledge graph concepts that are central to the developed ap- 
+proach; Section 4 puts forth a set of requirements as a basis of our 
+proposed solution; Section 5 discusses the conceptualization of our 
+approach; Section 6 introduces our knowledge graph-based attack 
+detection framework, and Section 7 discusses the implementation 
+and introduces application scenarios; we evaluate our approach in 
+Section 8 , discuss the results in Section 9 and conclude with an 
+outlook on future research in Section 10 . 
+2. Related work 
+In this article we focus on misuse-based intrusion detec- 
+tion techniques, which search for well-deﬁned patterns of at- 
+tack ( Kumar, 1996 ). Consequently, we organize related work on 
+threat detection and attack graph construction into the following 
+categories: (i) provenance-based tracking, (ii) tactical attack con- 
+struction, (iii) graph queries, and (iv) ontology-based threat detec- 
+tion. Table 1 summarizes and compares existing attack discovery 
+approaches, which will be discussed in the following sections. 
+Provenance-based Tracking Seminal work on provenance-based 
+attack detection ( King and Chen, 2003a ) introduced the idea to 
+investigate attacks through backward tracking. A major limita- 
+tion of initial “naive” backtracking approaches is that they are 
+based on coarse-grained provenance data. This typically introduces 
+a large number of false dependencies in the graph, a problem 
+known as “dependence explosion” ( Hossain et al., 2018 ). Several re- 
+4 https://github.com/sepses/Krystal 
+searchers introduced approaches to mitigate this problem through 
+ﬁned-grained taint-tracking or information ﬂow tracking ( Ji et al., 
+2017; 2018; Kemerlis et al., 2012 ). Although these approaches 
+can accurately distinguish suspicious and benign nodes, scaling 
+them remains a challenge ( Hossain et al., 2018 ). Another ap- 
+proach tried to solve this problem by introducing tag-propagation . 
+SLEUTH ( Hossain et al., 2017 ), for instance, introduced trustwor- 
+thiness tags (t-tags) and conﬁdentiality tags (c-tags) that are used 
+to assign suspicion levels to nodes and propagate them through 
+the provenance graph. In combination with a policy framework, 
+these tags can trigger alarms and successfully identify unseen at- 
+tacks in real-time and with low overhead. However, SLEUTH suffers 
+from numerous false-positives for attacks with long-running pro- 
+cesses ( Hossain et al., 2020 ). MORSE ( Hossain et al., 2020 ) extends 
+this approach by introducing tag-attenuation and tag-decay to cut 
+down false alarms by more than an order of magnitude. To reduce 
+the provenance graph, it indexes all subjects and objects using a 
+numeric index. However, none of these approaches leverage stan- 
+dard representations, but rely on custom graph models and hard- 
+coded rules and policies. Consequently, they are diﬃcult to expand 
+and it is diﬃcult to investigate the resulting attack graphs further, 
+e.g., by linking them to background knowledge. Furthermore, both 
+SLEUTH and MORSE do not explicitly represent the high-level con- 
+text of attacks. As a result, it becomes exceedingly diﬃcult to iden- 
+tify attacks as attack graphs become more complex. 
+Our approach introduces a standard and ﬂexible graph model 
+based on an ontology. Hence, with a standard graph model and 
+declarative rules and policies, our approach can produce compact 
+attack graphs and also ﬂexibly integrate and link them to back- 
+ground knowledge. For graph reduction, we use (Header, Dictio- 
+nary, Triples) HDT ( Fernández et al., 2013 ), a compact RDF-based 
+structure that keeps large provenance graph compressed. We dis- 
+cuss it in more detail in Section 6.1 . 
+Tactical Attack Construction Provenance-based tracking typi- 
+cally relies on a bottom-up approach, i.e., identifying attacks based 
+on the causality relationship of system objects, such as processes, 
+ﬁles, and sockets. By contrast, several approaches follow a top- 
+3

@@ -1,0 +1,40 @@
+ecall
+
+, as we focused
+on the balance between precision and recall.
+Figure 3 presents the measurement results. We confirmed
+that the F1-score appeared the highest when θ was 0.5. For
+Crown and Emscripten, the F1-score was higher when θ is
+greater than 0.5; this is because the ratio of modified VCCs
+was small and thus FPs decreased at higher θ. Overall, the
+precision drops when θ is less than 0.5, while recall decreases
+when θ is greater than 0.6. Hence, we believe that θ of 0.5
+maintains a good balance between high precision and recall.
+One thing to note is that MOVERY can discover 15 VCCs
+that were not discovered in the previous experiments when it
+utilizes θ less than 0.5. In contrast, MOVERY still produces
+4 FNs and 3 FPs even when θ is 0 and 1, respectively; we
+discuss this issue in Section 6 in detail.
+3046    31st USENIX Security Symposium USENIX Association
+
+===== PAGE 012 =====
+Table 6: VCC discovery results of MVP and CENTRIS .
+Name #VCCs ∗ #TP #FP #FN #Unique† Precision Recall
+MVP 266 220 46 184 8 0.83 0.54
+CENTRIS 553 281 272 152 37 0.51 0.65
+*: #VCCs discovered for ten target software, †: #VCCs not discovered by MOVERY .
+5.2 Comparison with MVP
+We then compare MOVERY with MVP [49], a recurring vul-
+nerability detection technique, to demonstrate that MOVERY
+is more effective in discovering VCCs from modified compo-
+nents. Since MVP is not available owing to the commercial
+issue, we implemented MVP based on their paper [49] with
+their default options.
+Result analysis. When we applied MVP to ten target software,
+it discovered 220 VCCs (i.e., TPs) while reporting 46 FPs and
+184 FNs (see Table 6). It is noteworthy that MVP hardly dis-
+covered VCCs belonging to T1 and T2 (see Table 5), because
+MVP does not consider internal OSS modifications. MVP can
+only discover VCCs that contain all the code lines deleted
+from the security patch, and therefore it failed to discover 32
+VCCs that do not conta

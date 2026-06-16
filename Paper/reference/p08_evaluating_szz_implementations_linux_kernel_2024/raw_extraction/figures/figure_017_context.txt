@@ -1,0 +1,31 @@
+Page: 14
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+2232
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+Considering that GPT-4 currently has a cap of 25 messages
+every 3 hours and the manual process involved, we selected
+a sample of 375 failure cases18 (with a 95% conﬁdence level
+and 5% margin of error, following previous work [55], [56],
+[57], [58]) from the total of 14,437 identiﬁed failure cases.
+We exclude the “Line Change Detection” category because
+TC-SZZ was able to identify all bug-inducing commits in this
+group. To simplify, we do not use TC-SZZ in this section, as
+our ground truth in Section VI-C only uses git log -L.
+In Section VI-C, we classiﬁed the 14,437 failure cases into
+three categories: Function-Log Detection, Within-File Detec-
+tion, and Cross-File Detection. This section introduces an
+additional category, Function-Blame Detection, which is a
+subset of Function-Log Detection. The differentiation lies in
+the method used for identifying the bug-inducing commit. In
+the case of Function-Log Detection, the git log -L command
+is employed. This command helps in tracing the evolution of
+speciﬁc parts of a ﬁle, revealing the historical changes that led
+to the current state. For Function-Blame Detection, we utilize
+the git blame command only once. This command allows us to
+pinpoint the last change made to those lines. There are a total of
+3,200 Function-Blame Detection cases and 4,994 Function-Log
+Detection cases. For instance, consider the commit 06bbf75.19
+This commit involves a single deleted line within the function
+“process_response_list”. By applying git blame to all the lines
+of thi

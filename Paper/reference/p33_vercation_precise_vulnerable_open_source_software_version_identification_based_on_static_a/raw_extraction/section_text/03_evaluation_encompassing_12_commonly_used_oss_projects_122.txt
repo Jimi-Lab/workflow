@@ -1,0 +1,339 @@
+evaluation, encompassing 12 commonly used OSS projects, 122
+Common Vulnerabilities and Exposures (CVEs), and a total
+of 1,211 OSS versions. This dataset comprised every patch
+released through Git with respect to those 122 CVEs. The
+ﬁrst author engaged in manual vulnerability validation with the
+help of public Proof-of-Concept (PoC), meticulously labeling
+the presence of vulner abilities across softw are versions. On
+this dataset, V
+ERCATION demonstrated both higher precision
+(91.8%) and recall (94.5%) compared to state-of-the-art meth-
+ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN
+[27], VERJava [28] and Vision [29]. We conducted an ablation
+study using three different LLMs (GPT-4[30], CodeLlama[31],
+and DeepSeek-V3 [32]) to evaluate their vulnerability compre-
+hension capabilities. Utilizing the Few-shot and CoT combined
+strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ-
+cantly improving the F1 score of Joern parser [33] by 92.8%, a
+commonly-used static analysis tool. More importantly, during
+the evaluation, we found 202 version errors in the NVD reports.
+VERCATION has also been shown to be efﬁcient, analyzing each
+vulnerability on an average of 28.61 seconds.
+Contributions. The main contributions of this paper are as
+follows:
+• Unlike previous efforts that heavily relied on pre-deﬁned
+patterns of static analysis tools, we present V ERCATION,
+the ﬁrst framework to integrate the reasoning capability of
+LLM for vulnerable version identiﬁcation tasks, through
+the use of a multi-strategy universal prompt engineering.
+• V
+ERCATION presents a solution based on expanded and
+normalized AST to address the structural modiﬁcations
+in the clone detection challenge, which was designed
+for refactoring commit identiﬁcation during vulnerability
+backtrack.
+• We curated a dataset including 122 published CVEs con-
+taining 1,211 versions. This extensive dataset was curated
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 003 =====
+378 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+Fig. 1. Function timeline from vulne rability introduction to vulnerability
+ﬁxing.
+across 12 OSS projects and underwent meticulous labeling
+through a combination of PoC input validation and manual
+veriﬁcation.
+• We have implemented a prototype of our approach and
+assessed its performance using our dataset, achieving the
+F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+We also evaluated three contrasting LLMs — a commer-
+cial, closed model (GPT-4) and open models (CodeLlama
+and DeepSeek-V3) — in our approach and reported that
+they achieved similar performances in our context when
+appropriate prompting strategies were applied. More im-
+portantly, by applying our approach, we have detected 202
+incorrect vulnerable OSS versions in NVD reports.
+The source code of V
+ERCATION and our curated dataset are
+publicly available at https://github.com/Veronica-L/Vercation.
+II. B ACKGROUND AND MOTIVATION
+In this section, we clarify the target problem, introduce the
+LLM and discuss the motivation with two examples.
+A. Problem Statement
+Commits serve as comprehensive records of OSS develop-
+ment, functioning as vital checkpoints for tracking the chrono-
+logical evolution of code changes. They enable developers to
+revisit speciﬁc points on a particular date or time. This paper
+centers on vulnerable version identiﬁcation in OSS vulnerabil-
+ities. Within the development of an OSS, certain commits in-
+troduce vulnerabilities, referred to as vulnerability-introducing
+commits (vic), which are later ﬁxed in vulnerability ﬁxing com-
+mits (vfc). The vulnerable version analysis aims to pinpoint the
+vic, allowing us to assess which versions are susceptible to the
+vulnerabilities.
+We posit that the initial function undergoes modiﬁcation by
+a vic and transforms into a vulnerable function F
+v. There prob-
+ably exists some subsequent commits such as feature-adding
+commits and refactoring commits to optimize the function code,
+which is denoted as Fvr. Ultimately, software analysts discover
+the vulnerability and ﬁx the code in thevfc, resulting in the ﬁnal
+function Ff. An illustrative timeline is presented in Fig. 1.
+B. Large Language Model
+Large Language Models (LLMs) have revolutionized nat-
+ural language processing and have demonstrated remarkable
+capabilities in various code-relate d tasks. These models, ex-
+tensively trained on vast amounts of text and code reposito-
+ries, can understand and generate human-like text and code.
+Recent advancements in LLMs, such as GPT-3 [34],G P T - 4
+[30], DeepSeek [35] and CodeLlama [31], have demonstrated
+impressive performance in code generation [19], [20], code
+summarization [21], [22] and program repair [36], [37].
+The success of LLMs in code-related tasks can be attributed
+to their ability to capture compl ex patterns and contextual re-
+lationships in code [31], [38]. Through Pattern Recognition,
+LLMs learn correlations and patterns between code snippets
+from large-scale training data, enabling them to identify code
+with different syntax but sim ilar functionality. Additionally,
+LLMs can infer the purpose of code snippets based on their
+context. This makes them particularly suitable for tasks that
+require a deep understanding of code structure and function-
+ality like vulnerability detection. However, the effectiveness of
+LLMs heavily depends on the quality of prompts used to guide
+their responses. Prompt engineering, the process of designing
+effective prompts, has become a crucial area of research in
+leveraging LLMs for speciﬁc tasks [39], [40].
+Despite their reasoning capab ilities, LLMs also face chal-
+lenges in code analysis tasks such as handling very long code
+sequences. Therefore, in our work, instead of blindly applying
+LLM as a standalone tool, we ﬁrst use static analysis to extract
+candidate vulnerability-related codes and then leverage the se-
+mantic capturing capabilities of LLMs to improve the accuracy
+of extracted codes.
+C. Motivating Examples
+We present two examples of disclosed vulnerable code in
+two distinct scenarios, which motivate our work. Both of these
+vulnerabilities have now been effectively r esolved by the de-
+velopment team. The key points we wish to underscore are
+as follows: 1) The signiﬁcance of understanding vulnerability
+behavior in the process of discovering vic. 2) The challenge of
+accurately pinpointing vic due to the code structural modiﬁca-
+tions introduced by the intermediate commits.
+Example 1) A vulnerability in FFmpeg (CVE-2017-14169
+[41]) shows the limitation of existing approaches in terms
+of capturing vulnerability l ogic. The code snippet of vfc is
+shown in Listing 1. A sanitizing check was added at Line
+13 for the item_num. Without this check, a remote at-
+tacker can make a crafted ﬁle with a large item_num ﬁeld
+such as 0xffffffff, causing a buffer overﬂow issue in the
+avio_read function at Line 25 and potentially leads the
+application to exhibit incorrect behavior or crash.
+V-SZZ[17] assumes the deletion lines in the security patch as
+vulnerable codes and the basic idea of it is to pinpoint the earli-
+est commit introducing the deletion lines as vic. However, vul-
+nerability logic is composed of various vulnerable codes, such
+as Lines 21 and 25 in Listing 1. V-SZZ only considers tracing
+back deleted line (Line 12) and overlooks the real vulnerability
+behavior, leading to incorrect identiﬁcation of vic. V0Finder
+[16] attempts to identify vulnerable versions using code clone
+detection. It generates hash values for the entire vulnerability
+function and identiﬁes code clones according to the distance
+value of two hashes. This method may still introduce excessive
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 004 =====
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 379
+1 diff --git a/libavformat/mxfdec.c b/libavformat/
+mxfdec.c @@ -493,11
+2 +493,11 @@ static int mxf\_read\_primer\_pack
+3 static int
+4 mxf_read_primer_pack(void *arg, AVIOContext *pb,
+5 int tag, int size,
+6 UID uid, int64_t klv_offset) {
+7 MXFContext *mxf = arg;
+8 int item_num = avio_rb32(pb);
+9 int item_len = avio_rb32(pb);
+10 if (item_len != 18) {
+11 avpriv_request_sample(pb, "Primer pack
+item length %d", item_len);
+12 return AVERROR_PATCHWELCOME;
+13 }
+14 - if (item_num > 65536) {
+15 + if (item_num > 65536 || item_num < 0) {
+16 av_log(mxf->fc, AV_LOG_ERROR, "item_num %
+d is too large\n", item_num);
+17 return AVERROR_INVALIDDATA;
+18 }
+19 if (mxf->local_tags)
+20 av_log(mxf->fc, AV_LOG_VERBOSE, "Multiple
+primer packs\n");
+21 av_free(mxf->local_tags);
+22 mxf->local_tags_count = 0;
+23 mxf->local_tags = av_calloc(item_num,
+item_len);
+24 if (!mxf->local_tags)
+25 return AVERROR(ENOMEM);
+26 mxf->local_tags_count = item_num;
+27 avio_read(pb, mxf->local_tags, item_num*
+item_len);
+28 return 0;
+29 \vspace*{-6pt}
+Listing 1. Motivating Example of CVE-2017-14169.
+vulnerability-unrelated features due to th e inclusion of “entire
+function”.
+Observation. Identiﬁcation of vulnerable versions is hindered
+by the challenge of comprehendi ng vulnerability logic from
+the security patch. LLMs can grasp contextual code semantics
+and achieve human-like understanding in code-related tasks,
+eliminating the reliance on predeﬁned patterns and rules utilized
+by traditional static analysis and automated tools. Through the
+integration with an LLM, we can automate vulnerability anal-
+ysis, enhancing the efﬁciency of our approach.
+Example 2) After extracting the vulnerability logic and its
+corresponding vulnerable statements ( S
+v), we can locate the
+vic by backtracing the code changes of Sv in the previous
+commit, thereby identifying the vulnerable versions. V-SZZ
+[17] identiﬁes code clones before and after such code changes
+by the edit distance. However, refactoring commits, prevalent in
+OSS development, aim to optimize and reorganize code while
+preserving its functionality [42], [43].
+A refactoring commit in FFmpeg (Listing 2) demonstrates
+how structural changes caused by method encapsulation mis-
+lead existing detection methods. In this commit, developers ex-
+tracted the code with ifcondition structure into a new method
+FFMIN() to improve code modularity. While this refactoring
+preserves functionality, it introduces signiﬁcant syntactic diver-
+gence between the original code (Lines 7-8) and the restructured
+code (Lines 9-10).
+1 diff --git a/libavformat/avidec.c b/libavformat/
+avidec.c @@ -350,8
+2 +350,7 @@ static void avi_read_nikon(
+AVFormatContext *s, uint64_t
+3 end)
+4 uint16_t tag = avio_rl16(s->pb);
+5 uint16_t size = avio_rl16(s->pb);
+6 const char *name = NULL;
+7 char buffer[64] = { 0 };
+8 - if (avio_tell(s->pb) + size > tag_end)
+9 - size = tag_end - avio_tell(s->pb);
+10 + size =FFMIN(size, tag_end - avio_tell
+11 + (s->pb));
+12 size -= avio_read(s->pb, buffer, FFMIN(size,
+13 sizeof(buffer) - 1));
+14
+15 /*The definition of method FFMIN in libavutil/
+common.h*/ #define
+16 FFMIN(a, b) ((a)>(b)?(b):(a))
+17 \vspace*{-6pt}
+Listing 2. Motivating Example of Code Refactoring Commit.
+Traditional tools like V-SZZ [17] consider edit distance as
+the metric to detect code clones. The edit distance between the
+original and refactored code drops to 48% due to the method
+outlining, causing V-SZZ to incorrectly ﬂag this commit as the
+vulnerability-introducing commit ( vic). Other approaches like
+ReDeBug [14] and V0Finder [16] also fail to recognize the
+equivalence between inline logic and encapsulated methods, as
+their coarse pattern matching ignores structural abstraction.
+Observation. This case highlights the structural refactoring in
+OSS development and the limitations of existing clone detection
+techniques. VERCATION addresses this by expanding function
+calls during AST generation—inlining the FFMIN() method
+body to reconstruct the original logic. Combined with AST
+normalization, this allows V ERCATION to detect code logic
+equivalence despite structural variations, accurately tracing the
+vic through refactored commits.
+III. D ESIGN OF VERCATION
+We propose VERCATION, an end-to-end automated approach
+designed for vulnerable version identiﬁcation in OSS vul-
+nerabilities. The high-level workﬂow is illustrated in Fig. 2.
+VERCATION consists of three phases: Vulnerable code extrac-
+tion (P1), Code clone detection (P2) and Vulnerable version
+range determination (P3).
+In P1, V ERCATION combines program slicing and LLM to
+identify and extract vulnerability-related program statements in
+a precise manner. Speciﬁcally, we utilize the patch code as a
+slicing criterion to extract dangerous ﬂows, deﬁned as program
+statements that directly or indirectly affect the variables or
+expressions at the patch code. To mitigate the risk of includ-
+ing statements unrelated to the vulnerability (false positives),
+we employ prompt engineering with few-shot and Chain-of-
+Thought (CoT) strategies, empowering LLM to reason with
+the vulnerability based on th e extracted dangerous ﬂows and
+accurately extract vulnerability-related statements.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 005 =====
+380 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+Fig. 2. V ERCATION Workﬂow.
+In P2, VERCATION retraces historical commits to collect pre-
+vious modiﬁcations of vulnerable statements. For each state-
+ment before and after modiﬁcation, V ERCATION expands the
+functions within the statement, generates ASTs, and normalizes
+them. Then we utilize an in-order traversal algorithm to com-
+pare the AST before and after the modiﬁcation as code similar-
+ity, which determines if the co mmit is the initial introduction
+of the vulnerable statements.
+In P3, V
+ERCATION identiﬁes the affected versions based on
+the CVE’s vfc and the corresponding vic.
+To note, V ERCATION supports patches that span multiple
+functions and ﬁles. In P1, we extract dangerous ﬂows from each
+affected function independently, then combine all extracted
+dangerous ﬂows as input to the LLM for uniﬁed vulnerability
+logic analysis. In P2, we perform a backtrack analysis for vul-
+nerable statements from all affected functions.
+A. Vulnerable Code Extraction
+Taking a vfc as an input, V
+ERCATION identiﬁes and extracts
+program statements related to a vulnerability in three steps, as
+explained in the following subsections respectively.
+1) Dangerous Flow Extraction: Firstly, VERCATION con-
+ducts program slicing [44] on the source code to extract crucial
+program statements t hat may contribute to the vulnerability,
+w h i c hw ec a l ldangerous ﬂow . The slicing is based on the
+following criteria: deleted/added statements and patch-related
+variables. Building upon existing techniques [12], [13], [15],
+we execute program slicing on the program dependency graph
+of the patched function according to the slicing criteria. We
+performed slicing in two directions: backward and forward.
+Backward slicing is used to trace the source of patch-related
+variables and forward slicing is used to ﬁnd the trigger behavior
+that causes the vulnerability. For different statement types, we
+customize different slicing rules:
+• Assignment statement affects the data-ﬂow values of vul-
+nerability behavior. We conduct normal slicing in the as-
+signment statements and the assigned variables should be
+added to the slicing criterion. For example, if we take
+item_num of Line 12 and 13 in Listing1 as slicing criterion
+and perform forward slicing, Line 21 and 24 are included.
+• Conditional statement affects the reaching condition of
+the vulnerability trigger. We aim to slice the condition
+statement that takes the variables of slicing criterion as
+condition check, and the result also includes all the subse-
+quent statements of condition s tatement (e.g., subsequent
+statement Line 14-15 of condition statement Line 13, sub-
+sequent statement Line 23 of condition statement Line 22).
+• Function call statement. If the function call statement’s
+parameters contain patch-related variables included in the
+slicing criterion, we conduct slicing on the statement.
+• Return statement. There is no need for forward slicing
+because there is no dependency between the return value
+and the statements following the return statement. For
+example, there is no need for forward slicing on Line 15
+and 23 in Listing 1.
+2) Dangerous Flow-Based Prompt Construction: Secondly,
+we leverage an LLM to reﬁne these dangerous ﬂows further
+since the dangerous ﬂows extracted in the above step (program
+slicing) may include false positives (unrelated to vulnerability
+logic). We explore prompting strategies to assist LLM in the
+vulnerability comprehension tas k and in reﬁni ng vulnerable
+statements from the dangerous ﬂows extracted through program
+slicing. It is important to note that the LLM’s role is to perform
+code understanding and vulnerability logic analysis rather than
+to recall speciﬁc CVE information from its training data. Most
+vulnerability reports do not provide detailed vulnerability logic
+analysis or identify speciﬁc vulnerable code statements [45],
+where the LLM’s semantic analysis capabilities become essen-
+tial.
+Our method utilizes an LLM that supports interaction with

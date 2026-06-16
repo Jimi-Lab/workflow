@@ -1,0 +1,133 @@
+1.  TPLFILTER Construction 2. TPL Reuse Identification
+Similarity
+Comparison
+Function Hash 
+Hashing
+Birth-time Comparison
+Path-name Comparison
+Target Program
+ Identification Optimization
+3. 1-day Vulnerability Detection
+CVE-Commit Mapping
+Patch Commit
+V1 V2 ...... Vn
+V1.2
+Release Slice
+Reused
+LibraryRedundant
+Function
+Elimination
+Vulnerability
+Report
+Selection
+TPL
+Selection
+TPL Hash
+Flaw Report
+Line Match
+Chunk Match
+Chunk Extraction
+Code FormatSyntactic Analysis
+Chunk-based Analysis
+File Path
+Version
+Func Hashing
+CVE ID
+CPE
+Patch Commit
+ Reuse Report
+TPL Summary
+SynChunk Process
+Candidate
+Vulnerability
+Extraction
+Component 
+Segment
+Vulnerability 
+Segment
+Candidate Libraries
+Public database
+Birth Time
+Description
+Parsing
+Commit
+Mapping
+LLM
+Fig. 3: Workflow of V ULTURE
+IV. V ULTURE
+A. TPLF ILTER
+To detect 1-day vulnerabilities introduced by TPL reuses,
+VULTURE must 1) identify the reused TPLs in the target
+program; 2) verify whether the reused TPL version is vulner-
+able; 3) suggest if any potential patch is available. Therefore,
+VULTURE is required to construct a database, containing the
+TPLs commonly used by a platform and the corresponding
+vulnerable and patch information as a detection reference.
+1) TPL Selection: As TPLs vary across different plat-
+forms, VULTURE executes TPLF ILTER to construct a database
+containing TPLs specific to the targeted platform (e.g., IoT
+firmware, Android, iOS). Since most open-source projects are
+maintained and operated on GitHub, TPLF ILTER first collects
+all prevalent libraries from GitHub or existing TPL databases,
+such as OpenWRT [9] and Awesome Android [1]. To select
+TPLs specific to the target platform, we manually created
+a keyword list of the most commonly used keywords for
+describing the target platforms. Through the keyword list,
+TPLF ILTER performs keyword matching to determine if the
+titles, tags, and descriptions of each collected TPL contain
+any of the specified keywords. Additionally, TPLF ILTER
+scans the project metadata, official websites of projects, and
+README files to identify the keywords (e.g., system, server,
+firmware) for non-library project exclusion. For each selected
+TPL, TPLF ILTER clones them from GitHub and lists all the
+published versions through git tag.
+2) Component Segment Construction: Within the database,
+TPLF ILTER gathers detailed information on each selected TPL
+to construct the component segment. GitHub repositories and
+official websites may provide a variety of information about the
+TPL, including details about their functions, file names, license
+information, and the creation time of each library (i.e., birth
+time). However, we observed that file names are not unique
+to every TPL and licenses are not formally organized by all
+target programs, which may negatively affect the effectiveness
+of TPL reuse detection. Alternatively, TPLF ILTER analyzes
+functions declared in each TPL and their birth times to
+build the database, For efficiency, rather than storing all the
+complicated details of functions, TPLF ILTER calculates a hash
+value for each function and stores them in the component
+segment.
+To minimize false alarms arising from string-matching in
+the handling of custom patches, TPLF ILTER employs LSH to
+process each function. LSH is a fuzzy hashing technique that
+hashes similar input items into the same “buckets” with high
+probability, thereby enhancing the accuracy of data compari-
+son [25]. Hence, TPLF ILTER analyzes each TPL version and
+extracts all functions with ctags. Then, it calculates the hash
+value of each function.
+Simultaneously, it executes git log to identify the birth
+time of each function from the commit histories. Each function
+is then represented as fc =< H, Birth >, where H is the
+hash value of the function and Birth refers to its birth time.
+Hence, each version of a TPL is comprised of the functions,
+represented as FC = {fc(i)|1 ≤ i ≤ n}, where n is the
+maximum number of functions included in the TPL version.
+As a TPL A may invoke functions from another TPL B (i.e.,
+A depends on B), such dependencies may lead to redundant
+comparisons when analyzing function similarities.
+Although some previous works (e.g., Centris [48] and
+OSSFP [49]) also utilize LSH to calculate hash values, these
+works identify redundant functions with hash value similar-
+ity comparison rather than exact match identification. Such
+schemes become inefficient when comparing functions on a
+large scale. To eliminate redundant comparisons, TPLF IL-
+TER employs a hashing-index based elimination method that
+narrows down the scope by searching for functions with
+identical hash values. Specifically, TPLF ILTER first identifies
+the functions fc(i) and fc(j) by comparing hash values H(i)
+and H(j). Among all the functions with the same hash values,
+it selects the function with the earliest birth time and removes
+the other functions.
+3) Vulnerability Segment Construction: To support the de-
+termination of whether the reused versions of TPLs contain
+any vulnerabilities, TPLF ILTER collects all vulnerabilities
+5

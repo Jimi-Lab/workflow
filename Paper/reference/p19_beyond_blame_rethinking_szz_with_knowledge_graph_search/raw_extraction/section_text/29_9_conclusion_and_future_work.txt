@@ -1,0 +1,28 @@
+9 Conclusion and Future Work
+We presented AgenticSZZ, a novel approach that reframes Bug-Inducing Commit (BIC) identifica-
+tion from a ranking problem over blame commits into a graph search problem over a Temporal
+Knowledge Graph. Our preliminary study (RQ0) on 2,102 validated cases revealed that 28% of BICs
+require traversal beyond direct blame commits and 14% of cases are blameless, motivating the
+need for expanded search capabilities. AgenticSZZ addresses these challenges through a two-phase
+architecture: TKG construction that encodes temporal and structural relationships among commits,
+and an LLM agent that navigates this graph using specialized tools for candidate enumeration,
+structural traversal, and causal analysis.
+Our evaluation demonstrates that AgenticSZZ outperforms all baselines on three of four dataset
+splits, achieving F1-scores of 0.48 to 0.74 across datasets and improving over state-of-the-art by
+up to 27%. The ablation study confirms that both the TKG and agent are essential, reflecting an
+exploration-exploitation trade-off: the TKG expands the search space while the agent provides
+intelligent selection, especially for Blame and Blameless BIC cases. The controlled comparison with
+LLM4SZZ using identical LLMs validates that our improvements stem from the TKG-guided search
+paradigm rather than LLM selection.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 019 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 19
+Future Work.Several directions emerge from our findings. First, the persistent challenges on
+high-complexity cases (e.g., DS_APACHE with 3.3 blame commits per case) suggest that incorpo-
+rating code semantic similarity or developer expertise patterns could help disambiguate among
+competing candidates. Second, while we focused on single-BIC prediction, extending AgenticSZZ
+to identify multiple co-dependent BICs would better handle cases where bugs emerge from the
+interaction of several commits. Third, exploring alternative graph schemas that capture semantic
+code relationships (e.g., data flow, call graphs) beyond file and function co-modification could
+enable more precise causal reasoning.

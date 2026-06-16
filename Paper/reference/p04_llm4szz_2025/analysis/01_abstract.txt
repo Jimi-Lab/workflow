@@ -1,0 +1,11 @@
+Problem: Existing SZZ variants identify bug-inducing commits but are limited by static heuristics, deleted-line assumptions, and incomplete use of patch/commit context.
+Gap: Static and heuristic SZZ variants are easy to implement but have limited improvement; neural variants require complex preprocessing, can be language-limited, and may trade recall for precision.
+Core Idea: Use LLM assessment with additional context to identify bug-inducing commits under different bug-fixing commit patterns.
+Method: The paper presents two paths: rank-based identification and context-enhanced identification.
+Evaluation Setup: The abstract states evaluation across three datasets and comparisons with baselines; exact numeric use requires table repair.
+Main Results: Text layer states F1 improvement of 6.9% to 16.0% and additional bug-inducing commits found; these numbers should be table/citation-verified before paper reuse.
+Contribution Wording: The abstract frames LLM4SZZ as using LLM comprehension of bugs plus context-rich candidate selection.
+Limitations or Scope Boundaries: It targets bug-inducing commit identification, not complete affected versions reconstruction.
+Reusable Writing Pattern: State weaknesses of prior algorithm families, then introduce a hybrid design that dispatches cases to different strategies.
+Relevance to Our Paper: Useful as a candidate-commit generation baseline and as a contrast for why affected versions require downstream version/tag verification.
+Do Not Borrow: Do not present LLM4SZZ's commit-level F1 as affected versions accuracy.

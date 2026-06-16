@@ -1,0 +1,250 @@
+{
+  "cwe_id": "CWE-335",
+  "name": "Incorrect Usage of Seeds in Pseudo-Random Number Generator (PRNG)",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product uses a Pseudo-Random Number Generator (PRNG) but does not correctly manage seeds.",
+  "extended_description": "PRNGs are deterministic and, while their output appears random, they cannot actually create entropy. They rely on cryptographically secure and unique seeds for entropy so proper seeding is critical to the secure operation of the PRNG. Management of seeds could be broken down into two main areas: (1) protecting seeds as cryptographic material (such as a cryptographic key); (2) whenever possible, using a uniquely generated seed from a cryptographically secure source PRNGs require a seed as input to generate a stream of numbers that are functionally indistinguishable from random numbers. While the output is, in many cases, sufficient for cryptographic uses, the output of any PRNG is directly determined by the seed provided as input. If the seed can be ascertained by a third party, the entire output of the PRNG can be made known to them. As such, the seed should be kept secret and should ideally not be able to be guessed. For example, the current time may be a poor seed. Knowing the approximate time the PRNG was seeded greatly reduces the possible key space. Seeds do not necessarily need to be unique, but reusing seeds may open up attacks if the seed is discovered.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-330",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Use of Insufficiently Random Values"
+      },
+      {
+        "cwe_id": "CWE-330",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Use of Insufficiently Random Values"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a Pseudo-Random Number Generator (PRNG) but does not correctly manage seeds.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "seeds",
+      "seed",
+      "prng",
+      "cryptographic"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "seeds",
+      "seed",
+      "prng",
+      "cryptographic",
+      "secure",
+      "cryptographically",
+      "pseudo-random",
+      "generator"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code uses a statistical PRNG to generate account IDs.",
+        "snippet": "private static final long SEED = 1234567890; public int generateAccountID() { Random random = new Random(SEED); return random.nextInt(); }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "Both of these examples use a statistical PRNG seeded with the current value of the system clock to generate a random number:",
+        "snippet": "Random random = new Random(System.currentTimeMillis()); int accountID = random.nextInt();"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "Both of these examples use a statistical PRNG seeded with the current value of the system clock to generate a random number:",
+        "snippet": "srand(time()); int randNum = rand();"
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "This code grabs some random bytes and uses them for a seed in a PRNG, in order to generate a new cryptographic key.",
+        "snippet": "# getting 2 bytes of randomness for the seeding the PRNG seed = os.urandom(2) random.seed(a=seed) key = random.getrandbits(128)"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2020-7010",
+        "description": "Cloud application on Kubernetes generates passwords using a weak random number generator based on deployment time.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-7010"
+      },
+      {
+        "reference": "CVE-2019-11495",
+        "description": "server uses erlang:now() to seed the PRNG, which results in a small search space for potential random seeds",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-11495"
+      },
+      {
+        "reference": "CVE-2018-12520",
+        "description": "Product's PRNG is not seeded for the generation of session IDs",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2018-12520"
+      },
+      {
+        "reference": "CVE-2016-10180",
+        "description": "Router's PIN generation is based on rand(time(0)) seeding.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2016-10180"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

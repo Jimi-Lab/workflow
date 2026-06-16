@@ -1,0 +1,197 @@
+[
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:001",
+    "block_type": "text",
+    "text": "// Original buggy code\nchar buf[8];\nstrcpy(buf, input);\n",
+    "bbox": [
+      62.22889709472656,
+      71.26368713378906,
+      166.38079833984375,
+      97.28589630126953
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:002",
+    "block_type": "text",
+    "text": "// Possible patch 1\nchar buf[8];\n- strcpy(buf, input);\n+ strncpy(buf, input, 8);\n",
+    "bbox": [
+      228.41439819335938,
+      71.26368713378906,
+      346.76910400390625,
+      106.16248321533203
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:003",
+    "block_type": "text",
+    "text": "// Possible patch 2\nchar buf[8];\n+ if(strlen(input) < 8)\nstrcpy(buf, input);\n",
+    "bbox": [
+      394.5998840332031,
+      71.26368713378906,
+      503.48626708984375,
+      106.16248321533203
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:004",
+    "block_type": "text",
+    "text": "Figure 1: Buggy code example and two possible patches\n",
+    "bbox": [
+      190.5417938232422,
+      119.46061706542969,
+      420.63531494140625,
+      131.3460235595703
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:005",
+    "block_type": "text",
+    "text": "the code into high-level representations like parse trees and\ncontrol ﬂow graphs. They then employ advanced fuzzy\nmatching algorithms on the abstractions to ﬁnd additional\ncode clones that we may miss. On the other hand, they\nmay report more false code clones, which require signiﬁcant\nhuman effort to inspect all the reported cases. Furthermore,\nit is known to be very hard to implement good parsers [7].\nOverall, the main difference is by employing simpler\ntechniques that is language agnostic, we can focus on ef-\nﬁcient data structures and algorithms and ultimately scale to\nmuch larger code bases written in many different languages.\nOur techniques may miss some clones, but minimize false\nclone detection rate. This is important for at least two\nreasons. First, by checking all code in a distribution quickly\nwe can make basic guarantees that at least syntactically\nsimilar unpatched code clones do not exist. Second, we\ncan conservatively estimate the amount of code cloning in\nexisting large code bases. The more advanced algorithms in\nthe above work have not demonstrated they can make either\nclaim.\n",
+    "bbox": [
+      56.1036376953125,
+      146.54551696777344,
+      296.68194580078125,
+      383.3163146972656
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:006",
+    "block_type": "text",
+    "text": "B. Unpatched Code Clone Detection\n",
+    "bbox": [
+      56.103641510009766,
+      389.9248046875,
+      205.7511444091797,
+      401.7016906738281
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:007",
+    "block_type": "text",
+    "text": "At a high level, there are two approaches to ﬁnd unpatched\ncode clones in OS distributions: (1) ﬁrst ﬁnd all code clones\namong the source and then check if a patch applies to copies,\nor (2) check for clones of only the patched code. Previous\nwork has focused on techniques for ﬁnding all clones such\nas in (1). This makes sense when doing bug ﬁnding on\nwhole code bases is cheaper to do on unique code snippets.\nReDeBug takes approach (2) because we only want to ﬁnd\nclones of the original unpatched buggy code.\nReDeBug looks for unpatched code clones where patches\nare in UNIX uniﬁed diff format. Uniﬁed diffs are pop-\nular among open source kernel developers, OS distribution\nmaintainers, and are well-integrated into popular revision\ncontrol systems like Subversion [12].\nA uniﬁed diff patch consists of a sequence of diff hunks.\nEach hunk contains the changed ﬁlename, and a sequence of\nadditions and deletions. Added source code lines are preﬁxed\nby a “+” symbol, and deletions are preﬁxed by a “-” symbol.\nLine changes are represented as deleting the original line and\nadding back the changed lines.\nThe original buggy code includes all code deleted by\nthe patch. However, simply looking for the lines that were\nchanged (by being deleted) is insufﬁcient: we must also\n",
+    "bbox": [
+      56.09376525878906,
+      404.86785888671875,
+      296.68194580078125,
+      677.1470336914062
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:008",
+    "block_type": "text",
+    "text": "consider the surrounding context of the patch.\nConsider the buggy code and two possible patch scenarios\nshown in Figure 1. Patch 1 signiﬁes that strcpy is buggy\nby deleting the line of code. The code is replaced with the\nsafe strncpy version. We can go looking for the deleted\nline of code, and ﬂag it as buggy everywhere we see it.\nHowever, patch 2 simply adds a check. Looking for the\nmissing check is not straightforward since we cannot directly\nlook for missing lines of code. Our approach is to look for\ncopies of the surrounding context tokens, c, for each changed\nline and report clones of the context.\nThe overall steps used by ReDeBug to detect buggy code\nclones, shown in Figure 2, are:\n",
+    "bbox": [
+      314.48529052734375,
+      146.5651092529297,
+      555.0733032226562,
+      300.4832763671875
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:009",
+    "block_type": "text",
+    "text": "• Step 1: Pre-process the source. A user obtains all\nsource ﬁles used in their distribution. For Debian, this is\ndone using the apt tool. ReDeBug then automatically:\n",
+    "bbox": [
+      324.3572082519531,
+      302.0298156738281,
+      555.0783081054688,
+      337.9424743652344
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:010",
+    "block_type": "text",
+    "text": "1) Performs normalization and tokenization as de-\nscribed in the core system in § II-A.\n2) Moves an n-length window over the token stream.\nFor each window, the resulting n-tokens are\nhashed into a Bloom ﬁlter.\n3) Stores the Bloom ﬁlter for each source ﬁle in\na raw data format. ReDeBug compresses Bloom\nﬁlters before storing to disk to save space and to\nreduce the amount of disk access at query time.\nWhile initially the above steps would be performed over\nthe entire distribution, day-to-day use would only run\nthe steps on modiﬁed ﬁles, e.g., as part of a revision\ncontrol check-in. In our experiments and implemen-\ntation, we also concatenate per-ﬁle Bloom ﬁlters for\na project into a single bitmap before saving to disk.\nThis is purely an optimization; loading the single large\nBloom ﬁlter is much quicker than loading a bunch of\nsmall Bloom ﬁlters on our machines.\n",
+    "bbox": [
+      334.2958984375,
+      342.66705322265625,
+      555.068603515625,
+      557.7385864257812
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:011",
+    "block_type": "text",
+    "text": "• Step 2: Check for unpatched code copies. A user\nobtains a uniﬁed diff software patch. ReDeBug then\nautomatically:\n1) Extracts the original code snippet and the c tokens\nof context information from the pre-patch source.\nThe mechanics for the code snippet are simple:\nwe extract lines preﬁxed by a “-” symbol in the\npatch (lines preﬁxed with a “+” symbol are added\nand thus not present in the original buggy code). If\ncontext information is given in the patch, we use\n",
+    "bbox": [
+      324.3572082519531,
+      557.3290405273438,
+      555.068359375,
+      678.06689453125
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:012",
+    "block_type": "text",
+    "text": "51\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:004:013",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

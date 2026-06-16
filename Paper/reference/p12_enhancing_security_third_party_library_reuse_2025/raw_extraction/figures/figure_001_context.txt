@@ -1,0 +1,52 @@
+universal standard, de-
+velopers across different platforms (e.g., IoT firmware, mobile
+operating systems, Open-source software) tailor varied infras-
+tructures to meet specific objectives. Hence, TPL providers
+sometimes offer specialized versions of TPLs to better adapt
+to specific platform(s). For instance, CocoaMQTT [2], Paho
+Android Service [10] and Paho MQTT C/C++ client[11] are
+MQTT client libraries for iOS, Android, and embedded plat-
+forms, respectively. Hence, the TPL database used for reuse
+matching must be:
+• Comprehensive: TPLs that are commonly invoked within
+the targeted platform must be included.
+2
+
+===== PAGE 003 =====
+1995 May 2010 Aug
+2011 Sep
+2018 May
+zlib
+Start to maintain at:
+zlib.net 
+Linux
+Reused zlib at:
+linux/lib/zlib_deflate
+TrinityCore
+Reused zlib at: 
+dep/zlib
+zlib
+Mirrored to: 
+github.com/madler/zlib
+TizenRT
+Reused zlib at: 
+external/grpc/extlib/zlib2005 May
+Fig. 1: Example of zlib Maintenance and Reuse
+• Specific: Different platforms may have unique libraries
+that cannot be used by the other platforms. To avoid false
+alarms, libraries specific to other platforms, unnecessary
+for the targeted platform, or projects not used as libraries
+must be excluded during the detection process.
+• Maintainable: TPLs are often developed to accelerate
+the development cycle of open-source software and are
+regularly updated to fix bugs and integrate new features.
+Hence, the libraries included in the database should also
+be extendable — to accommodate the newly-created li-
+braries, updatable — to include the latest library versions,
+and traceable — to track all previous revision details.
+Unfortunately, the existing TPL databases [27], [48], [49] fall
+short of the necessary standards as they are neither compre-
+hensive nor specific, and they lack efficient mechanisms for
+updates to include additional whitelists. When updating these
+databases, it is imperative to reconstruct them by meticulously
+repeating all of the step

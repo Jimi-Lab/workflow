@@ -1,0 +1,46 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:19
+Table 8. The statistics of extra bug-inducing commits identified by LLM4SZZ
+Count DS_LINUX DS_GITHUB DS_APACHE
+only-additions 97 15 3
+with-deletions 25 12 6
+total 122 27 9
+330 to 1,887 lines of code. This overwhelming long context hinders the LLM’s ability to accurately
+detect the bug.
+Fixing the bug requires subtle changes. The remaining 18 failed test cases arise from the LLM’s
+difficulty in detecting subtle changes. For example, some bug-fixing commits only reorder code
+statements. In such cases, the LLM may incorrectly assume that both versions contain the same
+statements, misidentifying them as buggy. Similarly, bug fixes involving minimal changes, such as
+altering a single word in a long string, are also challenging for the LLM to detect.
+6.5 Can LLM4SZZ Find Extra Bug-inducing Commits?
+In this section, we examine whether LLM4SZZ can identify extra commits that all baselines cannot.
+Table 8 presents the statistics of the extra bug-inducing commits that baselines fail to find.LLM4SZZ
+identifies 109 extra bug-inducing commits in DS_LINUX, 31 in DS_GITHUB, and 10 in DS_APACHE,
+accounting for 7.8%, 7.4%, and 2.5% of the total bug-inducing commits, respectively.
+We classify these bug-fixing commits into two categories: those containing only added lines
+and those containing deleted lines. From the table, we observe that LLM4SZZ effectively identifies
+bug-inducing commits from those with only added lines. Additionally, techniques employed in
+LLM4SZZ, such as context expanding, facilitate the discovery of extra bug-inducing commits from
+bug-fixing commits with deleted lines. In DS_LINUX, the majority of extra bug-inducing commits
+are identified from bug-fixing commits with only added lines. Conversely, in DS_GITHUB, the
+number of extra bug-inducing commits found from bug-fixing commits with only added lines is
+nearly equal to those identified from bug-fixing commits with deleted lines.
+6.6 Threats to Validity
+Internal Validity. The LLMs may produce random outputs during the experiment. To minimize
+bias, we set the same parameters for all models. Additionally, we repeat the experiment three times
+and select the majority result as the final output. We also conduct our experiment on large-scale
+datasets to counteract the randomness. These datasets consist of two programming languages and
+a total of 2,104 test cases.
+External Validity. One potential limitation is that we implement and evaluate LLM4SZZ on only
+two programming languages, C and Java. However, the majority of bug-fixing commits in the
+three datasets are written in these two languages. Another concern is that DS_LINUX is created
+by randomly selecting test cases from the original dataset. To mitigate bias, we selected a total of
+1,500 test cases, achieving over a 95% confidence level with a confidence interval of 3. The third
+threat is the assumption that most bugs are fully fixed and introduced with a single commit. While
+this assumption holds for most test cases in the three datasets, it may not reflect all real-world
+scenarios. In the future, we plan to collect additional datasets to address this limitation.
+7 Related Work
+LLMs in SE. LLMs have been applied to numerous tasks in software engineering [Fan et al .
+2023; Hou et al. 2023], such as code generation, software testing and software mountainance. In
+code generation, researchers have proposed generation models like CodeX [Chen et al . 2021],
+AlphaCode [Li et al . 2022] and Codegen [Nijkamp et al . 2022]. They have also improved the
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

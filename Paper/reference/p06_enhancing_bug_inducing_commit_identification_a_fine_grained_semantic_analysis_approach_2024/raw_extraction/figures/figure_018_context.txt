@@ -1,0 +1,26 @@
+n we begin to check which commit
+first introduces all buggy statements. We first check the
+earliest commit 153bedbac2e and find that no statement
+has a line similarity over 0.75 with the statement flags
+= atomic_fetch_andnot(IRQ_WORK_PENDING, &
+work-> flags). The most closely related statement is line
+3, but its similarity is still under 0.75. Thus, 153bedbac2e
+is not the bug-inducing commit. Then, we check commit
+feb4a51323b and find that it contains all statements in
+the buggy statements. Thus, we designate it as the final
+bug-inducing commit, which is the same as the developers’
+message in Fig. 1.
+E. Extending S
+EM-SZZ to Bug-Fixing Commits With
+Deleted Lines
+While our method is primarily designed for bug-fixing com-
+mits with only added lines, the approach of comparing program
+states and identifying buggy statements can also be applied to
+commits with deleted lines. However, some adjustments are
+necessary for this scenario, particularly with respect to deleted
+lines.
+First, during program slicing, we mark the basic block con-
+taining deleted lines as the point of interest and search its nearest
+N predecessors and successors. Second, when comparing pro-
+gram states, we focus more on deleted lines. Specifically, if we
+find differences

@@ -1,0 +1,154 @@
+# 3
+THE PROPOSED APPROACH
+
+Figure 3 presents the process of our approach. The input of our
+approach is a vulnerability with its fixing commits in a software
+project. First, we apply an improved SZZ algorithm to identify
+inducing commits for this vulnerability. Then, we scan the project
+repository to identify the commits that contain the same changes
+in the fixing commits and inducing commits. Finally, we infer the
+versions affected by this vulnerability based on the fixing commits
+and inducing commits.
+SZZ for vulnerabilities. As shown in the second motivating ex-
+ample in Section 2.2, vulnerabilities can be introduced by a earlier
+change on the vulnerable code in the fixing commit. Moreover,
+Ozment and Schechter found that more than 50% vulnerabilities are
+foundational, i.e., they were present in their initial versions [39].
+However, one assumption of SZZ algorithms is that for each line
+that is modified by the commits for fixing a bug, the commit that
+last modified the line introduced this bug, which is not suitable for
+the identification of many vulnerability-inducing commits. So, the
+current SZZ algorithms might not identify inducing commits for
+vulnerabilities effectively.
+Therefore, we propose a modified SZZ algorithm called V-SZZ,
+aiming to identify inducing commits for vulnerabilities by going
+further back to get earlier changes on the vulnerable code. Similar
+to the study of Rodríguez-Pérez et al. [44], we call the immediately
+previous commits to the lines changed in the fixing commit as
+the previous commits and all the commits that previously mod-
+ified the lines changed in the fixing commit as the descendants
+commits.
+Given each modified line in a fixing commit, V-SZZ first identifies
+the previous commit using the git blame command. Similar to
+these improved SZZ algorithms [11, 27, 35], we ignore the non-
+semantic lines of code, including blank/comment lines and those
+involving format modifications. Then, to automatically identify
+descendants commits, we first leverage the line mapping algorithm
+to map the modified line to the line in the previous version. Then,
+we continue to use the git blame command to go back to identify
+the descendants commits.
+For Java projects, we leverage the abstract syntax tree (AST) map-
+ping algorithms [13, 15, 20] to map the modified lines between two
+versions of the source code files. We implement the line mapping
+algorithm provided by Fan et al. [17].
+However, most previous studies for AST mapping algorithms
+focused on Java projects and did not provide the implementation
+for other languages. Thus, for C/C++ projects, we map the modified
+lines considering the string similarity and localization between the
+lines. We compute the line similarity based on the edit distance
+and set the similarity threshold is equal to 0.75. But this might
+result in some incorrect mappings, which would be discussed in
+the evaluation (see Section 5). If the line mapping algorithm can
+identify a corresponding line in the previous commit or descen-
+dants commits, we continue going back by running the git blame
+command for the line. This process stops until the line mapping
+algorithm identifies the line as a new line, the source code file of
+the line is firstly added, or the commit is the initial commit of the
+repository.
+We consider the earliest commit as the inducing commit for
+each modified line of code since vulnerabilities are more likely
+to be foundational. Finally, V-SZZ can generate a set of inducing
+commits for a vulnerability.
+Duplicated change detection. When using Git for software de-
+velopment, developers often create multiple branches to manage
+workflows of different versions in a project. To apply the change in
+a commit among multiple branches, developers often use the git
+cherry-pick command to pick it individually or the git merge
+command to integrate several changes. We find that the fixing com-
+mits or inducing commits of vulnerabilities are often applied to
+other branches. For example, in the first motivating example, the
+fixing commit 118e1b has been cherry-picked three times.
+To infer vulnerable versions accurately, we need to identify all the
+commits that contain changes in the fixing commits and inducing
+commits. If missing a fixing commit, some non-vulnerable versions
+would be considered vulnerable. On the other hand, if missing an
+2355
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 005 =====
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+Fixing commit
+line1
+git blame
+line1
+…
+linen
+Previous commits / 
+Descendants commits
+linei
+Line Mapping
+Change 
+Type
+linei
+’
+Vulnerable 
+Versions Tags
+Duplicated 
+Change Detection
+Fixing commits
+Inducing commits
+Vulnerable version
+Common commits
+Branch 1
+Branch 2
+Duplicated fixing commit
+Non-vulnerable version
+Inserted /
+New File /
+Init Commit
+Vulnerable Version Detection
+SZZ for Vulnerability
+Figure 3: The proposed approach
+561cbe
+715feb
+Figure 4: Two commits in the project OpenSSL with the same
+change
+inducing commit, some vulnerable versions would be considered
+as not vulnerable.
+To detect the cherry-picked commits for a commit, we can search
+its commit id in the commit message because a sentence with the
+following pattern is automatically generated in the commit mes-
+sage: “cherry picked from commit xxx”. However, some commits can
+be copied to another branch without explicit information in the
+commit message. For example, Figure 4 present two commits with
+the same change from the project OpenSSL. The below commit in
+the figure is copied from the above commit for an upgrade. We use
+a hash-based duplicated change detection method to identify the
+commits copied to other branches without explicit messages. We
+first hash the hunks of all commits in a project repository. Given a
+commit, we search for the commits that contain all the hashes in it.
+Vulnerable version detection. In this step, we want to identify
+the versions affected by a vulnerability based on a set of fixing com-
+mits and their corresponding inducing commits. In a Git workflow,
+project maintainers usually assign a tag to a commit for a release
+version, such as ‘‘n3.1’ in FFmpeg and ‘OpenSSL_1_0_0-stable’ in
+OpenSSL. Hence, our goal is to identify these commits with ver-
+sion tags that are affected by a vulnerability. The idea is intuitive,
+i.e., the vulnerability introduced by the inducing commits will be
+transferred to the future commits until it gets fixed. Thus, the vul-
+nerable versions are between the inducing commits and the fixing
+commits. We first identify the commits with version tags that are
+reachable to the inducing commits (denoted as Ci). A commit A is
+reachable to another commit B, indicating that A belongs to the
+parents or the ancestor commits of B. We also identify the commits
+with version tags that are reachable to the fixing commits (denoted
+as Cf ). Then, we can get the set of the vulnerable versions Cv, i.e.,
+the set difference of Ci and Cf (i.e., Ci −Cf ).
+As shown in Figure 3, the two commits in green color are not
+vulnerable because the one in the first branch is after a fixing
+commit and the other one in the second branch is not reachable
+to the inducing commit. The vulnerable versions in the figure are
+marked as brown. Finally, the output of this step is a set of version
+tags that are affected by a vulnerability, see an example in Figure 1.

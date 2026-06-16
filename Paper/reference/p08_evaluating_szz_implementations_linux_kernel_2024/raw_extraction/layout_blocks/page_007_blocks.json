@@ -1,0 +1,137 @@
+[
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2225",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:002",
+    "block_type": "text",
+    "text": "Using git, we collect 78,384 potential bug-ﬁxing com-\nmits with Fixes:. We further mine all bug-inducing com-\nmits in each bug-ﬁxing commit. In the ﬁrst step, we use\n[0-9a-f]{7,40} to ﬁnd the partial commit IDs (7-40 digits)\nof potential bug-inducing commits. We exclude partial com-\nmit IDs with fewer than seven characters to prevent ambi-\nguity. In the second step, we search for the partial commit\nIDs in the list of actual complete commit IDs in the repos-\nitory. If the partial commit ID can be found anywhere as\na substring of a complete commit ID, we return the com-\nplete commit ID as the bug-inducing commit. To investi-\ngate the number of false positives in this step, we compare\nour results with those obtained using the git rev-parse com-\nmand, which returns the full hash from a partial commit ID.9",
+    "bbox": [
+      37.58,
+      63.79,
+      288.65,
+      230.33
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:003",
+    "block_type": "text",
+    "text": "As a result of this comparative analysis (of 104 cases), we\nobserved two main issues that account for the differences\nbetween our method and the git rev-parse command: (1) Over-\nlapping Partial Commit IDs: In certain instances, a par-\ntial commit ID is shared by multiple complete commit IDs,\nleading to false positives. We manually veriﬁed such cases\nand corrected 51. (2) Typos in Commit IDs: We found\nthat the remaining 55 cases were the result of typos in com-\nmit IDs. Occasionally, commit IDs in the Linux kernel are\nincorrect due to typos, such as missing characters, which\nprevents git rev-parse from identifying the correct commit.\nFor example, the partial commit ID af4df655040 should ac-\ntually be 3af4df655040, making git rev-parse unable to ﬁnd\n3af4df65504088e9a7d20c0251e1016e521ad4fc. Searching for\npartial commit IDs in the list accurately identiﬁed 55 of 56\ncases. We encountered one instance where the commit did not\nbelong to any branch in the repository, being part of a fork\noutside the repository. In the last step, we collect all the potential\nbug-ﬁxing commits for which we can ﬁnd at least one bug-\ninducing commit into the Bug-ﬁxing Commit Dataset. We\nthen collect those commits for which we cannot ﬁnd any bug-\ninducing commits into the CSV ﬁle included in the replica-\ntion package.\nOur resulting Bug-ﬁxing Commit Dataset contains 76,046\ncommits from between Oct 24, 2013 and Nov 20, 2022 that\ncontain one or more properly formatted Fixes: annotations. The\nLinux kernel does not have an associated bug tracker through\nwhich we can validate that the annotated commits are ﬁxing\nbugs. Nevertheless, the Fixes: annotation has, like the rest of\nthe commit, been subject to the Linux kernel review process.\nFurthermore, we ﬁnd that over 99% of the Fixes: annotations\nrefer to existing commits.\nWe name our newly collected dataset KFC (Linux Kernel\nBug-Fixing Commits). KFC contains a one-to-many relation-\nship between bug-inducing commits and bug-ﬁxing commits,\nas a single bug-inducing commit can lead to multiple future\nbug-ﬁxing commits. Conversely, there is also a many-to-one\nrelationship, where a single bug-ﬁxing commit may be the result\nof multiple bug-inducing commits.",
+    "bbox": [
+      37.58,
+      231.16,
+      288.69,
+      696.59
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:004",
+    "block_type": "text",
+    "text": "9https://git-scm.com/docs/git-rev-parse",
+    "bbox": [
+      45.56,
+      734.04,
+      172.05,
+      743.96
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:005",
+    "block_type": "text",
+    "text": "C. Veriﬁcation of the Dataset",
+    "bbox": [
+      300.6,
+      63.94,
+      422.03,
+      74.9
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:006",
+    "block_type": "text",
+    "text": "To verify the quality of our dataset, we conduct a manual\nanalysis on a subset of the KFC dataset. This analysis aims to\nconﬁrm that the “Fixes:” ﬁeld is indeed used in practice to point\nto the cause of the bug, rather than mistakenly pointing to the\ninitial implementation of related functionalities.\nIn this study, we followed four steps to validate the subset of\nthe KFC dataset:\n(i) Sampling: The complete KFC dataset includes 76,046\nbug-ﬁxing commits. We selected a random sample of 383\ncases to provide a statistically signiﬁcant representation,\naiming for a 95% conﬁdence level with a 5% margin of\nerror, according to standard sample size calculations.10",
+    "bbox": [
+      300.6,
+      80.73,
+      551.66,
+      223.35
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:007",
+    "block_type": "text",
+    "text": "(ii) Preparation: Three annotators initially discussed and re-\nﬁned their approach to ensure consistent labeling, based\non an examination of a preliminary set of examples. This\nled to the creation of a comprehensive set of labeling\nguidelines.\n(iii) Labeling: Following these guidelines, the dataset was\nthen labeled. One annotator was responsible for labeling\nall 383 cases, while the other two split the complete set,\neach labeling either 191 or 192 cases.\n(iv) Discussion: Upon completion of labeling, the annotators\nmet to discuss and resolve all discrepancies.\nAfter the preparation step, six categories were established\nfor the labeling process: (1) “Yes”: The bug-inducing commit\nclearly points to the cause of the bug. (2) “Affected by other\nchanges”: External modiﬁcations led to the emergence of the\nbug. (3) “Partial ﬁx”: An intermediate commit attempted to ﬁx\nthe bug but did not completely succeed. (4) “Introducing a new\nfunction”: The commit introduced new functionality that was\nlater involved in a bug, but was not directly the cause. (5) “No”:\nThe bug-inducing commit does not point to the cause of the bug\nand does not ﬁt into categories (2)-(4). Annotators are required\nto mark the reasoning behind this classiﬁcation. (6) “Not sure”:\nThe annotator could not determine whether the bug-inducing\ncommit is related to the cause of the bug and is instructed to\nmark the reasons for this uncertainty.\nAfter the Labeling and Discussion steps, we found that 81%\n(317 out of 383) of the sample cases fell into the “Yes” cate-\ngory. Additionally, classiﬁcations for the remaining cases were\ndistributed as follows: 4% (15 out of 383) were categorized as\n“Introducing a new function,” 2% (9 out of 383) as “Affected\nby other changes,” and 3% (11 out of 383) as “Partial ﬁx.”\nA further 2% (9 out of 383) of cases were labeled as “No,”\nas the annotators could not discern a relationship between the\nbug-ﬁxing and bug-inducing commits. Lastly, 7% (26 out of\n383) of the cases were tagged as “Not sure,” due to the anno-\ntators’ lack of expertise in the Linux kernel, which prevented\nthem from making judgments. Despite a small percentage of\ncases not directly representing the cause of the bug, the vast\nmajority of the dataset accurately reﬂects the intended use of the\n“Fixes:” ﬁeld.",
+    "bbox": [
+      300.6,
+      224.19,
+      551.67,
+      701.56
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:008",
+    "block_type": "text",
+    "text": "10https://www.surveymonkey.com/mp/sample-size-calculator",
+    "bbox": [
+      308.57,
+      734.04,
+      505.11,
+      743.96
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 7,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:007:009",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

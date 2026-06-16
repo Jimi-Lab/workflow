@@ -1,0 +1,95 @@
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 13
+4.3 RQ1. Effectiveness Evaluation
+We select three representative state-of-the-art methods for identifying vulnerable versions in the
+Java ecosystem as our baselines: V-SZZ [ 9], which is based on commit tracing; VERJava [ 42],
+which leverages code similarity; and LLM4SZZ [43], which utilizes LLMs for vulnerability versions
+identification.
+V-SZZ traces all deleted lines in a fix commit back to their origin using git blame , treating
+them as vulnerability-inducing lines. To improve the accuracy of locating vulnerability-inducing
+commits (VICs), it also uses an AST-based line mapping algorithm. However, V-SZZ cannot handle
+cases where the fix commit contains no deleted lines, and the AST-based line mapping is not
+always accurate. VERJava addresses this limitation by supporting fix commits without deleted lines.
+It computes vulnerable versions at both the function level and the entire patch level, and then
+synthesizes the results to determine the final set of vulnerable versions. Since VERJava requires
+comparing every version, the computational cost is very high. As a result, the authors evaluated
+only a subset of versions. In contrast, to ensure the accuracy of our evaluation, we evaluate all
+versions of each project. For example, the VERJava study only assessed 13 versions of the Liferay
+Portal project, while we evaluated all 233 versions. LLM4SZZ employs rank-based identification
+and context-enhanced identification to handle different types of fixing commits.
+Table 2 and 3 present the results of CaVulner and baselines in identifying vulnerable versions in
+the CVE level and version level, respectively. Both LLM4SZZ andCaVulner use DeepSeek V3 as the
+large language model. According to the evaluation metrics, the criteria for CVE level statistics are
+particularly strict: if even a single predicted vulnerable version does not match the ground truth,
+the result cannot be counted as true. As a result, the accuracy at the CVE level is generally lower
+than precision and recall at the version level.
+Despite the stringent requirements for CVE-level accuracy, Table 2 reveals thatCaVulner achieves
+the highest overall accuracy of 73.30%, outperforming LLM4SZZ (33.52%), V -SZZ (37.50%) and
+VERJava (20.45%). These results highlight the effectiveness of CaVulner in accurately identifying
+complete vulnerable version sets for each CVE.
+We examined the 47 failure cases where CaVulner failed, aiming to clarify the underlying causes
+of these inaccuracies. Specifically, 8 cases erroneously included non-vulnerable early versions,
+while 39 failed to cover the complete vulnerable range. Further analysis reveals that 27 failures
+stemmed from misjudged semantic equivalence, while 14 cases resulted from errors in identifying
+duplicated commits, and the remaining 6 were caused by incorrect initial code localization.
+At the version level, where predictions are evaluated at a finer granularity, Table 3 demonstrates
+that CaVulner again achieves superior performance across all metrics. It achieves the highest
+precision (98.14%), recall (83.15%), and F1-score (90.02%), indicating that it can reliably identify
+most vulnerable versions while introducing few false positives. In comparison, LLM4SZZ achieves
+a lower recall (47.20%) and F1-score (61.38%), suggesting its vulnerability identification is more
+conservative and incomplete. Meanwhile, VERJava, although showing slightly better recall (68.56%)
+than V-SZZ (51.21%), suffers from a high false positive rate, as reflected by its lower precision
+(63.78%) and F1-score (66.08%).
+Notably, CaVulner achieves 100% precision in several projects such as jackson-databind, jenkins,
+spring-security, and struts, indicating its ability to avoid introducing any irrelevant versions during
+prediction. Even in large-scale projects like jenkins and jackson-databind, which contain thousands
+of versions, CaVulner maintains consistently high accuracy and recall.
+, Vol. 1, No. 1, Article . Publication date: January 2018.

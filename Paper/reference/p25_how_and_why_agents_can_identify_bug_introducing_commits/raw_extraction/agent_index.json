@@ -1,0 +1,2103 @@
+{
+  "paper_id": "p25_how_and_why_agents_can_identify_bug_introducing_commits",
+  "title": "How and Why Agents Can Identify Bug-Introducing Commits",
+  "source_manifest": "00_source_manifest.txt",
+  "extraction_profile": "extraction_profile.txt",
+  "evidence_units": [
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:abstract",
+      "type": "section",
+      "page": null,
+      "section": "abstract",
+      "topic": "abstract",
+      "text_anchor": "Abstract Śliwerski, Zimmermann, and Zeller (SZZ) just won the 2026 ACM SIGSOFT Impact Award for asking: When do changes induce fixes? Their paper from 2005 served as the foundation for a wide array of approaches aimed at",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/01_abstract.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:method_0_54_and_the_previous_sota_0_64_we_also_uncoverwhy",
+      "type": "section",
+      "page": null,
+      "section": "method_0_54_and_the_previous_sota_0_64_we_also_uncoverwhy",
+      "topic": "method 0 54 and the previous sota 0 64 we also uncoverwhy",
+      "text_anchor": "method (0.54) and the previous SOTA (0.64). We also uncoverwhy agents are so successful: They derive shortgreppablepatterns from the fix commit diff and message and use them to effectively search and find bug-introducing",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/02_method_0_54_and_the_previous_sota_0_64_we_also_uncoverwhy.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:1_introduction",
+      "type": "section",
+      "page": null,
+      "section": "1_introduction",
+      "topic": "1 introduction",
+      "text_anchor": "1 Introduction The problem of identifying bug-introducing commits from fix com- mits has seen remarkable interest from the software engineering research community, demonstrated by the more than 1300 citations of the awar",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/03_1_introduction.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:problem_definition_given_a_fix_commit_fix_that_repairs_a_bug",
+      "type": "section",
+      "page": null,
+      "section": "problem_definition_given_a_fix_commit_fix_that_repairs_a_bug",
+      "topic": "problem definition given a fix commit fix that repairs a bug",
+      "text_anchor": "Problem Definition.Given a fix commit 𝑐fix that repairs a bug in a software repository, the goal is to identify the set of bug-introducing commits 𝐵⊆𝐻 , where 𝐻is the repository history prior to𝑐fix. Each commit 𝑏∈𝐵 intr",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/04_problem_definition_given_a_fix_commit_fix_that_repairs_a_bug.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:2_1_related_work",
+      "type": "section",
+      "page": null,
+      "section": "2_1_related_work",
+      "topic": "2 1 related work",
+      "text_anchor": "2.1 Related Work The SZZ Algorithm.The original SZZ algorithm [ 31] identifies bug-introducing commits by tracing the lines deleted in a fix commit back to the commits that last modified them using version control annota",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/05_2_1_related_work.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_precision_recall_f1_score_precision_recall_f1_score",
+      "type": "section",
+      "page": null,
+      "section": "approach_precision_recall_f1_score_precision_recall_f1_score",
+      "topic": "approach precision recall f1 score precision recall f1 score",
+      "text_anchor": "Approach Precision Recall F1-Score Precision Recall F1-Score Precision Recall F1-Score SZZ 0.49 0.60 0.54 0.46 0.61 0.53 0.480.680.57 AG-SZZ 0.48 0.58 0.52 0.46 0.64 0.53 0.45 0.59 0.51 L-SZZ 0.44 0.43 0.44 0.38 0.38 0.3",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/06_approach_precision_recall_f1_score_precision_recall_f1_score.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:3_1_approach",
+      "type": "section",
+      "page": null,
+      "section": "3_1_approach",
+      "topic": "3 1 approach",
+      "text_anchor": "3.1 Approach Figure 1 shows an overview of SZZ-Agent. It consists of two stages. Stage 1: SZZ-based Identification.The approach starts from a fix commit, defined by its diff, showing which lines were added and/or deleted",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/07_3_1_approach.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_precision_recall_f1_score",
+      "type": "section",
+      "page": null,
+      "section": "approach_precision_recall_f1_score",
+      "topic": "approach precision recall f1 score",
+      "text_anchor": "Approach Precision Recall F1-Score SZZ 0.54 0.59 0.56 AG-SZZ 0.55 0.60 0.57 L-SZZ 0.52 0.51 0.51 R-SZZ 0.52 0.51 0.52 MA-SZZ 0.51 0.58 0.54 RA-SZZ 0.51 0.58 0.54 V-SZZ 0.44 0.49 0.47 LLM4SZZ 0.62 0.61 0.62 SZZ-Agent (Our",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/08_approach_precision_recall_f1_score.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:3_3_experiments",
+      "type": "section",
+      "page": null,
+      "section": "3_3_experiments",
+      "topic": "3 3 experiments",
+      "text_anchor": "3.3 Experiments 3.3.1 RQ1: Effectiveness.We evaluate whether SZZ-Agent outper- forms existing SZZ variants. Table 3: RQ2b: LLM4SZZ with different LLM backbones vs. SZZ-Agent. Best results in bold.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/09_3_3_experiments.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_precision_recall_f1_score_2",
+      "type": "section",
+      "page": null,
+      "section": "approach_precision_recall_f1_score_2",
+      "topic": "approach precision recall f1 score 2",
+      "text_anchor": "Approach Precision Recall F1-Score LLM4SZZ (gpt-4o-mini) 0.65 0.64 0.64 LLM4SZZ (gpt-5.2) 0.61 0.60 0.61 LLM4SZZ (claude-opus-4-5) 0.66 0.65 0.65 SZZ-Agent (claude-opus-4-5) 0.78 0.76 0.77 Setup.We run SZZ-Agent with Cla",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/10_approach_precision_recall_f1_score_2.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_1_shows_the_results_szz_agent_outperforms_all_",
+      "type": "section",
+      "page": null,
+      "section": "results_table_1_shows_the_results_szz_agent_outperforms_all_",
+      "topic": "results table 1 shows the results szz agent outperforms all ",
+      "text_anchor": "Results.Table 1 shows the results. SZZ-Agent outperforms all base- lines on every dataset. Compared to LLM4SZZ, the previous state of the art, SZZ-Agent improves F1-score by 13 percentage points on DS_LINUX (0.77 vs. 0.6",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/11_results_table_1_shows_the_results_szz_agent_outperforms_all_.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_2_shows_the_results_szz_agent_achieves_0_81_f1",
+      "type": "section",
+      "page": null,
+      "section": "results_table_2_shows_the_results_szz_agent_achieves_0_81_f1",
+      "topic": "results table 2 shows the results szz agent achieves 0 81 f1",
+      "text_anchor": "Results.Table 2 shows the results. SZZ-Agent achieves 0.81 F1- score on DS_LINUX-26, which is even higher than its 0.77 on DS_LINUX. All improvements over baselines are statistically signif- icant (𝑝<0.01) with large eff",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/12_results_table_2_shows_the_results_szz_agent_achieves_0_81_f1.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_3_shows_the_results_upgrading_the_llm_backbone",
+      "type": "section",
+      "page": null,
+      "section": "results_table_3_shows_the_results_upgrading_the_llm_backbone",
+      "topic": "results table 3 shows the results upgrading the llm backbone",
+      "text_anchor": "Results.Table 3 shows the results. Upgrading the LLM backbone of LLM4SZZ from gpt-4o-mini to gpt-5.2 or Claude Opus 4.5 does ===== Page 005 ===== How and Why Agents Can Identify Bug-Introducing Commits Preprint, Under Su",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/13_results_table_3_shows_the_results_upgrading_the_llm_backbone.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_with",
+      "type": "section",
+      "page": null,
+      "section": "approach_with",
+      "topic": "approach with",
+      "text_anchor": "Approach With Message With Diff Precision Recall F1-Score SZZ – – 0.54 0.59 0.56 SZZ-Agent✗ ✗0.49 0.48 0.48 SZZ-Agent✗✓0.74 0.73 0.73 SZZ-Agent✓✗0.78 0.77 0.77 SZZ-Agent ✓ ✓ 0.81 0.80 0.81 Table 5: RQ2d: Contribution of ",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/14_approach_with.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_precision_recall_f1_score_cost_usd",
+      "type": "section",
+      "page": null,
+      "section": "approach_precision_recall_f1_score_cost_usd",
+      "topic": "approach precision recall f1 score cost usd",
+      "text_anchor": "Approach Precision Recall F1-Score Cost (USD) Stage 1 Only 0.48 0.47 0.48$0.18 Stage 2 Only 0.77 0.76 0.76 $1.20 SZZ-Agent 0.81 0.80 0.81 $0.67 not meaningfully improve its F1-score (0.64→0.61 →0.65). In con- trast, SZZ-",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/15_approach_precision_recall_f1_score_cost_usd.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_4_shows_the_results_without_both_the_commit_me",
+      "type": "section",
+      "page": null,
+      "section": "results_table_4_shows_the_results_without_both_the_commit_me",
+      "topic": "results table 4 shows the results without both the commit me",
+      "text_anchor": "Results.Table 4 shows the results. Without both the commit mes- sage and the diff, SZZ-Agent drops to 0.48 F1-score, below standard SZZ (0.56). Providing only the diff recovers performance to 0.73, and providing only the",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/16_results_table_4_shows_the_results_without_both_the_commit_me.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_5_shows_the_results_stage_1_alone_achieves_onl",
+      "type": "section",
+      "page": null,
+      "section": "results_table_5_shows_the_results_stage_1_alone_achieves_onl",
+      "topic": "results table 5 shows the results stage 1 alone achieves onl",
+      "text_anchor": "Results.Table 5 shows the results. Stage 1 alone achieves only 0.48 F1-score at $0.18 per fix commit, while Stage 2 alone reaches 0.76 at $1.20. The combined pipeline achieves the best F1-score of 0.81 at $0.67, demonstr",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/17_results_table_5_shows_the_results_stage_1_alone_achieves_onl.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_6_shows_the_results_performance_is_remarkably",
+      "type": "section",
+      "page": null,
+      "section": "results_table_6_shows_the_results_performance_is_remarkably",
+      "topic": "results table 6 shows the results performance is remarkably",
+      "text_anchor": "Results.Table 6 shows the results. Performance is remarkably stable across thresholds, ranging from 0.76 to 0.82 F1-score. Higher thresholds reduce cost ($0.68 at threshold 8 vs. $0.33 at ∞) because fewer binary search s",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/18_results_table_6_shows_the_results_performance_is_remarkably.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:approach_precision_recall_f1_score_precision_recall_f1_score_2",
+      "type": "section",
+      "page": null,
+      "section": "approach_precision_recall_f1_score_precision_recall_f1_score_2",
+      "topic": "approach precision recall f1 score precision recall f1 score 2",
+      "text_anchor": "Approach Precision Recall F1-Score Precision Recall F1-Score Precision Recall F1-Score SZZ 0.49 0.60 0.54 0.46 0.61 0.53 0.48 0.68 0.57 LLM4SZZ 0.65 0.64 0.64 0.63 0.62 0.63 0.55 0.55 0.55 SZZ-Agent 0.78 0.76 0.770.750.7",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/19_approach_precision_recall_f1_score_precision_recall_f1_score_2.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:4_1_approach",
+      "type": "section",
+      "page": null,
+      "section": "4_1_approach",
+      "topic": "4 1 approach",
+      "text_anchor": "4.1 Approach Figure 2 shows an overview of Simple-SZZ-Agent. Given a fix com- mit, the approach collects the commit histories of all files modi- fied by the fix, forming a single candidate set. It then provides an LLM-ba",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/20_4_1_approach.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:4_3_experiments",
+      "type": "section",
+      "page": null,
+      "section": "4_3_experiments",
+      "topic": "4 3 experiments",
+      "text_anchor": "4.3 Experiments 4.3.1 RQ3: Effectiveness.We evaluate whether Simple-SZZ-Agent can match or exceed the performance of SZZ-Agent despite its drastically simpler design. Setup.We run Simple-SZZ-Agent on DS_LINUX, DS_GITHUB-",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/21_4_3_experiments.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_7_shows_the_results_simple_szz_agent_matches",
+      "type": "section",
+      "page": null,
+      "section": "results_table_7_shows_the_results_simple_szz_agent_matches",
+      "topic": "results table 7 shows the results simple szz agent matches",
+      "text_anchor": "Results.Table 7 shows the results. Simple-SZZ-Agent matches or outperforms SZZ-Agent on every dataset. On DS_LINUX, it achieves 0.81 F1-score compared to 0.77 for SZZ-Agent, an improve- ment of 4 percentage points. On DS",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/22_results_table_7_shows_the_results_simple_szz_agent_matches.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_we_expected_that_scanning_a_large_candidate_set_woul",
+      "type": "section",
+      "page": null,
+      "section": "results_we_expected_that_scanning_a_large_candidate_set_woul",
+      "topic": "results we expected that scanning a large candidate set woul",
+      "text_anchor": "Results.We expected that scanning a large candidate set would degrade performance and require substantially more resources. To our surprise, neither turned out to be the case. Figure 3a shows the relationship between can",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/23_results_we_expected_that_scanning_a_large_candidate_set_woul.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_figure_6_shows_the_results_of_100_fix_commits_simple",
+      "type": "section",
+      "page": null,
+      "section": "results_figure_6_shows_the_results_of_100_fix_commits_simple",
+      "topic": "results figure 6 shows the results of 100 fix commits simple",
+      "text_anchor": "Results.Figure 6 shows the results. Of 100 fix commits, Simple- SZZ-Agent correctly identifies the bug-introducing commit in 87 cases. Of the 13 incorrect predictions, 4 fail because the true bug- introducing commit is n",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/24_results_figure_6_shows_the_results_of_100_fix_commits_simple.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:results_table_8_shows_the_results_simple_szz_agent_is_effec",
+      "type": "section",
+      "page": null,
+      "section": "results_table_8_shows_the_results_simple_szz_agent_is_effec",
+      "topic": "results table 8 shows the results simple szz agent is effec",
+      "text_anchor": "Results.Table 8 shows the results. Simple-SZZ-Agent is effec- tive across all tested configurations. Even the cheapest configu- ration (OpenHands with minimax-m2.5 at $0.04 per fix commit) achieves 0.79 F1-score, outperf",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/25_results_table_8_shows_the_results_simple_szz_agent_is_effec.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:5_discussion",
+      "type": "section",
+      "page": null,
+      "section": "5_discussion",
+      "topic": "5 discussion",
+      "text_anchor": "5 Discussion We discuss directions for future work motivated by our findings. While these directions are beyond the scope of this paper, we hope they inspire other researchers to explore them. We cover research on identi",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/26_5_discussion.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:6_threats_to_validity",
+      "type": "section",
+      "page": null,
+      "section": "6_threats_to_validity",
+      "topic": "6 threats to validity",
+      "text_anchor": "6 Threats to Validity We discuss threats to the internal, external, and construct validity of our study. 6.1 Internal Validity Sample Size.Budget constraints limit our evaluation to 100–200 fix commits per dataset, which",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/27_6_threats_to_validity.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:limitation_applies_to_all_szz_approaches_and_is_inherited_fr",
+      "type": "section",
+      "page": null,
+      "section": "limitation_applies_to_all_szz_approaches_and_is_inherited_fr",
+      "topic": "limitation applies to all szz approaches and is inherited fr",
+      "text_anchor": "limitation applies to all SZZ approaches and is inherited from the standard evaluation methodology [18].",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/28_limitation_applies_to_all_szz_approaches_and_is_inherited_fr.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:7_conclusion",
+      "type": "section",
+      "page": null,
+      "section": "7_conclusion",
+      "topic": "7 conclusion",
+      "text_anchor": "7 Conclusion We introduced SZZ-Agent, an agentic approach that uses binary search over source code versions to identify bug-introducing com- mits, outperforming all previous approaches by at least 12 percent- age points ",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/29_7_conclusion.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:section:references",
+      "type": "section",
+      "page": null,
+      "section": "references",
+      "topic": "references",
+      "text_anchor": "References [1] Anthropic. 2024.Models Overview. Anthropic PBC. https://platform.claude.com/ docs/en/about-claude/models/overview Claude API Documentation. [2] Anthropic. 2025.Claude Code. https://github.com/anthropics/cl",
+      "bbox": null,
+      "files": [
+        "raw_extraction/section_text/30_references.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "abstract",
+        "introduction",
+        "method",
+        "evaluation",
+        "related_work",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_001",
+      "type": "table",
+      "page": null,
+      "section": "table_001",
+      "topic": "table 001",
+      "text_anchor": "Table 1: RQ1: SZZ-Agent vs. baselines across three datasets. Best results per dataset in bold. DS_LINUX DS_GITHUB-c DS_GITHUB-j Approach Precision Recall F1-Score Precision Recall F1-Score Precision Recall F1-Score",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_001_raw.txt",
+        "raw_extraction/tables/table_001.md",
+        "raw_extraction/tables/table_001_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_002",
+      "type": "table",
+      "page": null,
+      "section": "table_002",
+      "topic": "table 002",
+      "text_anchor": "Table 2: RQ2a: SZZ-Agent vs. baselines on DS_LINUX-26 (post training data cutoff). Best results in bold. Approach Precision Recall F1-Score",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_002_raw.txt",
+        "raw_extraction/tables/table_002.md",
+        "raw_extraction/tables/table_002_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_003",
+      "type": "table",
+      "page": null,
+      "section": "table_003",
+      "topic": "table 003",
+      "text_anchor": "Table 3: RQ2b: LLM4SZZ with different LLM backbones vs. SZZ-Agent. Best results in bold. Approach Precision Recall F1-Score",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_003_raw.txt",
+        "raw_extraction/tables/table_003.md",
+        "raw_extraction/tables/table_003_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_004",
+      "type": "table",
+      "page": null,
+      "section": "table_004",
+      "topic": "table 004",
+      "text_anchor": "Table 4: RQ2c: Impact of withholding the fix commit message and diff. Best results in bold. Approach With",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_004_raw.txt",
+        "raw_extraction/tables/table_004.md",
+        "raw_extraction/tables/table_004_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_005",
+      "type": "table",
+      "page": null,
+      "section": "table_005",
+      "topic": "table 005",
+      "text_anchor": "Table 5: RQ2d: Contribution of Stage 1 and Stage 2. Costs are average per fix commit. Best results in bold. Approach Precision Recall F1-Score Cost (USD)",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_005_raw.txt",
+        "raw_extraction/tables/table_005.md",
+        "raw_extraction/tables/table_005_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_006",
+      "type": "table",
+      "page": null,
+      "section": "table_006",
+      "topic": "table 006",
+      "text_anchor": "Table 6: RQ2e: Impact of the commit selection threshold. Costs are average per fix commit. Best results in bold. Commit",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_006_raw.txt",
+        "raw_extraction/tables/table_006.md",
+        "raw_extraction/tables/table_006_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_007",
+      "type": "table",
+      "page": null,
+      "section": "table_007",
+      "topic": "table 007",
+      "text_anchor": "Table 7: RQ3: Comparison of SZZ-Agent and Simple-SZZ-Agent for bug-introducing commit identification. Best results per dataset in bold. DS_LINUX DS_GITHUB-c DS_GITHUB-j",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_007_raw.txt",
+        "raw_extraction/tables/table_007.md",
+        "raw_extraction/tables/table_007_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_008",
+      "type": "table",
+      "page": null,
+      "section": "table_008",
+      "topic": "table 008",
+      "text_anchor": "Table 8: RQ4c: Simple-SZZ-Agent with different underlying models and agents. Best results in bold. Avg. per Fix Commit Agent Model Precision Recall F1-Score Cost Tool Calls Tokens",
+      "bbox": null,
+      "files": [
+        "raw_extraction/tables/table_008_raw.txt",
+        "raw_extraction/tables/table_008.md",
+        "raw_extraction/tables/table_008_cells.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "citation-ready numeric claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_001",
+      "type": "figure",
+      "page": null,
+      "section": "figure_001",
+      "topic": "figure 001",
+      "text_anchor": "Figure 1: SZZ-Agent: Stage 1 applies standard SZZ to the deleted lines and uses an agent to select BICs from the candidates. Stage 2 activates when Stage 1 fails: it collects file histories, binary searches over commits ",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_001_caption.txt",
+        "raw_extraction/figures/figure_001_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_002",
+      "type": "figure",
+      "page": null,
+      "section": "figure_002",
+      "topic": "figure 002",
+      "text_anchor": "Figure 1 shows an overview of SZZ-Agent. It consists of two stages. Stage 1: SZZ-based Identification.The approach starts from a fix commit, defined by its diff, showing which lines were added and/or",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_002_caption.txt",
+        "raw_extraction/figures/figure_002_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_003",
+      "type": "figure",
+      "page": null,
+      "section": "figure_003",
+      "topic": "figure 003",
+      "text_anchor": "Figure 2: Simple-SZZ-Agent: The fix commit’s file histories are collected into a single candidate set. An agent with access to developer tools directly selects the bug-introducing commit, without SZZ-based filtering or b",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_003_caption.txt",
+        "raw_extraction/figures/figure_003_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_004",
+      "type": "figure",
+      "page": null,
+      "section": "figure_004",
+      "topic": "figure 004",
+      "text_anchor": "Figure 2 shows an overview of Simple-SZZ-Agent. Given a fix com- mit, the approach collects the commit histories of all files modi- fied by the fix, forming a single candidate set. It then provides an",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_004_caption.txt",
+        "raw_extraction/figures/figure_004_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_005",
+      "type": "figure",
+      "page": null,
+      "section": "figure_005",
+      "topic": "figure 005",
+      "text_anchor": "Figure 3: Relationship between the number of candidate commits and F1-score, cost, token usage, and tool calls. Finding 5:Simple-SZZ-Agent matches or outperforms SZZ-Agent on all datasets, despite removing both the SZZ-b",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_005_caption.txt",
+        "raw_extraction/figures/figure_005_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_006",
+      "type": "figure",
+      "page": null,
+      "section": "figure_006",
+      "topic": "figure 006",
+      "text_anchor": "Figure 4: Distribution of tool calls per tool type during agent execution. lines back to the commit that introduced them—but the agent",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_006_caption.txt",
+        "raw_extraction/figures/figure_006_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_007",
+      "type": "figure",
+      "page": null,
+      "section": "figure_007",
+      "topic": "figure 007",
+      "text_anchor": "Figure 5: Distribution of grep search sources used by the agent. \"FC\" stands for \"Fix Commit\". and ground truth bug-introducing commits were too complex for",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_007_caption.txt",
+        "raw_extraction/figures/figure_007_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_008",
+      "type": "figure",
+      "page": null,
+      "section": "figure_008",
+      "topic": "figure 008",
+      "text_anchor": "Figure 6: Manual error analysis of Simple-SZZ-Agent on 100 fix commits from DS_LINUX-26.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_008_caption.txt",
+        "raw_extraction/figures/figure_008_context.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "visual-detail claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:reference:references",
+      "type": "reference",
+      "page": null,
+      "section": "references",
+      "topic": "references",
+      "text_anchor": "References [1] Anthropic. 2024.Models Overview. Anthropic PBC. https://platform.claude.com/ docs/en/about-claude/models/overview Claude API Documentation. [2] Anthropic. 2025.Claude Code. https://github.com/anthropics/cl",
+      "bbox": null,
+      "files": [
+        "raw_extraction/references.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "related_work",
+        "citation_verification"
+      ],
+      "do_not_use_for": [
+        "verified BibTeX metadata"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:artifact:source_static_inventory",
+      "type": "artifact",
+      "page": null,
+      "section": "source_static_inventory",
+      "topic": "source static inventory",
+      "text_anchor": "Source Path: [NEEDS ARTIFACT] no local source/artifact path detected beside the requested PDF Analysis Mode: static-only Repository / File Layout Observed: - Input directory: E:\\AI\\Agent\\workflow\\Replication\\BaseLine(Vul",
+      "bbox": null,
+      "files": [
+        "raw_extraction/source_static_inventory.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": true,
+      "usable_for": [
+        "artifact_consistency",
+        "reproducibility"
+      ],
+      "do_not_use_for": [
+        "runtime behavior",
+        "reproduced metric",
+        "artifact completeness claim"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_001",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_001",
+      "topic": "prompt 001",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_001.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_002",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_002",
+      "topic": "prompt 002",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_002.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_003",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_003",
+      "topic": "prompt 003",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_003.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_004",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_004",
+      "topic": "prompt 004",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_004.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_005",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_005",
+      "topic": "prompt 005",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_005.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_006",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_006",
+      "topic": "prompt 006",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_006.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_007",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_007",
+      "topic": "prompt 007",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_007.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:prompt:prompt_008",
+      "type": "prompt",
+      "page": null,
+      "section": "prompt_008",
+      "topic": "prompt 008",
+      "text_anchor": "Prompt/LLM-related nearby text extracted with possible layout loss.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/prompts/prompt_008.txt"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "method",
+        "retrieval"
+      ],
+      "do_not_use_for": [
+        "exact prompt reproduction"
+      ],
+      "notes": "Generated from local raw extraction; verify against PDF for citation-critical use."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_001:phase2",
+      "type": "table",
+      "page": 3,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "SZZ-Agent | 0.78 | 0.76 | 0.77 | 0.75 | 0.74 | 0.75 | 0.67 | 0.67 | 0.67",
+      "bbox": [
+        88.33699798583984,
+        232.33749135335287,
+        523.6640014648438,
+        244.07182820638022
+      ],
+      "files": [
+        "raw_extraction/tables/table_001.csv",
+        "raw_extraction/tables/table_001.md",
+        "raw_extraction/tables/table_001_cells.json",
+        "raw_extraction/tables/table_001_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_002:phase2",
+      "type": "table",
+      "page": 4,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "SZZ-Agent (claude-opus-4-5) | 0.78 | 0.76 | 0.77",
+      "bbox": [
+        317.9549865722656,
+        172.75668334960938,
+        570.551025390625,
+        185.26668294270834
+      ],
+      "files": [
+        "raw_extraction/tables/table_002.csv",
+        "raw_extraction/tables/table_002.md",
+        "raw_extraction/tables/table_002_cells.json",
+        "raw_extraction/tables/table_002_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_003:phase2",
+      "type": "table",
+      "page": 4,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "SZZ-Agent (Ours) | 0.81 | 0.80 | 0.81",
+      "bbox": [
+        70.05799865722656,
+        227.55097452799478,
+        277.7860107421875,
+        240.0606486002604
+      ],
+      "files": [
+        "raw_extraction/tables/table_003.csv",
+        "raw_extraction/tables/table_003.md",
+        "raw_extraction/tables/table_003_cells.json",
+        "raw_extraction/tables/table_003_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_004:phase2",
+      "type": "table",
+      "page": 5,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "SZZ-Agent | ✓ | ✓ | 0.81 | 0.80 | 0.81",
+      "bbox": [
+        54.136827850341795,
+        194.90300369262695,
+        308.63800048828125,
+        207.02499389648438
+      ],
+      "files": [
+        "raw_extraction/tables/table_004.csv",
+        "raw_extraction/tables/table_004.md",
+        "raw_extraction/tables/table_004_cells.json",
+        "raw_extraction/tables/table_004_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_005:phase2",
+      "type": "table",
+      "page": 5,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "SZZ-Agent | 0.81 | 0.80 | 0.81 | $0.67",
+      "bbox": [
+        54.136827850341795,
+        299.32212611607144,
+        293.623592376709,
+        311.6105651855469
+      ],
+      "files": [
+        "raw_extraction/tables/table_005.csv",
+        "raw_extraction/tables/table_005.md",
+        "raw_extraction/tables/table_005_cells.json",
+        "raw_extraction/tables/table_005_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_006:phase2",
+      "type": "table",
+      "page": 6,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "Simple-SZZ-Agent | 0.82 | 0.81 | 0.81 | 0.75 | 0.75 | 0.75 | 0.75 | 0.75 | 0.75",
+      "bbox": [
+        72.71700286865234,
+        333.2255045572917,
+        539.2829895019531,
+        344.95982360839844
+      ],
+      "files": [
+        "raw_extraction/tables/table_006.csv",
+        "raw_extraction/tables/table_006.md",
+        "raw_extraction/tables/table_006_cells.json",
+        "raw_extraction/tables/table_006_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_007:phase2",
+      "type": "table",
+      "page": 7,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "𝑛=12 | | | | | | | | | |",
+      "bbox": [
+        93.02371215820312,
+        87.88636670793805,
+        281.5547332763672,
+        191.9651652018229
+      ],
+      "files": [
+        "raw_extraction/tables/table_007.csv",
+        "raw_extraction/tables/table_007.md",
+        "raw_extraction/tables/table_007_cells.json",
+        "raw_extraction/tables/table_007_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_008:phase2",
+      "type": "table",
+      "page": 7,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "| | | 𝑟= − | 0.03",
+      "bbox": [
+        355.83935885959204,
+        87.88636670793805,
+        543.80615234375,
+        191.9651652018229
+      ],
+      "files": [
+        "raw_extraction/tables/table_008.csv",
+        "raw_extraction/tables/table_008.md",
+        "raw_extraction/tables/table_008_cells.json",
+        "raw_extraction/tables/table_008_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_009:phase2",
+      "type": "table",
+      "page": 7,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "| | | 𝑟= − | 0.09",
+      "bbox": [
+        355.83935885959204,
+        243.20458984375,
+        543.80615234375,
+        350.28504943847656
+      ],
+      "files": [
+        "raw_extraction/tables/table_009.csv",
+        "raw_extraction/tables/table_009.md",
+        "raw_extraction/tables/table_009_cells.json",
+        "raw_extraction/tables/table_009_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_010:phase2",
+      "type": "table",
+      "page": 7,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "| | | 𝑟= | | 0.09",
+      "bbox": [
+        98.81912841796876,
+        247.60207875569662,
+        281.5547332763672,
+        350.28504943847656
+      ],
+      "files": [
+        "raw_extraction/tables/table_010.csv",
+        "raw_extraction/tables/table_010.md",
+        "raw_extraction/tables/table_010_cells.json",
+        "raw_extraction/tables/table_010_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_011:phase2",
+      "type": "table",
+      "page": 8,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "| | | | | 4 43.6% | 8.1%",
+      "bbox": [
+        393.29559326171875,
+        83.85247802734375,
+        550.7070922851562,
+        189.7706104625355
+      ],
+      "files": [
+        "raw_extraction/tables/table_011.csv",
+        "raw_extraction/tables/table_011.md",
+        "raw_extraction/tables/table_011_cells.json",
+        "raw_extraction/tables/table_011_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:table_012:phase2",
+      "type": "table",
+      "page": 8,
+      "section": null,
+      "topic": "phase2 table extraction",
+      "text_anchor": "9.8 | | | | | | |",
+      "bbox": [
+        88.28431701660156,
+        89.31215362548828,
+        292.70892944335935,
+        195.7277069091797
+      ],
+      "files": [
+        "raw_extraction/tables/table_012.csv",
+        "raw_extraction/tables/table_012.md",
+        "raw_extraction/tables/table_012_cells.json",
+        "raw_extraction/tables/table_012_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "experiments",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric claim without page-crop verification"
+      ],
+      "notes": "Phase-2 PyMuPDF table extraction. Treat as closer to citation-ready than caption-only, but still verify critical numbers."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_001:phase2",
+      "type": "figure",
+      "page": 2,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 1: SZZ-Agent: Stage 1 applies standard SZZ to the deleted lines and uses an agent to select BICs from the candidates.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_001_caption.txt",
+        "raw_extraction/figures/figure_001_context.txt",
+        "raw_extraction/figures/figure_001_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_002:phase2",
+      "type": "figure",
+      "page": 3,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 1 shows an overview of SZZ-Agent. It consists of two stages.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_002_caption.txt",
+        "raw_extraction/figures/figure_002_context.txt",
+        "raw_extraction/figures/figure_002_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_003:phase2",
+      "type": "figure",
+      "page": 6,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 2: Simple-SZZ-Agent: The fix commit’s file histories are collected into a single candidate set. An agent with access to",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_003_caption.txt",
+        "raw_extraction/figures/figure_003_context.txt",
+        "raw_extraction/figures/figure_003_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_004:phase2",
+      "type": "figure",
+      "page": 6,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 2 shows an overview of Simple-SZZ-Agent. Given a fix com-",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_004_caption.txt",
+        "raw_extraction/figures/figure_004_context.txt",
+        "raw_extraction/figures/figure_004_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_005:phase2",
+      "type": "figure",
+      "page": 7,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 3: Relationship between the number of candidate commits and F1-score, cost, token usage, and tool calls.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_005_caption.txt",
+        "raw_extraction/figures/figure_005_context.txt",
+        "raw_extraction/figures/figure_005_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_006:phase2",
+      "type": "figure",
+      "page": 8,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 4: Distribution of tool calls per tool type during agent",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_006_caption.txt",
+        "raw_extraction/figures/figure_006_context.txt",
+        "raw_extraction/figures/figure_006_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_007:phase2",
+      "type": "figure",
+      "page": 8,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 5: Distribution of grep search sources used by the",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_007_caption.txt",
+        "raw_extraction/figures/figure_007_context.txt",
+        "raw_extraction/figures/figure_007_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:figure:figure_008:phase2",
+      "type": "figure",
+      "page": 9,
+      "section": null,
+      "topic": "phase2 figure page crop",
+      "text_anchor": "Figure 6: Manual error analysis of Simple-SZZ-Agent on 100 fix commits from DS_LINUX-26.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/figures/figure_008_caption.txt",
+        "raw_extraction/figures/figure_008_context.txt",
+        "raw_extraction/figures/figure_008_page_crop.png"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "method",
+        "evaluation",
+        "figure_followup"
+      ],
+      "do_not_use_for": [
+        "pixel-level visual claim without manual inspection"
+      ],
+      "notes": "Phase-2 page crop and caption extraction."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:artifact:artifact_link_inventory:phase2",
+      "type": "artifact",
+      "page": null,
+      "section": "artifact_link_inventory",
+      "topic": "URLs DOI arXiv GitHub candidates",
+      "text_anchor": "https://github.com/niklasrisse/agents- https://platform.claude.com/ https://github.com/anthropics/claude-code https://code.claude.com/docs/en/ https://onlinelibrary.wiley.com/doi/pdf/10.1002/smr.1619",
+      "bbox": null,
+      "files": [
+        "raw_extraction/artifact_link_inventory.json",
+        "raw_extraction/artifact_link_inventory.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "citation_verification",
+        "artifact_followup",
+        "related_work"
+      ],
+      "do_not_use_for": [
+        "local artifact behavior",
+        "reproduced result"
+      ],
+      "notes": "Static link inventory only. No URL was fetched by this script."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:reference:citation_metadata_phase2",
+      "type": "reference",
+      "page": null,
+      "section": "citation_metadata",
+      "topic": "phase2 citation metadata verification",
+      "text_anchor": "arXiv:2603.29378, 2026 [NEEDS CITATION VERIFICATION] https://arxiv.org/abs/2603.29378",
+      "bbox": null,
+      "files": [
+        "raw_extraction/citation_metadata_verified.txt",
+        "raw_extraction/metadata.json"
+      ],
+      "confidence": "partial",
+      "repair_needed": true,
+      "usable_for": [
+        "citation_verification",
+        "bibliography"
+      ],
+      "do_not_use_for": [
+        "final BibTeX without manual verification"
+      ],
+      "notes": "arXiv page found for the title; overlaps with the Beyond Blame title family and needs citation disambiguation."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:artifact:phase3_static_snapshot",
+      "type": "artifact",
+      "page": null,
+      "section": "artifact_static_snapshot",
+      "topic": "downloaded static artifact snapshot",
+      "text_anchor": "Static artifact snapshot downloaded and inspected without execution.",
+      "bbox": null,
+      "files": [
+        "raw_extraction/source_static_inventory_phase3.txt",
+        "raw_extraction/artifact_static_snapshot_inventory.txt",
+        "raw_extraction/artifact_static_snapshot/download_log.json"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "artifact_consistency",
+        "reproducibility",
+        "method",
+        "evaluation"
+      ],
+      "do_not_use_for": [
+        "runtime behavior",
+        "reproduced metric"
+      ],
+      "notes": "[EXECUTION NOT REQUESTED] static downloaded artifact inspection only."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:table:phase3_numeric_audit",
+      "type": "table",
+      "page": null,
+      "section": "table_numeric_verification",
+      "topic": "phase3 numeric table audit",
+      "text_anchor": "1 citation-ready candidates; 11 still need repair.",
+      "bbox": null,
+      "files": [
+        "analysis/16_table_numeric_verification_audit.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": true,
+      "usable_for": [
+        "evaluation",
+        "numeric_followup"
+      ],
+      "do_not_use_for": [
+        "final numeric quote without checking audit caveat"
+      ],
+      "notes": "Static CSV/page-crop audit; no experiments run."
+    },
+    {
+      "id": "p25_how_and_why_agents_can_identify_bug_introducing_commits:artifact:phase3_drive_or_eval_table_audit",
+      "type": "artifact",
+      "page": null,
+      "section": "phase3_artifact_audit",
+      "topic": "static artifact enhancement",
+      "text_anchor": "Author-released TeX tables and result JSON files inspected statically.",
+      "bbox": null,
+      "files": [
+        "analysis/17_artifact_evaluation_tables_audit.txt",
+        "analysis/16_table_numeric_verification_audit.txt"
+      ],
+      "confidence": "medium",
+      "repair_needed": false,
+      "usable_for": [
+        "evaluation",
+        "artifact_consistency",
+        "reproducibility"
+      ],
+      "do_not_use_for": [
+        "runtime behavior",
+        "reproduced metric"
+      ],
+      "notes": "Static-only artifact inspection. [EXECUTION NOT REQUESTED]"
+    }
+  ],
+  "known_gaps": [
+    "[NEEDS TABLE REPAIR] table cells/values are not citation-ready",
+    "[NEEDS FIGURE EXTRACTION] figure crops/images are missing",
+    "[NEEDS CITATION VERIFICATION] metadata and references are unverified",
+    "[NEEDS ARTIFACT] local source/artifact tree not detected",
+    "[EXECUTION NOT REQUESTED] static-only analysis"
+  ]
+}

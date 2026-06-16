@@ -1,0 +1,93 @@
+limitations, we conducted an in-depth case study to analyze the behaviors and failure modes of
+existing approaches.
+For in-depth investigation, we include not only V-SZZ, but also VERJava [42], which leverages
+code similarity analysis to detect vulnerable versions, and LLM4SZZ [43], a recent method that
+utilizes large language models to identify bug-inducing commits. Although LLM4SZZ is designed
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 005 =====
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 5
+for bug detection rather than vulnerabilities, it represents the best-performing variant of SZZ to date
+and thus provides a strong reference point for evaluating the boundaries of current methodologies.
+The motivating example is illustrated in Figure 1, which examines CVE-2018-1000406, an arbitrary
+file-write vulnerability caused by Jenkins’s failure to properly normalize and constrain user input.
+The correct range of affected versions for this vulnerability is[1.312, 1.658]∪[ 2.0, 2.145]. However,
+all three tools report the range as [1.362, 1.658] ∪ [2.0, 2.145], incorrectly identifying 1.362 as the
+lower bound. This discrepancy indicates a shared weakness across these tools in accurately tracing
+back to the true inducing commit.
+Each tool failed for different reasons:
+•For V-SZZ, it identifies vulnerability-inducing commits by treating every deleted line in the
+fix commit as vulnerable and tracing them back using the git blame command, aided by an
+AST-based line mapping to handle refactorings. In this case, it incorrectly attributes the commit
+e96c8f8 (corresponding to version 1.362) as the inducing commit. However, deeper semantic
+inspection reveals that the actual vulnerable logic was introduced in a descendant commit of
+e96c8f8, which V-SZZ fails to reach due to it only tracing the vulnerable codes identified in the
+pre-patch commit, while neglecting the syntactic changes of these code during the backward
+tracing. Additionally, V-SZZ is unable to handle fixes that contain only added lines, rendering it
+ineffective in such scenarios.
+•For VERJava , on the other hand, it uses code similarity to match vulnerable code patterns
+across versions. While this helps to detect structurally similar code, it struggles when semantic
+equivalence exists without syntactic similarity, particularly when code evolves significantly
+across versions. As a result, it fails to recognize vulnerable logic in earlier versions, leading to
+false negatives.
+•For LLM4SZZ, it employs a large language model to analyze commit messages and code diffs
+to identify bug-inducing commits. Despite its improved performance for bugs, it still fails to
+identify the correct vulnerability-inducing commit in this case, again misattributing e96c8f8 as
+the root cause. This failure highlights a key limitation: without contextual information such as
+CVE descriptions and a deeper understanding of both pre-fix and post-fix code, the model lacks
+the necessary reasoning to detect subtle security vulnerabilities. Moreover, like other SZZ-based
+approaches, LLM4SZZ is not equipped to perform extended historical tracing, which is often
+required to uncover long-lived vulnerabilities.
+These findings collectively underscore the inadequacy of current approaches in reliably iden-
+tifying vulnerability-inducing commits. Accurate vulnerable version identification demands not
+only precise syntactic tracing but also deep semantic understanding of code changes and security
+context.

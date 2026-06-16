@@ -1,0 +1,88 @@
+T ABLE IV
+A TT&CK T E C H N I QU E S W I T H RE L AT E D CAPEC S A N D CWE S F O R
+IN T RU S I O N SE T - V O LT TY P H O O N (G1017)
+Attack
+T echnique CAPEC IDs CWE IDs
+T1005 204, 647, 545, 37
+524, 311, 1258, 1239, 285, 1330,
+1323, 1278, 1272, 1266, 1243, 525,
+318, 315, 314, 312, 226, 1301
+T1007 574 200
+T1016 309 200
+T1018 292 200
+T1033 577 200
+T1036.005 616 200
+T1046 300 200
+T1057 573 200
+T1069 576 200
+T1078 560 654, 522, 309, 308, 307, 263,
+262, 1273
+T1082 312, 580, 313 200, 208, 205, 204
+T1083 127, 497 732, 693, 425, 424, 288, 285,
+276, 200
+T1090.001 465 441
+T1112 203 15
+T1113 648 267
+T1120 646 200
+T1124 295 200
+T1217 169 200
+T1505.003 650 553, 287
+T1552.004 485, 474 330, 522
+T1614 694 497
+nodes than actual. In both cases, the full traversal reveals
+30,433 CVEs for G1015 and 19,242 for G1017, highlighting
+the wide range of exploitable vulnerabilities. This highlights
+how systemic weaknesses (CWEs) serve as bridges to a broad
+set of concrete vulnerabilities, offering both ﬁne-grained detail
+for defenders and a scalable means of tracking group-level
+exploit potential.
+D. CISA Advisory
+CISA advisories list MITRE A TT&CK techniques and
+selected CVEs, but they do not fully map high-level TTPs
+to the broader set of relevant vulnerabilities. Traditionally ,
+analysts must manually connect A TT&CK techniques to
+CAPECs, CWEs, and CVEs, a time-consuming and error-
+prone process. Our knowledge graph automates this bridging
+by traversing semantic relationships, including direct links
+(related_capec, related_cwe) and hierarchical expan-
+Fig. 10. V isualizing group-to-CWE mappings for Scattered Spider (G1015).
+The blue node represents group G1015, and dark green nodes represent CWEs.
+sions (child and precedence relations up to depth three), as
+illustrated in the Cypher query shown in Fig. 14.
+Case Study 1: Russian GRU T argeting W estern Logistics
+Entities and T echnology Companies. On May 21, 2025,
+CISA released advisory AA25-141A, which highlights a Rus-
+sian state-sponsored cyber campaign attributed to the GRU’s
+85th Main Special Service Center (Unit 26165). The campaign
+has targeted W estern logistics entities and technology com-
+panies involved in coordinating, transporting, and delivering
+foreign assistance to Ukraine. Since 2022, these sectors have
+faced an elevated risk as targets. The advisory warns that
+executives and network defenders in these industries should
+recognize the heightened threat level, increase monitoring for
+known TTPs and indicators of compromise (IOCs), and adopt
+defensive postures that assume persistent targeting.
+The advisory details a set of initial access techniques
+used by the threat actors, including brute force login at-
+tempts (T1110.001, T1110.003), spearphishing (T1566), ex-
+ploitation of Internet-facing infrastructure (T1133, T1190),
+WinRAR and Outlook vulnerabilities (CVE-2023-38831,
+CVE-2023-23397), and abuse of SOHO devices (T1665).
+These techniques only partially reveal the broader vul-
+nerability surface. When executed in the canonical or-
+der (T echnique →CAPEC→CWE→CVE), the query does
+not return all CVEs cited in the advisory . Incorporat-
+ing hierarchical relations such as capec_precedence,
+capec_child, cwe_precedence, and cwe_child sur-
+faces CVE-2023-23397, a critical Outlook NTLM vulner-
+ability . With two-hop expansions, the query retrieves not only
+the explicitly mentioned CVEs but also nearly 60% of all
+CVEs in the graph, showing how our framework operational-
+izes advisories to uncover latent vulnerabilities beyond those
+listed in CISA reports.
+Case Study 2: #StopRansomware Medusa Ransomware.
+In February 2025, the FBI, CISA, and MS-ISAC released a
+joint #StopRansomware advisory on the Medusa ransomware
+variant. Medusa, ﬁrst identiﬁed in 2021, has impacted more
+Fig. 11. V isualizing group-to-CWE mappings for V olt T yphoon (G1017). The
+blue node represents group G1017, and dark green nodes represent CWEs.

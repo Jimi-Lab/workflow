@@ -1,0 +1,167 @@
+[
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:001",
+    "block_type": "text",
+    "text": "• High false detection rate: The advanced heuristics\nused to ﬁnd more code clones introduce a high false\ndetection rate, i.e., a large number of false code clones\nare reported. For example, Deja Vu boasts the highest\naccuracy we are aware of at 26-34%, meaning 66-74%\nare false code clones. That’s 2 out of every 3 reports.\nA considerable amount of resources would be wasted\nto inspect all the reported cases.\nReDeBug tackles a new point in the design space where\nwe trade more expensive, yet thorough, pattern matching\nalgorithms for speed, scalability, and a language-agnostic\nproperty:\n",
+    "bbox": [
+      55.6098747253418,
+      70.63139343261719,
+      296.1980285644531,
+      214.68617248535156
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:002",
+    "block_type": "text",
+    "text": "• Scalability: ReDeBug uses a syntax-based pattern\nmatching approach that can be implemented using\nextremely efﬁcient data structures which allow fast\nquerying for code clones when given a patch. ReDeBug\nprocessed source code into a database at about 700,000\nLoC/min on a commodity desktop. This database of\nover 2.1 billion lines of code can then be queried in less\nthan 8 minutes. Therefore, ReDeBug can also be used\nas part of the normal development and patch process\non hardware available to an average developer or user,\ne.g., an average desktop.\n",
+    "bbox": [
+      65.47689819335938,
+      216.60398864746094,
+      296.197998046875,
+      346.85015869140625
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:003",
+    "block_type": "text",
+    "text": "• Language agnostic: Roughly speaking, ReDeBug per-\nforms simple normalization where all whitespace is\nremoved and all characters are transformed to their\nlower-case equivalent. Such simple normalization al-\nlows ReDeBug to identify a variety of latent security\nvulnerabilities in programs written in many different\nlanguages. Interestingly, in our evaluation, Deckard –\na tree-based code clone detection technique – missed\n6x more code clones than ReDeBug, not counting\nlanguages handled by ReDeBug but not supported by\nDeckard (§ IV-A).\n",
+    "bbox": [
+      65.47689819335938,
+      346.7959289550781,
+      296.2078552246094,
+      483.7394714355469
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:004",
+    "block_type": "text",
+    "text": "• Lower false detection rate: ReDeBug focuses on de-\ncreasing false detection rate by using a close-to-exact\nmatching instead of fuzzier matching employed by pre-\nvious code clone work. This means we may ﬁnd fewer\nunpatched code clones, but that we will also have fewer\nfalse positives due to mis-matches. ReDeBug has false\npositives when vulnerable code is not detected as dead\ncode by the underlying compiler, and when a previously\nidentiﬁed vulnerable code segment is used in a way\nthat makes it non-exploitable. Deja Vu and similar\napproaches have similar sources of false detection, plus\nerrors in the matching algorithms themselves [21, 23–\n25]. As a result, Deja Vu had a false detection rate\nof 66-74%, which is on the better end of similar code\nclone detection mechanisms [21, 23–25]. ReDeBug has\nzero errors due to matching, thus does not suffer from\nthe major source of false positives found in previous\nwork.\n",
+    "bbox": [
+      65.47689819335938,
+      476.9878234863281,
+      296.1980285644531,
+      690.0865478515625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:005",
+    "block_type": "text",
+    "text": "We have used ReDeBug to check for unpatched code\nclones in Debian 6.0 Squeeze (348,754,939 LoC 1), De-\nbian 5.0 Lenny (257,796,235 LoC), Ubuntu 11.10 Oneiric\n(397,399,865 LoC), Ubuntu 10.10 Maverick (245,237,215\nLoC), Linux Kernel (8,968,871 LoC), and all C/C++\nprojects at SourceForge (922,424,743 LoC). So far, Re-\nDeBug has found 15,546 unpatched code clones in the\ntotal 2,180,581,868 LoC by checking 376 Debian/Ubuntu\nsecurity-related patches. The patches address a variety of\nissues ranging from buffer overﬂows, to information dis-\nclosure vulnerabilities, to denial of service vulnerabilities.\nOur measurements indicate that even though ReDeBug is\nsimpler, it actually ﬁnds a comparable number of code clones\nto existing approaches (§ IV-A).\nPrevious work has shown that once a patch is released, an\nattacker can use the patch to reverse engineer the bug and\nautomatically create an exploit in only a few minutes [10].\nOur experiments indicate one security implication of ReDe-\nBug is an attacker, using a single laptop, could potentially\nﬁnd thousands of vulnerable applications among billions of\nlines of code in only a few minutes once a patch is released,\nassuming he has already preprocessed the code.\nIn addition to ﬁnding unpatched code clones, we have\nconducted the ﬁrst study of the amount of code cloning in\nthe entire Debian Lenny source base. By performing pair-\nwise comparison among functions, ReDeBug provides the\ndistribution of function pairs based upon their similarity (see\n§ III-H)\nOverall, our main contributions are:\n",
+    "bbox": [
+      313.99151611328125,
+      70.63542175292969,
+      554.5910034179688,
+      413.92718505859375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:006",
+    "block_type": "text",
+    "text": "• We analyze entire OS distributions to comprehend the\ncurrent trends of unpatched code clones. To the best\nof our knowledge, ReDeBug is the ﬁrst tool to explore\nover 2.1 billion lines of entire OS distributions to under-\nstand unpatched code clone problems. We show that un-\npatched code clones are a recurring problem in modern\ndistributions, and ﬁnd 15,546 unpatched code clones\nfrom Debian Lenny/Squeeze, Ubuntu Maverick/Oneiric\ndistributions, the Linux kernel, and SourceForge. So far,\nReDeBug has conﬁrmed 145 real bugs.\n",
+    "bbox": [
+      323.8669128417969,
+      415.8375244140625,
+      554.5979614257812,
+      534.2476806640625
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:007",
+    "block_type": "text",
+    "text": "• We describe ReDeBug, which suggests a new design\nspace for code clone detection in terms of scalability,\nspeed, and false detection rate. In particular, the design\npoint makes ReDeBug realistic for use by typical de-\nvelopers in everyday environments in order to improve\nthe security of their code by quickly querying known\nvulnerabilities.\n",
+    "bbox": [
+      323.8669128417969,
+      534.1940307617188,
+      554.597900390625,
+      617.0958251953125
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:008",
+    "block_type": "text",
+    "text": "• We provide the ﬁrst empirical measurement of the\ntotal amount of copied code in OS distributions. This\nsuggests that in the future, unpatched code clones will\ncontinue to be important and relevant.\n",
+    "bbox": [
+      323.8669128417969,
+      617.0431518554688,
+      554.5880737304688,
+      664.436767578125
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:009",
+    "block_type": "text",
+    "text": "1We always count non-empty, non-comment lines.\n",
+    "bbox": [
+      321.893798828125,
+      673.299072265625,
+      485.11688232421875,
+      683.76953125
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:010",
+    "block_type": "text",
+    "text": "49\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:002:011",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

@@ -1,0 +1,135 @@
+Page: 3
+Caption: Figure 1: Overview of AgentSZZ, illustrating the end-to-end workflow from preprocessing (1-3), through the ReAct investigation
+
+Page text context:
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits
+Preprint, Under Submission, Arxiv
+Tool Execution 5
+BFC: Commit xxx
+powercap: intel_rapl: Fix locking in
+TPMI RAPL The RAPL framework...
+4 flies changed+40 -11
+1
+Phase 1: PREPROCESSING
+BFC
+Search Bound Extraction
+2
+Fix Info
+Domain
+Knowledge
+Tool
+Descriptions
+Prompt
+Assembly
+Phase 2: REACT LOOP
+Phase 3: OUTPUT
+ReAct
+Investigation Loop
+(Up to T=15 turns)
+BIC: 
+<commit_hash>
+Domain Knowledge
+Tool Design
+Context Compression
+Output
+Compression
+cache →format →extract
+6
+Reasoning
+Analyze evidence 
+Plan next action
+4
+Candidate
+Evaluation
+Follow domain rules 
+to judge candidates
+7
+3
+Hash
+Result
+Parsing
+8
+Fix Date
+Extract Fix Date d_fix
+2021-06-21
+Hash 
+Normalization
+9
+Project
+Codebase
+Action
+Observation
+git_blame git_show
+git_log_s git_log_func
+git_grep
+Retrieve
+Figure 1: Overview of AgentSZZ, illustrating the end-to-end workflow from preprocessing (1-3), through the ReAct investigation
+loop (4-7), to output generation (8-9). Given a bug-fixing commit (BFC), the agent investigates the repository through tool
+interactions guided by domain knowledge, with context compression, and outputs the identified bug-inducing commit (BIC).
+and domain knowledge for precise bug-inducing commit identi-
+fication. AgentSZZ addresses this gap by combining structured,
+task-specific tools with domain knowledge to enable accurate bug-
+inducing commit identification.
+3
+AgentSZZ Approach
+To address the limitations of existing SZZ algorithms and the chal-
+lenges of applying agent-based approaches to bug-inducing commit
+identification, we propose AgentSZZ, an agent-based framework
+that leverages LLM-based agents to interact with repositories and
+identify bug-inducing commits, as illustrated in Figure 1. AgentSZZ
+performs adaptive investigation that more closely resembles how
+developers analyze bugs, in contrast to prior SZZ approaches that
+follow fixed pipelines. Inspired by the ReAct paradigm [48], the
+agent dynamically selects investigation strategies based on interme-
+diate findings, enabling flexible repository exploration. Instead of
+relying on syntactic line matching, it reasons about causal rela-
+tionships between commits and the bug, distinguishing superficial
+changes (e.g., refactorings) from those that introduce faulty logic.
+This enables AgentSZZ to handle challenging scenarios such as
+cross-file cases and refactoring-obscured bugs.
+3.1
+Design Process
+The components of AgentSZZ were derived through an iterative,
+case-driven design process rather than predefined. To guide this
+process, we randomly sampled 50 cases from the Linux kernel
+dataset [23], excluding those used in the final evaluation [36]. We
+did not scale up this set due to the high cost of in-depth case analysis,
+as our goal was to perform detailed investigations to understand key
+challenges and inform component design. We conducted our study
+on the Linux kernel, a large and complex codebase that enables
+diverse and challenging cases. We investigated these cases while
+interacting with a LLM [2] to simulate the agent’s behavior.
+Through this process, we iteratively refined the tool design, do-
+main knowledge, and context management. Initially, we employed
+git_blame and git_show as core tools following standard SZZ
+practices. These tools were implemented as thin wrappers with
+only essential parameters (e.g., commit hash and file path), which
+often produced excessive outputs and led to inefficient investiga-
+tion. To address this, we introduced scoped parameters (e.g., line
+ranges, file filters, and search bounds) to constrain the search space.
+We further expanded the tool set to handle more complex scenar-
+ios by adding git_log_s for locating commits that introduce or
+remove specific identifiers, git_grep for repository-wide search,
+and git_log_func for function-level history tracing. We exclude
+git bisect, as it requires compiling and executing.
+Beyond tool refinement, we distilled domain knowledge from
+these investigations and existing literature. This includes heuristics
+such as starting with blame as a default entry point while allow-
+ing the agent to switch to broader search tools (e.g., git_log_s)
+when necessary. We also encourage continued blame tracing when
+encountering refactoring [11] or meta-changes [10] (e.g., merges),
+preventing premature convergence to non-causal commits. These
+heuristics guide deeper exploration and enable the identification of
+bug-inducing commits that require non-trivial investigation. We
+further observed that tool outputs can be large, introducing unnec-
+essary noise and increasing token consumption. This observation
+motivated the design of structured context compression to preserve
+essential evidence while reducing token usage.
+3.2
+Approach Overview
+As shown in Figure 1, the overall workflow of AgentSZZ into three
+main phases: Preprocessing, ReAct investigation loop, and Output.
+Preprocessing. Given a fix commit, AgentSZZ retrieves the
+commit message and diff of
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

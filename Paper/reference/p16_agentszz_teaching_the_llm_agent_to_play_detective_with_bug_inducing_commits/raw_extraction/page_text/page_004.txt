@@ -1,0 +1,91 @@
+Preprint, Under Submission, Arxiv Lyu et al.
+Table 1: Task-specific tools provided to theAgentSZZagent.
+Parameters marked with * are required. These tools are de-
+signed to cover the key operations involved in tracing bug-
+inducing commits.
+Tool Parameters
+git_show commit*,file_filter,stat_only,context_lines
+git_blame file_path*,commit,line_start,line_end
+git_log_s search_string*,path,after,before
+git_log_func function_name*,file_path*,after,before
+git_grep search_string*,commit,path
+bound for all subsequent search operations 2 . Finally, fix informa-
+tion, tool descriptions, domain knowledge, and search constraints
+are assembled into the initial context for the LLM agent 3 .
+ReAct Investigation Loop.The agent then enters a multi-turn
+investigation loop following the ReAct paradigm [ 48]. This iter-
+ative observe–reason–act cycle enables adaptive exploration of
+the repository, with observations and intermediate reasoning ac-
+cumulated across turns. We set a maximum of 15 turns, following
+prior agent-based approaches [ 22, 37, 45]. Given the initial con-
+text, the agent first analyzes the available information and plans
+the next action based on domain knowledge 4 . It then invokes
+one of thetask-specific toolsto interact with the repository and
+gather observations 5 . The tool output is subsequently processed
+by the context compression module to reduce token consumption
+6 . Based on the compressed observations, the agent evaluates
+candidate commits according to domain knowledge and updates
+its belief about the BIC 7 . This process repeats until the agent
+identifies a BIC candidate with sufficient evidence or reaches the
+turn limit, allowing it to iteratively refine its search and adapt its
+strategy when initial approaches prove unfruitful.
+Output.Once the agent identifies a BIC candidate or reaches the
+turn limit, it produces a structured output containing the predicted
+BIC hash, confidence level, and supporting reasoning.AgentSZZ
+then parses this output 8 and normalizes the commit hash 9 . The
+extracted hash is sanitized to remove non-hexadecimal characters
+and verified against the repository using git rev-parse. If the
+full hash cannot be resolved (e.g., due to hallucination), If no valid
+commit can be resolved, the prediction is discarded.
+3.3 Task-Specific Tools
+Table 1 summarizes the five tools provided to the agent. Instead
+of exposing raw git commands, we design a task-specific interface
+that constrains the agent’s action space to operations relevant to
+bug-inducing commit identification.
+Tool Abstraction.An unrestricted git interface exposes hun-
+dreds of subcommands and flag combinations, many of which are ir-
+relevant to bug-inducing commit identification. We distill this space
+into five tools, each supporting a distinct operation in the investi-
+gation process (Section 3.1). git_blame traces line-level ownership
+to identify the commit that last modified a given line. git_show re-
+trieves the commit message and diff for semantic classification (e.g.,
+distinguishing refactoring from bug inducing). git_log_s (pickaxe
+search) and git_log_func (function-level history) support tracing
+code origins across file renames and structural changes. git_grep
+AgentSZZPrompt##	Tools
+##	Workflow
+##	Tool	Rules
+YouareanexpertatidentifyingBug-IntroducingCommits(BICs)inthesoftwarerepositories.Givenafixcommit,findthecommitthatoriginallyintroducedthebug.
+###	Step	1:	git_blameat	fix~1<Trace	the	changed	lines	to	their	last	modifier>###	Step	2:	Evaluate	Blame	Results<Classify:	refactor	→	penetrate	|	introduction	→	BICambiguous→	counterfactual	test>###	Step	3:	Report<Confirm	causal	link,	output	BIC	with	evidence><r>BIC:	<full_commit_hash>confidence:	<high|medium|low>type:	<introduction|omission|cross_file|refactor_penetration>reasoning:	<brief	explanation></r>	(The	full	workflow	prompt	is	available	in	our	replication	package.)-git_log_s:includeapathwhenpossible;broadenonlyifempty.Usethefixcommitdateasthe`before`upperbound—theBICmustpredatethefix.-git_showonlargecommits:usefile_filter.-Donotgit_showthesamecommitmorethantwice.-Timeout→retrywithnarrowerparameters.-file_filterreturns"nochanges"→filewasatadifferentpathinthatcommit.Trygit_showWITHOUTfile_filtertoseetheactualpaths,orblameatcommit~1.
+1.**git_show(commit,context_lines,stat_only,file_filter)**—Viewcommitmessageanddiff.Usefile_filterforonefile'schangesinlargecommits.2.**git_blame(file_path,commit,line_start,line_end)**—Showwhichcommitlastmodifiedeachline.3.**git_log_s(search_string,path,after,before,use_regex,max_commits)**—Searchcommitsbyadded/removedstring(-S)ordiffpattern(-G).4.**git_log_func(function_name,file_path,after,before,max_commits)**—Trackfunctionbodychangehistory.5.**git_grep(search_string,commit,path)**—Searchcodebaseatacommitsnapshot.
+Figure 2: Prompt forAgentSZZ, encoding domain knowl-
+edge for Bug-Inducing Commit (BIC) investigation.
+searches the codebase at a specific revision to locate definitions,
+call sites, and cross-file references. All five tools wrap standard Git
+commands (git blame, git show, git log -S, git log -L, and
+git grep ), but are exposed as function-calling schemas via the
+API tools parameter, restricting the agent to invoking only these
+predefined operations with schema-conforming arguments.
+Scoped Parameters.Each tool exposes a focused set of pa-
+rameters that constrain its output scope, enabling more targeted
+queries. git_blame supports line_start and line_end to focus
+on modified lines, while git_show provides a file_filter to re-
+strict diff output to specific files. The search tools ( git_log_s,
+git_log_func) support temporal scoping via date parameters, al-
+lowing exploration within relevant history. git_grep accepts a
+commit parameter to search the codebase at a specific revision, and
+a path filter to narrow results to relevant directories. These param-
+eters remain optional, allowing the agent to apply them based on
+context while preserving flexibility within a bounded search space.
+3.4 Domain Knowledge
+The agent’s investigation is guided by a structured execution prompt
+that encodes domain knowledge distilled from our design process
+(Section 3.1) and existing literature. The prompt ofAgentSZZ
+(Fig. 2) consists of three components: a task description, tool spec-
+ifications (Section 3.3), and domain knowledge that defines both
+high-level investigation guidance and operational rules.
+textbfInvestigation Workflow. The domain knowledge encodes a
+three-step investigation strategy as high-level guidance, while the
+agent retains full autonomy over tool selection, invocation order,
+and query parameters at each step.Step 1 (Entry point selection).
+The domain knowledge recommends starting with git_blame on

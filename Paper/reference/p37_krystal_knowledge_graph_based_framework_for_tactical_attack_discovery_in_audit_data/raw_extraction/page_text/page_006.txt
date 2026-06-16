@@ -1,0 +1,76 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 5. Krystal Framework Architecture. 
+Listing 1. Excerpt of an RDF-based provenance graph generated from a log event. 
+tegrates a variety of attack discovery mechanisms and takes advan- 
+tage of its semantic model to include internal and external knowl- 
+edge in the analysis. Fig. 5 gives an overview of the KRYSTAL attack 
+discovery framework which consists of three main parts, i.e., (i) 
+provenance graph building, (ii) threat detection and alerting, and 
+(iii) attack graph and scenario reconstruction. 
+Security analysis is typically conducted either online or oﬄine . 
+Online refers to an analysis performed in a running system in 
+(near) real-time, whereas oﬄine refers to analysis over collected 
+data. These two modes have a different purpose (monitoring vs 
+forensics), but they can complement each other in hybrid settings 
+( Marz and Warren, 2015 ). 
+KRYSTAL works in an online mode in that it imports each 
+log event in sequence from potentially heterogeneous hosts (e.g., 
+Linux, Windows, FreeBSD). The Provenance Graph Building mod- 
+ule then generates an RDF-based provenance graph, taking advan- 
+tage of the well-deﬁned ontology and enabling enrichment with 
+background knowledge. Subsequently, the Threat Detection & Alert- 
+ing module allows for the combination of various approaches on 
+the uniform Knowledge Graph (KG). We illustrate the generality 
+of the approach by implementing a set of common mechanisms 
+as SPARQL queries, combining (i) tag propagation, (ii) attenuation 
+& decay, and (iii) signature-based detection based on Indicator of 
+Compromise. The Attack Graph Reconstruction module then facili- 
+tates (oﬄine) attack graph generation via Backward-forward chain- 
+ing and attack pattern matching via Graph Querying over the prove- 
+nance graph. We explain each component in more detail in the fol- 
+lowing subsections. 
+6.1. Provenance graph building 
+This component consists of two sub-components, Log Parsing 
+and RDF Mapping. Log Parsing transforms raw log events from het- 
+erogeneous hosts and operating systems (e.g., auditd from Linux, 
+ETW from Windows, and dtrace from FreeBSD) into a structured 
+format (i.e., JSON). This component selects and parses important 
+information from the log event such as system entities (e.g., pro- 
+cesses, ﬁles, sockets, etc.) and their relations (e.g., read, write, ex- 
+ecute, etc). RDF-Mapping maps the structured log data into an RDF 
+Listing 2. Excerpt of inferred RDF triples. 
+graph representation. Speciﬁcally, we used the KRYSTAL ontology 
+described in Section 5.2 and RML 14 , a declarative RDF-mapping 
+language, to map the parsed audit data and transform them into 
+well-deﬁned, RDF-based provenance graphs. 
+Listing 1 shows an excerpt of a log event in RDF representation. 
+It captures the fact that a system object (Firefox process) created a 
+ﬁle (“/home/admin/clean”). In RDF, the Firefox process is modeled 
+as subject :Firefox , the “write” operation is represented as prop- 
+erty kry:writes and the ﬁle “/home/admin/clean” is connected 
+as object :/home/admin/clean . 
+Taking advantage of reasoning rules (cf. Section 5.3 ), Listing 2 
+shows the inferred RDF triples from the provenance graph. 
+:Firefox has been identiﬁed as a kry:Process and 
+kry:SystemObject . In addition, the provenance relation prop- 
+erty :provRel with the object :/home/admin/clean has been 
+added automatically, and the type of :/home/admin/clean has 
+been inferred as kry:File . 
+Graph Reduction & Compression We apply two strategies to re- 
+duce the graph size. First, we automatically merge the duplicated 
+RDF output identiﬁed by the same URI (2021) , thus eliminating re- 
+dundant events (events with the same subject, property and object ). 
+Furthermore, we skipped irrelevant events – i.e., events that are 
+not considered in our ontology –f r o m being processed. Second, 
+we use Header Dictionary Triples (HDT) ( Fernández et al., 2013 ) as 
+a graph compression technique that provides a compact data struc- 
+ture and binary serialization format for RDF. HDT keeps large graph 
+data compressed and manageable while enabling query operations 
+without prior decompression. We discuss our graph reduction and 
+compression results in Section 8 . 
+6.2. Threat detection & alerting 
+Due to the uniform KG representation, the KRYSTAL framework 
+allows to combine and integrate a variety of techniques for threat 
+detection and alerting. We illustrate this by (i) transforming and 
+14 https://rml.io/ 
+7

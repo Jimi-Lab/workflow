@@ -1,0 +1,47 @@
+ISSTA016:12 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+Table 1 presents the statistics of the three datasets. Since the majority of the combined datasets
+are comprised of C and Java projects, we include only C and Java projects in the final dataset. To
+control experimental costs, we sample data from DS_LINUX following previous studies [Li et al.
+2024a; Xue et al. 2024; Yang et al. 2024], using a 95% confidence level and a margin of error below 5%.
+We sample 1,500 bug-fixing commits from a total of 76,046 commits, along with their corresponding
+bug-inducing commits. This sample size is comparable to previous studies. For example, Li et al. [Li
+et al. 2024a] sampled 381 commits from a total of 35,431 commits to evaluate their approach for
+generating commit messages. Note that we do not sample data from DS_GITHUB and DS_APACHE.
+We also provide information about the size of bug-fixing commits. Following previous studies [Bao
+et al. 2022; Tang et al. 2023], if a bug-fixing commit contains more than five changed lines, we
+categorize it as a large commit, otherwise, we categorize it as a small commit. From the table, we
+observe that the number of small bug-fixing commits is roughly equal to the number of large bug-
+fixing commits in DS_LINUX and DS_GITHUB, while most bug-fixing commits in DS_APACHE are
+large. In summary, our dataset comprises multiple high-quality pairs of bug-fixing and bug-inducing
+commits in various programming languages across numerous repositories.
+4.2 Experiment Setting
+Our experiment is conducted on a server equipped with two NVIDIA A800 GPUs and an Intel Xeon
+6326 CPU, running on Ubuntu OS. We utilize gitpython [GitPython 2024] to extract patch content
+and obtain the necessary information about commits. Additionally, we use the tree-sitter [treesitter
+2024] parser to extract functions from the source code when generating the context. Although our
+implementation focuses on the Java and C programming languages, LLM4SZZ is generic and can
+be easily extended to other programming languages by altering the parser in tree-sitter.
+For LLMs, we aim to balance cost and effectiveness for proprietary models. Therefore, we choose
+GPT-4o-mini due to its low fees and relatively high effectiveness. We estimated that using GPT-4
+would cost approximately $300 per round, which is prohibitively expensive. Our experiments
+show that GPT-4o-mini is sufficient for our needs. For open-source LLMs, we use Llama3-8b and
+Llama3-70b, which we downloaded from Hugging Face [HuggingFace 2024].To reduce randomness,
+we set the temperature to 0.0 for both GPT-4o-mini and the open-source LLMs, aligning with
+settings used in previous studies [Li et al. 2024a; Xu et al. 2024]. We also employ two strategies
+to further address randomness. First, we repeat the entire experiment three times and calculate
+the average metrics across the three runs. Second, our dataset consists of 2,102 test cases, which is
+large enough to reveal statistical patterns and minimize the influence of individual test cases on
+the final results.
+We use the SZZ algorithms introduced in Section 2.1 as our baselines. Implementations of the
+B-SZZ, AG-SZZ, MA-SZZ, L-SZZ, R-SZZ, and RA-SZZ algorithms are from the replication package
+provided by Rosa et al. [Rosa et al. 2021]. The implementation of the NeuralSZZ algorithm is from
+the replication package provided by Tang et al. [Tang et al. 2023]. We train the model using the
+same training set as in the original paper and achieve nearly identical performance on its own test
+set. We then apply the trained model to DS_GITHUB and DS_APACHE-j. To evaluate our approach
+and baselines, we employ three widely used metrics: Precision, Recall, and F1-score, following the
+methodology used in previous studies [Bao et al. 2022; Lyu et al. 2024].
+5 Experiment Results
+In this section, we first demonstrate the effectiveness of LLM4SZZ (RQ1). Next, we evaluate the
+impact of its key components (RQ2). Finally, we show that LLM4SZZ can be applied to other large
+language models (RQ3).
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

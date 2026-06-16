@@ -1,0 +1,156 @@
+2228
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE III
+AVERAGE NUMBER OF BUG-INDUCING
+COMMITS IDENTIFIED BY VARIOUS SZZ
+ALGORITHMS PER BUG-FIXING COMMIT
+Algorithm
+datasetlinux
+datasetrosa
+B-SZZ
+1.76
+1.96
+AG-SZZ
+1.73
+1.73
+L-SZZ
+1
+1
+R-SZZ
+1
+1
+MA-SZZ
+1.81
+2.01
+SZZ@PYD
+1.73
+1.95
+average improvement of 9.67% for these four algorithms. Only
+AG-SZZ and R-SZZ have lower precision on the KFC dataset
+than on the baseline. R-SZZ and L-SZZ hold a signiﬁcant
+advantage in precision compared to other SZZ variants on the
+KFC dataset. AG-SZZ, the third-best performer, performs in
+line with B-SZZ on the Linux dataset (42%). SZZ@PYD ranks
+as the fourth best algorithm in Rosa’s dataset, but it is the third
+best algorithm in our dataset. Concurrently, MA-SZZ consis-
+tently underperforms.
+Table III presents the average number of bug-inducing com-
+mits identiﬁed by the different SZZ algorithms for each bug-
+ﬁxing commit across the two datasets, excluding the Ghost
+Commits. For instance, for each bug-ﬁxing commit on Rosa’s
+dataset [28], B-SZZ identiﬁes an average of 1.96 bug-inducing
+commits, whereas, on the KFC dataset, B-SZZ only identiﬁes
+an average of 1.76 bug-inducing commits. Thus, the precision
+of B-SZZ of 0.39 on Rosa’s dataset increases to 0.42 on the
+Linux kernel dataset, an increase of 7.7%. The results in Tables
+II and III clearly show that as the number of identiﬁed commits
+decreases, precision increases.
+Recall: As shown in Table II, all SZZ algorithms exhibit
+varying degrees of decline in recall as compared to the results
+on Rosa’s Dataset, with an average decrease of 13.34%
+across the six algorithms. This highlights the challenge of
+achieving good recall with the SZZ algorithm, an issue that
+seems more signiﬁcant on the Linux kernel dataset than in
+the previous empirical study [28]. Among all SZZ algorithms,
+B-SZZ consistently delivers the best performance on both
+datasets. In contrast, L-SZZ and R-SZZ are the least effective
+algorithms, as they identify only one potential bug-inducing
+commit each. MA-SZZ consistently ranks as the third-best
+algorithm. Notably, MA-SZZ, AG-SZZ, and SZZ@PYD
+demonstrate remarkably similar performance on the Linux
+dataset, with a mere 0.1% difference between them. One source
+of missed bug-inducing commits is ghost commits. In Section
+VI-B, we will examine the inﬂuence of ghost commits on the
+recall achieved by the SZZ algorithms. Then, in Section VI-C,
+we will investigate the other situations SZZ fails to identify
+bug-inducing commits.
+Our ﬁndings conﬁrm that the top-performing algorithms
+for precision and recall remain R-SZZ (∼59%) and B-SZZ
+(∼58%), respectively, which validates the previous research by
+Rosa et al. However, when applied to a complete repository
+such as the Linux kernel, the precision of R-SZZ and recall
+TABLE IV
+BUG-INDUCING COMMITS CORRECTLY IDENTIFIED EXCLUSIVELY BY
+EACH SZZ ALGORITHM
+Algorithm
+datasetlinux
+percentage
+datasetrosa
+percentage
+B-SZZ
+1024/47352
+2.163%
+21/784
+2.679%
+AG-SZZ
+2/47352
+0.004%
+0/784
+0%
+L-SZZ
+0/47352
+0%
+0/784
+0%
+R-SZZ
+0/47352
+0%
+0/784
+0%
+MA-SZZ
+160/47352
+0.338%
+1/784
+0.128%
+SZZ@PYD
+66/47352
+0.139%
+0/784
+0%
+of B-SZZ, two leading SZZ algorithms, decline by 10.6% and
+15.9%, respectively. While R-SZZ can still be useful for cases
+where precision is crucial and B-SZZ when recall is crucial, it
+is important to note that both algorithms still have limitations
+in accurately and comprehensively identifying bug-inducing
+commits in software repositories.
+Table IV presents the correctvi\(SZZexp\vi) metric calculated
+for each SZZ variant vi. This metric represents the correct bug-
+inducing commits identiﬁed exclusively by vi and not by the
+other SZZ algorithms. For instance, consider the KFC dataset,
+where all SZZ algorithms combined correctly identify a total of
+47,352 bug-inducing commits. Of these, B-SZZ uniquely and
+correctly identiﬁes 1,024 bug-inducing commits not identiﬁed
+by other SZZ algorithms. Similarly, in the datasetrosa, the total
+number of correctly identiﬁed bug-inducing commits by all
+SZZ algorithms is 784, with B-SZZ alone correctly identifying
+21 bug-inducing commits that the other algorithms did not.
+In datasetlinux, four techniques (i.e., B-SZZ, AG-SZZ, MA-
+SZZ, SZZ@PYD) identify bug-inducing commits that remain
+undiscovered by other techniques, while in datasetrosa, only two
+techniques (B-SZZ, MA-SZZ) exhibit this ability. Given that
+B-SZZ does not ﬁlter any potential bug-inducing commits and
+shows the highest recall in the results displayed in Table II, it has
+the most uniquely identiﬁed bug-inducing commits across both
+datasets. Interestingly, despite having the third-lowest recall,
+MA-SZZ can uniquely identify 160 bug-inducing commits.
+The results depicted in Table IV illustrate the correct iden-
+tiﬁcation of bug-inducing commits by technique vi that were
+missed by all other techniques. Conversely, Fig. 4(a) and 4(b)
+depict the correctvi∩vj metric, which represents the degree of
+similarity between any two algorithms in their ability to accu-
+rately identify bug-inducing commits, calculated for each pair
+of SZZ variants on datasetlinux and datasetrosa respectively. The
+heatmaps exhibit symmetry, as correctvi∩vj = correctvj∩vi.
+Fig. 4 reveals a signiﬁcant overlap in the true positives
+identiﬁed in both datasets. In datasetrosa, 13 out of 15 com-
+parisons share more than 70% overlap in the identiﬁed true
+positives, while in datasetlinux, all 15 comparisons show this
+level of overlap. For instance, in Fig 4(a), the similarity between
+B-SZZ and AG-SZZ in the KFC dataset can be observed at the
+intersection of row 2 and column 1, or equivalently at row 1
+and column 2 due to symmetry, where it is 0.94. The comple-
+mentarity between the different SZZ variants is thus relatively
+low on both datasets, suggesting that there is a group of bug-
+ﬁxing commits for which all variants fail to identify the correct
+bug-inducing commit.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

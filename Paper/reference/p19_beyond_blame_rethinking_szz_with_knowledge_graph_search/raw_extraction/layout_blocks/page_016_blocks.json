@@ -1,0 +1,152 @@
+[
+  {
+    "page": 16,
+    "block_id": "page_016:block_001",
+    "block_type": "text",
+    "text": "16 Yu Shi et al.",
+    "bbox": [
+      45.64500045776367,
+      60.6286735534668,
+      440.1717529296875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_002",
+    "block_type": "text",
+    "text": "Table 5. Ablation study of AgenticSZZ components. All differences between AgenticSZZ and ablations are statistically significant ( ∗ 𝑝 < 0 . 05 , McNemar’s test).",
+    "bbox": [
+      45.58599853515625,
+      84.34700775146484,
+      440.1749572753906,
+      106.26506805419922
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_003",
+    "block_type": "text",
+    "text": "DS_LINUX DS_GITHUB DS_APACHE",
+    "bbox": [
+      157.66799926757812,
+      121.03233337402344,
+      390.5543212890625,
+      131.72821044921875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_004",
+    "block_type": "text",
+    "text": "Ablations Prec. Recall F1-score Prec. Recall F1-score Prec. Recall F1-score",
+    "bbox": [
+      76.2490005493164,
+      134.91363525390625,
+      409.7497253417969,
+      146.49420166015625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_005",
+    "block_type": "text",
+    "text": "Blame-only 0.491 0.471 0.481 0.587 0.585 0.586 0.546 0.374 0.444 Blame-fallback 0.555 0.533 0.544 0.629 0.627 0.628 0.558 0.383 0.454 TKG-only 0.544 0.523 0.533 0.483 0.482 0.482 0.400 0.274 0.325 Agent-only 0.567 0.545 0.556 0.590 0.588 0.589 0.537 0.369 0.437 AgenticSZZ 0.670 0.644 0.657 ∗ 0.722 0.720 0.721 ∗ 0.608 0.417 0.495 ∗",
+    "bbox": [
+      76.2490005493164,
+      149.87762451171875,
+      409.74969482421875,
+      201.44485473632812
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_006",
+    "block_type": "text",
+    "text": "Table 6. True positives by BIC category. Each BFC is assigned to a single category using priority (Blame > Ancestor > Blameless). Ancestor combines Blame Ancestor and BFC Ancestor categories. For fair comparison, LLM4SZZ uses the same LLM (DeepSeek-V3.2) as AgenticSZZ (Table 4 ). Results are based on the best run (highest F1-score) for each approach.",
+    "bbox": [
+      45.54999923706055,
+      226.93301391601562,
+      441.1559753417969,
+      270.218994140625
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_007",
+    "block_type": "text",
+    "text": "Approach Blame Ancestor Blameless Total",
+    "bbox": [
+      143.8159942626953,
+      285.53631591796875,
+      342.18377685546875,
+      296.2322082519531
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_008",
+    "block_type": "text",
+    "text": "Blame-only 1,076 0 0 1,076 Blame-fallback 1,076 0 114 1,190 TKG-only 980 0 104 1,084 Agent-only 1,077 1 112 1,190 LLM4SZZ 1,016 35 123 1,174 AgenticSZZ 1,209 19 180 1,408",
+    "bbox": [
+      143.8159942626953,
+      299.61663818359375,
+      342.18377685546875,
+      361.01025390625
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_009",
+    "block_type": "text",
+    "text": "TKG-only on all datasets, confirming that intelligent reasoning over a focused candidate set is more effective than deterministic ranking over an expanded set. The full pipeline combines the TKG’s structured exploration with the agent’s intelligent navigation, achieving the best performance across all datasets. Category-level analysis reveals the strengths of LLM4SZZ vs. AgenticSZZ. Table 6 and Figure 5 break down the true positives of each approach by BIC category. AgenticSZZ achieves the highest total number of true positives (1,408) through substantial gains in Blame (+193 over LLM4SZZ) and Blameless (+57) categories. The Venn diagrams reveal that the two approaches are largely complementary in the Blame category (998 shared successes, but AgenticSZZ uniquely solves 211 cases vs. LLM4SZZ’s 18), while they solve completely different cases in the Ancestor category (no overlap). Interestingly, LLM4SZZ’s context expansion finds more Ancestor-category BICs (35 vs. 19), suggesting that expanding context around modified lines, while aimed to improve the identification of blameless cases, actually is more efficient in finding Ancestor cases. In contrast, AgenticSZZ’s superior reasoning enabled it to correctly identify 193 more Blame BICs than LLM4SZZ. This indicates that intelligent candidate selection matters more than search space expansion for the majority of cases. The TKG-agent synergy reflects an exploration-exploitation trade-off [ 33 ]. The TKG expands the frontier of possible solutions by encoding temporal and code-level relationships, while the agent exploits semantic understanding to select among them. Neither component alone is sufficient: expansion without intelligence introduces noise, while intelligence without expansion hits a coverage ceiling. This complementary design suggests that future work could explore integrating search-based software engineering techniques [ 13 ] to further optimize the navigation strategy.",
+    "bbox": [
+      45.459999084472656,
+      392.4190979003906,
+      441.2664489746094,
+      657.245361328125
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 16,
+    "block_id": "page_016:block_010",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      45.827999114990234,
+      671.4816284179688,
+      225.87257385253906,
+      682.496337890625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

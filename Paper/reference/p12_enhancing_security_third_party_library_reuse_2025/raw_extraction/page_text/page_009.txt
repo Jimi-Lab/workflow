@@ -1,0 +1,156 @@
+are merged, while those unmerged chunks remain independent
+from each other.
+Vulnerability detection. After constructing the chunks, V UL-
+TURE uses chunk matching to determine if variables in the
+target code snippet have been patched. Initially, VULTURE con-
+ducts disjoint checking by pairwisely comparing each chunk
+in Diffvt and Diffpt with the chunks from Diffvp to determine
+whether the patches have been applied to the target program.
+If both sets of Diffvt and Diffpt share the same variables
+with Diffvp, V ULTURE further performs line matching. A
+vulnerability is considered “patched” if all lines in Diffvp
+appear in Diffvt, but disappear in Diffpt. Otherwise, V ULTURE
+further executes operation match. When all operations in Diffvp
+appear in Diffvt, but disappear in Diffpt, it indicates that the
+vulnerability has been patched via customized modifications.
+If both matching conditions are failed, a 1-day vulnerability is
+considered to be “found”.
+A detailed example for chunk-based detection is depicted
+in Figure 4. The code snippet A at the top represents the
+patch code, while code snippet B at the bottom shows the
+customized patch. To construct chunks, V ULTURE initially
+treats each added line in the patch and reused code as an
+individual chunk. Next, V ULTURE merges these chunks based
+on semantic relationships and context. For instance, in the
+patch code snippet A, the first four lines are merged into a
+single chunk because they share the same variable, cmaplen.
+Similarly, the last two lines are incorporated into another chunk
+as the same control block governs them.
+After constructing the chunks, V ULTURE starts to process
+chunk matching. In the above example, chunk C pairs with
+chunk E, and chunk D pairs with chunk F. Code B is classified
+as patched, since the line match was unsuccessful (indicated
+by the highlighted lines on the left side), the operation match
+succeeded (indicated by the highlighted lines on the right side).
+This scenario of custom patch may lead to false positives
+in other systems like V1SCAN, but V ULTURE can accurately
+identify the patch.
+A
+B
+C
+D
+METHODDEF(JDIMENSION) get_8bit_row(...){
+    
+  +   int cmaplen;
+    ...
+  +  cmaplen = source->cmap_length;
+    ...
+  + if (t >= cmaplen)
+  +   return 1;
+    output++ = colormap[0][t];
+    ...
+  + if (getUsed(bitClrUsed))
+  +     return 1;
+    ...
+}
+METHODDEF(JDIMENSION) get_8bit_row(...){
+    
+  +   int cmaplen = source->cmap_length;
+    ...
+  + if (t >= cmaplen)
+  +    return 1;
+    output++ = colormap[0][t];
+    ...
+  + if (getUsed(bitClrUsed))
+  +    return 1;
+    ...
+}
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+F
+REUSE
+Line numbers [5 ， 6] 
+Variable [bitClrUsed]
+Operation [
+ bitClrUsed: {callexpr, arg0}    
+]
+Line numbers [1,2,3,4] 
+Variable [cmaplen, source->cmap_length]
+Operation [
+ cmaplen: {assign;left; 
+   source->cmap_length}
+          { >=; right; t}
+ source->cmap_length ：
+          {assign; right;cmaplen}
+]
+E
+Fig. 4: Chunk extraction and match
+After processing all potential vulnerabilities for the tar-
+get program through version-based and chunk-based analysis,
+VULTURE will generate a comprehensive vulnerability report.
+This report not only includes the CVE-ID of the vulnerability
+but also provides the patch commit URL from our vulnerability
+segment of the database, along with details of the chunks
+involved in the detection process, to facilitate further patching
+on 1-day vulnerabilities by developers.
+V. E XPERIMENT
+We evaluate the performance of V ULTURE across two
+aspects: the accuracy of TPL reuse detection, and the effec-
+tiveness in detecting 1-day vulnerabilities introduced by the
+reused TPLs.
+A. Experiment Setup
+Although V ULTURE can be applied to any arbitrary plat-
+form for 1-day vulnerability detection, we applied VULTURE to
+IoT projects as a representative in our following experiments.
+In detail, V ULTURE collected all prevalent repositories from
+GitHub, OpenWRT, stm32duino, awesome-cpp, awesome-c,
+and mongoose-os-libs in C/C++, and then conducted TPL
+selection to choose the specific TPLs. After filtering the
+repositories via keywords, 19,057 libraries were left. These
+libraries were consolidated into a database named DB kwd.
+After identifying the dependent libraries and only retaining
+the parent TPLs, V ULTURE eventually built a TPL database
+DBiot containing 1,872 IoT-specific TPLs, which include TPL
+names, all TPL versions, hash values, and birth times of
+functions within the TPL to store as the component segment
+within DB iot. According to the collected TPLs, V ULTURE
+explored 5,114 CVE reports, of which, 1,717 CVEs have
+GitHub patches available. These CVE reports and patches are
+stored as the vulnerability segment within DB iot.
+We evaluated the performance of each component in V UL-
+TURE against corresponding state-of-the-art works. To evaluate
+the database quality, (Section V-B), we selected Centris, SNYK
+and VFCFinder [20]. For vulnerability detection (Section V-C),
+we chose V1SCAN, TPLite [27], and SNYK. Although MVP is
+also a 1-day vulnerability detection tool, was excluded due to
+its lower reported performance compared to V1SCAN. Each
+tool was implemented by using its latest version as of April
+2024, following the instructions provided by developers.
+We ran V ULTURE on a machine with Debian GNU/Linux
+12, 32GB RAM and 1TB SSD. For patch commit collection,
+we set the search slice size k at 20. For similarity comparison,
+we set THhash = 30 and THsim = 10% after manual testing
+to achieve optimal detection results.
+B. Database Evaluation
+We evaluated the two segments (i.e., component segment
+and vulnerability segment) within the database, DB iot, respec-
+tively.
+1) Component Segment Evaluation: A suitable database
+for TPL reuse detection must be comprehensive, specific, and
+maintainable (refer to Section II); thus we conducted two
+experiments to evaluate whether DB iot adheres to these char-
+acteristics while ensuring the database size remains relatively
+small:
+9

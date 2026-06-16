@@ -1,0 +1,44 @@
+Input:
+- Unified diff security patch.
+- Source corpus or OS-distribution codebase.
+- Parameters n and theta.
+- Optional context lines around changed code.
+
+Output:
+- A list/report of candidate unpatched code clones.
+- For similarity mode, pairwise similarity measurements between code units.
+
+Objects / Entities:
+- Patch file.
+- Diff hunk.
+- Deleted vulnerable line.
+- Added fixed line.
+- Context tokens.
+- Source file.
+- n-token set.
+- Bloom filter or feature-hashing bitvector.
+- Candidate match and exact match.
+
+Formal Definitions:
+The paper defines containment for vulnerable snippet set fa against source set fb as |fa ∩ fb| / |fa|, and similarity as Jaccard |fa ∩ fb| / |fa ∪ fb|. Equations require formula repair before exact reproduction [NEEDS FORMULA REPAIR].
+
+Objective:
+Find clones of buggy pre-patch code in large corpora quickly with low false detection from the matching algorithm.
+
+Constraints:
+- Must scale to OS-distribution-sized corpora.
+- Must handle multiple languages.
+- Must avoid parser fragility.
+- Must keep reports low-noise enough for manual/security triage.
+
+Evaluation Target:
+Scalability, query time, database size, number of unpatched code clones, confirmed bugs, persistence across OS versions, and comparison with Deckard.
+
+Boundary Conditions:
+The default unpatched-code-clone experiment uses a conservative theta=1 configuration. It targets syntactic near-exact clone evidence, not semantic equivalence.
+
+What Is Not Solved:
+Semantic variants, variable-name/type changes, non-exploitable contexts, and fixes applied at different locations can evade or confuse ReDeBug.
+
+Reusable Formalization Pattern:
+Separate a broad semantic security question into a narrower detectable relation: "does a corpus contain the normalized pre-patch token context?"

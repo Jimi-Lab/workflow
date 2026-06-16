@@ -1,0 +1,1432 @@
+
+
+===== PAGE 1 =====
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+905
+Automatically Identifying CVE Affected Versions
+With Patches and Developer Logs
+Yongzhong He
+, Yiming Wang
+, Sencun Zhu
+, Wei Wang
+, Yunjia Zhang, Qiang Li
+, and Aimin Yu
+Abstract—While vulnerability databases are important sources
+of information for software security, it is known that information in
+these databases is inconsistent. How to rectify these incorrect data
+is a challenging issue. In this article, we employ developer logs and
+patches to automatically identify vulnerable source code versions
+that each CVE really affects. Our tool organizes all versions of a
+piece of software into a version tree, and identiﬁes the ﬁrst vulner-
+able version, and the last vulnerable versions in the version tree
+trunk and branches. For evaluation, we took Linux Kernel as the
+case study and quantiﬁed the error rate of the vulnerable versions
+reported by the NVD. The total number of vulnerable Linux Kernel
+versions reported by the NVD was 43,727 (as of September 2020),
+of which the total number of false positives reached 2,497 and the
+total number of false negatives reached 9,330, accounting for 5.7%
+and 21.34%, respectively. In addition, we compare our tool with two
+vulnerability detection tools and show that our tool could achieve
+high detection accuracy.
+Index Terms—Developer logs, NVD, patch, versions, vulnerab-
+ility.
+CCS
+CONCEPTS:
+Security
+and
+privacy
+Software
+security
+I. INTRODUCTION
+S
+OURCE code vulnerabilities in computer and network sys-
+tems are a serious threat to users and organizations. The
+2021 open-source software security and threat analysis report of
+Synopsys [1] showed that more than 75 percent of commercial
+software using open-source components had known bug code.
+Although there were 13 automatic ﬁx mechanisms, at least 86
+percentofcomputerswerenotpatchedevenwhenvulnerabilities
+Manuscript received 19 February 2022; revised 4 January 2023; accepted 7
+January 2023. Date of publication 5 April 2023; date of current version 14 March
+2024. This work was supported in part by the Fundamental Research Funds for
+the Central Universities of China under Grant 2020JBZ104, and in part by the
+National Natural Science Foundation of China under Grants U21A20463 and
+U22B2027.(Y.Wangistheco-ﬁrstauthorofthisarticle.Y.WangandY.Zhangdid
+this work under the supervision of Y. He.) (Corresponding authors: Yongzhong
+He; Wei Wang; Qiang Li.)
+Yongzhong He, Wei Wang, and Qiang Li are with the Beijing Key Laboratory
+of Security and Privacy in Intelligent Transportation, School of Computer,
+BeijingJiaotongUniversity,Beijing100044,China(e-mail:yzhhe@bjtu.edu.cn;
+wangwei1@bjtu.edu.cn; qiangcas@gmail.com).
+Yiming Wang and Yunjia Zhang are with the Beijing Jiaotong University, Bei-
+jing 100044, China (e-mail: 19120480@bjtu.edu.cn; 18120489@bjtu.edu.cn).
+Sencun Zhu is with the Department of Computer Science and Engineering,
+The Pennsylvania State University, State College, PA 16801 USA (e-mail:
+sxz16@psu.edu).
+Aimin Yu is with the Institute of Information Engineering, Chinese Academy
+of Sciences, Beijing 100045, China (e-mail: yuaimin@iie.ac.cn).
+This article has supplementary downloadable material available at https://doi.
+org/10.1109/TDSC.2023.3264567.
+Digital Object Identiﬁer 10.1109/TDSC.2023.3264567
+were presently available as of 2020, as reported by Lopes [2].
+Therefore, it is important to identify and remedy the software
+security problems that are constantly found to protect computer
+systems.
+Security professionals rely on various sources of information
+to inform them of new security issues. An important source
+is the vulnerability database. Public vulnerability databases in-
+clude CVE, NVD, SecurityFocus, Redhat Bugzilla, ExploitDB,
+OpenWall, SecurityTracker, etc., but we focus on the most
+widely used and authoritative database: National Vulnerability
+Database (NVD) [3] in this work. The database is maintained by
+the U.S. government, committed to accurately record all known
+vulnerabilities, and effectively as an industry standard. For ex-
+ample, business security services (such as Hakiri [4], Snyk [5]
+and SourceClear [6]) and open-source security tools (such as
+BudlerAudit[7],OWASPOSSIndex[8]anddependencycheck-
+ing [9]) rely on NVD vulnerability information to run effectively.
+Researchers [10], [12] use the NVD as the core data source
+to reveal all aspects of vulnerability discovery and recovery
+process. Aksu et al. [13] rely on the information of the NVD to
+generate attack graph automatically. However, is the information
+from the NVD database accurate? Indeed, previous work has
+pointed out the inaccuracy of NVD information. For example,
+Dong et al. [14] reported the inconsistent vulnerable software
+versions of the NVD are highly prevalent: only 59.82% of the
+vulnerability CVE summaries strictly match the standardized
+NVD entries, and the inconsistency level increases over time.
+Anwar et al. [15] discovered the inconsistent or incomplete data
+of the NVD and showed the possible impact of these data prob-
+lems. Other work [16], [17], [18] also investigated some types
+of NVD data quality problems. The above work indicated that
+the known affected software conﬁguration of NVD (introduced
+in Section II-A) was indeed inaccurate. However, the previous
+work mostly pointed out the inaccuracy of the NVD, with
+the following question largely remaining unanswered: which
+vulnerable versions are exactly affected by a CVE-ID?
+To ﬁll this gap, we aim to propose a practical solution to
+justify the incorrect versions reported by the NVD. For a given
+CVE, none of the existing vulnerability detection methods can
+guarantee that the vulnerability can be accurately identiﬁed
+in all released versions, so just relying on these methods is
+not enough. For example, patch-based detection [19], [20] has
+one assumption: the unpatched code is vulnerable and patched
+code is secure. However, in this article we ﬁnd this assumption
+is not correct. Fuzzing [21] has low false positives, but it is
+difﬁcult to fuzz programs that take highly structured inputs, or
+1545-5971 © 2023 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 2 =====
+906
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+to ﬁnd vulnerabilities that are guarded by complex conditions
+and do not manifest as crashes. The methods based on machine
+learning [22], [23], [24] rely on experts to manually deﬁne
+features and then use learning models to classify code with or
+without vulnerabilities. Due to the coarse code granularity, it
+is difﬁcult to determine the exact location of the vulnerability.
+The methods based on code similarity [20], [25] are difﬁcult to
+detectvulnerabilitiesthatarenotcausedbycodeduplication,and
+the programs with similar vulnerable code are not necessarily
+vulnerable, which leads to inaccurate results. For a CVE, we aim
+to determine the boundary (e.g., the ﬁrst and the last vulnerable
+versions) of all vulnerable versions in the version tree (i.e., a
+tree structure to organize all versions, with the major versions
+in the trunk and minor versions in the branches, introduced in
+Section IV). It is worth noting that we only pay attention to
+the vulnerabilities speciﬁed by CVEs, not all vulnerabilities of a
+version. Therefore, if aCVEvulnerabilitystill exists inaversion,
+we call it a vulnerable version.
+We conduct an in-depth large-scale analysis on the open-
+source code of the released versions, and systematically evaluate
+and determine the versions impacted by each CVE. For a given
+CVE, we divide the problem space into three steps. First, we
+determine the last vulnerable version in the version tree. Based
+on our study, we ﬁnd that unpatched code does not necessarily
+have a vulnerability, because it may have been ﬁxed in another
+way (called repatching). Second, we determine the last vulnera-
+ble version in each branch of the version tree. Third, some early
+versions may have gone through many updates, which is the
+reason for partial matching (introduced in Section II-B) between
+patches and source code. Accordingly, we design methods to
+identify the partial matching source code and provide more
+reliable results for the vulnerabilities. Especially, we use both
+patchesandgitlogstojustifytheﬁrstversionofthevulnerability.
+Finally, our work will not only put forward a new idea to
+justify the Known Affected Software Conﬁgurations of the NVD,
+but also reveal the special behaviors in patching vulnerable
+code.
+Contributions. Based on the developer logs and patches,
+our tool is dedicated to automatically generate a report with
+justiﬁcations to correct the Known Affected Software Conﬁg-
+urations of the NVD. Our work provides several contributions.
+First, our method builds all the software versions into a version
+tree according to their commit dependence. We can leverage
+the version tree to improve the accuracy and efﬁciency of our
+tool. By contrast, previous tools check each software version
+separately, which is hard to verify the detection results when they
+conﬂict with each other. Second, we propose a general method
+using patches and developer log information to verify which
+versions are really vulnerable and further determine the version
+number boundaries of the CVE vulnerabilities in the version
+tree, because developer logs provide more reliable evidence than
+patches only. The phenomena of repatching and partial matching
+are discovered and countermeasures are proposed. Finally, we
+rectiﬁed 11, 827 incorrect reports of Linux Kernel, and con-
+ﬁrmed that 94 patched versions lacked corresponding committed
+records in the changelogs. Our method can be applied for other
+open source software (e.g. Firefox, OpenSSL). In addition,
+we compare our tool to two very representative vulnerability
+detection tools using a number of versions randomly selected
+from ﬁve widely used open-source projects as the testing dataset.
+Ourresultsshowthatthesetoolscouldnotachievehighdetection
+accuracy while our tool achieved 94.3% precision and 95.6%
+recall. Our work not only reports the incorrect vulnerability
+information of the NVD, but also provides important insights
+on such data sources for future vulnerability detection.
+II. BACKGROUND
+We ﬁrst introduce the background on security vulnerability
+reporting mechanisms, and then describe several basic require-
+ments for our tool.
+A. Vulnerability Reporting
+CVE and CVE-ID. CVE (Common Vulnerability Enumer-
+ation) is a list of records for publicly known cybersecurity
+vulnerabilities. Launched by MITRE in 1999 as a community
+effort, today it is used in many cybersecurity products and
+services from around the world. Each CVE record contains
+an identiﬁcation number (CVE-ID) (e.g., “CVE-2021-3564”),
+a description, at least one public reference [26]. When people
+ﬁnd a new vulnerability, they can request and obtain a unique
+CVE-ID from a CVE Numbering Authority (CNA) [27].
+NVD. NVD (National Vulnerability Database), launched by
+NIST (National Institute of Standards and Technology) [28],
+is a repository of standard vulnerability management data
+represented using the Secure Content Automation Protocol
+(SCAP) [29]. Built upon and fully synchronized with the CVE
+record List [26], the NVD in addition provides enhanced struc-
+turalinformationforeachrecordsuchasﬁxinformation,severity
+scores, and impact ratings in its vulnerability detail pages. After
+the initial vulnerability report, the information of the NVD may
+be manually updated [14]. For instance, for a new CVE, security
+patches may not be available in the time of releasing the CVE,
+but later on the links to the security patches can be added to its
+NVD page.
+Known Affected Software Conﬁgurations. Each vulnerability
+in the NVD has a vulnerability detail page, which contains
+a section called Known Affected Software Conﬁgurations (see
+Fig. 1(a)). It is used to show which software or combinations
+of software are considered vulnerable at the time of analysis.
+Corresponding to a given CVE-ID, it reports a list of versions
+impacted by the vulnerable source code. The NVD uses the
+Common Platform Enumeration (CPE) 2.3 speciﬁcation when
+creating these applicability statements and the matching CPE
+URI[s]. Applicability statements are a way to communicate
+which products are vulnerable in a relatively ﬂexible syntax [30].
+This was designed primarily for machines to process and thus is
+not easy for human readers to understand.
+B. Basic Requirements
+Our tool relies on both security patches and developer logs
+to provide evidence of the vulnerability of a version, so that we
+assume that security patches and developer logs are correct and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 3 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+907
+Fig. 1.
+Examples of vulnerability and change reporting systems.
+trustworthy, but only security patches or only developer logs are
+not enough to decide if a software version is affected by a CVE
+(incomplete).
+Security Patch. Patches are a set of code changes to soft-
+ware or operating systems (OS). They aim to solve security
+vulnerabilities in programs or products. Software vendors may
+release updates to ﬁx performance vulnerabilities, or to provide
+enhanced security features [31]. A CVE-ID may correspond to
+a single patch or multiple patches, and we call each vulnerable
+code block in a patch as a diff hunk. A diff hunk is identiﬁed by
+one@@statementinthepatch(seeFig.1(b)),anditcorresponds
+to a source code block waiting to be patched. For ease of
+explanation, we deﬁne all the lines without preﬁx in a diff hunk
+as an oth, and all the ‘-’ lines as sub. A diff hunk consists of
+four parts: the vulnerable function (including its parameters),
+Fig. 2.
+Examples of exact and partial matching.
+oth (excluding the comments), the ‘-’ line(s) and the ‘+’ line(s).
+Among them, the ‘-’ line and the ‘+’ line represent the lines of
+source code that need to be deleted and added, respectively, and
+oth is used to locate the ‘-’ line and the ‘+’ line. For example, the
+diff hunkinFig. 1(b) represents that theio_ add_buffers fromthe
+/fs/io _ uring.c ﬁle is a vulnerable function, and this vulnerability
+is patched by deleting the ‘-’ line from the vulnerable source
+code and adding the ‘+’ line. The patch-based vulnerability
+detection [19], [20], [32] relies on a context-based patch method,
+which extracts the lines from the diff hunks of the patches for
+identiﬁcation of vulnerable source code.
+There are two types of methods for matching a diff hunk with
+the source code. The exact match method means that the string
+consisting of ‘-’ line(s) and oth speciﬁed by the diff hunk must
+exactly match the source code, and the code sequence is also the
+same, as shown in Fig. 2(a). We can see that the oth lines include
+six positioning start and end statements. The two ’+’ lines do not
+appear in the source code, which means this code is unpatched.
+Note that for a diff hunk consisting of only ‘+’ lines and oth, the
+exact match means the corresponding ‘+’ lines and oth exactly
+match the source code which has been patched, because ‘+’ lines
+are new code, which does not exist in the unpatched source code
+at the corresponding locations.
+The second method is called partial match, which matches
+the source code that does not have all ‘-’ lines and oth in the
+diff hunk, as shown in Fig. 2(b). We can see that the oth lines
+include lines 4-6 and 14-18 in the patch ﬁle, which match the
+correspondent lines in the source code, but line 15 in the patch
+does not match line 10 in the source code. There is no partial
+match for the diff hunk consisting of only ‘+’ lines and oth,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 4 =====
+908
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+which we will introduce in detail in Section IV-D1. For a diff
+hunk where both ‘-’ and ‘+’ lines exist, our matching method
+does not consider the ‘+’ lines of the diff hunk unless the ‘-’
+lines in the diff hunk is a subset of the ‘+’ lines (‘+’ or ‘-’ preﬁx
+omitted), and this type of diff hunk is generally used to change
+the code position.
+Changelog. A changelog is a log or record of all notable
+changes (e.g., bug ﬁxes, security patching, new features, etc.)
+made to a project (Fig. 1(c) shows an example). Some open-
+source projects include changelogs as one of the top-level ﬁles
+in their distributions. Each changelog corresponds to one open-
+source version, and one changelog is composed of multiple
+git logs. Changelogs need to be written according to certain
+speciﬁcation and its creation is a time-consuming manual pro-
+cess [33]. It is worth noting that some versions of software do
+not have changelogs, either because they were released before
+the changelog writing speciﬁcation was formed, or because the
+vendors simply did not write one. Thus, while we regard the
+information recorded in the changelogs as ground truth in our
+research, we do not assume the record list of changelogs for a
+software project is complete.
+Git Log. It is a log generated by the command “git log [<
+options >] [< revision range >] [[-] < path > ...]” [34], and
+it can be used to show project history [35], [36], [37], [38] and
+search for speciﬁc changes. Fig. 1(d) shows a part of the git
+log list, which is a collection of git logs in chronological order.
+Here each line represents a git log title, and the details recorded
+in a git log include the commit-id, the commit time of patch,
+diff hunks, the author and committer of this log (see Fig. 1(e)).
+A git log is a modiﬁcation record of the source code, which
+is identiﬁed by a unique commit-id. Note that the developer
+can make new git commits for reasons other than ﬁxing bugs
+reported by CVEs; therefore, while each CVE-ID corresponds
+to a commit-id, many commit-ids have nothing to do with CVEs.
+Because git logs are recorded by the system program, we regard
+the information recorded in the git logs as ground truth in our
+research.
+III. RESEARCH GOALS AND CHALLENGES
+ResearchGoal.CorrespondingtoagivenCVE-ID,theKnown
+Affected Software conﬁgurations section in NVD reports a list
+(or a set) of software versions impacted by the vulnerable source
+code. Prior research [14], [15] (as well as our investigation) has
+shown that such information may be inaccurate. We ﬁnd that
+in most cases, the NVD includes in this section all versions
+whose version numbers are below the “up to” version (the last
+vulnerable version reported, see Fig. 1(a)). Therefore, for each
+CVE-ID, we choose the false positive rate and the false negative
+rate as the performance metrics to quantify the inaccuracy of this
+set. We use developer log as evidence to accurately determine
+which versions are truly affected by a given CVE-ID. From
+another perspective, for a CVE-ID, we determine the boundary
+of vulnerable versions in the version tree that contains all the
+versions.
+Challenges. There are three main challenges in this research.
+(C1) Lack of convincing evidences. To identify and justify
+the exact CVE affected vulnerable program versions, the most
+challenging task is to provide convincing evidences to the output
+of the methods. The veriﬁcation by PoC(Proof of Concept) is the
+most reliable, but not scalable and practical in our task. There
+are different methods and source of information regarding to the
+CVE affected versions, but they usually give conﬂicting results.
+As software source codes are changing over time, vulnerabilities
+are introduced, transformed, patched, and repatched with a new
+patch. We observed that a CVE patch present in a software
+version is neither a sufﬁcient nor a necessary condition to prove
+that the version is ﬁxed respect to the CVE. In this article, we
+assume that patches are correct and trustworthy. Therefore, if a
+patch is present in the software version, we consider a software
+version is ﬁxed; but if a patch is not present, we cannot decide if
+a version is really affected by only depending on patch presence
+test methods. (C2) Large scale of source codes of different
+versions. Since the set affected by the vulnerability may cover
+all published versions, how to efﬁciently and accurately identify
+the vulnerability version set for a large scale of software versions
+is a challenge. The traditional method is to check each software
+version separately. However, regardless of static or dynamic
+detection methods, with the continuous source code version
+updates, the number of software versions becomes very large,
+so the efﬁciency problem. (C3) Continuous transformation of
+the source code. Due to the continuous update and release of
+open source software versions, a vulnerability code may have
+undergone many changes in some earlier versions, which leads
+to incomplete matching between source code and the patch ﬁle
+for newer versions. Traditional detection methods relying on
+patch presence test are difﬁcult to accurately check such code
+whether there are vulnerabilities in the partial matching codes.
+Our Approaches to the Challenges. To overcome the chal-
+lenge C1, we leverage the information contained in version tree
+and developer logs because they contain ﬁrsthand and reliable
+evidences for the state transition of the vulnerabilities, which
+is presented in Sections IV-A, IV-B, and IV-D. For C2, we
+construct a version tree and ﬁnd the boundary of the affected
+versionsinthistreecollectively,insteadofcheckingeachversion
+separately, which is presented in Section IV-A and IV-C. For C3,
+We classify the different types of partial matching and trace the
+developer logs to counter this challenge, which is described in
+Section IV-D.
+IV. RESEARCH METHODOLOGY
+Overview of Our Method. Fig. 3 gives an overview of our
+method, which consists of three steps. The required input in-
+cludes the CVE-IDs for an open-source software project under
+investigation, the set of open-source code for all its versions,
+and the developer logs (including the set of changelogs and
+the set of git logs corresponding to the CVE-IDs). The ﬁrst
+step is to build the version tree and obtain a version number
+set over which the vulnerability has been patched according
+to the commit-ids recorded in the changelogs. Based on this
+version set, the second step involves three different processing
+directions: (R1) to determine the last vulnerable version number
+in the trunk of the version tree, (R2) to determine the vulnerable
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 5 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+909
+Fig. 3.
+Overview of our approach with three major steps numbered from 1 to 3.
+version of each version branch and (R3) to determine the ﬁrst
+vulnerable version. To ensure the accuracy of the results, in this
+step, we need address some special problems, such as solving
+the vulnerability reappearance problem, using developer logs to
+detect whether there are vulnerabilities in the partial matching
+source code. Finally, we compare the vulnerable version set of
+our tool against the vulnerable version set accoding to the NVD,
+and report the error rate of the NVD set. Among them, if there is
+a CVE vulnerability in a certain version but not reported in the
+NVD, it is a false negative case. If a certain version has no CVE
+vulnerability but is reported in the NVD, it is a false positive
+case.
+A. Build Version Tree and Acquire Committed Version Set
+Software versions are published in git as tags. Every tag
+has its commit log in which parent commits are recorded. We
+can build the version tree by recursively traversing from the
+commit logs of versions to its parent and grand parent commit
+logs. However, there is a common protocol to arrange versions.
+Taking the Linux operating system as an example, the team
+publicly announced the types of versions on the Linux kernel
+ofﬁcial website, including main branch version (Mainline), sta-
+ble version and long-term version. The main branch version is
+the starting point version of each vertical branch in the version
+tree, which introduces all new functions based on the previous
+main branch version. From the main branch version, new stable
+versions are released later one by one, which form the trunk of
+the version tree. Based on this protocol, we can build the version
+tree for Linux kernel by digits in its version. Next we brieﬂy
+introduce a few notations about the version tree and give an
+example. We refer to the overall structure of the software release
+versions as a version tree, with the ﬁrst version as the root node
+Vroot. Fig. 4 shows an example version tree with version 1.0
+Fig. 4.
+Version tree: structural model of source code release versions. A red
+triangular node represents a vulnerable version, a red triangular node in green
+dotted circle represents a known unpatched version, a blue node represents a
+version with unknown status. R1, R2, R3 indicate the three directions in which
+we are looking for other vulnerable versions.
+as Vroot. In the version tree, nodes, Vi.j, with two digit version
+numbers (e.g., versions 2.6 and 4.0) are called major versions,
+and nodes Vi.j.k with three digit version numbers (e.g., versions
+3.3.5 and 5.0.4) are called minor versions, and they are located
+in the branches of the corresponding major versions. For the
+version branch of Vi.j, we refer to the end of the branch (i.e., its
+largest minor version) as Vi.j.E (e.g., version 3.3.22 in Fig. 4).
+In addition, we use V i.j.k to denote a vulnerable version, and
+V i.j.U is the last (or upto) vulnerable version in the branch of
+Vi.j. We also use V i.j.k(E) (‘E’ means “excluding”) to denote
+the vulnerable version immediately before Vi.j.k, where Vi.j.k is
+not vulnerable (i.e., patched). Finally, for each reported vulnera-
+bility (CVE-ID), we use V from and V upto to denote its ﬁrst and
+last vulnerable versions in the entire version tree, respectively.
+Speciﬁcally, as shown in Fig. 4, for a given CVE-ID, we will
+search the other vulnerable versions in the version tree in three
+directions R1, R2, R3. R1 is the direction (process) to ﬁnd the
+ﬁrst vulnerable version V from, R2 is to ﬁnd the last vulnerable
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 6 =====
+910
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+version V i.j.U in each version branch, R3 is to ﬁnd the actual
+last version V upto of the entire version tree, which could be later
+than the upto version reported in NVD.
+Generally, there are one or more patches to ﬁx a CVE. In
+most cases, a CVE-ID corresponds to one git log, and a git log
+is identiﬁed by a commit-id. But sometimes there are more than
+one commit-id to ﬁx a CVE when there are several patches for
+the CVE. As long as the changed code (vulnerability ﬁxes, bug
+ﬁxes, etc.) is submitted, git logs will be created. Therefore, each
+patched version is uniquely identiﬁed by a commit-id or several
+commit-ids. We ﬁrst obtain the commit-ids corresponding to
+the CVE-ID, and then explore the changelog information. A
+changelog corresponds to the release of a new version, and it
+records all modiﬁcations to the previous version. Therefore,
+a changelog typically records many different git logs, so it is
+shorthand format for git logs. Although each change log is not
+completely consistent with the writing structure of a git log,
+there is no difference in key content information such as the
+commit-ids. If all commit-ids of a CVE are included in the
+changelog, it indicates that the CVE vulnerability has been
+patched in the current version. Thus, we use the commit-ids
+located by CVE-ID to traverse all changelogs available to obtain
+the committed (i.e., patched) version set. We regard them as the
+known patched versions.
+As a running example, let us assume the three versions in
+green dashed circles in Fig. 4 form the committed version set of
+this CVE-ID, in which V3.0.6 and V4.0.4 are the minimum and
+maximum committed version, respectively. However, not every
+branch corresponds to a committed version, and the reason will
+be introduced in Section IV-C.
+B. Determine the Last Vulnerable Version of CVE-ID (R1)
+As the maximum committed version recorded by the changel-
+ogs, can V4.0.4 be used as V upto of this CVE-ID? Is the same
+vulnerability deﬁnitely gone after V4.0.4? The answer is no.
+In this section, We will combine developer logs and patches to
+determine V upto. To make it easier to understand, we ﬁrst give
+two examples to illustrate the problem. During our research, we
+ﬁnd an interesting phenomenon: starting from a certain version
+after the maximum committed version, the code may be restored
+to its previous unpatched state. Let us take CVE-2014-9715 as an
+example. The reason for its existence is that insufﬁciently large
+data type was used for certain extension data, which allows local
+userstocauseadenialofservice.Fromchangelogs,weknowthat
+itsmaximumcommittedversionis V3.14.5.However,weﬁndthat
+starting from V4.12, the code returned to the original unpatched
+state. According to the git log of CVE-2014-9715, this patch
+solves the denial of service vulnerability by reducing the size of
+the “ecache extension”. However,in its git log, the committers
+regarded that the previous patch released three years ago did not
+ﬁx this vulnerability well. Therefore, they restored the code to its
+unpatched state, and put forward the method of “compile-time
+assertion” to repatch the vulnerability. This illustrates the case
+that although the code is unpatched, the vulnerability corre-
+sponding to this CVE-ID no longer exists. In another example
+with CVE-2015-8558, unpatched code also reappeared in the
+version after the maximum committed version. Similarly, from
+the description of the log information, the developers said that
+they used a new approach to patch the previous vulnerability,
+different from the ﬁrst patch.
+Patches are developed and used to ﬁx bugs. However,
+some patches are correct but do not perform as good as ex-
+pected(correct but not good), or do not ﬁx the bugs com-
+pletely(incomplete), or introduce new bugs(wrong). Conse-
+quently, the earlier committed patches may be totally unpatched
+or patially unptached, and then newer patches are commited
+(“repatch”). According to our study, the repathes is an inevitable
+issues through all versions of Linux Kernel and the number of
+repatches is signiﬁcant. In order to achieve high precision of
+identifying the affected versions, it is important to consider the
+phenomenon, otherwise, the errors are non-negligible and not
+acceptable. Our tool is based on the assumption of correctness
+of patches, so that we only consider repatches that the earlier
+patches are correct, then unpatched totally or partially, ﬁnnaly
+repatched with better patches. We do not consider wrong or
+incomplete patches.
+For a given CVE-ID, patch-based detection [19], [20] will
+mistake the above repatch cases as “vulnerability reappearance”,
+so how do we verify whether the unpatched code has a real
+vulnerability? We already know that the information in the
+changelog is sometimes incomplete, so it is not enough to rely
+only on it. For example, for CVE-2018-21008, the NVD report
+shows that the last vulnerable version is 4.16.6, and the maxi-
+mum committed version based on the changelogs is 4.14.166,
+but there are still unpatched versions after 4.16.6. Our solution is
+to use both the patches and developer logs to accurately identify
+the unpatched code. In the case of repatch, our research found
+that it always includes the following two operations in the git
+log: (1) unpatch, consisting of complete unpatch and partial
+unpatch.Completeunpatchrestoresthepreviousunpatchedstate
+and changing the ‘-’ in diff hunk to ‘+’ and ‘+’ to ‘-’, which is
+an inverse process of patching. Patial unpatch is a partial inverse
+process of patching. It is similar to complete unpatch except that
+it only includes part of the diff hunk. (2) repatch, applying a new
+patch to the unpatched code.
+We cannot easily locate the diff hunks of repatched code
+through a CVE because a repatch is not released as a new
+CVE. Fortunately, the git log of a repatch clearly and accurately
+describes which previous patch(es) is(are) replaced by including
+the commmit-id of the previous git log in the title or the text
+body of the new git log for the repatch. We notice that the two
+operations of repatch, unpatch and repatch, may be carried out
+in one commit, resulting in a single git log. Compared with a
+previous patch, the location of a repatch may be the same code
+block in the same ﬁle, such as the repatch of CVE-2017-7477.
+It can also ﬁx code blocks in different locations of the same ﬁle,
+such as the repatch of CVE-2018-5873. It may also ﬁx code
+blocks in different ﬁles, such as the repatch of CVE-2014-9715.
+The two operations of repatch may also be carried out in two
+separate commits, resulting in two different git logs. The git
+log for the repatch operation can be located in the same git
+log list indexed by the same vulnerable ﬁle, the author, or the
+committer of the patch. Again, we can get the diff hunks of
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 7 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+911
+the repatch after locating the previous commit-id in the title or
+text body of git log, for example, the diff hunk of “repatch” of
+CVE-2014-9715. We use it against the nf_conntrack_core.c
+ﬁle to judge the existence of this vulnerability. Through the
+above process we can accurately justify whether there is an
+unpatched CVE vulnerability (i.e., without being repatched)
+after the maximum committed version.
+Next, we present our algorithm for determining V upto with
+our running example in Fig. 4. Here, V4.0.4 is the highest version
+of the committed version set. First, we determine whether the
+unpatched code still exists in major versions after V4.0.4 based
+on exact matching. If it does not exist, it means the vulnerability
+has been ﬁxed in all versions after V4.0.4, so V4.0.4 is regarded
+as V upto(E). On the other hand, if unpatched code exists in
+a later major version, say V5.0, we will check if a repatch has
+been applied to it to avoid false reporting. Speciﬁcally, we ﬁrst
+check whether there is an unpatch status in the git log list of the
+vulnerable ﬁle. if it does not exist, repatch cannot exist either,
+so the last unpatched version will be regarded as V upto(I).
+However, if unpatch exists, we will check if a repatch exists in
+the git log list indexed by the same vulnerable ﬁle, the author or
+the committer of the patch, and accordingly locate the diff hunk,
+as described in the paragraph above. If V5.0 has been repatched, it
+does not have this vulnerability any more, so V4.0.4 is regarded
+as V upto(E). On the contrary, if the last unpatched version,
+say V5.0.3, has not been repatched, and it will be regarded as
+V upto(I). Therefore, we accurately determined the boundary of
+the vulnerable versions on the far right of the version tree.
+C. Determine the Last Vulnerable Version in Each Branch (R2)
+The committed version set output from R1 of our tool does not
+giveusthecompleteknowledgeonthevulnerableversions.First,
+some branches in the version tree may correspond to non-long-
+term stable versions [39], and they are no longer maintained.
+Therefore, even though the versions in these branches are still
+vulnerable with respect to a CVE, they are no longer patched.
+In other words, although not covered in the committed version
+set, there may be vulnerable versions in these branches. Second,
+some versions may have no changelogs submitted, so they have
+slipped out from our detection, because our tool uses changelogs
+as the input to generate the committed version set.
+To address the problem, intuitively we can check each version
+against the patch. This is clearly inefﬁcient and unscalable.
+Instead, we leverage the following heuristics: (1) in each version
+branch, the release time of a minor version Vi.j.k must be later
+than the major version Vi.j or the earlier minor version Vi.j.k−1,
+(2) a changelog states which vulnerabilities it has ﬁxed and
+it is released together with the current software version. For
+example, if V4.14.177 in Fig. 5 is a committed version (because
+its changelog states the vulnerability has been ﬁxed), the vul-
+nerability must not exist in V4.14.178 and the other later minor
+version. The similar examples include V4.19.116, V5.4.33 etc.
+Let us denote the disclosure time of the CVE as TCV E. As
+reported by Li et al. [40], CVE publication time in NVD is not the
+same as CVE disclosure time, but the median difference is only
+Fig. 5.
+The relationship between CVE-ID committed time and version release
+time.
+Fig. 6.
+Look for the upper boundary of the vulnerability in the version tree.
+one month, so that we can use CVE publication time to approx-
+imate its disclosure time. When the CVE is released, it may or
+maynothavepatchesavailable.WeuseTCV E toquicklyidentify
+the potentially vulnerable versions in each branch. Speciﬁcally,
+for each branch, we ﬁrst compare TE, which is the release time
+of its last version Vi.j.E, with TCV E. If TE < TCV E, that is,
+version Vi.j.E was released before the CVE, we then determine
+whether Vi.j.E contains the vulnerable code by matching against
+the patch. If it is an exact match (not patched), we directly take
+Vi.j.E as V i.j.U(I) of this branch. If it is a partial match, we will
+use the method in the next subsection to verify whether Vi.j.E
+has the vulnerability. Otherwise, we will look for the boundary
+in the earlier versions backward,If the boundary does not exist,
+then Vi.j.E is considered as V i.j.U. Otherwise we refer to the last
+unpatched version as V i.j.U, and verify that the patching record
+oftheversionfollowingtheboundaryversionismissingfromthe
+changelog. Therefore, we accurately determined the boundary
+of the vulnerable versions in each branch of the version tree.
+D. Determine the First Vulnerable Version Number of CVE-ID
+(R3)
+For a given CVE-ID, once we discover V from and V upto, the
+boundary containing all the vulnerable versions is determined.
+However, it is very challenging to identify the ﬁrst vulnerable
+version V from. On the one hand, we should not immediately
+label the minimum committed version reported by changelog
+(e.g., V3.0.6 in Fig. 4) as V from, because early versions might
+not have the corresponding changelog or the changelog was
+incomplete. On the other hand, open-source code versions are
+continuously updated and released and for some early versions,
+the code related to the CVE vulnerability may have gone through
+many changes, so that they can not be matched exactly with the
+patches. Recall that it is a partial match when a diff hunk does
+not completely match the corresponding source code. In theory,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 8 =====
+912
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+Fig. 7.
+Examples of partial matching code (The left side shows the diff hunk
+(DH) of each CVE patch, and the right side shows the corresponding source
+code fragment (SF)).
+the software versions that are partially matched with patches
+may or may not be vulnerable.
+In order to leverage the information of partial matches, we ﬁrst
+classify partial matches into three categories, and then we design
+the method to locate the partially matching code fragments based
+on the diff hunk(s) of a given CVE. Finally we justify whether
+the code has the CVE vulnerability based on git logs and partial
+matches so as to determine the ﬁrst vulnerable version V from.
+1) Classiﬁcation and Detection of Partial Matches: By ana-
+lyzing the partial matches in a large number of early versions,
+we summarize the code features into the following three cate-
+gories, and then we detect and locate the matching source code
+fragments according to their categories. For ease of presentation,
+we introduce a few notations. We use DH to denote a Diff Hunk
+composed of sub and oth, Fun to denote the vulnerable Function,
+and SF to denote the Source code Fragment in the CVE-speciﬁed
+ﬁle corresponding to the DH. In Fig. 7(a) and (b), “Function()”
+in the DH (also in SF) represents the Fun, and in Fig. 7(c),
+“FunctionB1()” of the DH represents the Fun.
+Case 1. The SF only partially matches oth of the DH. As
+shown in Fig. 7(a), corresponding to the oth code in the DH, SF
+does not call funcD1 and it has “return err” instead of the “break”
+statement in the “if(err)” branch. Moreover, it calls funcD2,
+which has a different name from funcD1 in oth. In this case,
+SF contains all the code in sub.
+Case 2. The SF partially matches the sub of the DH. As shown
+in Fig. 7(b), the SF lacks “int n” and “if” statements of the DH.
+For oth, SF may not contain the entire oth, but it contains at least
+one oth and one sub statement.
+Case 3. The SF only partially matches the contextual func-
+tions of the DH, but the SF contains the entire sub. As shown in
+Fig. 7(c), contextual functions A1 and C1 are used to locate the
+vulnerable function B1 in DH, but they are named A2 and C2
+in the SF. Although the functions B1 and B2 also have different
+parameters, they might still be the same vulnerable function.
+For example, for CVE-2013-1959, the function used to locate
+Fun is “set_cred_user_ns”, but this function does not exist in SF
+before the Linux kernel version 3.8. For CVE-2017-14991, the
+Fun is “sg_ﬁll_request_table”, but before Linux kernel version
+4.13, the function in SF is “sg_ioctl”, and they are the same
+vulnerable code in different functions. For CVE-2017-8069, the
+contextual function of the DH is “async_set_reg_cb”, but it is
+the “ctrl_callback” function in the SF in Linux kernel version
+3.2.86.
+Given the Diff Hunk(DH) of a CVE, we will detect and locate
+all the Source code Fragments (SFs) in the early versions for
+three partial match cases, respectively. The high level idea of
+our algorithm is as follows. In all three cases, there is at least
+one line of matched code in SF with that in DH. Therefore, we
+use one or two lines of matched code as the anchor point to
+select three blocks of code in the function(Fun) of the source
+code. Let us take the example of only one line of Matched Code
+(called MC), and assume there are L1 and L2 lines of code before
+MC and after MC, respectively, in the DH. To locate SF, in the
+Fun of the source code, we select L1 and L2 lines of code before
+Matched Code(MC) and after MC as the ﬁrst and the third block,
+respectively while MC serves as the second block. When there
+are two or more lines of matched code, the code in the source
+code between the ﬁrst MC and the last MC forms the second
+block while the ﬁrst and third blocks are selected in the same
+way as previously. The detailed algorithm is presented in the
+supplemental document (available online).
+2) Justify the Vulnerable Versions by Git Logs: After we lo-
+cated all the Source code Fragments(SFs) in the partial matches,
+we will justify whether these SFs contain the vulnerability with
+the help of git log information. We propose an automatic log
+tracing method to trace the corresponding git logs. We illustrate
+our idea through the example in Fig. 8. Here, with respect to
+a CVE, the versions between V1.0 and V2.1 shared the same
+(partial matching) source code fragment SF3. After an update
+on SF3, the versions between V2.2 and V2.5 shared the same
+SF2. After another update on SF2, the versions starting from
+V2.6 shared the (exact matching) SF1. Let sf-diff represent the
+difference between the SFs of two versions, and it can be
+generated through a diff tool [41]. Since each update resulted
+in a git log that recorded the difference in the form of a Diff
+Hunk, we can use each sf-diff to traverse every git log in the
+git log list whose release time was earlier than TCV E, and ﬁnd
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 9 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+913
+Fig. 8.
+Some earlier major versions that are continuously updated. V2.2 to
+V2.5 have the same partial matching vulnerable code (red dotted frame).
+the corresponding git log by exactly matching the sf-diff against
+the DHs in the git logs. Then, we manually use log information
+(e.g., description, commit-id) to accurately determine whether
+the current version is vulnerable. This process is done for each
+sf-diff in the backward temporal order. Note that a sf-diff may
+consist of multiple consecutive diff hunks, and the diff hunks
+may be recorded in multiple git logs.
+Propercommitmessageswithinformationaboutwhatisbeing
+merged and why they merge are not always logged [42]. There-
+fore, our justiﬁcation result for a partially matching software
+version can be divided into three types: Yes, No, Probable.
+Among them, “Yes” means it is a vulnerable version because
+there is detailed information in the git logs, such as the exploit
+of Proof-of-Concept (POC) or the dependency relationship of
+the vulnerability, which is established in the form of text or
+commit-id.“No”meansitisanonvulnerableversionbecausethe
+CVE-related Source fragments (SFs) does not exist. “Probable”
+means it is a suspicious version because we have no sufﬁcient
+information. It is worth noting that, in order to ensure the in-
+tegrity of the results, although some partially matching versions
+need to be reviewed by human experts to determine whether the
+code is vulnerable, the proportion of these versions is small and
+the cost is not high. We will report the number of CVEs/commit
+that require manual inspection and the total man-hours spend in
+the next evaluation section.
+We use one example to illustrate the idea. According to
+description of CVE-2011-2521, there is a vulnerability in func-
+tion ”x86_assign_hw_event”. However, when our tool checks
+the patch, many earlier versions are partially matched. By log
+tracing based on the commit-id of the patch, it is found that this
+vulnerability was originally introduced from the commit
+41bf498, and patched twice afterwards because the ﬁrst patch
+was not complete. This example demonstrates how the log
+tracing helps to identify the ﬁrst version of the vulnerability,
+3) The Method to Find the First Vulnerable Version: Our
+algorithm for determining V from is as following. First, for
+a CVE-ID, we obtain the matching results (exact or partial
+matching) by checking each major version before the minimum
+committed version in the version tree (e.g., V3.0.6 in Fig. 9). If all
+the matching results are exact matches, then the ﬁrst vulnerable
+version is the earliest version with exact matching. Otherwise,
+Fig. 9.
+Identify the ﬁrst vulnerable version in the version tree.
+TABLE I
+WEBSITE DISTRIBUTION OF PATCHES
+we determine V from by the log tracing and vulnerability jus-
+tiﬁcation methods introduced in Section IV-D2. We illustrate
+the process for determining V from with our example in Fig. 8.
+In the ﬁrst step, we ﬁnd the ﬁrst exact matching major version
+before V3.0. If it is Vroot, then Vroot is V from. If it is not, the
+ﬁrst exact matching version, say V2.6, will be regarded as V from
+as long as the vulnerable ﬁle does not exist in the early version
+V2.5. Otherwise, in the second step, if the last partial matching
+versionV2.5 doesnotcontainthevulnerabilityoritsvulnerability
+status cannot be veriﬁed by us, V2.6 is regarded as V from. If
+the vulnerability exists, the versions before V2.5 with the same
+partial matching code are all regarded as vulnerable versions. In
+the backward order, through log tracing, eventually we will be
+able to identify the ﬁrst vulnerable version and label it as V from.
+V. EVALUATION
+We ﬁrst brieﬂy introduce the implementation of our system,
+and then evaluate the effectiveness of our algorithms via stan-
+dard metrics such as precision and recall. Let TP be the number
+of true vulnerabilities detected (true-positives), FP be the num-
+ber of false vulnerabilities detected (false-positives), and FN be
+the number of true vulnerabilities undetected (false-negatives).
+The metric precision = TP/(TP + FP) reﬂects the correctness
+among the detected positives. The metric recall =TP/(TP + FN)
+reﬂects the completeness of the detected positives.
+A. Implementation
+We implemented our system in Python 3.6.0. Our experi-
+ments ran on a PC with Intel CPU core i5-8265 U operating at
+1.80 GHz and 8 GB RAM. The implementation consists of Data
+Crawler, Vulnerable Version Finder, Log Tracer, and Result
+Generator. Data Crawler connects to the speciﬁed URLs to
+collect and preprocess software packages (such as Linux kernel,
+Qemu, OpenSSL), CVE database, patches, and Changelogs etc.
+Vulnerable Version Finder implements the algorithms in R1,
+R2 and R3 to ﬁnd the ﬁrst(‘from’) and last(‘upto’) vulnerable
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 10 =====
+914
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+TABLE II
+THE RESULT STATISTICS OF DETERMINING THE FIRST VULNERABLE VERSION OF EACH CVE-ID IN THE LINUX KERNEL VERSION TREE
+versions. Log Tracer searches the logs to ﬁnd evidences of
+the vulnerability status. Finally, Result Generator compares the
+results from Vulnerable Version Finder with the Known Affected
+Software Conﬁgurations of the NVD, and outputs the justiﬁed
+affected versions and the accuracy of the NVD.
+B. Experimental Setup and Dataset
+Dataset. This article mainly selects the following products,
+including Linux kernel, Openssl, BusyBox, Wget and QEMU.
+The source websites of their patches are shown in Table II.
+Taking Linux kernel as an example, after the ﬁnal screening,
+there are 1,367 CVE ﬁles in our database, including many vul-
+nerability types such as buffer overﬂow, integer overﬂow, SQL
+injection, use-after-free and many others. We collected Linux
+kernel vulnerabilities released from January 2003 to September
+2020 from the NVD, which resulted in 2,576 CVE -IDs in total.
+Among them, 1,367 were published in https://git.kernel.org,
+including 2,664 patches. The rest correspond to the secondary
+development versions based on the Linux kernel, and their
+patches might not exist or were scattered on various third-party
+websites, so these CVE-IDs are not within our consideration. In
+addition, we collected a total of 3,086 Linux kernel versions that
+make up its version tree, taking 585 G of data space.
+C. Accuracy Evaluation
+We scan 1,367 CVE-IDs of Linux kernel against its 3,086
+open-sourceversionstodetectallvulnerableversionsinthethree
+directions (R1, R2 and R3). For our dataset, we manually verify
+the reported boundary of vulnerable versions in the version tree
+foreachCVE-ID.NotethatfortheTPsofthereportedvulnerable
+version set, we can verify them by manual inspection. However,
+for FNs, since there are a great number of software versions(we
+do not regard the versions reported by NVD as the ground truth
+because it has many errors, as presented in the next subsection),
+we cannot directly report the FN rate or recall. Therefore, for
+R1 and R2, we sample 100 CVE-IDs for manual inspection to
+calculate the recall of our tool. As for R3, we determine the
+lower bound of the recall. The evaluation results of our tool are
+as follows:
+R1. It represents the method of obtaining the last vulnerable
+version of Linux kernel for a given CVE-ID. Manual veriﬁcation
+shows that the reported vulnerable versions has no false positive,
+and the precision reaches 100%. Among the 100 sampled CVE-
+IDs, there are unpatched codes in the next major versions with
+respect to 4 CVE-ids, and there is no repatch found. So the lower
+bound of the recall rate is 96%. The incomplete patches and
+errors in git logs are possible causes behind these false negative
+cases.
+R2. It represents the method of determining the last vulnerable
+version in each version branch. Our manual inspection shows
+that the precision of the reported versions also reaches 100%.
+We again sample 100 different CVE-IDs for manual inspection,
+which shows that there are unpatched codes in the next minor
+versions with respect to 2 CVE-IDs, so the recall rate is at least
+98% for the samples. The reasons for the false negatives are as
+above.
+R3.Itrepresentsthemethodofdeterminingtheﬁrstvulnerable
+versionV from bybackwardtraversingthemajorversionsbefore
+the minimum committed version (reported by changelog) in the
+version tree. As shown in Table II, among the 1,367 CVE-IDs,
+337 of them have some partial matching versions and the re-
+maining 1,030 only have exact matching versions. Among the
+matching results, we add up the number of vulnerable versions
+detected by each CVE-ID, and the total number is 37,685,
+including 32,903 exact matching versions and 4,782 partial
+matching versions. Because different CVE-IDs may correspond
+to different source code fragments SFs in the same version, a
+vulnerable version may be counted more than one time. For
+the 1,030 exact matching only CVE-IDs, since the ﬁrst exact
+matching version will be regarded as V from, we ﬁrst check
+the versions right before our reported version V from. Among
+them, it is found that either the CVE-speciﬁed ﬁle does not
+exist, or there is no vulnerable function (Fun) in the source code.
+Therefore, the V from under our exact matching method has no
+false negative. Our tool spent 10.2 hours for this process in total.
+For the remaining 337 CVE-IDs with partial matches, we
+only check the major versions with different partial matching
+code, not the minor versions. Our statistics shows that on average
+one CVE-ID corresponds to 2 different sf-diffs. To evaluate our
+partial matching algorithm and obtain the accurate V from for
+each CVE-ID, we need to check at least 532 times, and we
+spent about 3.3 hours to verity the partial matching code. Since
+the partial matching code is similar to the CVE patch, we can
+determine that the code has a potential vulnerability, but whether
+it has a real vulnerability or not needs to be conﬁrmed through
+context-based dynamic analysis and POC construction, which
+requires huge investment and cost. Fortunately, git logs record
+the ﬁx process of a vulnerability, including the release of CVE,
+which is the ground truth for our justiﬁcation of the vulnerability.
+However, if the git log information did not record whether the
+code is related to a vulnerability, it is probable that the code has
+a vulnerability, or it may be just a bug that was ﬁxed. Speciﬁ-
+cally, if a git log is in the following two situations, we cannot
+directly determine whether it has the vulnerability: (1) The log
+information is incomplete. (2) the log information is complete,
+but it does not record the relationship with the vulnerability. In
+this case, the V from for this CVE-ID is the earliest vulnerable
+version in the version tree that we can manually determine.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 11 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+915
+Fig. 10.
+Comparison of last vulnerable versions.
+Fig. 11.
+Comparison of ﬁrst vulnerable versions.
+In the end, there are 12 partial matching versions of CVE,
+which makes it impossible to determine whether there are
+any vulnerabilities in this study. There are 74 corresponding
+versions, accounting for nearly 3.6% of 337 CVEs. Among
+the remaining 325 CVEs, if some matching codes are directly
+identiﬁed as vulnerabilities by our tool, through log veriﬁcation,
+it is found that there are 19 CVEs with false positives and
+4 CVEs with false negatives, corresponding to 172 versions
+and 39 versions respectively. Therefore, assuming that all 74
+unconﬁrmed versions have corresponding CVE vulnerabilities,
+the total number of false negatives is 113 (74 plus 39) versions,
+and the total number of true positives is 4669 versions, so the
+lower limit of recall rate of this tool is 97.6%. At the same
+time, the number of false positives is 172 versions, and the
+corresponding number of true positives is 4610 versions, so
+the correct rate of this tool is 96.4%. In the end, this scheme
+corrected 19+4=23 CVE vulnerabilities that were incorrectly
+identiﬁed by the tool through log veriﬁcation.
+D. Incorrect Results of Known Affected Software Versions of
+NVD
+In this section, we will introduce the difference between the
+result of our tool and the Known Affected Software Versions of
+the NVD. We use the boundary versions (V upto, V i.j.U, V from)
+in the version tree for each vulnerability, which we have veriﬁed
+previously. It is worth noting that in this section we introduce
+FP/FN for the NVD information, not FP/FN of our tool.
+In Figs. 10 and 11, for fairness, we sample 273 versions at
+intervals of 5 versions for mapping. The x-axis represents the
+CVE-IDs from 2011/2003 to 2020 and the y-axis represents the
+Fig. 12.
+An example of CVE-2013-1826.
+Fig. 13.
+The error rate of last vulnerable version set of NVD.
+version numbers. Due to the large amount of data, we hide the
+scale of the x-axis. In Fig. 10, we can observe that in many cases
+the maximum committed versions in the changelogs, the upto
+versions (i.e., the last vulnerable version) of NVD, and the V upto
+reported by our method are different. That is, in many cases
+neither the upto versions reported by NVD nor the changelog
+based maximum committed versions are correct. Take CVE-
+2013-1826 as an example (see Fig. 12), for the branch of major
+version V3.4, its V i.j.U should be minor version V3.4.13, which
+is our veriﬁed version, but the NVD reported version is V3.4.122.
+Therefore, it is regarded as a false negative case. In the second
+example, for CVE-2017-15868, its V upto veriﬁed by our tool is
+V3.18.63, but NVD reported V3.18.66 as its upto version; therefore,
+this is regarded as a false positive case. In another example, for
+CVE-2017-15951, its V upto veriﬁed by our tool is V4.13.9, but
+the NVD upto version is V4.12.14, which is regarded as a false
+negative case.
+Fig. 11 shows the report on the from versions (i.e., the ﬁrst
+vulnerable version) of each CVE in the NVD, and it can be seen
+that most of the from versions it reported are version V1.2.0.
+Throughourmethod,weﬁndthatinmostcases,V from isgreater
+than version 1.2.0, which indicates that there are a lot of false
+positives on the from versions of the NVD. For example, in our
+vulnerable version set, V from of CVE-2015-7550 should be
+version V2.6.10, but the NVD report is V1.2.0, so this from version
+is regarded as a false positive. Finally, under our dataset, we
+found 11,827 versions incorrectly reported in NVD. Our study
+also shows that some versions missed records in changelogs.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 12 =====
+916
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+Fig. 14.
+The error rate of all vulnerable version set of NVD.
+Fig. 15.
+Changelogs missing records of some patched versions.
+For example, the maximum committed version of CVE-2020-
+12655 in the changelog is V5.4.50, but the actual maximum
+patched version is V5.7. Therefore, there was a missing record
+of the corresponding changelog. As shown in Fig. 15, we found
+94 versions have been patched, but their commit-ids were not
+recorded in the corresponding changelogs. In particular, the
+changelogs released in 2016 had the highest error rate 16% (36
+out of 221 CVE-IDs released in 2016), followed by 6% in 2018
+(20 out of 338 CVE-IDs released in 2018).
+Overall, for the 1,367 Linux kernel CVE-IDs, the number of
+false positives for the upto versions of the NVD reached 276,
+and the number of false negatives reached 289, accounting for
+20.19% and 21.14%, respectively. As shown in Figs. 13 and 14,
+we show the error rates of upto versions of the NVD and the error
+rates of all vulnerable version sets of the NVD over the years,
+respectively. Corresponding to the CVE-IDs, the denominator
+of the formula for calculating the rates is the total number of
+vulnerable versions reported by the NVD in one year, and the
+numerator is the number of false positives or false negatives for
+those versions. Among the 1,367 CVE-IDs, the total number of
+the vulnerable versions reported by NVD was 43,727, of which
+the total number of false positives reached 2,497, and the total
+number of false negatives reached 9,330, accounting for 5.7%
+and 21.34%, respectively.
+E. Comparison With ReDeBug and VUDDY
+In this section, we will compare with two well-known vulner-
+able code detection tools that are available, ReDeBug [32] and
+Fig. 16.
+In our ﬁve datasets, the number of repatch we found.
+VUDDY [43]. ReDeBug uses a syntax-based pattern matching
+approach to detect unpatched code clones in OS-distribution
+scale code bases, and VUDDY uses coarse-grained function
+feature values to detect code clones. Our vulnerability database
+includes Linux kernel (totally 1,367 CVE-IDs, 2,664 security
+patches by Sep. 2020), OpenSSL (totally 91 CVE-IDs, 165
+patches by Jan. 2021), BusyBox (totally 13 CVE-IDs, 20 patches
+by Jan.2021), Wget (totally 22 CVE-IDs, 31 patches by Jan.
+2021), QEMU (totally 114 CVE-IDs, 145 patches by Jan.2021).
+To measure and compare the accuracy of the three vulnera-
+bility detection methods, we randomly select one version from
+each of the above ﬁve pieces of software, as shown in the ﬁrst
+column of Table III. We check each version against all the 2,576
+CVE-IDs. With the ground truth (in total 69 vulnerabilities)
+established by the developer logs (i.e., changelogs and git logs),
+we show the accuracy of the three methods in Table III. One
+can observe that neither ReDeBug [32] nor VUDDY [43] could
+achieve high precision and recall here, whereas our method has
+94.3%precisionand95.6%recall. SomeCVEsreleasedbyNVD
+do not have corresponding patch(es), and these CVEs slipped out
+from the detection of our tool, which is the reason for the 95.6%
+recall of our tool. As shown in Fig. 16, under these ﬁve data sets,
+weshowthenumberofrepatchescollectedbyyear.Aftermanual
+veriﬁcation,itisfoundthatsomepartiallymatchedcodereported
+by our tool do not have the CVE vulnerability, which is also the
+reason for the 94.3% precision of our tool. We summarized the
+reasons that led to the false positives and false negatives with
+ReDebug and VUDDY: (1) they wrongly identiﬁed repatched
+code (i.e., repatched in a different way) as a vulnerability, and
+(2) some exact or partial matching vulnerable code were not
+identiﬁed. Further, ReDebug detects by comparing the similarity
+between patch and vulnerability code, and the granularity is
+coarse, resulting in a large number of false positives. VUDDY
+is designed to achieve low false positive rates, which appear to
+be inherent to the approach of detecting vulnerabilities caused
+by code clones. However, when using this approach to detecting
+vulnerabilities that are not caused by code clones, high false
+negative rates occur. Note that although here the measurement
+results are not based on all versions with all CVE-IDs, it is
+sufﬁcient to demonstrate the relative performance of different
+methods and the weaknesses of the two existing methods. In
+Appendix C, available in the online supplemental material, we
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 13 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+917
+TABLE III
+ACCURACY (I.E., TRUE POSITIVE, FALSE POSITIVE AND FALSE NEGATIVE) OF REDEBUG, VUDDY AND OUR METHOD
+report the detailed results of 50 (out of 69 in total) vulnerabilities,
+including the version number of the source code, CVE-ID,
+vulnerability type, patch type, error type, etc.
+VI. RELATED WORK
+Reliability of the NVD. Quality issues in vulnerability
+databases, such as the NVD, have been noted and studied
+before. It is shown that the CVSS metric [11], [44] is more
+suitable for enterprise software products, rather than personal
+software products. Nguyen et al. [18] conducted an empirical
+experiment on the reliability of the vulnerable Chrome versions
+in the NVD. They use the Chrome vulnerabilities with the
+bug-ﬁxes IDs to manually verify the inaccuracy of the NVD
+report, but they cannot handle the situation without the bug IDs.
+Dong et al. [14] analyzed a large number of inconsistencies
+by extracting software names and software versions in public
+security vulnerability reports, but they did not provide a practical
+solution to justify the incorrect software versions of the NVD.
+Anwar et al. [15] focused on the inconsistencies between the
+entries of the NVD and the CVE, and they explored methods
+for rectifying the vulnerability’s publication date, CWE class,
+CVSS rating, and the affected CPE information of the NVD,
+but we aim to use develop log to quantify the inaccuracy of the
+Know Affected Software Versions of the NVD.
+Vulnerability Detection. Security patches are released to dis-
+cover and ﬁx the vulnerabilities that have been released. This is
+also the most critical process for managing security systems.
+Using patches to discover vulnerabilities in the system has
+always been the focus of research in the security ﬁeld [45]. A
+vulnerability detection system with a high false positive rate or a
+high false negative rate is unusable. Many researchers [20], [25],
+[32], [43] have studied the use of security patches for source
+code vulnerability detection. However, only based on patches,
+the error rate is still high. Li proposed VulDeePecker [23] using
+RNN training on code snippets related to library/API function
+calls to detect improper calls. The dataset they used in their
+work tried to compare with VUDDY, but no false positives
+of VUDDY were found. Further, considering silent security
+patches, Xiao et al. [46] proposed MVP and they enriched the
+dataset with commits obtained from their industrial collaborator,
+but such datasets were not publicly accessible. The methods
+proposed in [47], [48] use trees and graphs as the representation
+methods for detecting vulnerabilities, and they cannot capture
+the exact nuance of vulnerabilities, so than they are not suitable
+for determining which vulnerable versions are really affected by
+CVEs.
+Reproducing Vulnerabilities. Reproducing a vulnerability is
+the most convincing evidence for a vulnerable version. Her-
+cules [49] is based on symbolic execution to generate input
+examples to crash the software at the speciﬁed location. Sem-
+fuzz [50] makes use of CVE reports and Linux git logs to
+generatePoCexploits.Manyresearchproposesthetechniquesof
+generating patch that ﬁxes the vulnerability based on examples,
+while Huang et. al. [51] propose a property-based method to
+generate vulnerability patches, but their method is dependent on
+experts to specify the properties. As claimed in [17] reproduc-
+ing a vulnerability requires information such as conﬁgurations,
+trigger method, PoC, as well as a lot of manual work of experts,
+meanwhile these information are usually incomplete or unavail-
+able. It is very challenging especial for our task with a large sale
+of software versions.
+Fuzzing combines symbolic execution and constraint solving
+to detect vulnerabilities. Cassez et al. [21] use a static analysis
+tool for intermediate representation based on LLVM to check
+whether there is a run of a speciﬁed error block and reach the
+intermediate representation, which is mainly used to detect three
+types of vulnerabilities: zero error, pointer overﬂow, and dead
+code. In general, it is hard to perform directed fuzzing on Linux
+kernel. On the one hand, entering the kernel layer depends on
+the call of the application layer, which is equivalent to writing an
+application layer call for each CVE. On the other hand, Linux
+kernel is a large-scale system, which means that it has a very
+large number of conditional branch instructions. It is difﬁcult for
+fuzzing to ﬁnd the code where the diff hunk is located. Therefore,
+this type of methods are very expensive to employ in the context
+of vulnerability detection.
+VII. DISCUSSION
+Our method has several assumptions which may limit its ap-
+plication. First, developer logs and patches may be unavailable.
+Second, the software packages must be open-sourced. Third,
+although we propose log tracing to reduce the search space, the
+partial matching method still requires human experts to review
+some commits to determine whether the code is vulnerable, but
+the cost of this process is quite minor. In order to overcome
+these limitations, future work is needed. For the problem of
+unavailable patches, an approach is to identify and generate the
+patch from the respective software versions. If the source code
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 14 =====
+918
+IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+is not open, binary based patch detection can be used. Natural
+language processing can be used to lessen human efforts in the
+partial matching. Errors in the developer logs and patches are
+threats to validity. We have found some errors in the logs, al-
+though the number of errors is very small in our evaluation, but it
+will decrease the accuracy of the method if no additional checks
+are introduced. Sometimes patches may not be implemented
+correctly, which means that the software versions are vulnerable
+even if they are patched. We plan to study how to identify
+incorrect(incomplete or wrong) patches in the future work.
+VIII. CONCLUSION
+In this article, we proposed and implemented novel ideas
+(by verifying CVE information with security patches and de-
+veloper logs based on version tree) and techniques (including
+partial matching and log tracing methods) to identify the known
+vulnerable software versions with respect to the CVEs. By
+comparison of the reports for Linux between our tool and the
+NVD, we found that there were 11,827 incorrect vulnerable
+versions of the NVD, and conﬁrmed that 94 patched versions
+lacked committed records in the changelogs. For future research,
+it will be interesting to solve the above limitations, and explore
+whether partial matching and repatching can be extended for
+binary code vulnerability detection.
+REFERENCES
+[1] “2021 open-source security and risk analysis report,” 2021. [Online].
+Available: https://www.synopsys.com/content/dam/synopsys/sig-assets/
+reports/rep-ossra-2021.pdf
+[2] C. V. Lopes et al., “A map of code duplicates on GitHub,” Proc. ACM
+Program. Lang., vol. 1, no. OOPSLA, pp. 1–28, 2017.
+[3] “National vulnerability database,” 2021. [Online]. Available: https://nvd.
+nist.gov/
+[4] Developers, “Hakiri: Ships secure ruby apps,” 2019. [Online]. Available:
+https://hakiri.io/
+[5] Developers, “Synk: Develop fast: Stay secure,” 2019. [Online]. Available:
+https://snyk.io/
+[6] Developers, “Sourceclear: Software composition analysis for devsecops,”
+2019. [Online]. Available: https://www.sourceclear.com/
+[7] Developers, “Bundler-Audit,” 2019. [Online]. Available: https://github.
+com/rubysec/bundler-audit
+[8] Developers, “Sonatype | OSS index,”2019. [Online]. Available: https://
+ossindex.sonatype.org/
+[9] Developers, “OW ASP dependency check,” 2019. [Online]. Available:
+https://www.owasp.org/index.php/OWASP_Dependency_Check
+[10] A. Anwar, A. Khormali, D. Nyang, and A. Mohaisen, “Understanding the
+hidden cost of software vulnerabilities: Measurements and predictions,” in
+Proc. Secur. Privacy Commun. Networks: 14th Int. Conf., SecureComm,
+Singapore, Singapore, Aug. 8-10, 2018, pp. 377–395.
+[11] A.
+Horváth,
+P.
+M.
+Erdsi,
+and
+F.
+Kiss,
+The
+Common
+Vulner-
+ability Scoring System (CVSS) generations–usefulness deﬁciencies.
+IT és hálózati sérülékenységek társadalmi-gazdasági hatásai, 2016,
+pp. 137–153.
+[12] F. Li and V. Paxson, “A large-scale empirical study of security patches,” in
+Proc. ACM SIGSAC Conf. Comput. Commun. Secur., vol. 43, no. 1, 2017,
+pp. 2201–2215.
+[13] M. U. Aksu, K. Bicakci, M. H. Dilek, A. M. Ozbayoglu, and E. I.
+Tatli, “Automated generation of attack graphs using NVD,” in Proc. 8th
+ACM Conf. Data Application Secur. Privacy, Tempe, AZ, USA, 2018,
+pp. 135–142.
+[14] Y. Dong, W. Guo, Y. Chen, X. Xing, Y. Zhang, and G. Wang, “Towards
+the detection of inconsistencies in public security vulnerability reports,”
+in Proc. 28th USENIX Secur. Symp., Santa Clara, CA, USA, 2019,
+pp. 869–885.
+[15] A. Anwar, A. Abusnaina, S. Chen, F. Li, and D. Mohaisen, “Cleaning the
+NVD: Comprehensive quality assessment, improvements, and analyses,”
+IEEE Trans. Dependable Secure Comput., vol. 19, no. 6, pp. 4255–4269,
+2021.
+[16] J. Berr, ““WannaCry” ransomware attack losses could reach 4 billion,”
+2019. [Online]. Available: https://cbsn.ws/2yYjif2
+[17] D.Muetal.,“Understandingthereproducibilityofcrowd-reportedsecurity
+vulnerabilities,”inProc.27thUSENIXSecur.Symp.,Baltimore,MD,USA,
+2018, pp. 919–936.
+[18] V. H. Nguyen and F. Massacci, “The (un)reliability of NVD vulnerable
+versionsdata:AnempiricalexperimentonGooglechromevulnerabilities,”
+in Proc. 8th ACM Symp. Inf. Comput. Commun. Secur., Hangzhou, China,
+2013, pp. 493–498.
+[19] T. Luo, C. Ni, Q. Han, M. Yang, J. Wu, and Y. Wu, “POSTER: PatchGen:
+Towards automated patch detection and generation for 1-day vulnerabili-
+ties,” in Proc. 22nd ACM SIGSAC Conf. Comput. Commun. Secur., Denver,
+CO, USA, 2015, pp. 1656–1658.
+[20] J. K. H. L. Hongzhe Li and H. Kwon, “A scalable approach for vul-
+nerability discovery based on security patches,” in Applications and
+Techniques in Information Security. Berlin, Germany: Springer, 2014,
+pp. 109–122.
+[21] M. Böhme, C. Cadar, and A. Roychoudhury, “Fuzzing: Challenges and
+reﬂections,” IEEE Soft., vol. 38, no. 3, pp. 79–86, 2020.
+[22] Z. Li, D. Zou, S. Xu, Z. Chen, Y. Zhu, and H. Jin, “VulDeeLocator:
+A deep learning-based ﬁne-grained vulnerability detector,” IEEE Trans.
+Dependable Secure Comput., vol. 19, no. 4, pp. 2821–2837, 2021.
+[23] Z.Lietal.,“VulDeePecker: Adeeplearning-basedsystemforvulnerability
+detection,” in Proc. 25th Annu. Netw. Distrib. System Secur. Symp., San
+Diego, California, USA, 2018.
+[24] W. Wang et al., “ContractWard: Automated vulnerability detection models
+for ethereum smart contracts,” IEEE Trans. Netw. Sci. Eng., vol. 8, no. 2,
+pp. 1133–1144, Second Quarter 2021.
+[25] Z. Li, D. Zou, S. Xu, H. Jin, H. Qi, and J. Hu, “VulPecker: An automated
+vulnerability detection system based on code similarity analysis,” in Proc.
+32nd Annu. Conf. Comput. Secur. Appl., Los Angeles, CA, USA, 2016,
+pp. 201–213.
+[26] “What is CVE-ID,” 2021. [Online]. Available: https://www.redhat.com/
+en/topics/security/what-is-cve
+[27] “CVE numbering authorities,” 2021. [Online]. Available: https://cve.
+mitre.org/cve/cna.html
+[28] “Nation al institute of standards and technology,” 2021. [Online]. Avail-
+able: https://www.nist.gov/
+[29] “Security content automation protocol,” 2021. [Online]. Available: https:
+//csrc.nist.gov/projects/security-content-automation-protocol
+[30] “Know affected software conﬁgurations,” 2021. [Online]. Available: https:
+//nvd.nist.gov/vuln/vulnerability-detail-pages
+[31] “Posting patches,” 2021. [Online]. Available: https://www.kernel.org/doc/
+html/latest/process/5.Posting.html
+[32] J. Jang, A. Agrawal, and D. Brumley, “Redebug: Finding unpatched code
+clones in entire OS distributions,” in Proc. IEEE Symp. Secur. Privacy,
+vol. 37, no. 6, 2012, pp. 48–62.
+[33] “Keep a changelog,” 2021. [Online]. Available: https://keepachangelog.
+com/
+[34] “Understanding git log,” 2021. [Online]. Available: https://mijingo.com/
+blog/understanding-git-log
+[35] “Git log in linux kernel source tree,” 2021. [Online]. Available: https:
+//git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log
+[36] “Git log in busybox,” 2021. [Online]. Available: https://git.busybox.net/
+busybox/log
+[37] “Git log in QEMU,” 2021. [Online]. Available: https://git.qemu.org/git/
+qemu.git
+[38] “Git log in OpenSSL,” 2021. [Online]. Available: https://git.openssl.org
+[39] “Active kernel releases,” 2021. [Online]. Available: https://www.kernel.
+org/releases.html
+[40] F. Li and V. Paxson, “A large-scale empirical study of security patches,”
+in Proc. ACM SIGSAC Conf. Comput. Commun. Secur., Dallas, TX, USA,
+2017, pp. 2201–2215.
+[41] “Winmerge,” 2021. [Online]. Available: https://winmerge.org/
+[42] “Linux kernel merges need to be done properly,” 2021. [Online]. Available:
+https://lore.kernel.org/lkml/CAHk-=wjbtip559HcMG9VQLGPmkurh5K
+c50y5BceL8Q8=aL0H3Q.mail.gmail.com/
+[43] S. Kim, S. Woo, H. Lee, and H. Oh, “VUDDY: A scalable approach for
+vulnerable code clone discovery,” in Proc. IEEE Symp. Secur. Privacy,
+2017, San Jose, CA, USA, 2017, pp. 595–614.
+[44] “Vulnerability metrics,” 2021. [Online]. Available: https://nvd.nist.gov/
+vuln-metrics/cvss
+[45] J. Pan, G. Yan, and X. Fan, “Digtool: A virtualization-based framework
+for detecting kernel vulnerabilities,” in Proc. 26th USENIX Secur. Symp.,
+2017, Vancouver, BC, Canada, 2017, pp. 149–165.
+[46] Y. Xiao et al., “MVP: Detecting vulnerabilities using patch-enhanced
+vulnerability signatures,” in Proc. 29th USENIX Secur. Symp., 2020,
+pp. 1165–1182.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 15 =====
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS
+919
+[47] F. Yamaguchi, N. Golde, D. Arp, and K. Rieck, “Modeling and discovering
+vulnerabilities with code property graphs,” in Proc. IEEE Symp. Secur.
+Privacy, Berkeley, CA, USA, 2014, pp. 590–604.
+[48] D. Zou et al., “SCVD: A new semantics-based approach for cloned
+vulnerable code detection,” in Proc. 14th Int. Conf. Detection Intrusions
+Malware Vulnerability Assessment, Bonn, Germany, 2017, pp. 325–344.
+[49] V.-T. Pham, W. B. Ng, K. Rubinov, and A. Roychoudhury, “Hercules: Re-
+producing crashes in real-world application binaries,” in Proc. IEEE/ACM
+37th Int. Conf. Softw. Eng., 2015, pp. 891–901.
+[50] W. You et al., “SemFuzz: Semantics-based automatic generation of proof-
+of-concept exploits,” in Proc. ACM SIGSAC Conf. Comput. Commun.
+Secur., Dallas, TX, USA, 2017, pp. 2139–2154.
+[51] Z. Huang, D. Lie, G. Tan, and T. Jaeger, “Using safety properties to
+generate vulnerability patches,” in Proc. IEEE Symp. Secur. Privacy, San
+Francisco, CA, USA, 2019, pp. 539–554.
+Yongzhong He received the PhD degree in com-
+puter science from the Institute of Software, Chinese
+Academy of Sciences, in 2006. He is a full professor
+with the School of Computer, Beijing Jiaotong Uni-
+versity, China. He did research with Oakland Univer-
+sity, in 2009, and the Pennsylvania State University
+during 2014-2015 as a visiting scholar. His research
+interests include system security, privacy protection,
+and mobile security.
+Yiming Wang received the M.S. degree in cy-
+berspace security from Beijing Jiaotong Univer-
+sity, in 2022. His research interest includes system
+security.
+Sencun Zhu received the PhD degree in information
+technology from George Mason University, in 2004.
+He is an associate professor with Penn State Univer-
+sity. His research interests include privacy, wireless
+and mobile security, smartphone security, anomaly
+detection, IoT security, and ML/DL related security.
+Wei Wang received the PhD degree in control science
+and engineering from Xi’an Jiaotong University, in
+2006. He is currently a full professor with the School
+of Computer, Beijing Jiaotong University, China. His
+main research interests include mobile, computer, and
+network security.
+YunjiaZhangreceivedtheM.S.degreeincyberspace
+security from Beijing Jiaotong University, in 2021.
+Her research interest includes system security.
+Qiang Li received the PhD degree in computer sci-
+ence from the University of Chinese Academy of
+Sciences, in 2015. Currently, he is an associate pro-
+fessor with the School of Computer and Information
+Technology, Beijing Jiaotong University, China. His
+research interests include revolve around Internet of
+Things, software security, artiﬁcial intelligence, and
+machine learning for cybersecurity
+Aimin Yu is a research scientist with the Institute of
+Information Engineering, Chinese Academy of Sci-
+ences. His research interests include system security
+and trust computing.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 

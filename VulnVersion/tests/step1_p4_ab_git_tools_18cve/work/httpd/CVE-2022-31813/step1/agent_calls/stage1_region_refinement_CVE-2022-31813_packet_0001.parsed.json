@@ -1,0 +1,39 @@
+{
+  "schema_version": "step1_agent_region_refinement.v1",
+  "cve_id": "CVE-2022-31813",
+  "repo": "httpd",
+  "region_results": [
+    {
+      "region_id": "region_0001",
+      "region_role": "primary_root_cause_region",
+      "evidence_strength": "strong",
+      "allowed_downstream_use": [
+        "prompt_context"
+      ],
+      "root_cause_relation": "missing_guard",
+      "root_cause_likelihood": 0.92,
+      "fix_guard_likelihood": 0.95,
+      "vulnerable_sequence_likelihood": 0.95,
+      "vulnerable_sequence": [
+        "proxy_run_fixups(r);",
+        "if (ap_proxy_clear_connection(r, r->headers_in) < 0) { return HTTP_BAD_REQUEST; }",
+        "for (counter = 0; counter < headers_in_array->nelts; counter++) { if (headers_in[counter].key == NULL || headers_in[counter].val == NULL || !ap_cstr_casecmp(headers_in[counter].key, \"Host\") || !ap_cstr_casecmp(headers_in[counter].key, \"Keep-Alive\") || !ap_cstr_casecmp(headers_in[counter].key, \"TE\") || !ap_cstr_casecmp(headers_in[counter].key, \"Trailer\") || !ap_cstr_casecmp(headers_in[counter].key, \"Upgrade\")) { continue; } }"
+      ],
+      "fix_guard_sequence": [
+        "if (ap_proxy_clear_connection(r, r->headers_in) < 0) { rc = HTTP_BAD_REQUEST; goto cleanup; }",
+        "apr_table_unset(r->headers_in, \"Keep-Alive\"); apr_table_unset(r->headers_in, \"Upgrade\"); apr_table_unset(r->headers_in, \"Trailer\"); apr_table_unset(r->headers_in, \"TE\");",
+        "proxy_run_fixups(r);",
+        "for (counter = 0; counter < headers_in_array->nelts; counter++) { if (headers_in[counter].key == NULL || headers_in[counter].val == NULL) { continue; } }"
+      ],
+      "evidence_refs_used": [
+        "956f708b094698ac9ad570d640d4f30eb0df7305:modules/proxy/proxy_util.c:diff:17-241",
+        "660f5820972d961e2dafc1a6a7b66f98b952865c:modules/proxy/proxy_util.c:diff:17-241",
+        "956f708b094698ac9ad570d640d4f30eb0df7305:commit_msg:1-8",
+        "660f5820972d961e2dafc1a6a7b66f98b952865c:commit_msg:1-8"
+      ],
+      "reasoning_summary": "Root cause is an ordering flaw in ap_proxy_create_hdrbrgd(). In the vulnerable version, proxy_run_fixups(r) runs BEFORE hop-by-hop header clearance (ap_proxy_clear_connection + apr_table_unset for Keep-Alive/Upgrade/Trailer/TE). The X-Forwarded-For/Host/Server headers are added by the proxy code after clearance but a client-sent Connection header listing X-Forwarded-For can bypass this mechanism via fixup hooks that re-add or manipulate headers before clearance removes them. The fix reorders: clear hop-by-hop headers first, then add X-Forwarded-* headers, then strip Proxy-Authorization/If-* headers, then run fixups last. The emit loop is simplified to only skip NULL key/val since all hop-by-hop headers are already removed via apr_table_unset. Evidence: commit 956f708 reorders proxy_run_fixups relative to ap_proxy_clear_connection (fixups moved from before clearance to after X-Forwarded-* addition). Commit 660f582 is a non-functional refactor aligning with 2.4.x patterns that precedes the actual security fix.",
+      "risk_flags": []
+    }
+  ],
+  "global_risk_flags": []
+}

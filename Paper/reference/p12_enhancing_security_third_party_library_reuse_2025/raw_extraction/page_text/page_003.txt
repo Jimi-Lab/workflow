@@ -1,0 +1,123 @@
+1995 May 2010 Aug
+2011 Sep
+2018 May
+zlib
+Start to maintain at:
+zlib.net 
+Linux
+Reused zlib at:
+linux/lib/zlib_deflate
+TrinityCore
+Reused zlib at: 
+dep/zlib
+zlib
+Mirrored to: 
+github.com/madler/zlib
+TizenRT
+Reused zlib at: 
+external/grpc/extlib/zlib2005 May
+Fig. 1: Example of zlib Maintenance and Reuse
+• Specific: Different platforms may have unique libraries
+that cannot be used by the other platforms. To avoid false
+alarms, libraries specific to other platforms, unnecessary
+for the targeted platform, or projects not used as libraries
+must be excluded during the detection process.
+• Maintainable: TPLs are often developed to accelerate
+the development cycle of open-source software and are
+regularly updated to fix bugs and integrate new features.
+Hence, the libraries included in the database should also
+be extendable — to accommodate the newly-created li-
+braries, updatable — to include the latest library versions,
+and traceable — to track all previous revision details.
+Unfortunately, the existing TPL databases [27], [48], [49] fall
+short of the necessary standards as they are neither compre-
+hensive nor specific, and they lack efficient mechanisms for
+updates to include additional whitelists. When updating these
+databases, it is imperative to reconstruct them by meticulously
+repeating all of the steps, including the library collection
+and redundancy elimination. This process is time-consuming,
+particularly because redundancy elimination typically incurs
+higher costs, requiring approximately 100 hours [48], [49].
+Therefore, a powerful and adaptive database is expected to
+be built.
+Detection of TPL reuse. Apart from the platform diver-
+sity, each TPL includes a variety of functions to serve
+different purposes, allowing developers to choose specific
+APIs that align with their unique requirements. For instance,
+coreMQTT [3] provides two APIs, MQTT_ProcessLoop()
+and MQTT_ReceiveLoop(), for receiving packets from the
+transport interface iteratively. If it is not necessary to keep
+the receiving portal alive, MQTT_ProcessLoop() can be
+selected; otherwise, MQTT_ReceiveLoop() should be cho-
+sen. Therefore, it is necessary to check the functions invoked
+in the target program by matching them with the functions
+declared in the libraries. Nonetheless, such similarity-based
+determination is heuristic and highly relies on a threshold
+established through manual observation. A high threshold
+might miss some cases; whereas a low threshold leads to many
+false alarms. Due to the diverse infrastructure, developers may
+modify some functions in TPLs to fit their code structure
+better, rather than reusing TPLs exactly, which complicates
+the similarity comparison process as well. Hence, additional
+details such as birth times of when each version of TPLs was
+created are employed as auxiliary information [48]. Relying
+on single auxiliary information may be insufficient to validate
+the complicated dependencies among TPLs and the dependent
+software.
+Considering the real-world TPL reuses demonstrated in
+Figure 1 as an example, it illustrates the dependencies among
+zlib, Linux, TrinityCore, and TizenRT, and the birth time of
+each project. Specifically, zlib was created at zlib.net in May
+1995 and was mirrored to GitHub in September 2011. Linux,
+TrinityCore, and TizenRT separately reuse zlib for compression
+and decompression; thus three projects share some common
+functions that are invoked from zlib. Since zlib was initially
+released on its own websites and only appears on GitHub
+later than both Linux and TrinityCore, the validation through
+function similarity comparison and birth time ranking [48]
+consequently wrongly indicates that TizenRT reuses functions
+from both Linux and TrinityCore.
+Conclusion 1: The comparison process should be op-
+timized by incorporating sufficient and accurate TPL
+information for effective TPL reuse detection.
+1-day vulnerability detection within TPLs. The integration
+of TPLs within the development cycle of OSS not only
+offers convenience for implementing common features but also
+introduces security and privacy hazards by importing security
+issues. Some of these vulnerabilities arise from integrating
+the vulnerable versions of TPLs [16], [28], [46], [50], [58],
+while others occur because of the violations of specific usage
+requirements [19], [56], [60]. 1-day vulnerabilities are typically
+caused by the former.
+Similar to TPL reuse detection, some vulnerable features
+are required for syntactical and semantic comparison to rec-
+ognize the potential vulnerabilities introduced by the reused
+TPLs. According to the types of reused TPLs, the exact TPL
+reuses can be commonly analyzed via feature comparison [19],
+[50], [58] or even solely through the comparison of TPL
+versions. However, real-world TPL reuse can be customized by
+modifying specific segments to achieve functional objectives.
+While some studies have considered customized reuses, they
+heavily rely on coarse-grained semantic analysis to pinpoint
+the common features that appear in both vulnerable code
+and patches (e.g., variable names [28], core lines of state-
+ments [46], coarse-grained function abstraction [51]). Many
+false alarms are consequently reported. Hence, it is essential to
+differentiate the critical statements and operations that are the
+root causes of a vulnerability for vulnerability identification.
+Considering the TPL reuses in ReactOS (shown in Fig-
+ure 2) as an example, ReactOS originally reused vulnerable
+TPL versions of libjepg-turbo and mbedtls. Then it patches the
+vulnerabilities in a custom way. While the statement contents
+remain the same, the line numbers where the statements are
+located and the format of the statements changed, such alter-
+ation challenges the existing approaches [28] [46] to accurately
+identify the custom patches.
+Conclusion 2: Selecting critical vulnerable features that
+contribute to the generation and mitigation of a vulnera-
+bility can enhance the effectiveness and efficiency of 1-
+day vulnerability detection.
+B. CVE and Commit Analysis
+Software assessment relies on publicly available informa-
+tion on vulnerabilities and security patches, which is typically
+3

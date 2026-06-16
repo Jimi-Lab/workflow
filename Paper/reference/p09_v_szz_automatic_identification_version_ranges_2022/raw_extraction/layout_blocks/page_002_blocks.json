@@ -1,0 +1,152 @@
+[
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:001",
+    "block_type": "text",
+    "text": "ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA\nL. Bao et al.\n",
+    "bbox": [
+      53.79800033569336,
+      61.09828186035156,
+      558.2017211914062,
+      69.21601867675781
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:002",
+    "block_type": "text",
+    "text": "example, for CVE-2018-6621 as shown in the motivating example\n(see Section 2.2), its version range was ‘in FFmpeg through 3.4.1’\nwhen created on February 04, 2018, but was updated to ‘through 3.2’\nafter three years (January 05, 2021). Furthermore, Nguyen et al. re-\nported an inconsistent claim between the NVD team and software\nvendors in terms of ‘vulnerable version’ [38], i.e., NVD claimed\nvulnerable versions were taken from software vendors; whereas,\nsoftware vendors claimed they did not know about this information.\nAdditionally, Nguyen et al. reported that NVD usually applies a\nconservative rule: “If version X is vulnerable, then so are all its pre-\nvious versions” [38]. So, many earlier versions of software might be\nincorrectly marked as vulnerable due to this bias. These erroneous/-\nconservative vulnerable versions would cause additional work for\nsoftware companies. Additionally, many proprietary software sys-\ntems might use an older version of an OSS software due to many\nreasons, for example, updating a newer version may break function-\nality. Once a vulnerability in an OSS software is publicly disclosed\nin the NVD, software vendors need to remediate its risk within a\nspecified time according to remediation service level agreements\n(e.g., fix a vulnerability within 14 days3). Thus, if a tool can con-\nfirm that the vulnerability does not affect the OSS software they\nuse, software vendors do not need to upgrade it and save lots of\nresources and time.\nPrevious research has typically focused on vulnerability man-\nagement [19, 42, 48], or patches for vulnerabilities [8, 24, 29, 30, 48].\nFew studies have investigated how to refine the software versions\naffected by CVE vulnerabilities. In a previous study, Nguyen et\nal. [38] proposed an approach, built on the inducing commits gen-\nerated by the original SZZ algorithm [51], to detect spurious claims\non vulnerable versions in NVD. They revealed systematic spurious\nvulnerability claims, i.e., NVD reported vulnerable, but there is\nno code evidence for the presence of the vulnerability. However,\nthe original SZZ algorithm is designed to detect inducing commits\nfor common bugs. A previous study [8] found that the empirical\nconnection between bugs and vulnerabilities is considerably weak\nby evaluating code review effectiveness and participant experience.\nMany bugs are introduced by a recent bug-fixing commit [44], while\nvulnerabilities are usually foundational [39], i.e., introduced in their\ninitial versions. Additionally, many SZZ variants have been pro-\nposed to boost the accuracy of the original SZZ [11, 12, 27, 59].\nThere are many difficulties to identify the bug-inducing commits\nby SZZ algorithms accurately [44, 45]. Therefore, we want to inves-\ntigate whether the previous SZZ algorithms can identify inducing\ncommits for CVE vulnerabilities and refine vulnerable versions\nbased on inducing commits effectively.\nIn this study, we propose an approach based on an improved\nSZZ algorithm (called V-SZZ) for vulnerabilities to refine software\nversions affected by CVE vulnerabilities. To annotate the true in-\nducing commits for vulnerabilities, we follow the model proposed\nby Rodríguez-Pérez et al. [44], which is designed for bug-inducing\ncommit annotation. We choose two two publicly available datasets\nwith vulnerability-fixing commits, containing five C/C++ and 41\nJava projects, respectively. For the C/C++ dataset, we randomly\nselect 20 CVEs with small size fixing commits (i.e, have larger than\n",
+    "bbox": [
+      53.46699905395508,
+      83.56224060058594,
+      295.5596618652344,
+      676.7752685546875
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:003",
+    "block_type": "text",
+    "text": "3https://www.ivanti.com/blog/industry-driving-toward-14-day-sla-vulnerability-\nremediation\n",
+    "bbox": [
+      53.79800033569336,
+      690.321044921875,
+      288.2170104980469,
+      709.1392822265625
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:004",
+    "block_type": "text",
+    "text": "zero and less than or equal to five deleted lines) for each project. For\nthe Java project, we select all CVEs with small size fixing commits.\nFinally, we annotated 172 CVE vulnerabilities. We run V-SZZ on\nthe annotated vulnerability fixing commits to identify the inducing\ncommits. Then, we identify the vulnerable versions based on the\ninducing commits generated by V-SZZ. We also select the origi-\nnal SZZ algorithm and its three variants (AG-SZZ, MA-SZZ, and\nRA-SZZ) as the baselines. The experiment results show that V-SZZ\ncan correctly identify inducing commits for 88 and 59 vulnerabili-\nties from C/C++ and Java datasets, respectively. V-SZZ also has a\nhigher F1-score on C/C++ and Java datasets (0.736 and 0.630) than\nthe previous SZZ algorithms.\nTo verify the software versions affected by CVE vulnerabilities,\nwe first generate vulnerable versions based on the inducing com-\nmits we annotated. Then, we manually check the presence of the\nvulnerable code in the boundary versions to investigate whether\nthe generated vulnerable versions are correct. Finally, we compare\nthem with the version information of CVE vulnerabilities. We also\nidentify vulnerable versions based on the inducing commits gen-\nerated by V-SZZ and the previous SZZ algorithms. We find that\n99 out of 172 vulnerabilities’ version information is spurious. The\nexperiment results show that our approach based on V-SZZ has a\nhigher F1-score on C/C++ (0.928) and Java dataset (0.952) than the\nprevious SZZ algorithms.\nOur contributions can be summarized as follows:\n",
+    "bbox": [
+      317.62298583984375,
+      83.56224060058594,
+      559.7067260742188,
+      358.96728515625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:005",
+    "block_type": "text",
+    "text": "(1) We build a dataset linking 172 CVE vulnerabilities and their\ninducing commits. This dataset covers vulnerabilities from five\nC/C++ projects and 41 Java projects. We also manually verify\nthe software versions affected by these vulnerabilities and find\nthat the version information of many CVE vulnerabilities is\nspurious.\n(2) We propose an approach based on an improved SZZ algorithm\n(V-SZZ) to refine software versions affected by CVE vulnera-\nbilities. The experiment results show that our approach can\neffectively identify inducing commits for vulnerabilities and\nrefine vulnerable versions based on the inducing commits gen-\nerated by V-SZZ.\n",
+    "bbox": [
+      317.9549865722656,
+      371.959228515625,
+      559.708251953125,
+      504.89825439453125
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:006",
+    "block_type": "text",
+    "text": "Paper Structure: Section 2 describes the background of the SZZ\nalgorithms and demonstrates two motivating examples. Section 3\npresents our approach based on an improved SZZ to refine vulner-\nable versions for vulnerabilities in NVD. Section 4 describes the\nmanual annotation for inducing commits for vulnerabilities and\nverification of vulnerable versions. Section 5 shows the results of\nour approach on identifying inducing commits, and refining vul-\nnerable versions for vulnerabilities. Section 6 discusses the impact\nof duplicated changes on detecting vulnerable versions, the differ-\nence between vulnerabilities and common bugs, and the threats to\nvalidity. Section 7 reviews related work. Section 8 concludes the\npaper and discusses future directions.\n",
+    "bbox": [
+      317.7309875488281,
+      517.8902587890625,
+      559.70458984375,
+      650.8292846679688
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:007",
+    "block_type": "text",
+    "text": "2\nBACKGROUND\n",
+    "bbox": [
+      317.9549865722656,
+      671.6282958984375,
+      412.6014709472656,
+      686.2681274414062
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:008",
+    "block_type": "text",
+    "text": "In this section, we first introduce the original SZZ and its variants,\nthen we show two motivating examples.\n",
+    "bbox": [
+      317.9549865722656,
+      686.30224609375,
+      559.1785278320312,
+      709.6512451171875
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:009",
+    "block_type": "text",
+    "text": "2353\n",
+    "bbox": [
+      298.0,
+      746.8159790039062,
+      314.0,
+      755.7440185546875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 2,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:002:010",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

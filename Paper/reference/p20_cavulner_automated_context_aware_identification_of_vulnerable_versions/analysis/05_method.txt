@@ -1,0 +1,44 @@
+System Overview:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- Furthermore, with the recent and rapid emergence of powerful large language models, a growing body of recent studies has actively explored their potential integration into and enhancement of traditional SZZ-based workflows.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- Given the success of SZZ in the bug localization domain, it has subsequently been adapted for vulnerability analysis, particularly in identifying vulnerability-inducing commits and inferring vulnerability-affecting version ranges.
+- One notable and direct adaptation of this methodology is exemplified by V-SZZ [9], which operates by attempting to systematically trace backwards from a known vulnerability-fixing commit in order to identify and pinpoint the specific earlier commit that originally introduced the security flaw, primarily through the analysis of lines of code that were deleted within the fix patch.
+- More importantly, despite the shared conceptual basis, there are fundamental differences between bugs and vulnerabilities that are often not well accounted for in these approaches.
+Pipeline Stages:
+- [NEEDS EVIDENCE] pipeline stages require manual confirmation
+Core Algorithm:
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- By understanding the contextual meaning of code changes and commit descriptions, LLM4SZZ reduces false positives and identify extra commits that all baselines cannot.
+Data Structures:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- One notable and direct adaptation of this methodology is exemplified by V-SZZ [9], which operates by attempting to systematically trace backwards from a known vulnerability-fixing commit in order to identify and pinpoint the specific earlier commit that originally introduced the security flaw, primarily through the analysis of lines of code that were deleted within the fix patch.
+- This situation underscores the pressing and critical need for the development of more specialized techniques that are explicitly designed to model and address the distinct, often subtle, and exploit- oriented nature of security vulnerabilities, as opposed to merely adapting or directly borrowing from methodologies originally conceived for the localization of general, non-security-related software bugs.
+Model / Agent Components:
+- Furthermore, with the recent and rapid emergence of powerful large language models, a growing body of recent studies has actively explored their potential integration into and enhancement of traditional SZZ-based workflows.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- By understanding the contextual meaning of code changes and commit descriptions, LLM4SZZ reduces false positives and identify extra commits that all baselines cannot.
+- Fix Commit: c3351d2 + build.getProject().getWorkspace().child(location).copyFrom(file); - build.getWorkspace().child(location).copyFrom(file); + FilePath locationFilePath = build.getWorkspace().child(location); + locationFilePath.copyFrom(file); - FilePath locationFilePath = build.getWorkspace().child(location); + if (!ALLOW_FOLDER_TRAVERSAL_OUTSIDE_WORKSPACE + && !ws.isDescendant(location)) { + return null; locationFilePath.copyFrom(file); Project: Jenkins CVE-2018-1000406: A path traversal vulnerability exists in Jenkins 2.145 and earlier, LTS 2.138.1 and earlier in core/src/main/java/hudson/model/FileParameterValue.java that allows attackers with Job/Configure permission to define a file parameter with a file name outside the intended directory, resulting in an arbitrary file write on the Jenkins master when scheduling a build.
+- This situation underscores the pressing and critical need for the development of more specialized techniques that are explicitly designed to model and address the distinct, often subtle, and exploit- oriented nature of security vulnerabilities, as opposed to merely adapting or directly borrowing from methodologies originally conceived for the localization of general, non-security-related software bugs.
+- Among them, tools such as V-SZZ [ 9] represent state-of-the- art solutions in this space.
+Design Choices:
+- Specifically, V-SZZ assumes all deleted lines are vulnerable and fails to address fix commits that only contain added lines.
+- This situation underscores the pressing and critical need for the development of more specialized techniques that are explicitly designed to model and address the distinct, often subtle, and exploit- oriented nature of security vulnerabilities, as opposed to merely adapting or directly borrowing from methodologies originally conceived for the localization of general, non-security-related software bugs.
+Why Each Choice Is Needed:
+- [NEEDS EVIDENCE] requires close reading of method subsections.
+Failure Handling:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- By understanding the contextual meaning of code changes and commit descriptions, LLM4SZZ reduces false positives and identify extra commits that all baselines cannot.
+- Specifically, V-SZZ assumes all deleted lines are vulnerable and fails to address fix commits that only contain added lines.
+- Consequently, the effectiveness of existing SZZ-based approaches in vulnerability detection remains limited, as they fail to accommodate the unique characteristics of VICs.
+Complexity / Cost Discussion:
+- The motivating example of CVE-2018-1000406 window, vulnerabilities tend to originate much earlier in the commit history, e.g., sometimes persisting for years before being discovered and fixed [ 5].
+- [35], who manually collected and curated vulnerabilities in open-source software along with their corresponding fixing commits.
+Pseudocode or Algorithm Blocks:
+- See raw_extraction/algorithms/ if present; otherwise [NEEDS ALGORITHM REPAIR].
+Static Reproducibility Signals:
+- Source path: [NEEDS ARTIFACT] no local source/artifact path detected beside the PDF; source code was not available locally in the requested path. [EXECUTION NOT REQUESTED]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Present the method as a pipeline from security evidence extraction to candidate generation/filtering/ranking/validation, with each stage tied to a specific failure mode.

@@ -1,0 +1,162 @@
+2234
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE X
+RESULTS OF THE CHATGPT EXPERIMENT // INDICATES THAT THE RESPECTIVE INDICATOR WAS
+NOT EVALUATED IN THE CORRESPONDING CATEGORY
+Failure Situations
+Number
+Directory
+File
+Function
+Line of Code
+Recall
+Precision
+F1
+Function-Blame Detection
+94
+//
+//
+//
+//
+0.62
+0.28
+0.39
+Function-Log Detection
+32
+//
+//
+//
+✓: 8 ✗: 24
+0.31
+//
+//
+Within-File Detection
+116
+//
+//
+✓: 32 ✗: 44
+✓: 25 ✗: 26
+0.22
+//
+//
+Cross-File Detection
+133
+✓: 86 ✗: 46
+✓: 43 ✗: 46
+✓: 10 ✗: 11
+✓: 11 ✗: 5
+0.08
+//
+//
+commits are located within the same directory. For example,
+the bug-ﬁxing commit 5b8481f and the bug-inducing commit
+89a23c8 are both found within the ‘net/ipv6’ directory. Never-
+theless, there are four instances where the bug-ﬁxing commit is
+not even in the same root directory as the bug-inducing commit.
+Through this ChatGPT experiment, we conclude that Chat-
+GPT exhibits potential in assisting researchers and developers
+in identifying bug-inducing commits. We acknowledge that this
+exploration is only preliminary, given that our experimental
+setup does not reﬂect realistic conditions, as we knew the cate-
+gories beforehand. Nonetheless, considering that ChatGPT is
+a generalized model not speciﬁcally ﬁne-tuned for this task,
+its performance hints at the potential beneﬁts of similar LLMs.
+We hope that this work will catalyze further research efforts on
+using LLMs to overcome the limitations of the SZZ algorithm
+in identifying bug-inducing commits, including challenges such
+as ghost commits and cross-ﬁle detection.
+C. Evaluating ChatGPT Beyond the 2021 Data Cutoff
+ChatGPT may have been trained on the data used in our
+experiment, which could bias the results. Our initial work with
+ChatGPT, involving 165 commits, was carried out from June
+28th to July 4th, 2023, prior to OpenAI’s announcement on
+September 27th, 2023 that it had enhanced ChatGPT’s capabil-
+ities, extending its knowledge base beyond the previous cutoff
+in September 2021.22 This raises the opportunity to compare
+the success rate ChatGPT on those commits that were released
+prior to September 2021 to those that were released after that
+date, that were certain to be outside of the knowledge base of
+ChatGPT.
+In an analysis of 165 commits up to September 2023, 134
+were made before September 2021, and the remaining 31 oc-
+curred after this date. This date serves as the data cutoff point,
+dividing the commits into two groups for evaluation: commits
+before the cutoff may have been part of the ChatGPT training
+data, while those subsequent to the cutoff had not. As shown
+in Table XI, for Function-Blame Detection, testing cases subse-
+quent to the data cutoff exhibited a notable improvement with
+ChatGPT, achieving a 24% increase in recall (from 0.47 to 0.71)
+and a 7% increase in precision (from 0.26 to 0.33). However,
+for Function-Log Detection and Within-File Detection, testing
+cases subsequent to the data cutoff resulted in a 2% decrease
+in performance. Regarding Cross-File Detection, testing cases
+before the data cutoff had an 8% recall rate, whereas cases
+after the data cutoff failed to identify the correct bug-inducing
+commits in this category. Given that testing cases after the data
+22https://twitter.com/OpenAI/status/1707077710047216095?s=20
+TABLE XI
+COMPARATIVE OF CHATGPT ON BEFORE AND AFTER 2021 DATA CUTOFF
+Failure
+Before (134)
+After (31)
+Situations
+Recall
+Pr.
+Recall
+Pr.
+Function-Blame Detection
+0.47
+0.26
+0.71
+0.33
+Function-Log Detection
+0.35
+-
+0.33
+-
+Within-File Detection
+0.24
+-
+0.22
+-
+Cross-File Detection
+0.08
+-
+0
+-
+cutoff demonstrated a signiﬁcant advantage of up to 24% in one
+category, and no substantial disadvantage in the three remaining
+categories—with drops ranging from 2% to 8%—there is no
+conclusive evidence to suggest that testing cases potentially
+seen by ChatGPT would impact the experimental results.
+D. Compare With Code-Speciﬁc Models
+To further evaluate the performance of ChatGPT, we conduct
+a comparative analysis with the code-speciﬁc models CodeT5+
+[59] and CodeGen2.0 [60], applying a consistent experimen-
+tal setting as outlined in Section VII-A. We follow again the
+evaluation methodology described at the beginning of Section
+VII-B. We use the same prompts for ChatGPT, CodeT5+, and
+CodeGen2.0 to ensure a fair comparison. CodeT5+, proposed
+by Wang et al. [59], stands out as an encoder-decoder code foun-
+dation LLMs, demonstrating good performance across more
+than 20 code-related benchmarks involving both understanding
+or generative tasks, including in the zero-shot setting. Given
+that the 2B, 6B, and 16B parameter sizes of CodeT5+ are built
+upon CodeGen, we also include a comparison with CodeGen2.0
+in our analysis. However, due to constraints related to GPU
+memory, our assessment is conﬁned to the codet5p-2b and
+codegen2-3_7B models for the inference stage, as these are the
+largest model sizes we can load. Both models are deployed on a
+Docker environment with NVIDIA RTX 6000 Ada Generation
+(48GB of graphics memory). We use the same settings for the
+CodeT5+ 2B23 and CodeGen2-3.7B24 models from Hugging
+Face. The default conﬁgurations for CodeT5+ include parame-
+ters such as temperature of 1.0, model type as encoder-decoder,
+and 16-bit ﬂoating point tensors. On the other hand, CodeGen2
+uses similar defaults with a temperature of 1.0 but employs the
+GPT2Tokenizer and conﬁgures tensors to use 32-bit ﬂoating
+point. Additionally, for both models, we adjust the max_length
+parameter to 2048.
+23https://huggingface.co/Salesforce/codet5p-2b
+24https://huggingface.co/Salesforce/codegen2-3_7B_P
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

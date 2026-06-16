@@ -1,0 +1,33 @@
+VIII. C
+ONCLUSION AND FUTURE WORK
+In this study, we observe that the majority of bug-inducing
+commits for bug-fixing commits with only added lines can be
+effectively located by tracing back the nearby lines of the un-
+modified lines. To further enhance precision, we introduce our
+approach, S
+EM-SZZ. Our approach leverages data flow analysis
+and control flow analysis to compare the states between the
+two versions of the program, identifying their difference and
+generating the statements contributing to the bug. Subsequently,
+we trace back the buggy statements to identify candidate com-
+mits. Finally, we employ line similarity comparison to pinpoint
+the commit that initially introduced all the buggy statements,
+marking it as the bug-inducing commit. The result shows that
+our proposed method significantly improves the precision and
+F1-score of the baselines in all scenarios, regardless of whether
+the bug-fixing commit contains deleted lines. In the future, we
+plan to extend our work to other programming languages and
+collect more high-quality datasets. Additionally, current meth-
+ods overlook commit messages when locating bug-inducing
+commits. We intend to leverage large language models to in-
+terpret commit messages and code changes, using this informa-
+tion to filter out irrelevant lines detected by baselines such as
+A-SZZ. Furthermore, our current approach relies on line sim-
+ilarity to identify buggy commits. We aim to replace this with
+large language models. We hope this can maintain the high
+recall of A-SZZ while gaining SEM-SZZ’s high precision.
+D
+ATA AVAILABILITY
+The replication package, which includes the source code,
+datasets, and prediction results, can be found at https://figshare.
+com/s/a25207be10150e2f0177.

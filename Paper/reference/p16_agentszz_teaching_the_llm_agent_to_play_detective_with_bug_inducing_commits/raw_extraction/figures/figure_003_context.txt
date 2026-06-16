@@ -1,0 +1,145 @@
+Page: 6
+Caption: Figure 3: A successful case of AgentSZZ identifying a cross-
+
+Page text context:
+Preprint, Under Submission, Arxiv
+Lyu et al.
+blame
+show
+log_s
+grep
+L210-330 @ fix^1
+file: mv_sas.c
+121181f3 
+file: mv_sas.c
+AgentSZZ
+sas_notify_phy_event_gfp
+entire repo
+→ only in sas_event.c, 
+sas_init.c (introduced here) ✓
+sas_notify_phy_event_gfp
+path: libasa/
+grep
+notify_port_event(
+@ 121181f3
+log_func
+sas_notify_port_event
+file: sas_event.c
+6
+show
+show
+grep
+show
+Phase 1: Blame at Fix
+Phase 2: Cross-File Tracing
+5
+4
+3
+Phase 3: Multi-File Verification
+10
+9
+→ 121181f3, 20b09c29... 
+(multiple candidates)
+→ "Remove notifier indirection"
+API refactor ✗
+→ found in sas_event.c, 
+sas_init.c, libsas.rst
+→ no commits found
+→ found in aic94xx, mvsas, 
+hisi_sas, sas_event.c ✓
+→ 1c393b9 (2017) 
+"dynamic alloced work" ✓
+1c393b9
+file: libsas.h
+→ changed event struct and 
+API signature
+1c393b9
+file: sas_event.c
+"sas_alloc_event(", 
+@ 1c393b9
+→ sas_alloc_event() 
+Confirmed BIC ✓✓
+1c393b9
+file: sas_init.c
+→ added sas_alloc_event(), 
+rewrote notify functions
+Find BIC: 1c393b9
+8
+7
+1
+2
+Figure 3: A successful case of AgentSZZ identifying a cross-
+file bug-inducing commit.
+3.6
+Successful Example
+We illustrate AgentSZZ through a cross-file bug in the Linux ker-
+nel’s SCSI subsystem.1 Although the fix modifies mvsas/mv_sas.c,
+the root cause lies in the core library libsas/sas_event.c, where
+the event handling mechanism was rewritten four years earlier.
+Fig. 3 shows the 10-turn investigation trajectory.
+Phase 1: Blame at fix (Turns 1–2). Following the blame-first
+strategy, the agent blames the changed lines in mv_sas.c at the par-
+ent commit and identifies commit 121181f3 as a frequent modifier.
+git_show reveals this commit to be an API refactoring (“Remove
+notifier indirection”) that replaces indirect callbacks with direct
+calls—a mechanical change rather than the root cause.
+Phase 2: Cross-file tracing (Turns 3–6). Recognizing that the
+bug lies beyond the driver file, the agent shifts to cross-file explo-
+ration. It uses git_grep to locate sas_notify_phy_event_gfp across
+the repository, identifying references in sas_event.c, sas_init.c,
+and related files. After an unsuccessful git_log_s search, the agent
+adapts by tracing the pre-refactoring function notify_port_event.
+Using git_log_func, it identifies commit 1c393b9 (2017) as the
+change that rewrote the event handling logic.
+Phase 3: Multi-file verification (Turns 7–10). The agent ver-
+ifies the candidate across multiple files. It confirms changes to
+the API and data structures in libsas.h, validates the shift to dy-
+namic allocation in sas_event.c, and uses git_grep to confirm
+that sas_alloc_event was introduced in this commit. Finally, it
+inspects sas_init.c to complete the verification.
+The agent correctly identifies 1c393b9 as the bug-inducing com-
+mit with high confidence. This case highlights three key strengths
+of AgentSZZ: (i) domain knowledge enables effective refactor pene-
+tration and strategy adaptation; (ii) task-specific tools support cross-
+file tracing beyond line-based SZZ; and (iii) context compression
+1https://github.com/torvalds/linux/commit/feb18e900f0048001ff375dca639eaa327ab3
+maintains tractable context across multi-turn investigation. This
+trajectory illustrates how AgentSZZ progressively shifts from lo-
+cal blame to broader repository exploration when local evidence
+becomes insufficient. Notably, the BIC resides in a different file and
+predates the fix by four years—conditions under which traditional
+SZZ approaches typically fail.
+4
+Study Design
+4.1
+Research Questions
+To evaluate AgentSZZ, we design the following research questions:
+• RQ1. How effective is AgentSZZ at identifying BICs com-
+pared to baselines?
+• RQ2. How efficient is AgentSZZ in terms of time and cost?
+• RQ3. What is the contribution of each key component of
+AgentSZZ?
+• RQ4. Can AgentSZZ identify BICs in challenging scenarios?
+In RQ1, we evaluate the effectiveness of AgentSZZ by com-
+paring it with a range of existing SZZ algorithms on the task of
+identifying bug-inducing commits across multiple datasets. In RQ2,
+we assess the efficiency of AgentSZZ in terms of runtime, token
+consumption, and monetary cost, and compare it against the state-
+of-the-art LLM-based approach LLM4SZZ. In RQ3, we conduct an
+ablation study to quantify the contribution of each key component
+of AgentSZZ (i.e., task-specific tools, domain knowledge, and con-
+text compression) to its overall performance and efficiency. In RQ4,
+we further analyze the effectiveness of AgentSZZ in challenging
+scenarios, with a focus on cross-file and ghost commit cases that
+are known to be difficult for traditional SZZ methods [23, 29].
+4.2
+Evaluation Dataset
+To evaluate AgentSZZ, we use the same datasets as Tang et al. [36],
+including DS_LINUX, DS_GITHUB, and DS_APACHE. DS_LINUX
+contains 1,500 bug-fixing commits from the Linux kernel, sampled
+from the dataset of Lyu et al. [23]. DS_GITHUB contains 361 bug-
+fixing commits from 285 GitHub repositories covering C and Java
+projects [30]. During our evaluation (March 2026), we removed 6
+
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

@@ -1,0 +1,36 @@
+// Original buggy code
+char buf[8];
+strcpy(buf, input);
+// Possible patch 1
+char buf[8];
+- strcpy(buf, input);
++ strncpy(buf, input, 8);
+// Possible patch 2
+char buf[8];
++ if(strlen(input) < 8)
+strcpy(buf, input);
+Figure 1: Buggy code example and two possible patches
+the code into high-level representations like parse trees and
+control ﬂow graphs. They then employ advanced fuzzy
+matching algorithms on the abstractions to ﬁnd additional
+code clones that we may miss. On the other hand, they
+may report more false code clones, which require signiﬁcant
+human effort to inspect all the reported cases. Furthermore,
+it is known to be very hard to implement good parsers [7].
+Overall, the main difference is by employing simpler
+techniques that is language agnostic, we can focus on ef-
+ﬁcient data structures and algorithms and ultimately scale to
+much larger code bases written in many different languages.
+Our techniques may miss some clones, but minimize false
+clone detection rate. This is important for at least two
+reasons. First, by checking all code in a distribution quickly
+we can make basic guarantees that at least syntactically
+similar unpatched code clones do not exist. Second, we
+can conservatively estimate the amount of code cloning in
+existing large code bases. The more advanced algorithms in
+the above work have not demonstrated they can make either
+claim.
+B. Unpatched Code Clone Detection
+At a high level, there are two approaches to ﬁnd unpatched
+code clones in OS distributions: (1) ﬁrst ﬁnd all code clones
+among the source and then check if 

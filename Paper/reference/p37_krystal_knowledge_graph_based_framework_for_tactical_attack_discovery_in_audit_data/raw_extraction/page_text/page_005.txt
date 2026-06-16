@@ -1,0 +1,89 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 2. Krystal Ontology - nodes represent concepts (classes) and edges represent 
+the class relationship (properties). 
+Table 2 
+RDFS & OWL Reasoning Rules. 
+Rule Premise Conclusion 
+rdfs2 e 1 (v 1 , v 2 ) , rdfs:domain (e 1 , X) v 1 ∈ X
+rdfs3 e 1 (v 1 , v 2 ) , rdfs:range (e 1 , Y ) v 2 ∈ Y 
+rdfs7 e 1 (v 1 , v 2 ) , rdfs:subPropertyOf (e 1 , e 2 ) e 2 (v 1 , v 2 ) 
+owl: InverseOf e 1 (v 1 , v 2 ) , owl:inverseOf (e 1 , e 2 ) e 2 (v 2 , v 1 ) 
+and kry:isExecutedBy , kry:deletes , kry:mmap proper- 
+ties to represent links between Process class and File class. 
+The Socket class represents a network connection (combination 
+of an IPAddress and Port ). We deﬁned kry:sends and 
+kry:isReceivedBy properties that link the Process class to the 
+Socket class. 
+We also deﬁned User , a class that describes user of a system. 
+It has three sub-classes, i.e., (i) RootUser , that represents the root- 
+level user, (ii) SystemUser , represents the system-level user, (iii) 
+LocalUser , represents the local-level user. 
+We also deﬁned Host class that represent a host machine. The 
+kry:hasUser property connects Process class to the User class, 
+while the kry:originatesFrom property links it to Host class. 
+Finally, we also deﬁned several other classes such as Executable 
+class that identiﬁes an executable ﬁle and IPAddress that repre- 
+sents an IP Address. The kry:hasExe property connects Process 
+to Executable and kry:hasHostIP that links Process to IPAd- 
+dress . 
+Furthermore, we introduce a provenance relation (identiﬁed by 
+kry:provRel ) that self-links to SystemObject . It is a generic, 
+upper-level relation property that is used to represent provenance 
+relationships between system objects (e.g., socket to process, pro- 
+cess to ﬁle, ﬁle to process). This provenance relation is automati- 
+cally inferred from more speciﬁc relation properties, as explained 
+in the following. 
+5.3. Inference features in KRYSTAL ontology 
+The KRYSTAL ontology uses the RDF-S entailment and OWL rea- 
+soning rules summarized in Table 2 for provenance graph con- 
+struction. 
+rdfs2 & rdfs3 These rules are used to automatically infer the 
+speciﬁc type of a given system object based on its relations. 12 
+For example, as depicted in Fig. 3 , system object :Firefox 13 
+has the relation kry:writes to another system object 
+12 We represent objects with different colors: orange for processes, purple for ﬁles, 
+blue for sockets, and transparent-dotted circles for inferred system object types. 
+13 Note that we deﬁne preﬁx “: ”f o r an instance and “kry: ”f o r Krystal ontology. We 
+omit it in ﬁgures for simplicity. 
+Fig. 3. RDFS & OWL reasoning for vertice/edge inference. 12 
+Fig. 4. rdfs7 ( rdfs:subPropertyOf ) inference example. 
+:/home/admin/clean , since in the ontology we deﬁne kry:writes 
+as owl:ObjectProperty with an rdfs:domain of kry:Process . 
+Consequently, based on rdfs2 rule deﬁnition, it will be automat- 
+ically inferred that :Firefox ∈ kry:Process . The system object 
+:/home/admin/clean is another example. Since kry:writes has 
+rdfs:range of kry:File , based on the rdfs3 rule deﬁnition, it will 
+be deduced that :/home/admin/clean ∈ kry:File . This class type 
+inference is useful for, e.g., formulating semantic graph queries 
+to detect attack patterns based on the system object type and 
+their relations. We discuss the query processes in more detail in 
+Section 6 . 
+rdfs7 This rule is used to generalize relations based on prop- 
+erty hierarchies identiﬁed by rdfs:subPropertyOf . In the exam- 
+ple in Fig. 4 , for instance, :Firefox has the relation kry:writes 
+to :/home/admin/clean , and in the ontology, kry:writes is a sub- 
+property of the more generic property kry:provRel , which repre- 
+sents provenance relationships. 
+Based on the rdfs7 rule, kry:provRel will be automatically in- 
+ferred between objects that have a more speciﬁc relation; this 
+creates provenance links for all system object relationships (e.g., 
+from the :Firefox process to the :/home/admin/clean ﬁle to the 
+:Clean process etc.). This is helpful to identify information ﬂows, 
+track causality of events, and reconstruct attack graph. We discuss 
+the advantage of having explicit provenance relations (e.g., during 
+backward-forward analysis for attack graph reconstruction) further 
+in Section 6.3 . 
+owl:InverseOf Finally, a reasoning technique that we use in our 
+ontology is property inversion, identiﬁed by owl:InverseOf , which 
+creates relations between system objects in both directions. For in- 
+stance, as depicted in Fig. 3 , :Firefox has a relation kry:writes 
+to :/home/admin/clean and in the ontology, kry:writes is deﬁned 
+as owl:inverseOf to kry:isWrittenBy . Based on the owl:inverseOf 
+rule, it will be automatically inferred that :/home/admin/clean also 
+has a relation kry:isWrittenBy to :Firefox . The same holds for 
+property kry:executes , since it has the relation owl:inverseOf to 
+kry:isExecutedBy in the ontology. 
+6. Solution architecture 
+In this section we present KRYSTAL , a modular framework for 
+tactical attack discovery in audit data. The proposed framework in- 
+6

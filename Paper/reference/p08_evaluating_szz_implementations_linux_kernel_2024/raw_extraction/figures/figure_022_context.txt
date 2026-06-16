@@ -1,0 +1,34 @@
+Page: 15
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2233
+Fig. 6.
+Input Provided to ChatGPT for Commit 761e205 in Linux kernel.
+In practice, we provide the entire function code to ChatGPT, however, space
+constraints prevent us from including the full screenshot in the paper. The
+complete screenshot is available in the replication package.
+Fig. 7.
+ChatGPT’s Output for Commit 761e205 in Linux kernel. If the
+details in the ﬁgure are difﬁcult to discern, please refer to our replication
+package.
+For the Within-File Detection cases, we follow a two-step
+method: (1) We ﬁrst use ctags21 to extract all function names
+in a ﬁle. Subsequently, we pose the Prompt B in Table IX
+to ChatGPT. We provide ChatGPT with the function names
+extracted using ctags, instead of the entire code, because the
+number of code tokens in a ﬁle often exceeds the token limit
+set by ChatGPT. (2) We then apply the same method as in the
+Function-Log Detection category for any correctly identiﬁed
+function to ﬁnd the bug-inducing commits.
+For the Cross-File Detection cases, we follow the three steps
+shown in Fig. 5: (A) The initial step involves identifying the
+ﬁle containing the bug-inducing commits. We pose the Prompt
+21https://ctags.io
+A in Table IX to ChatGPT. Given that the Linux kernel has
+15,000 ﬁles and limited information is available in the commit
+message, ChatGPT might have difﬁculty identifying an exact
+ﬁle. We have observed that it could instead return a directory,
+despite not having been prompted to do so, containing the code
+affected by the bug-inducing commit. Hence, we evaluate Chat-
+GPT’s performance based

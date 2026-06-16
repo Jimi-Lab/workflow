@@ -1,0 +1,110 @@
+language-dependent. Deckard [23] and Deja Vu [21] build
+parse trees for C code, and then reduce part of the parse trees
+to a vector. Comparisons are done on the vector. CP-Miner
+also parses the program: currently the parser is implemented
+only for C and C++. It then hashes these tokens and assigns
+a numeric value to each, and runs the CloSpan frequent
+subsequence mining algorithm to detect code clones.
+Each of the above techniques represent a unique and
+different point in the design space. For example, building the
+parse tree, CFG, etc. all require implementing a robust parser
+for the language. Implementing good parsers is a difﬁcult
+problem with which even professional software assurance
+companies struggle [7], but once done will give them a
+robust level of abstraction not available to ReDeBug. The
+highest false positive rate for reported errors among the code
+clones was 90% for CP-Miner, and 66-74% for Deja Vu. In
+terms of scalability, the largest code base we are aware of is
+Deja Vu, which looked at a proprietary code base consisting
+of about 75 million lines of C code. They used a cluster
+of 5 machines, and integrated the product into the build
+cycle. It found 2070-2760 likely bugs. Our experiments are
+on code bases upon to billions of lines of code (two orders
+of magnitude larger). If their techniques could be scaled
+up, they would likely ﬁnd more unpatched code clones, but
+the number of falsely detected clones would also scale up
+and the overall system would require more resources than
+available to a typical end-developer.
+SYDIT [26] is a program transformation tool, which
+characterizes edits as AST node modiﬁcations and generates
+context-aware edit scripts from example edits. It was tested
+on an oracle data set of 56 pairs of example edits from
+open source projects in Java. SYDIT complements ReDeBug
+in that SYDIT looks at abstract, semantic changes while
+ReDeBug focuses on syntactic changes at large scale.
+Pattern Insight’s Code Assurance [1] (aka Patch Miner)
+is advertised as ﬁnding unpatched code clones, as with
+ReDeBug. Their whitepaper does not contain any technical
+information to compare on a usage, algorithmic, perfor-
+mance, or accuracy basis, but does mention it performs a
+kind of “fuzzy matching”. We have contacted Pattern Insight
+to get more details, but they have not made the product
+available to us for comparison.
+Previous work has also done clustering. Much previous
+work, like us, uses the Jaccard distance metric, e.g., Deja Vu.
+Deckard and Deja Vu use locality sensitive hashing (LSH)
+to speed up the pairwise comparison using Jaccard. We use
+feature hashing. Theoretical analysis shows feature hashing
+outperforms LSH alone [29], and Jang et al. back this up
+with an empirical evaluation for malware clustering [22].
+However, a hybrid approach that ﬁrst uses LSH to ﬁnd near-
+duplicates which are then compared using feature hashing
+may be possible. We leave these types of optimizations as
+future work.
+Brumley et al. have shown once a patch becomes avail-
+able, an attacker may be able to use it to reverse engineer the
+problem and create an exploit automatically [10]. We leave
+exploring the ramiﬁcation of this problem as future work.
+VI. CONCLUSION
+In this paper we presented ReDeBug, an architecture
+designed for unpatched code clone detection. ReDeBug
+was designed for scalability to entire OS distributions, the
+ability to handle real code, and minimizing false detec-
+tion. ReDeBug found 15,546 unpatched code clones, which
+likely represent real vulnerabilities, by analyzing 2.1 billion
+lines of code on a commodity desktop. We demonstrate
+the practical impact of ReDeBug by conﬁrming 145 real
+bugs in the latest version of Debian Squeeze packages. We
+believe ReDeBug can be a realistic solution for regular
+developers to enhance the security of their code in day-to-
+day development.
+ACKNOWLEDGMENT
+This research was supported in part by sub-award
+PO4100074797 from Lockheed Martin Corporation originat-
+ing from DARPA Contract FA9750-10-C-0170 for BAA 10-
+36. This research was also supported in part by the National
+Science Foundation through TeraGrid resources provided
+by Pittsburgh Supercomputing Center. We would like to
+thank the anonymous referees, Debian developers, Spencer
+Whitman, Edward Schwartz, JongHyup Lee, Yongsu Park,
+Tyler Nighswander, and Maverick Woo for their feedback in
+preparing this paper.
+REFERENCES
+[1] Code Assurance.
+http://patterninsight.com/products/
+code-assurance/. Page checked 3/4/2012.
+[2] Pittsburgh Supercomputing Center.
+http://www.psc.
+edu/. Page checked 3/4/2012.
+[3] QuickLZ.
+http://www.quicklz.com/.
+Page checked
+3/4/2012.
+[4] SimMetrics.
+http://sourceforge.net/projects/
+simmetrics/. Page checked 3/4/2012.
+[5] Ira D. Baxter, Christopher Pidgeon, and Michael
+Mehlich. DMS: program transformations for practical
+scalable software evolution. In Proceedings of the In-
+ternational Conference on Software Engineering, 2004.
+[6] Daniel Bernstein.
+http://www.cse.yorku.ca/∼oz/hash.
+html. Page checked 3/4/2012.
+[7] Al Bessey, Ken Block, Ben Chelf, Andy Chou, Bryan
+Fulton, Seth Hallem, Charles Henri-Gros, Asya Kam-
+sky, Scott McPeak, and Dawson Engler. A few billion
+lines of code later: using static analysis to ﬁnd bugs in
+the real world. Communications of the Association for
+Computing Machinery, 53(2):66–75, 2010.
+61
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,67 @@
+# CWE-191 Stage 1 View
+Name: Integer Underflow (Wrap or Wraparound)
+
+## Goal
+
+在 patch chunk 级别判断哪些改动最可能直接修复了该 CWE 的根因，哪些只是支撑性修改，哪些只是上下文或无关改动。
+
+## Mechanism Summary
+
+The product subtracts one value from another, such that the result is less than the minimum allowable integer value, which produces a value that is not equal to the correct result.
+
+## PRIMARY_FIX Signals
+
+- checked arithmetic
+- widen type
+- range guard before multiplication/addition
+
+## SUPPORTING_FIX Signals
+
+- Introduces helpers, wrappers, or state propagation needed by the main fix
+- Adds error handling or early return logic that makes the main fix effective
+- Refactors data/control flow so the primary validation can dominate the sink/path
+
+## CONTEXTUAL_CHANGE Signals
+
+- comment-only change
+- rename-only change
+- logging-only change
+- style refactor without changing the sensitive path
+
+## High-Value Clues
+
+- integer
+- result
+- wraparound
+- allowable
+- subtracts
+- produces
+- unsigned
+- another
+
+## Dangerous Generic Tokens
+
+以下 token 过于常见，不能单独作为 chunk 角色判断依据：
+
+- size
+- len
+- length
+- count
+- index
+- idx
+- buf
+- data
+- value
+- ptr
+
+## Stage 1 Focus
+
+- direct change to vulnerable sink or validation site
+- changes that alter boundary, lifecycle, policy, or authorization relation
+- supporting helper or error-propagation logic needed by the main fix
+
+## Stage 1 Avoid
+
+- comment-only or naming-only changes
+- generic logging changes without security semantics
+- refactors unrelated to the sensitive sink/path

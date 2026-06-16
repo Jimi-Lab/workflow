@@ -1,0 +1,192 @@
+motivation and evaluate the effectiveness of our code clone de-
+tection approach, we analyzed the commits encountered during
+our evaluation. In the backtrack of our dataset, we conducted a
+total of 276 comparisons between pre-commit and post-commit.
+On average, it takes 3.73 comparisons to identify the vic for
+each vfc. During the commit backtrack, cases with signiﬁcant
+edit-distance differences (θ
+1 <0.9) but minor AST differences
+(θ2 ≥0.8) were classiﬁed as refactoring commits. Out of these
+comparisons, 89 commits (32.2%) were identiﬁed as refactoring
+commits, indicating that refactoring commits are a signiﬁcant
+factor in backtracing vic. Furthermore, our analysis reveals that
+cases without any intermediate commit between the vic and
+the vfc are comparatively uncommon, constituting only 11% of
+instances in our dataset.
+3) Threshold Sensitivity: We used ϑ
+1 and ϑ2 to represent the
+threshold for edit-distance similarity and AST-based similarity,
+respectively. ϑ
+3 represents the similarity_score used for the
+backtrack termination condition. To measure the sensitivity of
+the thresholds, we incrementally increased ϑ1, ϑ2 and ϑ3 by
+0.1 from 0 to 1, and evaluated the identiﬁcation F1-score of the
+CVEs in ground-trut h. Speciﬁcally, we ﬁrst initialized ϑ2 and
+ϑ3 to 0.8, as high similarity thresholds generally provide better
+precision in code clone detection. Then we varied ϑ1 from 0.1
+to 1.0 with a step of 0.1 and found the value ofϑ1 that achieved
+the highest F1-score (0.9). With ϑ1 ﬁxed at 0.9 and kept ϑ3 at
+0.8, we varied ϑ2 from 0.1 to 1.0 and found the optimal value
+(0.8). Finally, with ϑ1 = 0.9 and ϑ2 = 0.8, we varied ϑ3 from
+0.1 to 1.0 and determined the optimal value of ϑ3 (0.7). When
+the thresholds are greater than the optimal values, the precision
+is higher while the recall decreases. In contrast, the precision
+slightly decreases.
+RQ3: Refactoring commits occupy a signiﬁcant proportion
+of the code changes history. The AST-based similarity com-
+parison in Vercation performs better in the vulnerability-
+introducing commit identiﬁcation task for calculating code
+similarity, enhancing the overall effectiveness of Vercation
+in vulnerable versions detection.
+D. RQ4: Real-World Application
+We created a new vulnerability dataset consisting of 342
+CVEs from the NVD. By developing a simple crawler, we
+obtained the corresponding CPE and CVE patches. We applied
+VERCATION to the vulnerability dataset and found the vulnera-
+ble versions of 202 CVEs are incorrect. Among them, the CPE
+for 134 CVEs is incomplete, with 108 CVEs only reporting a
+single vulnerable version, signiﬁcantly increasing the risk of
+vulnerability propagation. Furt hermore, the CPE for 68 CVEs
+is affected by the overinclusion problem, with 56 CVEs con-
+sidered all versions before the OSS version mentioned in the
+vulnerability report as susceptible to attack, without conducting
+a detailed analysis. We hav e submitted reports to the NVD
+detailing the CVEs with incorrectaffected versions information
+we identiﬁed. The NVD team’s response said they plan to
+address these inaccuracies as part of their ongoing efforts to
+enhance the quality of their vulner ability information. More
+importantly, we have discovered 4 CVEs that do not provide
+information about the vulnerable version.
+To understand the practical impact of accurately identifying
+vulnerable versions, we analyzed the severity of 134 vulnerabil-
+ities with incomplete version in formation in the NVD dataset.
+The analysis shows that CVEs with CVSS Score of 4.0-6.9
+(Medium) and 7.0-8.9 (High) accounted for the most, at 49.7%
+and 49.1%. Notably, we identiﬁed 2 critical vulnerabilities
+(CVSS Score 9.0-10.0) in FFmpeg and php. These ﬁndings
+highlight that in many high-severity vulnerabilities, NVD does
+not report the correct vulnerable version. This inaccuracy has
+serious implications, as downstream software manufacturers
+may not recognize the need to update their vulnerable depen-
+dencies in time, exposing their systems to signiﬁcant security
+risks. Vercation’s high accuracy in identifying vulnerable ver-
+sions therefore helps organizations improve the accuracy of
+vulnerability reports.
+RQ4: Applying Vercation to real-world CVEs demonstrated
+practical impact in two key ﬁndings: it identiﬁed 202 CVEs
+(59.1%) with incomplete or overincluded versions in NVD
+reports. Notably, nearly half of the vulnerabilities with incor-
+rect versions were of high or critical severity, emphasizing
+the importance of accurate version identiﬁcation.
+VI. D ISCUSSION
+A. Performance and Cost Analysis
+In terms of performance efﬁciency, V ERCATION analyzes
+each vulnerability in an averageof 28.61 seconds. This includes
+the time for program slicing, LLM processing, and AST-level
+code clone detection. Compared to existing approaches: V-SZZ
+takes 10.25 seconds on average, V0Finder requires approxi-
+mately 22 seconds per CVE, Vision needs 1,094.12 seconds per
+vulnerability, and V1SCAN can detect vulnerabilities within 20
+seconds for 99% of projects. While VERJava performs faster at
+0.71 seconds per CVE, it achieves much lower recall in version
+identiﬁcation. Compared to other methods, Vercation achieves
+higher accuracy without signiﬁcant time overhead.
+The best LLM DeepSeek-V3 in our evaluation, whose API
+pricing is $0.30 per million t okens for input and $1.10 per
+million tokens for output. Basedon our experimental setup with
+10 independent runs for self-consistency, the average LLM API
+cost per CVE is only $0.0034. This cost includes: input tokens
+for CVE descriptions, dangerous ﬂows, and few-shot examples,
+output tokens for logic explanation, and vulnerable statements.
+The low cost allows the LLM’s application in practical security.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 016 =====
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 391
+B. Comparison With Dynamic Analysis
+While dynamic analysis through PoC testing provides deﬁni-
+tive evidence of vulnerability existence, several limitations ren-
+der it insufﬁcient for comprehensive and efﬁcient identiﬁcation
+of vulnerable versions at scale. Our analysis of CVEs published
+in the NVD from 1999 to 2025 reveals that only 24% of CVEs
+provide publicly available exploit links, and these exploit re-
+ports do not guarantee successful reproduction across different
+software versions.
+The portability of PoCs across different software ver-
+sions presents anot her critical challenge for dynamic analy-
+sis approaches. Previous studies have demonstrated that PoC
+reproducibility across different environments and versions is a
+signiﬁcant technical hurdle [4], [7]. During the construction of
+our ground-truth dataset, we encountered these challenges ﬁrst-
+hand when attempting to vali date vulnerabilities through PoC
+execution. Of the available PoCs in our dataset, only 55% could
+be successfully executed across multiple versions without mod-
+iﬁcation. The remaining cases failed to trigger the vulnerability
+due to environmental dependencies, compilation differences, or
+version-speciﬁc behavioral changes, which required substantial
+manual code-level analysis for veriﬁcation.
+The temporal cost of dynamic analysis further limits its prac-
+tical applicability for large-scal e vulnerable version identiﬁca-
+tion. Our experience during dataset construction revealed that
+each CVE required an average of 3 hours for environment setup,
+dependency resolution, and PoC execution across different ver-
+sions, excluding the time needed for manual veriﬁcation when
+PoCs failed. For our complete dataset of 122 CVEs spanning
+1,111 versions, comprehensive dynamic testing would require
+approximately 30 days compared to 28.61 seconds per CVE for
+our static approach. This represents a 742x time difference in
+favor of static analysis, making dynamic approaches impractical
+for real-world deployment s cenarios where rapid vulnerability
+assessment is crucial.
+C. Threats to Validity
+1) Internal Validity: Static–analysis precision. V
+ERCATION
+relies on the Joern parser to build code-property graphs that
+combine an AST, control-ﬂow graph, and data-dependency
+graph. Joern struggles with certain C/C ++ constructs, notably
+complex pointer arithmetic, overloaded constructors, and indi-
+rect calls, so some data ﬂows and constructor edges are missed.
+Our AST expansion step further inherits the classic limitations
+of method outlining: it cannot al ways disambiguate targets
+reachable via function pointers, callbacks, or C ++ virtual dis-
+patch, which static analysis alone cannot resolve deﬁnitively
+[67], [68]. These imprecisions may hide or mislocate refactor-
+ing patterns.
+Inter-procedural dependencies. In multi-function patches,
+V
+ERCATION currently analyses each affected function indepen-
+dently and then merges the results. Although effective for most
+cases, this strategy may overlook vulnerability patterns that
+hinge on data/control ﬂows spanning several functions.
+LLM variability and reproducibility. As LLMs continue to
+evolve rapidly, the performance of V ERCATION might change
+with newer versions of these models. This could affect the long-
+term consistency of our results . Additionally, LLMs may have
+biases or limitations in their training data that could inﬂuence
+their ability to understand certa in types of vulnerabilities or
+code structures. To m itigate this, we have provided detailed
+information about the LLM versions and prompts used in our
+study, but future research may need to account for potential
+variations in LLM capabilities andperformance as these models
+continue to develop.
+2) External Validity: Language generalisability.
+V
+ERCATION’s core methodology is language-agnostic and
+can be adapted to other programming languages. The program
+slicing tool Joern inheren tly supports mu ltiple l anguages,
+including Java, Python, JavaScript, and PHP. The main
+adaptations required would be updating the sensitive function
+table for language-speciﬁc vulnerability patterns and modifying
+AST generation rules according to the target language’s
+syntax and semantics. Future work could involve extending
+V
+ERCATION to support a broader range of programming
+languages and verifying its effectiveness across different
+language paradigms.
+Repository branching complexity. While our approach han-
+dles common merge [69] and branching patterns effectively,
+complex branching scenarios, such as when the same vulner-
+able code is independently modiﬁed in multiple parallel fea-
+ture branches before being merged (creating diamond-shaped
+merge patterns), may require more sophisticated graph traversal
+algorithms to accuratel y determine the earliest vulnerability

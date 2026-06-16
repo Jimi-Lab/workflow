@@ -1,0 +1,45 @@
+\section{Background and Problem Statement}
+\label{sec:background}
+
+\subsection{Task Definition}
+
+Let $P$ be a target open-source project, $V=\{v_1,\ldots,v_n\}$ be the set of released versions or tags, and $c$ be a CVE with one or more fixing commits. The goal is to recover:
+\[
+V_{\mathit{aff}}(c, P) = \{v \in V \mid \text{the vulnerable logic of } c \text{ is present in } v\}.
+\]
+The input setting follows the baseline paper~\cite{howfar2025}: a reported vulnerability, a project, released versions, and patch evidence such as fixing commits. The output is a set of affected released versions, not a vulnerability-inducing commit and not merely a vulnerable function.
+
+This distinction matters because version-level vulnerability exposure is not always a simple interval over the commit history. A project may maintain multiple release lines, backport a fix to selected branches, apply semantically equivalent but syntactically different patches, or remove and reintroduce relevant code through refactoring. Therefore, a method that finds a plausible inducing commit can still misidentify the affected releases.
+
+\subsection{Tracing-Based and Matching-Based Baselines}
+
+The baseline corpus divides direct affected-version identification methods into tracing-based and matching-based families~\cite{howfar2025}. Tracing-based methods include VCCFinder~\cite{vccfinder2015}, V-SZZ~\cite{vszz2022}, Lifetime~\cite{lifetime2021}, SEM-SZZ~\cite{semszz2024}, TC-SZZ~\cite{tcszz2024}, and LLM4SZZ~\cite{llm4szz2025}. Their common structure is to trace from a fixing patch toward candidate inducing commits and then infer affected versions from history.
+
+Matching-based methods include ReDeBug~\cite{redebug2012}, VUDDY~\cite{vuddy2017}, MOVERY~\cite{movery2022}, V1SCAN~\cite{v1scan2023}, FIRE~\cite{fire2024}, and VULTURE~\cite{vulture2025}. These methods construct vulnerability-related signatures or representations and search for them in target code versions. They reduce dependence on a single inducing commit, but they can be brittle under refactoring, syntax-preserving edits, alternative fixes, or cases where the patch does not delete the vulnerable logic.
+
+\subsection{Adjacent Evidence Sources}
+
+Several adjacent lines of work provide useful evidence but do not fully solve the target task. Commit-localization methods, including classic VCC prediction, semantic SZZ variants, LLM4SZZ, AgentSZZ, and temporal-graph SZZ, improve the ability to find bug- or vulnerability-inducing commits~\cite{vccfinder2015,semszz2024,llm4szz2025,agentszz2026,beyondblame2026,howwhyagents2026}. They are useful upstream signals, but they do not directly decide whether each released tag is affected. Recurring-vulnerability and vulnerable-clone detectors, including ReDeBug, VUDDY, MOVERY, V1SCAN, FIRE, and VULTURE, provide scalable code-presence evidence~\cite{redebug2012,vuddy2017,movery2022,v1scan2023,fire2024,vulture2025}. Their outputs are also evidence rather than final affected-version labels. Developer-log and vulnerable-version systems such as V-SZZ, TDSC, and Vercation are closest to our target~\cite{vszz2022,tdsc2024,vercation2026}, but their designs still motivate explicit treatment of branch history, patch semantics, LLM cost, and manual verification boundaries.
+
+\subsection{Failure Modes}
+
+The local reference analysis of ``How Far Are We?'' identifies several failure modes that directly shape \toolname:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Noisy patches.} A CVE may have multiple fixing commits, and a fixing commit may include wrapper changes, backports, tests, documentation, changelog edits, refactoring, or contextual changes unrelated to the root cause.
+  \item \textbf{Semantic mismatch.} The lines changed by the fix are not always the lines that best characterize the vulnerable condition. The root cause may span functions, files, data flow, or control-flow context.
+  \item \textbf{Shallow presence verification.} A deleted line or a patch signature is not by itself a proof that a historical tag is vulnerable. The method must verify whether the vulnerable condition still holds in that tag.
+  \item \textbf{Patch-type sensitivity.} Add-only patches, multi-file patches, and multi-branch fixes break assumptions used by both tracing and matching methods.
+\end{itemize}
+
+\subsection{Design Requirements}
+
+These failure modes and adjacent evidence sources imply five requirements for \toolname:
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Patch-family awareness.} The system must represent one CVE as a family of fixing commits rather than a single patch.
+  \item \textbf{Root-cause evidence extraction.} The system must distinguish vulnerability evidence from ordinary touched code.
+  \item \textbf{Repository-aware version planning.} The system must reason over release tags and branch/release-line structure without assuming a single global version order.
+  \item \textbf{Auditable tag verdicts.} The final affected/not-affected decision for selected tags must be tied to explicit repository evidence.
+  \item \textbf{Resource-aware agent use.} If an LLM/agent is used, the paper must report cost, tokens, time, tool calls, and failures rather than only accuracy.
+\end{enumerate}
+
+These requirements lead to the staged design in Section~\ref{sec:approach}.

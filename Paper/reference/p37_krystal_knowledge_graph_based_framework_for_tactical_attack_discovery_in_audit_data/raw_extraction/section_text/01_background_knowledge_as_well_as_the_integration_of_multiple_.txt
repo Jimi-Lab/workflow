@@ -1,0 +1,55 @@
+background knowledge, as well as the integration of multiple detection techniques, including tag prop- 
+agation, attack signatures, and graph queries. We implemented our framework in an openly available 
+prototype and demonstrate its applicability on multiple scenarios of the DARPA Transparent Computing 
+dataset. Our evaluation shows that the combination of different threat detection techniques within our 
+framework improved detection capabilities. Furthermore, we ﬁnd that RDF provenance graphs are scal- 
+able and can eﬃciently support a variety of threat detection techniques. 
+©2 0 2 2 The Author(s). Published by Elsevier Ltd. 
+This is an open access article under the CC BY license ( http://creativecommons.org/licenses/by/4.0/ ) 
+1. Introduction 
+In the face of complex cyber attacks, it is crucial to not only de- 
+tect attacks as early as possible, but also to understand their con- 
+text and implications in order to choose an appropriate response 
+strategy. To protect themselves, organizations typically rely on de- 
+fenses such as Intrusion Detection System. These systems are use- 
+ful in that they can point to indicators of compromise and issues, 
+but they also typically generate a large number of false positive 
+alerts. To identify relevant alerts, it is necessary to investigate their 
+context, which typically requires substantial manual effort and ex- 
+pertise ( Hossain et al., 2017; Milajerdi et al., 2019b ). As the sheer 
+∗ Corresponding author at: Vienna University of Economics and Business, 
+Welthandelsplatz 1, Vienna, Austria. 
+E-mail address: kabul.kurniawan@wu.ac.at (K. Kurniawan) . 
+volume of low-level log data grows, manual analyses become in- 
+creasingly infeasible. 
+In this context, system-level provenance graphs, which rely on 
+audit data represented in graph structures, have recently attracted 
+considerable attention in the security research community as a 
+promising tool with strong abstract expression ability and rela- 
+tively high eﬃciency ( Li et al., 2021 ). Such provenance graphs rep- 
+resent relationships between the control ﬂow and data ﬂow be- 
+tween subjects (e.g., processes, threads) and objects (e.g., ﬁles, 
+network sockets) in the system through a timestamped directed 
+graph. Based on that, a large variety of techniques have been de- 
+veloped to automatically detect and connect attack steps in such 
+graphs. 1 
+Motivating Example Figure 1 depicts the provenance graph of 
+an exﬁltration attack carried out in the context of the DARPA 
+1 cf. Li et al. (2021) for a recent survey. 
+https://doi.org/10.1016/j.cose.2022.102828 
+0167-4048/© 2022 The Author(s). Published by Elsevier Ltd. This is an open access article under the CC BY license ( http://creativecommons.org/licenses/by/4.0/ ) 
+
+===== Page 002 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 1 
+Comparison of attack discovery approaches . ( DS ) refers to domain-speciﬁc, ( N/A ) refers to not available, ( ✓ ) refers to provided, ( ✗ ) refers to not provided. 
+Approaches Data Models 
+Detection 
+Techniques 
+Data Reduction 
+Techniques 
+Attack 
+Reconstruction 
+High-Level 
+Attack 
+Summarization

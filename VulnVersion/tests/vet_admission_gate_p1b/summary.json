@@ -1,0 +1,94 @@
+{
+  "schema_version": "vet_admission_gate_summary.v1",
+  "review_dir": "E:\\AI\\Agent\\workflow\\VulnVersion\\tests\\vet_taxonomy_case_review\\expanded_27",
+  "dataset": "E:\\AI\\Agent\\workflow\\VulnVersion\\DataSet\\BaseDataOrder.json",
+  "cases": 27,
+  "tag_evaluation_policy": {
+    "affected_tags": "all mapped GT affected tags",
+    "unaffected_tags": "deterministic sample, max 30 per case",
+    "wrong_cleared_affected_tags": "exact for mapped GT affected tags",
+    "true_cleared_unaffected_tags": "sample-based estimate, not full release-tag coverage"
+  },
+  "strategies": {
+    "raw_agent_flags_any": {
+      "cleared_tags": 891,
+      "true_cleared_unaffected_tags": 521,
+      "wrong_cleared_affected_tags": 370,
+      "not_affected_clear_precision": 0.584736,
+      "cases_with_any_clear": 22,
+      "cases_with_wrong_clear": 10
+    },
+    "raw_fixed_token": {
+      "cleared_tags": 593,
+      "true_cleared_unaffected_tags": 237,
+      "wrong_cleared_affected_tags": 356,
+      "not_affected_clear_precision": 0.399663,
+      "cases_with_any_clear": 19,
+      "cases_with_wrong_clear": 10
+    },
+    "raw_absent_scope_or_vuln": {
+      "cleared_tags": 349,
+      "true_cleared_unaffected_tags": 335,
+      "wrong_cleared_affected_tags": 14,
+      "not_affected_clear_precision": 0.959885,
+      "cases_with_any_clear": 16,
+      "cases_with_wrong_clear": 2
+    },
+    "strict_fixed_token": {
+      "cleared_tags": 106,
+      "true_cleared_unaffected_tags": 74,
+      "wrong_cleared_affected_tags": 32,
+      "not_affected_clear_precision": 0.698113,
+      "cases_with_any_clear": 6,
+      "cases_with_wrong_clear": 3
+    },
+    "strict_fixed_token_and_vuln_absent": {
+      "cleared_tags": 0,
+      "true_cleared_unaffected_tags": 0,
+      "wrong_cleared_affected_tags": 0,
+      "not_affected_clear_precision": 0.0,
+      "cases_with_any_clear": 0,
+      "cases_with_wrong_clear": 0
+    },
+    "strict_absent_scope_only": {
+      "cleared_tags": 46,
+      "true_cleared_unaffected_tags": 46,
+      "wrong_cleared_affected_tags": 0,
+      "not_affected_clear_precision": 1.0,
+      "cases_with_any_clear": 3,
+      "cases_with_wrong_clear": 0
+    },
+    "strict_gate_any": {
+      "cleared_tags": 152,
+      "true_cleared_unaffected_tags": 120,
+      "wrong_cleared_affected_tags": 32,
+      "not_affected_clear_precision": 0.789474,
+      "cases_with_any_clear": 7,
+      "cases_with_wrong_clear": 3
+    },
+    "ultra_strict_gate_any": {
+      "cleared_tags": 46,
+      "true_cleared_unaffected_tags": 46,
+      "wrong_cleared_affected_tags": 0,
+      "not_affected_clear_precision": 1.0,
+      "cases_with_any_clear": 3,
+      "cases_with_wrong_clear": 0
+    }
+  },
+  "blocker_counts": {
+    "absent:line_risk_signals_missing": 2,
+    "fixed:uncertainty_present": 12,
+    "fixed:quality_uncertainty": 12,
+    "absent:agent_did_not_allow_cert_absent": 9,
+    "absent:uncertainty_present": 12,
+    "absent:quality_uncertainty": 12,
+    "fixed:negative_evidence_missing": 12,
+    "absent:negative_evidence_missing": 12,
+    "fixed:agent_did_not_allow_cert_fixed": 2
+  },
+  "conclusion": {
+    "raw_agent_certificates_safe_for_hard_decision": false,
+    "strict_gate_safe_on_p1b": false,
+    "strict_gate_has_coverage": true
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "cwe_id": "CWE-328",
+  "name": "Use of Weak Hash",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product uses an algorithm that produces a digest (output value) that does not meet security expectations for a hash function that allows an adversary to reasonably determine the original input (preimage attack), find another input that can produce the same hash (2nd preimage attack), or find multiple inputs that evaluate to the same hash (birthday attack).",
+  "extended_description": "A hash function is defined as an algorithm that maps arbitrarily sized data into a fixed-sized digest (output) such that the following properties hold: The algorithm is not invertible (also called \"one-way\" or \"not reversible\") The algorithm is deterministic; the same input produces the same digest every time Building on this definition, a cryptographic hash function must also ensure that a malicious actor cannot leverage the hash function to have a reasonable chance of success at determining any of the following: the original input (preimage attack), given only the digest another input that can produce the same digest (2nd preimage attack), given the original input a set of two or more inputs that evaluate to the same digest (birthday attack), given the actor can arbitrarily choose the inputs to be hashed and can do so a reasonable amount of times What is regarded as \"reasonable\" varies by context and threat model, but in general, \"reasonable\" could cover any attack that is more efficient than brute force (i.e., on average, attempting half of all possible combinations). Note that some attacks might be more efficient than brute force but are still not regarded as achievable in the real world. Any algorithm that does not meet the above conditions will generally be considered weak for general use in hashing. In addition to algorithmic weaknesses, a hash function can be made weak by using the hash in a security context that breaks its security guarantees. For example, using a hash function without a salt for storing passwords (that are sufficiently short) could enable an adversary to create a \"rainbow table\" [REF-637] to recover the password under certain conditions; this attack works against such hash functions as MD5, SHA-1, and SHA-2.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-326",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Inadequate Encryption Strength"
+      },
+      {
+        "cwe_id": "CWE-327",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Use of a Broken or Risky Cryptographic Algorithm"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "ICS/OT"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses an algorithm that produces a digest (output value) that does not meet security expectations for a hash function that allows an adversary to reasonably determine the original input (preimage attack),...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "hash",
+      "attack",
+      "digest",
+      "same"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "hash",
+      "attack",
+      "digest",
+      "same",
+      "algorithm",
+      "reasonable",
+      "preimage",
+      "original"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In both of these examples, a user is logged in if their given password matches a stored password:",
+        "snippet": "unsigned char *check_passwd(char *plaintext) { ctext = simple_digest(\"sha1\",plaintext,strlen(plaintext), ... ); //Login if hash matches stored hash if (equal(ctext, secret_password())) { login_user(); } }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In both of these examples, a user is logged in if their given password matches a stored password:",
+        "snippet": "String plainText = new String(plainTextIn); MessageDigest encer = MessageDigest.getInstance(\"SHA\"); encer.update(plainTextIn); byte[] digest = password.digest(); //Login if hash matches stored hash if..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The example code below is taken from the JTAG access control mechanism of the Hack@DAC'21 buggy OpenPiton SoC [REF-1360]. Access to JTAG allows users to access...",
+        "snippet": "... logic [31:0] data_d, data_q logic [512-1:0] pass_data; ... Write: begin ... if (pass_mode) begin pass_data = { {60{8'h00}}, data_d}; state_d = PassChk; pass_mode = 1'b0; ... end ..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The example code below is taken from the JTAG access control mechanism of the Hack@DAC'21 buggy OpenPiton SoC [REF-1360]. Access to JTAG allows users to access...",
+        "snippet": "... logic [512-1:0] data_d, data_q logic [512-1:0] pass_data; ... Write: begin ... if (pass_mode) begin pass_data = data_d; state_d = PassChk; pass_mode = 1'b0; ... end ..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-30320",
+        "description": "Programmable Logic Controller (PLC) uses a protocol with a cryptographically insecure hashing algorithm for passwords.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30320"
+      },
+      {
+        "reference": "CVE-2005-4900",
+        "description": "SHA-1 algorithm is not collision-resistant.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-4900"
+      },
+      {
+        "reference": "CVE-2020-25685",
+        "description": "DNS product uses a weak hash (CRC32 or SHA-1) of the query name, allowing attacker to forge responses by computing domain names with the same hash.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-25685"
+      },
+      {
+        "reference": "CVE-2012-6707",
+        "description": "blogging product uses MD5-based algorithm for passwords.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2012-6707"
+      },
+      {
+        "reference": "CVE-2019-14855",
+        "description": "forging of certificate signatures using SHA-1 collisions.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-14855"
+      },
+      {
+        "reference": "CVE-2017-15999",
+        "description": "mobile app for backup sends SHA-1 hash of password in cleartext.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2017-15999"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,432 @@
+===== PAGE 008 =====
+2226
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+IV. STUDY DESIGN
+The purpose of this study is to empirically evaluate the var-
+ious implementations of the SZZ algorithm on the currently
+largest dataset for SZZ evaluation and to investigate patterns
+that cannot be identiﬁed by SZZ (i.e., how to improve the recall
+of the SZZ algorithms), particularly Ghost Commits. To achieve
+these goals, we formulate three research questions:
+RQ1: How well do the different variants of SZZ perform
+in identifying bug-inducing changes?
+In our ﬁrst research question, we aim to examine the per-
+formance of different SZZ variants on our dataset relative to
+a previous study by Rosa et al. [28]. Our study involves a
+dataset with more bug-ﬁxing commits than in previous studies.
+Evaluating SZZ is crucial to ascertain if the prior studies’claims
+remain valid in an updated and more comprehensive dataset
+from a complete software project.
+RQ2: What is the impact of Ghost Commits on the
+behavior of SZZ in a real software project?
+In our second research question, we aim to explore the effects
+of ghost commits on the use of SZZ variants in a real software
+project, We divide RQ2 into two speciﬁc questions: (1) How
+frequently do ghost commits (Remove Mapping Ghost as bug-
+ﬁxing commits, Add Mapping Ghost as bug-inducing commits)
+occur? (2) How do ghost commits impact the SZZ algorithms?
+RQ3: What other situations, besides Ghost Commits,
+are undetectable by SZZ algorithms? In our ﬁnal research
+question, we aim to identify additional situations where the SZZ
+algorithms fail, apart from the Ghost Commit situation. Given
+that SZZ algorithms are founded on the assumption that “a bug-
+inducing change adds lines that are later removed by a ﬁx,”
+we address two speciﬁc questions within RQ3: (1) Do all fail-
+ure cases, besides Ghost Commits, adhere to this assumption?
+(2) Beyond the previously studied situation, what other situa-
+tions prevent SZZ from successfully identifying bug-inducing
+commits?
+A. Algorithm Selection & Data Collection
+We conduct experiments on several variants of the SZZ al-
+gorithm. Speciﬁcally, we adapt the main variants from the prior
+study by Rosa et al. [28] to run on our dataset. Of these, we do
+not use SZZ Unleashed since our commits are not associated
+with an issue tracker; thus there is no issue date. We do not
+use OpenSZZ since it needs a Jira URL as input. RA-SZZ∗
+only works on Java as Refactoring Miner [30] can only detect
+refactoring operations in Java ﬁles. Therefore we do not use
+RA-SZZ∗because the Linux kernel is a C-based project. In
+summary, we use B-SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ,
+and PyDriller (SZZ@PYD). We used the KFC dataset, featur-
+ing the complete set of 76,046 Fixes: annotated bug-ﬁxes.
+B. Data Analysis
+Given the set of bug-inducing commits predicted by the
+tested SZZ algorithms and the collected dataset, we evaluate
+the accuracy of the tested SZZ algorithms using recall and
+precision, two well-known Information Retrieval metrics [51].
+We also use F1 score [52], which calculates the harmonic
+mean of recall and precision. These metrics have been used
+in previous studies to evaluate SZZ performance [28], [46].
+The metrics for a bug-ﬁxing commits are deﬁned as follows,
+where correctci is the ground truth of bug-ﬁxing commit ci,
+i.e., the bug-inducing commits annotated by the original Linux
+kernel developer, identiﬁedci is the bug-inducing commits of
+bug-ﬁxing commit ci identiﬁed by the SZZ algorithms, and N
+is the total number of bug-ﬁxing commits:
+recall = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|correctci|
+precision = 1
+N
+N
+
+ci=1
+|correctci ∩identiﬁedci|
+|identiﬁedci|
+cF1 = 2 · recall × precision
+recall + precision
+We also analyze the complementarity of the SZZ variants
+following previous work [28]. Given the set of evaluated SZZ
+variants SZZ eval = {v1, v2, . . . , vn}, we compute their comple-
+mentarity using the following metrics for each vi [53]:
+correctvi∩vj = |correctvi ∩correctvj|
+|correctvi ∪correctvj|
+correctvi\(SZZ exp\vi) = |correctvi \ correct(SZZ exp\vi)|
+|correctvi ∪correct(SZZ exp\vi)|
+correctvi denotes the set of correct bug-inducing commits
+predicted by the SZZ algorithm vi. correct(SZZexp\vi) de-
+notes the correct bug-inducing commits predicted by all eval-
+uated SZZ algorithms except for vi. correctvi∩vj represents
+the overlap between the correct bug-inducing commits identi-
+ﬁed by the SZZ algorithm vi and another SZZ algorithm vj.
+correctvi\(SZZexp\vi), denotes the correct bug-inducing com-
+mits that are only identiﬁed by the SZZ algorithm vi.
+To analyze the frequency of each Remove Mapping Ghost
+and Add Mapping Ghost, we use the same computation as Rezk
+et al. [17]. Remove Mapping Ghost: the percentage of bug-
+ﬁxing commits that do not remove lines and only add lines out
+of all bug-ﬁxing commits. Add Mapping Ghost: the percentage
+of commits that do not add lines and only remove lines out of all
+commits. With respect to Add Mapping Ghost, we also report
+the percentage of bug-inducing commits that do not add lines
+and only remove lines out of the set of bug-inducing commits, as
+these are the only commits that only remove lines that actually
+have an impact on the SZZ results.
+V. TC-SZZ
+The fundamental premise of the SZZ algorithm is that “a bug-
+inducing change adds lines that are later removed by a ﬁx.” In
+other words, for a bug-ﬁxing commit, the SZZ algorithms use
+the git show command to identify deleted or modiﬁed lines, and
+the git blame command to identify the most recent change to
+each such line. However, we discovered that some bug-inducing
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 009 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2227
+commits are not the most recent changes before the bug ﬁx, but
+rather appeared earlier in a deleted or modiﬁed line’s change
+history.
+For example, Fig. 1 shows a line’s change history (i.e., it-
+eratively using git blame until the initial commit) of the bug-
+ﬁxing commit 68ad6d.11 Following Bao et al. [48], we call the
+immediately preceding the lines changed in the ﬁxing commit
+the previous commits (i.e., commit 53c13b in Fig. 1) and all
+commits (except the initial one) that previously modiﬁed these
+lines as the descendant commits (i.e., commit 8c49d9, 40747f,
+61a492 in Fig. 1). We refer to the commit at which tracing
+can no longer continue as the initial commit (i.e., commit
+454ede in Fig. 1). B-SZZ identiﬁed the previous commit as the
+bug-inducing commit, relying on using git blame once. Other
+algorithms, such as AG-SZZ and MA-SZZ, which improve on
+B-SZZ, access the rest of the descendant commits, identifying
+bug-inducing commits from other commits by considering cri-
+teria such as whether the commit is a meta-change. However, no
+existing algorithm comprehensively examines the line change
+history to identify the bug-inducing commit.
+Therefore, we propose the Tracing-Commit-SZZ (TC-SZZ)
+algorithm, which assumes a distinct function as compared to
+previous SZZ algorithms. Unlike the six SZZ algorithms dis-
+cussed in this paper, which normally identify only the pre-
+vious commit as the bug-inducing commit, and V-SZZ [48],
+which considers the initial commit based on the observation
+that vulnerabilities are often foundational, TC-SZZ is designed
+to more effectively locate and understand the position of the
+bug-inducing commit in the change history of lines. TC-SZZ
+applies git blame iteratively to all deleted or modiﬁed lines
+in the bug-ﬁxing commit until it reaches the initial commit,
+and returns all commits (i.e., the descendant commits and the
+initial commit in Fig. 1) in the change history of these lines.
+If git blame leads to a commit that has multiple removed
+lines, TC-SZZ chooses one among them to continue the iter-
+ation. Choosing all lines could lead to too much fanout, giving
+many false positives. For this, we have developed an algo-
+rithm based on V-SZZ [48]. Our algorithm takes into account
+both the string similarity and the relative distance between
+the line reported by git blame and the deleted lines in the
+same commit.
+An alternative to the iterative use of git blame would be to
+use git log -L, which tracks changes to speciﬁc lines through
+the history. TC-SZZ, however, adds an additional dimension
+by considering string similarity, which can account for moved
+lines, thus identifying more bug-inducing commits than git log
+-L. Take for example commit 5b47348.12 If we apply the git
+log -L command on the lines deleted by this bug-ﬁxing commit,
+we only trace back to commit ed928a3.13 In this commit, the
+developer relocated a few functionsto a different part of the ﬁle.
+11https://github.com/torvalds/linux/commit/d8ad6d39c35d2b44b3d48b787df
+7f3359381dcbf
+12https://github.com/torvalds/linux/commit/5b47348fc0b18a78c96f8474cc90
+b7525ad1bbfe
+13https://github.com/torvalds/linux/commit/ed928a3402d8a24a70c242c6310
+9c069a7b1f3ab
+TABLE II
+RECALL, PRECISION, AND F1 RESULTS OF ALL SZZ ALGORITHMS
+Algorithm
+datasetlinux
+datasetrosa
+Precision
+Recall
+F1
+Precision
+Recall
+F1
+B-SZZ
+0.42
+0.58
+0.49
+0.39
+0.69
+0.50
+AG-SZZ
+0.42
+0.56
+0.48
+0.45
+0.60
+0.52
+L-SZZ
+0.57
+0.43
+0.49
+0.52
+0.45
+0.48
+R-SZZ
+0.59
+0.45
+0.51
+0.66
+0.57
+0.61
+MA-SZZ
+0.40
+0.55
+0.46
+0.36
+0.64
+0.46
+SZZ@PYD
+0.43
+0.55
+0.48
+0.39
+0.67
+0.49
+The git log -L command interprets this as the initial commit
+for these lines. However, TC-SZZ goes beyond this by ﬁnding
+lines with similar content and executing git blame once more,
+enabling us to identify the bug-inducing commits.
+To facilitate future research on understanding the placement
+of bug-inducing commits in the change history, TC-SZZ offers
+multiple modes: (1) Chronological Trace Mode: For every
+deleted or modiﬁed line in a bug-ﬁxing commit, TC-SZZ re-
+turns all potential bug-inducing commits in the order of git
+blame. For instance, Fig. 1 illustrates the change history of
+a bug-ﬁxing commit for a speciﬁc deleted or modiﬁed line,
+with TC-SZZ providing the sequence: previous commit, de-
+scendants commit 61a492, 40747f, 8c49d9, and initial commit.
+(2) Unique Commits Mode: For the sake of conciseness, based
+on the results from Chronological Trace Mode, only unique
+potential bug-inducing commits are returned, eliminating du-
+plicates. (3) Custom Blame Invocation Mode: The user has
+the ability to specify the number of times git blame is invoked
+(a parameter of 1 is standard for SZZ, a parameter of 2 means
+using git blame twice for each modiﬁed line, and a parameter
+of -1 identiﬁes the initial commit). Our implementation of TC-
+SZZ is publicly available in the replication package.
+VI. RESULTS
+In this section, we answer the three Research Questions pro-
+posed in Section IV.
+A. RQ1: SZZ Performance
+Table II presents the results for the six SZZ algorithms,
+ordered chronologically, on our newly collected KFC dataset,
+compared against the results reported by Rosa et al. [28] for
+their dataset (datasetrosa).
+The results demonstrate that R-SZZ is the best algorithm
+(with the highest F1) on both datasets, given that F1 combines
+precision and recall. There are several factors that cause R-SZZ
+to outperform the other SZZ variants on our dataset. First and
+foremost, R-SZZ only returns the most recent commit among
+all candidates. At the same time, 96.1% (73,109) of the Linux
+bug-ﬁxing commits have only one bug-inducing commit. Thus,
+R-SZZ, by returning only one bug-inducing commit, achieves
+higher precision than SZZ algorithms that return multiple bug-
+inducing commits.
+Four of the six algorithms demonstrate better precision on the
+KFC dataset than on the baseline (i.e., Rosa’s result), with an
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 010 =====
+2228
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE III
+AVERAGE NUMBER OF BUG-INDUCING
+COMMITS IDENTIFIED BY VARIOUS SZZ
+ALGORITHMS PER BUG-FIXING COMMIT
+Algorithm
+datasetlinux
+datasetrosa
+B-SZZ
+1.76
+1.96
+AG-SZZ
+1.73
+1.73
+L-SZZ
+1
+1
+R-SZZ
+1
+1
+MA-SZZ
+1.81
+2.01
+SZZ@PYD
+1.73
+1.95
+average improvement of 9.67% for these four algorithms. Only
+AG-SZZ and R-SZZ have lower precision on the KFC dataset
+than on the baseline. R-SZZ and L-SZZ hold a signiﬁcant
+advantage in precision compared to other SZZ variants on the
+KFC dataset. AG-SZZ, the third-best performer, performs in
+line with B-SZZ on the Linux dataset (42%). SZZ@PYD ranks
+as the fourth best algorithm in Rosa’s dataset, but it is the third
+best algorithm in our dataset. Concurrently, MA-SZZ consis-
+tently underperforms.
+Table III presents the average number of bug-inducing com-
+mits identiﬁed by the different SZZ algorithms for each bug-
+ﬁxing commit across the two datasets, excluding the Ghost
+Commits. For instance, for each bug-ﬁxing commit on Rosa’s
+dataset [28], B-SZZ identiﬁes an average of 1.96 bug-inducing
+commits, whereas, on the KFC dataset, B-SZZ only identiﬁes
+an average of 1.76 bug-inducing commits. Thus, the precision
+of B-SZZ of 0.39 on Rosa’s dataset increases to 0.42 on the
+Linux kernel dataset, an increase of 7.7%. The results in Tables
+II and III clearly show that as the number of identiﬁed commits
+decreases, precision increases.
+Recall: As shown in Table II, all SZZ algorithms exhibit
+varying degrees of decline in recall as compared to the results
+on Rosa’s Dataset, with an average decrease of 13.34%
+across the six algorithms. This highlights the challenge of
+achieving good recall with the SZZ algorithm, an issue that
+seems more signiﬁcant on the Linux kernel dataset than in
+the previous empirical study [28]. Among all SZZ algorithms,
+B-SZZ consistently delivers the best performance on both
+datasets. In contrast, L-SZZ and R-SZZ are the least effective
+algorithms, as they identify only one potential bug-inducing
+commit each. MA-SZZ consistently ranks as the third-best
+algorithm. Notably, MA-SZZ, AG-SZZ, and SZZ@PYD
+demonstrate remarkably similar performance on the Linux
+dataset, with a mere 0.1% difference between them. One source
+of missed bug-inducing commits is ghost commits. In Section
+VI-B, we will examine the inﬂuence of ghost commits on the
+recall achieved by the SZZ algorithms. Then, in Section VI-C,
+we will investigate the other situations SZZ fails to identify
+bug-inducing commits.
+Our ﬁndings conﬁrm that the top-performing algorithms
+for precision and recall remain R-SZZ (∼59%) and B-SZZ
+(∼58%), respectively, which validates the previous research by
+Rosa et al. However, when applied to a complete repository
+such as the Linux kernel, the precision of R-SZZ and recall
+TABLE IV
+BUG-INDUCING COMMITS CORRECTLY IDENTIFIED EXCLUSIVELY BY
+EACH SZZ ALGORITHM
+Algorithm
+datasetlinux
+percentage
+datasetrosa
+percentage
+B-SZZ
+1024/47352
+2.163%
+21/784
+2.679%
+AG-SZZ
+2/47352
+0.004%
+0/784
+0%
+L-SZZ
+0/47352
+0%
+0/784
+0%
+R-SZZ
+0/47352
+0%
+0/784
+0%
+MA-SZZ
+160/47352
+0.338%
+1/784
+0.128%
+SZZ@PYD
+66/47352
+0.139%
+0/784
+0%
+of B-SZZ, two leading SZZ algorithms, decline by 10.6% and
+15.9%, respectively. While R-SZZ can still be useful for cases
+where precision is crucial and B-SZZ when recall is crucial, it
+is important to note that both algorithms still have limitations
+in accurately and comprehensively identifying bug-inducing
+commits in software repositories.
+Table IV presents the correctvi\(SZZexp\vi) metric calculated
+for each SZZ variant vi. This metric represents the correct bug-
+inducing commits identiﬁed exclusively by vi and not by the
+other SZZ algorithms. For instance, consider the KFC dataset,
+where all SZZ algorithms combined correctly identify a total of
+47,352 bug-inducing commits. Of these, B-SZZ uniquely and
+correctly identiﬁes 1,024 bug-inducing commits not identiﬁed
+by other SZZ algorithms. Similarly, in the datasetrosa, the total
+number of correctly identiﬁed bug-inducing commits by all
+SZZ algorithms is 784, with B-SZZ alone correctly identifying
+21 bug-inducing commits that the other algorithms did not.
+In datasetlinux, four techniques (i.e., B-SZZ, AG-SZZ, MA-
+SZZ, SZZ@PYD) identify bug-inducing commits that remain
+undiscovered by other techniques, while in datasetrosa, only two
+techniques (B-SZZ, MA-SZZ) exhibit this ability. Given that
+B-SZZ does not ﬁlter any potential bug-inducing commits and
+shows the highest recall in the results displayed in Table II, it has
+the most uniquely identiﬁed bug-inducing commits across both
+datasets. Interestingly, despite having the third-lowest recall,
+MA-SZZ can uniquely identify 160 bug-inducing commits.
+The results depicted in Table IV illustrate the correct iden-
+tiﬁcation of bug-inducing commits by technique vi that were
+missed by all other techniques. Conversely, Fig. 4(a) and 4(b)
+depict the correctvi∩vj metric, which represents the degree of
+similarity between any two algorithms in their ability to accu-
+rately identify bug-inducing commits, calculated for each pair
+of SZZ variants on datasetlinux and datasetrosa respectively. The
+heatmaps exhibit symmetry, as correctvi∩vj = correctvj∩vi.
+Fig. 4 reveals a signiﬁcant overlap in the true positives
+identiﬁed in both datasets. In datasetrosa, 13 out of 15 com-
+parisons share more than 70% overlap in the identiﬁed true
+positives, while in datasetlinux, all 15 comparisons show this
+level of overlap. For instance, in Fig 4(a), the similarity between
+B-SZZ and AG-SZZ in the KFC dataset can be observed at the
+intersection of row 2 and column 1, or equivalently at row 1
+and column 2 due to symmetry, where it is 0.94. The comple-
+mentarity between the different SZZ variants is thus relatively
+low on both datasets, suggesting that there is a group of bug-
+ﬁxing commits for which all variants fail to identify the correct
+bug-inducing commit.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

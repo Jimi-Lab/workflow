@@ -1,0 +1,157 @@
+{
+  "source": "runs\\batches\\root-cause-v2-contract-pilot-3",
+  "out_dir": "runs\\batches\\root-cause-v2-structural-replay-3",
+  "agent_invocation_count": 0,
+  "legacy_adapter_count": 0,
+  "seed_result": [
+    {
+      "cve_id": "CVE-2020-24020",
+      "repo": "FFmpeg",
+      "commit_sha": "584f396132aa19d21bb1e38ad9a5d428869290cb",
+      "status": "ok",
+      "nodes": 35,
+      "edges": 35
+    },
+    {
+      "cve_id": "CVE-2022-3109",
+      "repo": "FFmpeg",
+      "commit_sha": "656cb0450aeb73b25d7d26980af342b37ac4c568",
+      "status": "ok",
+      "nodes": 5,
+      "edges": 4
+    },
+    {
+      "cve_id": "CVE-2023-47342",
+      "repo": "FFmpeg",
+      "commit_sha": "d254fe2d1da3b1cba3526c5d6417c9912e330988",
+      "status": "ok",
+      "nodes": 5,
+      "edges": 4
+    },
+    {
+      "cve_id": "CVE-2023-47342",
+      "repo": "FFmpeg",
+      "commit_sha": "e4d5ac8d7d2a08658b3db7dd821246fe6b35381f",
+      "status": "ok",
+      "nodes": 5,
+      "edges": 4
+    }
+  ],
+  "status_counts": {
+    "rejected": 3
+  },
+  "structural_error_count": 21,
+  "lint_ingestion_parity": true,
+  "results": [
+    {
+      "cve_id": "CVE-2020-24020",
+      "source_artifact": "runs\\batches\\root-cause-v2-contract-pilot-3\\CVE-2020-24020",
+      "status": "rejected",
+      "accepted_hypothesis_ids": [],
+      "rejected_hypothesis_ids": [
+        "hyp:CVE-2020-24020:integer-overflow-in-data-length"
+      ],
+      "structural_error_count": 9,
+      "taxonomy": {
+        "unknown_function_id": 1,
+        "function_symbol_mismatch": 1,
+        "predicate_without_anchor": 2,
+        "semantic_node_without_shared_observation": 1,
+        "observation_scope": 6,
+        "fix_set_incomplete": 1
+      },
+      "invented_ids": [
+        "changed-function:FFmpeg:584f396132aa19d21bb1e38ad9a5d428869290cb:libavfilter/dnn/dnn_backend_native.c:calculate_operand_dims_count"
+      ],
+      "lint_ok": false,
+      "lint_ingestion_parity": true,
+      "legacy_adapter_count": 0,
+      "fix_set_results": {
+        "CVE-2020-24020:fix-set:1": {
+          "expected_fix_commits": [
+            "fix-commit:FFmpeg:584f396132aa19d21bb1e38ad9a5d428869290cb"
+          ],
+          "covered_fix_commits": [],
+          "missing_fix_commits": [
+            "fix-commit:FFmpeg:584f396132aa19d21bb1e38ad9a5d428869290cb"
+          ],
+          "invalid_anchor_ids": [
+            "anchor:584f396132:dnn_backend_native.c:calculate_operand_data_length"
+          ],
+          "complete": false
+        }
+      }
+    },
+    {
+      "cve_id": "CVE-2022-3109",
+      "source_artifact": "runs\\batches\\root-cause-v2-contract-pilot-3\\CVE-2022-3109",
+      "status": "rejected",
+      "accepted_hypothesis_ids": [],
+      "rejected_hypothesis_ids": [
+        "hyp:CVE-2022-3109:1"
+      ],
+      "structural_error_count": 5,
+      "taxonomy": {
+        "unknown_function_id": 1,
+        "predicate_without_anchor": 2,
+        "fix_set_incomplete": 1
+      },
+      "invented_ids": [],
+      "lint_ok": false,
+      "lint_ingestion_parity": true,
+      "legacy_adapter_count": 0,
+      "fix_set_results": {
+        "CVE-2022-3109:fix-set:1": {
+          "expected_fix_commits": [
+            "fix-commit:FFmpeg:656cb0450aeb73b25d7d26980af342b37ac4c568"
+          ],
+          "covered_fix_commits": [],
+          "missing_fix_commits": [
+            "fix-commit:FFmpeg:656cb0450aeb73b25d7d26980af342b37ac4c568"
+          ],
+          "invalid_anchor_ids": [
+            "code-anchor:FFmpeg:656cb0450aeb73b25d7d26980af342b37ac4c568:libavcodec/vp3.c:1"
+          ],
+          "complete": false
+        }
+      }
+    },
+    {
+      "cve_id": "CVE-2023-47342",
+      "source_artifact": "runs\\batches\\root-cause-v2-contract-pilot-3\\CVE-2023-47342",
+      "status": "rejected",
+      "accepted_hypothesis_ids": [],
+      "rejected_hypothesis_ids": [
+        "root-cause-hypothesis:CVE-2023-47342:1"
+      ],
+      "structural_error_count": 7,
+      "taxonomy": {
+        "unknown_function_id": 2,
+        "predicate_without_anchor": 4,
+        "fix_set_incomplete": 1
+      },
+      "invented_ids": [],
+      "lint_ok": false,
+      "lint_ingestion_parity": true,
+      "legacy_adapter_count": 0,
+      "fix_set_results": {
+        "CVE-2023-47342:fix-set:1": {
+          "expected_fix_commits": [
+            "fix-commit:FFmpeg:d254fe2d1da3b1cba3526c5d6417c9912e330988",
+            "fix-commit:FFmpeg:e4d5ac8d7d2a08658b3db7dd821246fe6b35381f"
+          ],
+          "covered_fix_commits": [],
+          "missing_fix_commits": [
+            "fix-commit:FFmpeg:d254fe2d1da3b1cba3526c5d6417c9912e330988",
+            "fix-commit:FFmpeg:e4d5ac8d7d2a08658b3db7dd821246fe6b35381f"
+          ],
+          "invalid_anchor_ids": [
+            "code-anchor:FFmpeg:d254fe2d1da3b1cba3526c5d6417c9912e330988:libavformat/rtsp.c:1",
+            "code-anchor:FFmpeg:e4d5ac8d7d2a08658b3db7dd821246fe6b35381f:libavformat/rtsp.c:1"
+          ],
+          "complete": false
+        }
+      }
+    }
+  ]
+}

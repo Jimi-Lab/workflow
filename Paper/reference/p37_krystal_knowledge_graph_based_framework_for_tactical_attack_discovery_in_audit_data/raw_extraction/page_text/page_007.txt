@@ -1,0 +1,80 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 6. Tag Propagation Example. 
+Listing 3. Propagation rule for incoming socket connections. 
+integrating established threat detection and alerting techniques (ii) 
+incorporating a signature-based threat detection approach through 
+the transformation of curated public rules (e.g. Sigma Rule), and 
+(iii) link the identiﬁed attack pattern into high-level attack tech- 
+nique and tactic (TTPs Mapping). Rather than hard-coding these 
+mechanisms and developing them for a custom data structure, we 
+show in the following how they can be implemented as stan- 
+dard declarative SPARQL queries. Tag Propagation is a prominent 
+method to establish event causality in the context of provenance 
+graphs. It is based on a set of rules to assign tag values onto sys- 
+tem object nodes (i.e., process, ﬁle, socket, etc.) upon interaction 
+between them ( Hossain et al., 2017 ). In order to trace the impact of 
+malicious events, tags and values will be propagated sequentially 
+through a provenance graph to other system objects if a given tag 
+propagation rule is satisﬁed. 
+Figure 6 illustrates tag propagation with an example. It 
+introduces integrity and conﬁdentiality tags to identify the 
+suspicion level of a node. We express propagation rules 
+Hossain et al. (2020) as SPARQL queries processed by our tag prop- 
+agation component. Listing 3 shows the query matching the illus- 
+tration in Fig. 6 . It checks if a socket connection ( < socket > ) 
+is received by ( :isReceivedBy ) a process ( < process > ) and 
+then compares the minimum ( afn:min ) integrity tag value 
+( :intTag ) of the < socket > (identiﬁed by ?oit variable) and 
+< process > (identiﬁed by ?sit variable). 15 If ?oit is not the 
+same as ?sit , it updates 16 ?sit with the new value (identiﬁed 
+by the ?nit variable). 
+Attenuation & Decay are techniques to tackle the “dependence 
+explosion” problem ( Hossain et al., 2017 ), which occurs when a 
+node in the provenance graph interacts with a large number of sys- 
+tem objects, causing a large number of benign events to be ﬂagged 
+as being part of an attack ( Hossain et al., 2020 ). This leads to a 
+large number of false-positive alerts, making it diﬃcult to identify 
+relevant alerts. Tag attenuation ( Hossain et al., 2020 ) aims to alle- 
+15 System objects with integrity scores in the interval [0 . 0 − 0 . 5 | are considered 
+suspicious and scores in the interval [0 . 5 − 1 . 0] are considered benign. 
+16 SPARQL uses DELETE and INSERT to perform update operations on triple(s); 
+cf. https://www.w3.org/TR/sparql11-update/ 
+Listing 4. Attenuation rule for a benign write propagation. 
+viate this issue by considering objects imperfect intermediaries for 
+propagating malicious behavior through a benign process. In the 
+previous example (cf. Fig. 6 ), for instance, the low integrity process 
+p 1 writes a ﬁle f 1 , lowering its integrity. To avoid excessive propa- 
+gation to other objects from there, the integrity and conﬁdentiality 
+tags of a benign subject get attenuated before they propagate to 
+another benign object. This can be achieved by applying an addi- 
+tive factor af to the original tag value. 
+Tag decay is based on the assumption that in case a benign 
+subject gets compromised and becomes suspicious, it will do so 
+soon after consuming a suspicious input (e.g., read low integrity 
+ﬁle) ( Hossain et al., 2020 ). Consequently, this technique gradually 
+lifts the score of the low integrity subject and limits benign ob- 
+jects from being propagated and ﬂagged as suspicious, particularly 
+for long-running processes. 
+Listing 4 illustrates how the KRYSTAL framework enables declar- 
+ative deﬁnitions of such rules using SPARQL queries. It shows an 
+example of an attenuation rule for a benign write propagation that 
+checks for a < process > that :writes a conﬁdential < file > . 
+The rule gradually increments the conﬁdentiality tag ( :confTag ) 
+value ( ?sct ) of processes. 
+Provenance-Based Alerting Provenance-based alerting policies 
+detect attacks based on the simultaneous fulﬁllment of sev- 
+eral conditions in the provenance graph. These conditions (cf. 
+Hossain et al., 2020 ) take data integrity tags as well as informa- 
+tion associated with nodes (e.g., permissions, users) into account. 
+For example, a suspicious ﬁle execution can be detected under the 
+following alert policy: 
+• a ﬁle f is executed by a process p , 
+• f has a low integrity tag value ( < 0.5) and p is benign (integrity 
+> = 0.5). 
+The KRYSTAL framework facilitates provenance-based alerting by 
+expressing alert policies as SPARQL queries and matching them 
+against the provenance log graph. Listing 5 provides an exam- 
+ple of an alerting policy for suspicious ﬁle execution. The query 
+matches a ﬁle ( ?file ) with a low integrity value that has been 
+executed by a benign process. Speciﬁcally, ﬁles with a tag value 
+8

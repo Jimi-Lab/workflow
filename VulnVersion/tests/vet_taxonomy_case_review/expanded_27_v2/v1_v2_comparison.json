@@ -1,0 +1,284 @@
+{
+  "schema_version": "vet_case_review_v1_v2_comparison.v1",
+  "v1": {
+    "summary": {
+      "schema_version": "vet_case_review_summary.v1",
+      "stage": "expanded_27",
+      "dry_run": false,
+      "planned_cases": 27,
+      "completed_cases": 27,
+      "agent_failed_cases": 0,
+      "needs_manual_review_cases": 0,
+      "review_status_counts": {
+        "reviewed": 27
+      },
+      "quality": {
+        "finding_count": 38,
+        "severity_counts": {
+          "warn": 38
+        },
+        "step2_admission_ready": false
+      },
+      "opencode": {
+        "health": {
+          "ok": true,
+          "response": {
+            "healthy": true,
+            "version": "1.2.26"
+          }
+        },
+        "provider_id": "deepseek",
+        "model_id": "deepseek-v4-flash",
+        "agent_name": null
+      }
+    },
+    "quality": {
+      "finding_count": 38,
+      "severity_counts": {
+        "warn": 38
+      },
+      "issue_counts": {
+        "cert_fixed_with_uncertainty": 12,
+        "empty_line_risk_signals": 2,
+        "empty_negative_evidence": 12,
+        "reviewed_with_uncertainty": 12
+      },
+      "gate": {
+        "json_schema_reload": true,
+        "step2_admission_ready": false,
+        "reason": "P1-A is a pilot review. Warnings must be resolved or explicitly waived before Step2/Step3 hard-certificate admission."
+      }
+    }
+  },
+  "v2": {
+    "summary": {
+      "schema_version": "vet_case_review_summary.v1",
+      "stage": "expanded_27_v2",
+      "dry_run": false,
+      "planned_cases": 27,
+      "completed_cases": 27,
+      "agent_failed_cases": 0,
+      "needs_manual_review_cases": 0,
+      "review_status_counts": {
+        "reviewed": 27
+      },
+      "quality": {
+        "finding_count": 79,
+        "severity_counts": {
+          "error": 44,
+          "warn": 35
+        },
+        "step2_admission_ready": false
+      },
+      "opencode": {
+        "health": {
+          "ok": true,
+          "response": {
+            "healthy": true,
+            "version": "1.2.26"
+          }
+        },
+        "provider_id": "deepseek",
+        "model_id": "deepseek-v4-flash",
+        "agent_name": null
+      }
+    },
+    "quality": {
+      "finding_count": 79,
+      "severity_counts": {
+        "error": 44,
+        "warn": 35
+      },
+      "issue_counts": {
+        "empty_evidence_item_source_refs": 8,
+        "empty_fix_evidence": 1,
+        "empty_necessary_conditions": 1,
+        "empty_negative_evidence": 22,
+        "empty_source_refs": 1,
+        "empty_vulnerable_condition_evidence": 1,
+        "missing_evidence_item_field": 40,
+        "reviewed_vet_with_uncertainty": 5
+      },
+      "gate": {
+        "json_schema_reload": true,
+        "step2_admission_ready": false,
+        "reason": "P1-A is a pilot review. Warnings must be resolved or explicitly waived before Step2/Step3 hard-certificate admission."
+      }
+    }
+  },
+  "v2_evidence_item_total": 176,
+  "v2_evidence_items_per_case": {
+    "min": 4,
+    "max": 10,
+    "avg": 6.518518518518518
+  },
+  "archetype_changes": [
+    {
+      "repo": "qemu",
+      "cve_id": "CVE-2020-14394",
+      "v1": "loop_bound_missing",
+      "v2": "loop_boundary_control"
+    },
+    {
+      "repo": "FFmpeg",
+      "cve_id": "CVE-2020-20453",
+      "v1": "missing_clamp",
+      "v2": "missing_lower_bound"
+    },
+    {
+      "repo": "httpd",
+      "cve_id": "CVE-2020-9490",
+      "v1": "security_feature_removal_with_logic_correction",
+      "v2": "status_error_handling_or_logic_correction"
+    },
+    {
+      "repo": "qemu",
+      "cve_id": "CVE-2021-3416",
+      "v1": "reentrancy_guard_bypass",
+      "v2": "bounds_length_check"
+    },
+    {
+      "repo": "qemu",
+      "cve_id": "CVE-2021-3544",
+      "v1": "missing_cleanup",
+      "v2": "multi_site_memory_leak_resource_lifecycle"
+    },
+    {
+      "repo": "ImageMagick",
+      "cve_id": "CVE-2021-39212",
+      "v1": "missing_authorization_check",
+      "v2": "missing_security_policy_enforcement"
+    },
+    {
+      "repo": "wireshark",
+      "cve_id": "CVE-2021-4182",
+      "v1": "infinite_loop_bounds_check",
+      "v2": "input_validation_invariant"
+    },
+    {
+      "repo": "openssl",
+      "cve_id": "CVE-2022-2097",
+      "v1": "loop_boundary_off_by_one",
+      "v2": "fencepost_loop_boundary"
+    }
+  ],
+  "worst_v2_quality_cases": [
+    {
+      "cve_id": "CVE-2020-22019",
+      "repo": "FFmpeg",
+      "issues": {
+        "empty_source_refs": 1,
+        "empty_necessary_conditions": 1,
+        "empty_vulnerable_condition_evidence": 1,
+        "empty_fix_evidence": 1,
+        "empty_negative_evidence": 1,
+        "missing_evidence_item_field": 40,
+        "empty_evidence_item_source_refs": 7
+      },
+      "total_findings": 52,
+      "evidence_items": 7
+    },
+    {
+      "cve_id": "CVE-2021-3416",
+      "repo": "qemu",
+      "issues": {
+        "empty_negative_evidence": 1,
+        "reviewed_vet_with_uncertainty": 1,
+        "empty_evidence_item_source_refs": 1
+      },
+      "total_findings": 3,
+      "evidence_items": 6
+    },
+    {
+      "cve_id": "CVE-2022-2097",
+      "repo": "openssl",
+      "issues": {
+        "empty_negative_evidence": 1,
+        "reviewed_vet_with_uncertainty": 1
+      },
+      "total_findings": 2,
+      "evidence_items": 9
+    },
+    {
+      "cve_id": "CVE-2020-11647",
+      "repo": "wireshark",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 6
+    },
+    {
+      "cve_id": "CVE-2020-11985",
+      "repo": "httpd",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 6
+    },
+    {
+      "cve_id": "CVE-2020-11993",
+      "repo": "httpd",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 5
+    },
+    {
+      "cve_id": "CVE-2020-14394",
+      "repo": "qemu",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 8
+    },
+    {
+      "cve_id": "CVE-2020-20453",
+      "repo": "FFmpeg",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 6
+    },
+    {
+      "cve_id": "CVE-2020-22037",
+      "repo": "FFmpeg",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 9
+    },
+    {
+      "cve_id": "CVE-2020-27771",
+      "repo": "ImageMagick",
+      "issues": {
+        "reviewed_vet_with_uncertainty": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 6
+    },
+    {
+      "cve_id": "CVE-2020-27823",
+      "repo": "openjpeg",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 4
+    },
+    {
+      "cve_id": "CVE-2020-27824",
+      "repo": "openjpeg",
+      "issues": {
+        "empty_negative_evidence": 1
+      },
+      "total_findings": 1,
+      "evidence_items": 7
+    }
+  ]
+}

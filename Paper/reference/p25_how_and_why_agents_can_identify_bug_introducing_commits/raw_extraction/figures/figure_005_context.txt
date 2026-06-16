@@ -1,0 +1,123 @@
+Page: 7
+Caption: Figure 3: Relationship between the number of candidate commits and F1-score, cost, token usage, and tool calls.
+
+Page text context:
+How and Why Agents Can Identify Bug-Introducing Commits
+Preprint, Under Submission, arXiv
+1–10
+11–50
+51–200
+201–1k
+>1k
+0
+0.2
+0.4
+0.6
+0.8
+1
+𝑛=12
+𝑛=24
+𝑛=25
+𝑛=26
+𝑛=9
+Number of candidate commits
+Average F1-score
+(a) F1-score.
+100
+101
+102
+103
+104
+0
+0.2
+0.4
+0.6
+0.8
+1
+Number of candidate commits
+Cost (USD)
+𝑟= −0.03
+(b) Cost per instance (USD).
+100
+101
+102
+103
+104
+0
+200k
+400k
+600k
+800k
+1M
+1.2M
+Number of candidate commits
+Total tokens
+𝑟= 0.09
+(c) Total tokens consumed.
+100
+101
+102
+103
+104
+0
+10
+20
+30
+40
+Number of candidate commits
+Number of tool calls
+𝑟= −0.09
+(d) Total tool calls.
+Figure 3: Relationship between the number of candidate commits and F1-score, cost, token usage, and tool calls.
+Finding 5: Simple-SZZ-Agent matches or outperforms SZZ-Agent
+on all datasets, despite removing both the SZZ-based first stage
+and the binary search. A single agent call over the full candidate
+set is sufficient.
+4.3.2
+RQ4a: How Does the Agent Find the Needle in the Haystack?
+Simple-SZZ-Agent receives hundreds or even thousands of candi-
+date commits, yet it identifies the bug-introducing commit reliably.
+We investigate how.
+Setup. We log all tool calls and analyze the behavior of the agent
+on DS_LINUX-26 (100 fix commits). We record the relationship
+between the number of candidate commits and the agent’s F1-score
+and resource consumption (cost, tokens, tool calls), the distribution
+of tool calls by type, and the sources of grep patterns.
+Results. We expected that scanning a large candidate set would
+degrade performance and require substantially more resources. To
+our surprise, neither turned out to be the case. Figure 3a shows the
+relationship between candidate set size and F1-score. Performance
+remains stable across candidate set sizes, with F1-scores above
+0.80 for sets of up to 1,000 candidates. Only for the largest sets
+(>1,000 candidates) does F1-score decrease to 0.72. Figure 3 shows
+the relationship between the number of candidate commits and
+resource consumption. Cost, token usage, and tool calls show no
+strong correlation with the number of candidates, indicating that
+the agent does not scale linearly with the candidate set size.
+To understand how the agent achieves this, we examined its
+tool usage. Figure 4 shows the distribution of tool calls. The agent
+predominantly uses Read (9.8 calls on average) and Grep (2.7 calls),
+with few calls to other tools. This reveals that the agent does not
+read all candidates sequentially; instead, it uses targeted searches
+to narrow down the candidate set. Figure 5 shows what the agent
+greps for. The most frequent grep patterns are derived from the
+removed lines of the fix commit diff (48.1% of grep calls) and the
+fix commit message (43.6%). The agent distills these sources into
+short patterns and uses them to search the candidate commits for
+matches. Across 243 grep calls, patterns have a median length of 21
+characters (mean 25.2, std. dev. 14.8, min 6, max 104); the majority
+(63.8%) are plain strings rather than regular expressions.
+Three examples illustrate this strategy:
+(1) Pattern from fix commit message. The fix [15] replaces
+fsleep() with udelay() because fsleep() must not be called
+from atomic context. The agent greps for "fsleep" and directly
+locates the bug-introducing commit [14], which introduced the
+fsleep() call.
+(2) Pattern from removed lines. The fix [16] corrects a firmware
+parser that assumed dword-aligned block sizes. The agent greps
+for "blk->size » 2", the faulty expression removed by the fix,
+and matches it to the bug-introducing commit [12] that added
+this line. This is analogous to what SZZ does—tracing removed
+
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

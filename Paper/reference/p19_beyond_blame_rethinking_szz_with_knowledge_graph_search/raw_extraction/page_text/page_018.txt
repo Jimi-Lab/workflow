@@ -1,0 +1,61 @@
+18 Yu Shi et al.
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8Precision
+DS_LINUX
+DS_APACHE
+DS_GITHUB
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8Recall
+5 10 15 20 30 50
+Candidate Limit (K)
+0.0
+0.2
+0.4
+0.6
+0.8F1-score
+Fig. 6. Sensitivity of AgenticSZZ performance to candidate limit𝐾across precision, recall, and F1-score.
+confirms that our improvements over LLM4SZZ stem from the TKG-guided paradigm rather than a
+more modern LLM version. Future work could evaluate AgenticSZZ with alternative LLMs.
+AgenticSZZ uses a candidate limit parameter 𝐾 that controls the maximum number of BIC
+candidates retrieved from the TKG for agent evaluation. Figure 6 examines the extent to which our
+results are sensitive to this parameter choice. Across 𝐾 values from 5 to 50, performance remains
+remarkably stable: DS_LINUX F1-score varies within 1.0% (0.635 to 0.645), DS_GITHUB within
+2.9% (0.700 to 0.729), and DS_APACHE within 3.2% (0.460 to 0.492). This stability indicates that
+the agent’s reasoning effectively filters candidates regardless of initial pool size, and our reported
+results do not need to rely on a carefully tuned K value. Even aggressive filtering (K=5) achieves
+near-optimal performance, suggesting that TKG ranking places true BICs near the top of candidate
+lists.
+External Validity.Our evaluation uses three datasets (DS_LINUX, DS_APACHE, DS_GITHUB)
+comprising C and Java projects. While these represent diverse development practices, from the
+highly-structured Linux kernel to varied open-source DS_APACHE and GitHub projects, our
+findings may not generalize to other languages (e.g., Python, JavaScript) or proprietary codebases
+with different commit conventions. The datasets contain developer-annotated BIC labels, which
+provide higher ground truth quality but may reflect annotation biases. Future work should evaluate
+AgenticSZZ on additional languages and project types.
+9 Conclusion and Future Work
+We presented AgenticSZZ, a novel approach that reframes Bug-Inducing Commit (BIC) identifica-
+tion from a ranking problem over blame commits into a graph search problem over a Temporal
+Knowledge Graph. Our preliminary study (RQ0) on 2,102 validated cases revealed that 28% of BICs
+require traversal beyond direct blame commits and 14% of cases are blameless, motivating the
+need for expanded search capabilities. AgenticSZZ addresses these challenges through a two-phase
+architecture: TKG construction that encodes temporal and structural relationships among commits,
+and an LLM agent that navigates this graph using specialized tools for candidate enumeration,
+structural traversal, and causal analysis.
+Our evaluation demonstrates that AgenticSZZ outperforms all baselines on three of four dataset
+splits, achieving F1-scores of 0.48 to 0.74 across datasets and improving over state-of-the-art by
+up to 27%. The ablation study confirms that both the TKG and agent are essential, reflecting an
+exploration-exploitation trade-off: the TKG expands the search space while the agent provides
+intelligent selection, especially for Blame and Blameless BIC cases. The controlled comparison with
+LLM4SZZ using identical LLMs validates that our improvements stem from the TKG-guided search
+paradigm rather than LLM selection.
+, Vol. 1, No. 1, Article . Publication date: February 2026.

@@ -1,0 +1,90 @@
+TABLE I: Maintainability of Each Database
+Database TPL Number Time Cost Per TPL Processing Storage Total(GB) Frequency of Comparisons Detection Time
+Clone (s) Elimination (s) Exact (s) Similarity
+DBiot 1,872 50.5 0.1 3.5 9,207.1 2.2 256.4
+DBkwd 19,057 50.5 0.1 37.4 10,657.5 5.1 301.7
+DBcentris 10,288 50.5 115.1 20.0 1,508,924.7 4.4 -
+TABLE II: TPL Reuse Detection Result of Centris
+Target DBcentris DBiot DBkwd
+Dtc Cfm Dtc Cfm Dtc Cfm
+AliOS-Things 22 15 81 36 78 21
+LiteOS 15 6 26 9 23 4
+Tasmota 28 17 93 55 85 41
+TizenRT 31 22 72 37 78 22
+kamailio 3 1 9 2 11 2
+mbed-os 7 3 22 10 35 11
+openthread 2 2 5 2 7 1
+Sming 5 3 48 18 10 5
+TDengine 3 1 4 3 9 4
+zephyr 1 1 3 2 8 1
+Total 117 71 363 174 334 112
+Dtc: Reuses detected.
+Cfm: Reuses confirmed with manual check.
+TABLE III: Performance of Security Patch Mapping
+Scheme Detected Confirmed F1 (%)
+Link Matching 47 47 45.86
+Snyk Database Retrieval 60 60 55.05
+VFCFinder (Top-1) 158 79 61.69
+VFCFinder (Top-5) 158 98 71.53
+VULTURE 124 124 87.94
+API and only needs to use commits at runtime as temporary
+variables, incurring no additional space overhead.
+The Impact of Search Space on Time Cost. The time cost
+required for identifying patch commits is directly related to
+the number of candidate commits due to the difference in
+search space. We developed an empirical study on the 158
+CVEs which are labeled with patch commits in the ground
+truth dataset. This study aimed to reveal how the time cost of
+different methods varies with the distribution of the number of
+candidate commits.
+Here, we categorized the distribution of candidate commit
+numbers N into three ranges: ❶ 100 > N > 0, ❷ 1000 >
+N ≥ 100, and ❸ N ≥ 1000. Among the total 158 labeled
+CVEs, the distribution of the number of commits is as follows:
+❶ 96, ❷ 54, and ❸ 8. Furthermore, we selected a total of 9
+CVEs covering the three candidate commit number ranges to
+analyze the time cost of different approaches and evaluate their
+usability. As shown in Figure 5, the horizontal axis represents
+the CVE ID with the number of candidate commits in the
+brackets; the vertical axis denotes the time overhead, measured
+in seconds. As observed, the time overhead of each approach
+positively correlates with the number of candidate commits.
+Besides, with the number of candidate commits increases, the
+time overhead of VFCFinder becomes substantially large; in
+contrast, even when the number of candidate commits reaches
+TABLE IV: Time and Space Cost of Security Patch Mapping
+Scheme Time Cost (s) Space Cost (MB)
+Mean Median Mean
+VFCFinder 285.92 71.90 337.94
+VULTURE 84.68 42.31 0.00
+CVE-2011-1764 (30)CVE-2016-1897 (42)CVE-2019-10899 (48)CVE-2016-6306 (221)CVE-2019-9183 (294)CVE-2021-28135 (387)CVE-2022-23094 (934)CVE-2007-6441 (1,407)CVE-2012-5360 (3,831)
+CVE-ID (Number of Candidate Commits)
+0
+1000
+2000
+3000
+4000Time Cost (s)
+VFCFinder
+Vulture
+Fig. 5: Correlation between the number of candidate commits
+and the time cost
+thousands, V ULTURE can still keep the time overhead within
+a few hundred seconds.
+C. Benchmark Vulnerability Detection
+We further assessed how V ULTURE performs when detect-
+ing 1-day vulnerabilities introduced by the reused TPLs. We
+compared V ULTURE with the state-of-the-art work, V1SCAN.
+The other tools were excluded because of various constraints.
+In detail, OSSFP is not available as open-source, and SNYK
+requires information on copyright and license, which is incom-
+patible with our benchmark.
+Vulnerability benchmark. To the best of our knowledge, there
+is no existing benchmark specifically for 1-day vulnerabilities
+in C/C++ programs. Therefore, we manually constructed a
+ground truth vulnerability benchmark. The benchmark com-
+prises 200 vulnerable function reuse cases sourced from var-
+ious repositories with more than 100 stars on GitHub. These
+200 cases cover the reuse of 66 CVEs. Among these cases,
+45% have patched the CVE they reused, while 55% have
+not. Additionally, 64% of these cases involve custom reuse,
+11

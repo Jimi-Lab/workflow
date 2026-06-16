@@ -1,0 +1,263 @@
+{
+  "cwe_id": "CWE-786",
+  "name": "Access of Memory Location Before Start of Buffer",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product reads or writes to a buffer using an index or pointer that references a memory location prior to the beginning of the buffer.",
+  "extended_description": "This typically occurs when a pointer or its index is decremented to a position before the buffer, when pointer arithmetic results in a position before the beginning of the valid memory location, or when a negative index is used.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "The CWE entry might be misused when lower-level CWE entries might be available. It also overlaps existing CWE entries and might be deprecated in the future."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product reads or writes to a buffer using an index or pointer that references a memory location prior to the beginning of the buffer.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "location",
+      "beginning",
+      "position",
+      "decremented"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "location",
+      "beginning",
+      "position",
+      "decremented",
+      "arithmetic",
+      "references",
+      "typically",
+      "negative"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following C/C++ example, a utility function is used to trim trailing whitespace from a character string. The function copies the input string to a local...",
+        "snippet": "char* trimTrailingWhitespace(char *strMessage, int length) { char *retMessage; char *message = malloc(sizeof(char)*(length+1)); // copy input string to a temporary string char message[length+1]; int index; for (index =..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following example asks a user for an offset into an array to select an item.",
+        "snippet": "int main (int argc, char **argv) { char *items[] = {\"boat\", \"car\", \"truck\", \"train\"}; int index = GetUntrustedOffset(); printf(\"You selected %s\\n\", items[index-1]); }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following is an example of code that may result in a buffer underwrite. This code is attempting to replace the substring \"Replace Me\" in destBuf with the...",
+        "snippet": "int main() { ... char *result = strstr(destBuf, \"Replace Me\"); int idx = result - destBuf; strcpy(&destBuf[idx], srcBuf); ... }"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2002-2227",
+        "description": "Unchecked length of SSLv2 challenge value leads to buffer underflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-2227"
+      },
+      {
+        "reference": "CVE-2007-4580",
+        "description": "Buffer underflow from a small size value with a large buffer (length parameter inconsistency, CWE-130)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-4580"
+      },
+      {
+        "reference": "CVE-2007-1584",
+        "description": "Buffer underflow from an all-whitespace string, which causes a counter to be decremented before the buffer while looking for a non-whitespace character.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-1584"
+      },
+      {
+        "reference": "CVE-2007-0886",
+        "description": "Buffer underflow resultant from encoded data that triggers an integer overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-0886"
+      },
+      {
+        "reference": "CVE-2006-6171",
+        "description": "Product sets an incorrect buffer size limit, leading to \"off-by-two\" buffer underflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-6171"
+      },
+      {
+        "reference": "CVE-2006-4024",
+        "description": "Negative value is used in a memcpy() operation, leading to buffer underflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-4024"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

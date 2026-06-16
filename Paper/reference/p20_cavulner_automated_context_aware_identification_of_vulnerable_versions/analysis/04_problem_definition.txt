@@ -1,0 +1,36 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- Fix Commit: c3351d2 + build.getProject().getWorkspace().child(location).copyFrom(file); - build.getWorkspace().child(location).copyFrom(file); + FilePath locationFilePath = build.getWorkspace().child(location); + locationFilePath.copyFrom(file); - FilePath locationFilePath = build.getWorkspace().child(location); + if (!ALLOW_FOLDER_TRAVERSAL_OUTSIDE_WORKSPACE + && !ws.isDescendant(location)) { + return null; locationFilePath.copyFrom(file); Project: Jenkins CVE-2018-1000406: A path traversal vulnerability exists in Jenkins 2.145 and earlier, LTS 2.138.1 and earlier in core/src/main/java/hudson/model/FileParameterValue.java that allows attackers with Job/Configure permission to define a file parameter with a file name outside the intended directory, resulting in an arbitrary file write on the Jenkins master when scheduling a build.
+- Moreover, vulnerabilities often arise from subtle semantic issues such as missing input validation or unsafe API usage, which are more difficult to detect using syntactic diff-based methods.
+- For instance, fixing a Missing Input Validation vulnerability typically involves adding conditional checks, whereas remediating an Information Exposure vulnerability involves deletions.
+- Formally, we guide the LLM in localizing potentially vulnerable methods by a vulnerability knowledge tuple 𝐾vul = (MCT,CVE,CWE), which is composed as follows: •MCT (Method Change Type).
+Objective:
+- For instance, a report [6] by Black Duck reveals that 86% of codebases contain components with known vulnerabilities.
+- The number of known software vulnerabilities has been increasing rapidly in recent years, which extensively influenced the ecosystem.
+- To manage this growing threat, organizations such as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate critical information on disclosed vulnerabilities, to support the wide usage of software supply chain tools like Software Composition Analysis (SCA), to assess potential risks.
+- In this case, SCA tools rely heavily on the accuracy of vulnerability data, especially the correct vulnerable versions, for automated mappings of security risks in downstream user projects.
+Constraints:
+- By understanding the contextual meaning of code changes and commit descriptions, LLM4SZZ reduces false positives and identify extra commits that all baselines cannot.
+- Specifically, V-SZZ assumes all deleted lines are vulnerable and fails to address fix commits that only contain added lines.
+- Both methods rely exclusively on syntax by examining only the lines modified in fix commits.
+Evaluation Target:
+- 4 Evaluation Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+- All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32 GB of RAM, and running Ubuntu 20.04.
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+- We leveraged the dataset compiled by Ponta et al.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- However, they heavily rely on the lines of changes in fix commits to trace the introduction of vulnerable code, while vulnerable code may not always be covered in fix commit diffs [36].
+- The severity of these limitations was highlighted by the latest comprehensive empirical study [13] on this topic.
+- The first stage focuses on coarse-grained localization by narrowing down candidate methods based on fix commit change patterns, such as whether a method contains only deletions, only additions, or both, and by incorporating relevant vulnerability information from CVE descriptions and CWE classifications.
+- On average, the LLM cost per vulnerability is only around $0.06.
+- To manage this growing threat, organizations such as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate critical information on disclosed vulnerabilities, to support the wide usage of software supply chain tools like Software Composition Analysis (SCA), to assess potential risks.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

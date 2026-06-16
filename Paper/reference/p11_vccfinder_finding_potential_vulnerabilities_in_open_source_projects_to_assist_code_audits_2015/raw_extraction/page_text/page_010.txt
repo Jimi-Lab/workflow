@@ -1,0 +1,116 @@
+added or modified file of a commit. We then record the
+lines which Flawfinder flags that were inserted by the com-
+mit. Consequently, we say that Flawfinder marked a commit
+if it found a flaw in one of the lines the commit inserted.
+We then evaluated both our tool and Flawfinder against
+the test dataset. Table 4 shows the contingency table, pre-
+cision and recall for both tools. We argue that precision is
+the most important metric in this table and the one which
+should be used to compare Flawfinder and VCCFinder, as
+this value determines how many code locations a security
+researcher needs to look at in order to find a vulnerabil-
+ity. While a higher recall would theoretically mean that
+more vulnerabilities can be found, in practice they would be
+buried in a large amount of false positives. So for now, we
+accept that we will not find all vulnerabilities but create an
+environment in which it is realistic for a reviewer to check all
+flagged commits and achieve a decent success rate. Each row
+compares VCCFinder to Flawfinder with a diﬀerent configu-
+ration. In the first row, we set VCCFinder’s recall to that of
+Flawfinder’s. As can be seen, VCCFinder’s precision is sig-
+nificantly higher. Our approach improves the false positive
+rate by over 99 %! This is the most realistic configuration,
+since this configuration can be used in a real world setting.
+For the next comparison, we set VCCFinder’s false posi-
+tives to the same number as Flawfinder’s. While of course
+the number of false positives is then prohibitively high, VC-
+CFinder does find almost three times as many VCCs as
+Flawfinder. In the final comparison, we set VCCFinder’s
+precision to Flawfinder’s very poor value. While the num-
+ber of false positives is prohibitively high, VCCFinder finds
+almost 90% of all VCCs compared to Flawfinder’s 24%.
+In Table 5 we also compare VCCFinder and Flawfinder
+based on their top results. In the first row, we select the top
+100 flagged commits, then 500 and finally 1000. Among the
+top 100 commits, VCCFinder identifies 56 VCCs correctly,
+significantly reducing the amount of commits a security re-
+searcher would need to review before finding a commit con-
+taining a vulnerability. Compared to FlawFinder, its preci-
+sion is more than 50 times higher and it already identifies
+more than 25% of all VCCs in the data set at this point.
+VCCFinder significantly outperforms Flawfinder in all pa-
+rameter configurations. Importantly, we were able to reduce
+the number of false positives to the point where it becomes
+realistic for reviewers to carefully check all flagged commits.
+This represents a significant improvement over the current
+state-of-the-art.
+We would have liked to compare our approach to more
+alternatives; however, since most research papers have not
+published the datasets they worked on and since their tools
+are not applicable to commits at the scale at which we tested
+VCCFinder, this was not possible. We are releasing our
+VCC database and results to the community, so that fu-
+ture researchers have a benchmark against which diﬀerent
+approaches can be compared.
+6. TAKE-A W AYS
+As the results above show, the performance of VCCFinder
+means that it can realistically be used in production en-
+vironments without overburdening developers with a huge
+number of reviews. Since it can work on code snippets it
+can used automatically when new commits come in without
+requiring a complex test environment.
+TP FP FN TN
+Pre
+cision
+R
+ecall
+Flawfinder
+Top 100 1 99 218 79121 0.01 0.00
+Top 500 6 494 213 78726 0.01 0.03
+Top 1000 13 987 206 78233 0.01 0.06
+VCCFinder
+Top 100 56 44 163 79176 0.56 0.26
+Top 500 88 412 131 78808 0.18 0.40
+Top 1000 105 895 114 78325 0.11 0.48
+Table 5: Confusion matrix of the tools by top X
+commits. T: True, F: False, P: Positive, N: Negative.
+Apart from this, we would like to present some qualitative
+take-aways we found while developing and evaluating VC-
+CFinder, which can be useful even without using the tool.
+While some of these take-aways confirm well-known beliefs,
+we found it interesting to see that our machine-learning ap-
+proach also came to these conclusions and backed them up
+with quantitative data, but also generated new insights.
+Error handling is hard.
+When looking at the features the SVM learnt by classify-
+ing VCCs, we saw that the adage “gotos considered harmful”
+[16] still holds true today, as amongst others the keyword
+goto and the according jump labels such as out: and er-
+ror: increase the likelihood of vulnerable code. We can
+confirm this by looking at Table 2. However, we found that
+the SVM also flags returning error values such as -EINVAL
+as potentially dangerous. Combined with gotos, these are
+common C mechanisms for error and exception handling. So
+unlike Dijkstra’s argument that gotos are harmful because
+they lead to unreadable code, in our context gotos are con-
+sidered harmful because they frequently occur in an error-
+handling context. So instead of merely detecting gotos, our
+SVM gives exception and error-handling code a higher po-
+tential vulnerability ranking. Our explanation of this eﬀect
+is as follows: because it is easy to miss some cases, exception
+handling is easy to get wrong (e.g. Apple’s goto fail bug in
+their TLS implementation12).
+Variable Usage and Memory Management.
+When examining highly ranked features of the SVM, we
+noticed that some memory management constructs lead to a
+higher vulnerability ranking. For instance, sizeof(struct,
+a high usage of sizeof in general, len and length as vari-
+able names occurred more often in vulnerable commits. In
+addition, we observed that variable names consisting of spe-
+cific strings often occurred in VCCs: buf, net, socket and
+sk. While the presented keywords and variables alone do
+not lead to vulnerabilities, they may indicate more critical
+areas of the code.
+12https://www.imperialviolet.org/2014/02/22/
+applebug.html
+435

@@ -1,0 +1,89 @@
+(a) Target preprocessing times.
+ (b) Matching times.
+ (c) Total times (preprocessing + matching).
+Figure 4: Target preprocessing and matching time spent on target software with various sizes.
+utilized the security patches as they were, there was no need
+for signature generation time. Unlike VUDDY , which simply
+extracts vulnerable functions, MOVERY required more time
+as it needed to reconstruct the oldest vulnerable functions and
+analyze the code line dependencies of functions; note that the
+signature generation is a one-time task.
+Target preprocessing and matching times.Figure 4 shows
+the target preprocessing and matching times for the three tools.
+The results present the following three main observations.
+(1) VUDDY requires the longest target preprocessing time.
+(2) MOVERY requires the longest matching time.
+(3) In total elapsed time,MOVERY requires the least amount
+of time and VUDDY requires the longest time (owing to
+its long preprocessing time).
+To precisely discover VCCs,MOVERY used the finer granular-
+ity (i.e., a set of code lines) that is slower than function units
+in VCC discovery [17], and further considered dependencies
+of code lines in matching, resulting in a longer matching time
+than ReDeBug and VUDDY . Nevertheless, (1) target prepro-
+cessing and matching could be performed within 200 s in
+MOVERY per target software (i.e., the fastest among the three
+tools) and (2) the time was not significantly increased even
+when the lines of code of the target software varied from
+213 K to 14.5 M (see Table 3), suggesting that MOVERY is
+sufficiently fast and scalable for practical use.
+5.5 Efficacy of the search space reduction
+To reduce the VCC search space, MOVERY focuses only on
+the borrowed code parts of the target software. Here we eval-
+uate the efficacy of the search space reduction technique.
+Scalability improvement. The cumulative number of direc-
+tories and code lines in ten target software were 539,781 and
+28,548,340, respectively. When considering only borrowed
+code parts, the number of directories decreases to 375,489
+(70%), and the number of code lines to be scanned was re-
+duced by 15,130,620 (53%), suggesting that MOVERY can
+skip approximately half of the software’s codebase that does
+not need to be scanned, which ensures higher scalability.
+Accuracy enhancement. In addition, we confirmed that fo-
+cusing on borrowed code parts can reduce FPs in VCC discov-
+ery. Existing approaches search VCCs for the entire codebase;
+searching for “propagated” VCCs outside the “reuse” code
+regions makes existing approaches misinterpret a function,
+which has similar syntax but completely different semantics
+with vulnerability signature, as a VCC, thereby producing
+more FPs. Quantitatively, 3 FPs and 24 FPs of VUDDY and
+ReDeBug were discovered outside of the “reuse” code re-
+gions, respectively. MOVERY was able to reduce such FPs by
+considering only the vulnerabilities of the reused OSS and
+the code parts where the OSS exists.
+5.6 Case study: Vulnerability in Git
+MOVERY discovered that the fix for CVE-2019-9169 ( i.e.,
+a heap-based buffer over-read vulnerability existed prior to
+Glibc v2.30) is not applied to the latest version of Git, which
+is one of the most popular version control systems. Since
+Git reused an older version of Glibc earlier than v2.27, the
+syntax of the VCC discovered in Git was quite different (i.e.,
+the syntax similarity was 65%) from that specified in the
+disclosed patch for CVE-2019-9169. Worse, we confirmed
+that this vulnerability can still cause memory leaks in the
+latest version of Git. We responsibly reported this to the Git
+team; they confirmed our report and replied that it will be
+addressed in a later task because they determined that this
+vulnerability does not presently pose a serious threat (we
+discuss responsible vulnerability disclosure in Section 6).
+6 Discussion
+Threshold setting. We used two threshold values: we skipped
+normalized code lines when the number of characters is less
+than 15, and used θ of 0.5 in the experiment. Since the related
+experiments of the latter case were introduced in Section 5.1,
+here we only discuss the former case.
+Skipping short code lines was determined from our obser-
+vations: when we manually inspected normalized code lines
+with less than 15 characters, more than 90% were observed as
+frequently appearing in non-vulnerable codes such as return
+statements, common-named variable declarations, parenthe-
+ses, “else”, and “continue” statements. If the vulnerability
+signature includes such a short code line, it could potentially
+lead MOVERY to produce FPs. When we slightly increased
+the character-length limit (e.g., 16 or 17), we observed that the
+ratio of non-vulnerable code lines decreased. Therefore, we
+set the threshold value as 15 characters. Note that this thresh-
+old is dependent on the vulnerability dataset. If MOVERY
+is applied in a different vulnerability dataset, this threshold
+needs to be adjusted.
+3048    31st USENIX Security Symposium USENIX Association

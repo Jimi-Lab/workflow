@@ -1,0 +1,104 @@
+VUDDY: A Scalable Approach for Vulnerable Code
+Clone Discovery
+Seulbae Kim, Seunghoon Woo, Heejo Lee∗, Hakjoo Oh
+Department of Computer Science and Engineering
+Korea University
+Seoul, Korea
+{seulbae, seunghoonwoo, heejo, hakjoooh}@korea.ac.kr
+Abstract—The ecosystem of open source software (OSS) has
+been growing considerably in size. In addition, code clones - code
+fragments that are copied and pasted within or between software
+systems - are also proliferating. Although code cloning may
+expedite the process of software development, it often critically
+affects the security of software because vulnerabilities and bugs
+can easily be propagated through code clones. These vulnerable
+code clones are increasing in conjunction with the growth of OSS,
+potentially contaminating many systems. Although researchers
+have attempted to detect code clones for decades, most of these
+attempts fail to scale to the size of the ever-growing OSS code
+base. The lack of scalability prevents software developers from
+readily managing code clones and associated vulnerabilities.
+Moreover, most existing clone detection techniques focus overly
+on merely detecting clones and this impairs their ability to
+accurately ﬁnd “vulnerable” clones.
+In this paper, we propose VUDDY, an approach for the scalable
+detection of vulnerable code clones, which is capable of detecting
+security vulnerabilities in large software programs efﬁciently
+and accurately. Its extreme scalability is achieved by leveraging
+function-level granularity and a length-ﬁltering technique that
+reduces the number of signature comparisons. This efﬁcient
+design enables VUDDY to preprocess a billion lines of code in
+14 hour and 17 minutes, after which it requires a few seconds to
+identify code clones. In addition, we designed a security-aware
+abstraction technique that renders VUDDY resilient to common
+modiﬁcations in cloned code, while preserving the vulnerable
+conditions even after the abstraction is applied. This extends the
+scope of VUDDY to identifying variants of known vulnerabilities,
+with high accuracy. In this study, we describe its principles
+and evaluate its efﬁcacy and effectiveness by comparing it
+with existing mechanisms and presenting the vulnerabilities it
+detected. VUDDY outperformed four state-of-the-art code clone
+detection techniques in terms of both scalability and accuracy,
+and proved its effectiveness by detecting zero-day vulnerabilities
+in widely used software systems, such as Apache HTTPD and
+Ubuntu OS Distribution.
+I. I NTRODUCTION
+During the last few years, the number of open source
+software (OSS) programs has increased at a rapid pace. Re-
+search published in literature showed that open source software
+projects have linear to quadratic growth patterns [1], [2], [3].
+In practice, the number of registered open source projects in
+SourceForge [4] increased from 136 K to 430 K between
+October 2009 and March 2014. GitHub [5] announced that
+its 10 millionth repository had been created in December
+2013, with most of the repositories being software projects.
+∗Heejo Lee is the corresponding author.
+Meanwhile, they currently have over 85 million projects, in
+March 2017.
+The considerable increase in the number of OSS programs
+has naturally led to an increase in software vulnerabilities
+caused by code cloning, thereby posing dire threats to the
+security of software systems. Code cloning, the act of copying
+and pasting portions of other software, can be useful if it is
+properly exploited [6], [7]. However, in practice, code cloning
+is often regarded as a bad programming practice because
+it can raise maintenance costs [8], reduce quality [9], [10],
+produce potential legal conﬂicts, and even propagate software
+vulnerabilities [11], [12], [13]. In particular, as OSS programs
+are widely used as codebase in software development, (e.g.,
+libraries), code cloning is becoming one of the major causes
+of software vulnerabilities. For example, the OpenSSL Heart-
+bleed vulnerability (CVE-2014-0160) has affected several
+types of systems (including websites, web servers, operating
+system distributions, and software applications), because the
+affected system either used the whole OpenSSL library or
+cloned some part of the library for use in their systems.
+Moreover, the lifecycle of vulnerabilities exacerbates such
+problems. Even if a vendor were to release a patch imme-
+diately after the discovery of vulnerability in the original
+program, it would take time for the patch to be fully deployed
+through every program that cloned the vulnerable code of
+the original program [14]. For example, in April 2016, the
+“Dogspectus” ransomware was disclosed. This ransomware
+exploits a bug in the Linux kernel named “futex local privilege
+escalation vulnerability” (CVE-2014-3153) to deliver drive-
+by-download malware to the mobile devices that run an
+unpatched Android operating system (versions 4.0.3 to 4.4.4).
+Another example, the Dirty COW vulnerability (CVE-2016-
+5195), which exploits a race condition for privilege escalation,
+was found in the memory subsystem of the Linux kernel in
+October 2016. What makes this vulnerability outrageous is that
+this bug was already ﬁxed in 2005, but the ﬁx was undone
+due to another problem raised by the ﬁx. As shown in the
+examples, old, vulnerable code fragments that are supposed to
+be eliminated, are ceaselessly re-emerging in various locations
+for a variety of reasons.
+Many researchers have proposed code clone detection tech-
+niques to address clone-related problems. However, to our
+surprise, few techniques are suitable for accurately ﬁnding
+vulnerability in a scalable manner. For example, lexical tech-
+2017 IEEE Symposium on Security and Privacy
+© 2017, Seulbae Kim. Under license to IEEE.
+DOI 10.1109/SP.2017.62
+595
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

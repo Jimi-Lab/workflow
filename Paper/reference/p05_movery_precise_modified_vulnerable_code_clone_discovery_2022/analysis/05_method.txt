@@ -1,0 +1,13 @@
+System Overview: MOVERY has signature generation and vulnerable code clone discovery phases.
+Pipeline Stages: paper headings recover P1 signature generation and P2 vulnerable code clone discovery; source exposes Preprocessing.py and Detector.py.
+Core Algorithm: static code suggests preprocessing extracts/abstracts C/C++ functions and hashes them, while detector reads vulnerability/patch signature datasets, reduces target search space by OSS/hash indices, and applies signature matching.
+Data Structures: dataset/vulESSLines, vulDEPLines, noOldESSLines, patESSLines, patDEPLines, vulBodySet, vulHashes, tarFuncs, oss_idx.txt, idx2cve.txt.
+Model / Agent Components: no model/agent component detected in local source.
+Design Choices: vulnerability signature plus patch signature is used to avoid confusing vulnerable and patched variants; search-space reduction focuses on borrowed OSS code.
+Why Each Choice Is Needed: modification-aware signatures address syntax diversity; search-space reduction addresses scale.
+Failure Handling: source has parser-error handling and missing-file exits, but runtime behavior is unverified. [EXECUTION NOT REQUESTED]
+Complexity / Cost Discussion: speed/scalability is evaluated in paper; exact numbers require table repair. [NEEDS TABLE REPAIR]
+Pseudocode or Algorithm Blocks: no reliable algorithm block extracted. [NEEDS EVIDENCE]
+Static Reproducibility Signals: Python scripts and config file exist; README, dataset, ctags, and target corpus are missing. [NEEDS ARTIFACT]
+Agent Evidence Anchors: raw_extraction/section_text/04_methodology.txt; raw_extraction/section_text/05_implementation.txt; raw_extraction/source_static_inventory.txt.
+Writing Pattern: split method into signature generation and detection, then tie each phase to one challenge.

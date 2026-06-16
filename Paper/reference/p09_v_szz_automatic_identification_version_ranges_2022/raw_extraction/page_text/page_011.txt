@@ -1,0 +1,127 @@
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+analyzed the vulnerability distribution based on a large vulnerabil-
+ity dataset, consisting of all known vulnerabilities associated with
+five representative open source projects [30].
+Many researchers also have investigated how to characterize
+and predict vulnerable code based on different attributes, such as
+code [22, 37, 41, 46, 49], commit [32, 33], and human factors [33, 49].
+For example, Shin and Williams used code complexity metrics to pre-
+dict vulnerable files and found that the defect prediction model and
+the vulnerability prediction model achieve similar performance [49];
+Scandariato et al. predicted vulnerable software components by
+applying text mining on source code [46].
+7.2
+SZZ Evaluation and Application
+To evaluate SZZ and its variants, some previous studies rely on
+manual analysis of a small sample of SZZ results [12, 27, 51, 59].
+But manual analysis by researchers is of high cost and might iden-
+tify bug introducing commits incorrectly. To build a more accurate
+ground truth, the “developer-informed” information can be lever-
+aged. For example, Rosa et al. identify bug introducing commits by
+associating the commit id in the commit messages [45]; Wen et al.
+collect the bug introducing commits in the bug reports [57]. How-
+ever, it is difficult to build such dataset that contain enough pairs of
+fixing commits and introducing commits for vulnerabilities. There-
+fore, we follow the approach of odríguez-Pérez et al. [44], based on
+the perfect test idea, to build a dataset linking vulnerabilities fixing
+commits and introducing commits.
+SZZ algorithms have been used in many software engineering
+researches. For example, in many defect prediction studies [9, 10,
+21, 26, 31, 52, 53, 60–62], an important research topic in software
+engineering, researchers use SZZ algorithms to identify the bug-
+inducing commits and build a dataset to evaluate their proposed
+defect prediction models. Some researchers use SZZ algorithms to
+conduct different kinds of empirical studies, such as code review [4,
+28], code smells [40], developer activities [6, 7], technical debt [56],
+etc. In our study, we evaluate the effectiveness of SZZ algorithms
+on identifying inducing commits for vulnerabilities and proposed
+an approach based on an improved SZZ algorithm to refine the
+software versions affected by CVE vulnerabilities.
+8
+CONCLUSION & FUTURE WORK
+In this paper, we proposed an approach based on an improved SZZ
+algorithm (V-SZZ) to refine vulnerable versions for vulnerabilities.
+V-SZZ assumes that the vulnerabilities are often introduced by the
+commit that modified the vulnerable code in earlier versions. Our
+approach uses the fixing commits and the inducing commits for a
+vulnerability to determine its vulnerable versions. Additionally, our
+approach also considers the duplicated fixing commits and inducing
+commits, making the results of vulnerable versions more accurate.
+To evaluate our proposed approach, we manually annotate the true
+inducing commits and verify the vulnerable versions for 172 vulner-
+abilities with fixing commits, which are from two publicly available
+datasets with C/C++ and Java projects. The experiment results show
+that our proposed approach can identify more vulnerabilities with
+the true inducing commits and correct vulnerable versions than
+the previous SZZ algorithms. Our approach has a higher F1-score
+for identifying inducing commits on both C/C++ and Java projects
+(0.736 and 0.630) than the previous SZZ algorithms. For refining
+vulnerable versions, our approach also achieves the best perfor-
+mance on the two datasets in terms of F1-score (0.928 and 0.952).
+In the future, we plan to analyze more vulnerabilities from projects
+with different programming languages. We also want to develop a
+tool based on our approach to help developers refine the versions
+affected by CVE vulnerabilities.
+DATA AVAILABILITY
+We provide a replication package of our dataset and proposed ap-
+proach, which is available at https://github.com/baolingfeng/V-
+SZZ.
+ACKNOWLEDGEMENT
+This research/project is supported by the National Science Founda-
+tion of China (No. 62141222, No. U20A20173 and No. 6190234).
+REFERENCES
+[1] 2017. How do the top programming languages measure up when it comes to
+security? https://www.whitesourcesoftware.com/most-secure-programming-
+languages. Accessed: 2021-08-23.
+[2] Muhammad Asaduzzaman, Michael C Bullock, Chanchal K Roy, and Kevin A
+Schneider. 2012. Bug introducing changes: A case study with android. In 2012 9th
+IEEE Working Conference on Mining Software Repositories (MSR). IEEE, 116–119.
+[3] Gabriele Bavota, Bernardino De Carluccio, Andrea De Lucia, Massimiliano
+Di Penta, Rocco Oliveto, and Orazio Strollo. 2012. When does a refactoring
+induce bugs? an empirical study. In 2012 IEEE 12th International Working Confer-
+ence on Source Code Analysis and Manipulation. IEEE, 104–113.
+[4] Gabriele Bavota and Barbara Russo. 2015. Four eyes are better than two: On the
+impact of code reviews on software quality. In 2015 IEEE International Conference
+on Software Maintenance and Evolution (ICSME). IEEE, 81–90.
+[5] Mario Luca Bernardi, Gerardo Canfora, Giuseppe A Di Lucca, Massimiliano
+Di Penta, and Damiano Distante. 2012. Do developers introduce bugs when
+they do not communicate? the case of eclipse and mozilla. In 2012 16th European
+Conference on Software Maintenance and Reengineering. IEEE, 139–148.
+[6] Mario Luca Bernardi, Gerardo Canfora, Giuseppe A Di Lucca, Massimiliano
+Di Penta, and Damiano Distante. 2018. The relation between developersâĂŹ
+communication and fix-Inducing changes: An empirical study. Journal of Systems
+and Software 140 (2018), 111–125.
+[7] Bora Çaglayan and Ayşe Başar Bener. 2016. Effect of developer collaboration
+activity on software quality in two large scale projects. Journal of Systems and
+Software 118 (2016), 288–296.
+[8] Felivel Camilo, Andrew Meneely, and Meiyappan Nagappan. 2015. Do bugs
+foreshadow vulnerabilities? a study of the chromium project. In 2015 IEEE/ACM
+12th Working Conference on Mining Software Repositories. IEEE, 269–279.
+[9] Gerardo Canfora, Andrea De Lucia, Massimiliano Di Penta, Rocco Oliveto, Anni-
+bale Panichella, and Sebastiano Panichella. 2013. Multi-objective cross-project
+defect prediction. In 2013 IEEE Sixth International Conference on Software Testing,
+Verification and Validation. IEEE, 252–261.
+[10] Gerardo Canfora, Andrea De Lucia, Massimiliano Di Penta, Rocco Oliveto, Anni-
+bale Panichella, and Sebastiano Panichella. 2015. Defect prediction as a multiob-
+jective optimization problem. Software Testing, Verification and Reliability 25, 4
+(2015), 426–459.
+[11] Daniel Alencar Da Costa, Shane McIntosh, Weiyi Shang, Uirá Kulesza, Roberta
+Coelho, and Ahmed E Hassan. 2016. A framework for evaluating the results of
+the szz approach for identifying bug-introducing changes. IEEE Transactions on
+Software Engineering 43, 7 (2016), 641–657.
+[12] Steven Davies, Marc Roper, and Murray Wood. 2014. Comparing text-based and
+dependence-based approaches for determining the origins of bugs. Journal of
+Software: Evolution and Process 26, 1 (2014), 107–139.
+[13] Georg Dotzler and Michael Philippsen. 2016. Move-optimized source code tree dif-
+ferencing. In 2016 31st IEEE/ACM International Conference on Automated Software
+Engineering (ASE). IEEE, 660–671.
+[14] Jordan Ell. 2013. Identifying failure inducing developer pairs within developer
+networks. In 2013 35th International Conference on Software Engineering (ICSE).
+IEEE, 1471–1473.
+[15] Jean-Rémy Falleri, Floréal Morandat, Xavier Blanc, Matias Martinez, and Martin
+Monperrus. 2014. Fine-grained and accurate source code differencing. In Pro-
+ceedings of the 29th ACM/IEEE international conference on Automated software
+engineering. 313–324.
+2362
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. 

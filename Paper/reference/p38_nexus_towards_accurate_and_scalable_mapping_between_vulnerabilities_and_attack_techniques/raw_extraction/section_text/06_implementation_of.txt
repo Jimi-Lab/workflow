@@ -1,0 +1,59 @@
+Implementation of
+Authentication Algorithm
+Weakness
+Abstraction: Base
+Description: ...
+...
+Related Attack
+Patterns (CAPEC): 90
+...
+ID: 90
+Name: 
+Reflection Attack in
+Authentication Protocol
+Taxonomy
+Mappings: Parent(114)...
+...
+...
+...
+...
+ID: 114
+Name: 
+Authentication Abuse...
+Taxonomy Mappings:
+CWEs CAPECs
+TTP (1548)
+TTPs
+Name: Abuse Elevation Control Mechanism
+Description: Adversaries may ...
+...
+...
+...
+External_ID: T1548
+Fig. 4: An example of building ground truth dataset.
+C. Attack Pattern Extraction
+We extract TTP-relevant information from CVE descrip-
+tions. Existing extraction approaches (e.g., [3], [9]–[11], [13])
+suffer from various limitations: keyword-based and rule-based
+ﬁltering may miss important attack details, ﬁne-tuned NER
+models often fail to generalize across different cybersecurity
+contexts, and predeﬁned entity lists may overlook critical
+CVE-speciﬁc information, leading to high false positive and
+false negative rates. We mitigate these issues through two key
+sub-steps detailed below.
+1) Data Preprocessing:This step normalizes CVE descrip-
+tions into canonical sentences for attack-pattern analysis. The
+text is ﬁrst cleaned with regular expressions to remove whites-
+pace, special characters, and citations, then segmented using
+the NLTK Punkt tokenizer [49]. Following prior work [3],
+[10], [21], [50], sentences are further split into sub-sentences
+via Semantic Role Labeling (SRL) [33], which identiﬁes
+predicates and their roles (who did what to whom). Verbs
+serve as anchors, and arguments are classiﬁed as agents and
+patients [3], [10], [50], ensuring each sub-sentence contains at
+least one object. A directed graph is then built: nodes are sub-
+sentences, and edges capture dependencies, if sub-sentence
+A shares verbs with B and B has more verbs, A becomes
+a child of B. This structure helps NEXUS associate TTPs
+with attack patterns through parent–child relationships, as in
+Section III-D1. This step is further detailed in Algorithm 1 in

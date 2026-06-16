@@ -1,0 +1,117 @@
+that expat/lib/xmlparse.ccontained a code clone of a
+vulnerable function retrieved from Google Android repository,
+which allows attackers to cause a DoS attack through a crafted
+XML ﬁle. Listing 9 shows part of the patches for CVE-2012-
+0876, and Listing 10 is an excerpt of the vulnerable function
+in Apache HTTP server, which can be triggered with a crafted
+packet to cause DoS.
+We could use a specially crafted XML ﬁle to trigger the
+vulnerability, and force the Apache HTTP server daemon
+to consume 100 % of CPU resources. We reported this
+zero-day vulnerability, which could critically affect numerous
+web services that run Apache HTTP server, and the Apache
+security team conﬁrmed this vulnerability.
+Listing 9: Patch for CVE-2012-0876 retrieved from Google
+Android repository.
+1 for (i = 0; i < table->size; i++)
+2 if (table->v[i]) {
+3 - unsigned long newHash = hash(table->v[i]->name);
+4 + unsigned long newHash = hash(parser, table->v[i]->
+name);
+5 size_t j = newHash & newMask;
+Listing 10: Vulnerable function in httpd-2.4.23/srclib/apr-
+util/xml/expat/lib/xmlparse.c (lines from 5428 to 5434) of
+Apache HTTP server 2.4.23 which is still unpatched even
+though the security patch was released in 2012.
+1 ...for (i = 0; i < table->size; i++)
+2 if (table->v[i]) {
+3 unsigned long newHash = hash(table->v[i]->name);
+4 size_t j = newHash & newMask;
+5 step = 0;...
+B. Kernel reuse cases
+One important characteristic of cases in which the kernel
+is reused, is that these kernels usually lag behind the latest
+kernel. This is very prevalent in the ecology of IoT devices
+including Android smartphones, Tizen appliances, and Linux-
+oriented operating systems such as Ubuntu. It often takes at
+least half a year to develop their own operating system on the
+basis of a certain version of Linux kernel, which eventually
+leaves them (i.e., the IoT devices, OS distributions, and smart
+appliances running the Tizen OS) subject to the vulnerabilities
+reported during the period of development. In other words,
+although the Linux kernel is constantly patched and updated,
+devices inevitably lag behind the patching efforts of Linux
+kernel developers.
+The dirty COW vulnerability (CVE-2016-5195) is an excel-
+lent example of a situation in which VUDDY can be effective,
+because a vulnerable Linux kernel was reused in a smartphone.
+This vulnerability was once discovered and ﬁxed by a Linux
+kernel developer in 2005, but its ﬁx was reverted, thereby
+nullifying the initial ﬁx. VUDDY detected the vulnerable clone
+(see Listing 11) in the ﬁrmware of an Android smartphone
+released in March 2016, and we successfully exploited the
+vulnerable clone to gain root privilege of the smartphone run-
+ning the examined ﬁrmware. If VUDDY had been employed to
+ﬁnd known old vulnerabilities before the affected kernels were
+released, Linux could have prevented such brutal vulnerability
+from being propagated through a number of OS distributions
+including those in Android smartphones which hold more than
+half of the market share.
+Listing 11: Vulnerable clone affected by Dirty COW
+vulnerability found in the Android ﬁrmware.
+1 ...}
+2 if ((flags & FOLL_NUMA) && pte_protnone(pte))
+3 goto no_page;
+4 if ((flags & FOLL_WRITE) && !pte_write(pte)) {
+5 pte_unmap_unlock(ptep, ptl);
+6 return NULL;
+7 }...
+8 * reCOWed by userspace write).
+9 */
+10 if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags &
+VM_WRITE))
+11 *flags &= ˜FOLL_WRITE;
+12 return 0;
+13 }
+We contacted the smartphone manufacturer3 to inform them
+about our ﬁndings of the vulnerability. As a result, they
+immediately initiated a process to address the vulnerability.
+C. Intra-project code reuse cases
+Owing to our abstraction strategy, we detected an 8-year-
+old vulnerability (CVE-2008-3528) which possibly is a zero-
+day vulnerability, in the latest stable trees including versions
+4.8.6, 4.7.10, and the LTS versions of the Linux kernel. V ery
+interestingly, although the original vulnerability was found in
+ext2, ext3, and ext4 ﬁle systems of the kernel 2.6.26.5, and
+patched in 2008 (Listing 12), the nilfs2 ﬁle system of which
+the implementation is very similar (but differs in relation to
+some identiﬁers) to that of ext2 has remained unpatched to
+date. The problematic function named*nilfs_dotdotis
+in linux/fs/nilfs2/dir.c.
+Listing 12: Original patch of CVE-2008-3528 targeting
+ext2 ﬁle system of Linux.
+1 struct ext2_dir_entry_2* ext2_dotdot (struct inode
+*dir, struct page **p)
+2 {
+3 - struct page *page = ext2_get_page(dir, 0);
+4 + struct page *page = ext2_get_page(dir, 0, 0);
+5 ext2_dirent*de = NULL;
+6
+7 if (!IS_ERR(page)) {
+Listing 13: Buggy function in nilfs2 ﬁle system of Linux.
+1 struct nilfs_dir_entry*nilfs_dotdot(struct inode *
+dir, struct page **p)
+2 {
+3 struct page*page = nilfs_get_page(dir, 0);
+4 struct nilfs_dir_entry*de = NULL;
+5
+6 if (!IS_ERR(page)) { de = nilfs_next_entry( ...
+The function described in Listing 13 is suspected to be
+cloned from the implementation of the ext2 ﬁle system,
+because ﬁle systems share a considerable amount of similar
+characteristics. Even though the name of the function called at
+line 3 of Listing 13 is different from that of the original buggy
+3Name of this company and vulnerable smartphones are deliberately
+anonymized for legal reasons.
+607
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

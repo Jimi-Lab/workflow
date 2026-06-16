@@ -1,0 +1,106 @@
+(a) Precision, Recall, and F1-
+score before/after augmentation.
+(b) FPR and FNR before and after
+augmentation.
+Fig. 19: Model performance across TTP support groups before
+and after CVE sample augmentation.
+quest; ↑ $8.8 ↓ 10↘5 per CVE–TTP pair) for 92,632 CVEs.
+Comparable results can be achieved using open-weight models
+(e.g., Llama-3.1-8B in Figure 26-28 in Appendix C).
+3) CVE Sample Augmentation Analysis:To conﬁgure CVE
+Sample Augmentation, we examine pre-augmentation perfor-
+mance and ﬁnd that TTPs with fewer than 20,000 CVEs gener-
+ally have F1 below 90%. Thus, we set the eligibility threshold
+T=20,000. For the repetition parameter, tests show little added
+diversity beyond N>5, so we useN=5 to balance diversity
+and redundancy. Figure 19 shows evaluation results before
+and after augmentation using RoBERTa-Large. Figure 19a
+shows consistent improvements in Precision, Recall, and F1-
+score, especially for low-support TTPs. Figure 19b shows FPR
+and FNR trends, highlighting that augmentation reduces FNR
+while maintaining or slightly lowering FPR, improving model
+robustness. Figure 18b shows improved CVE coverage across
+ATT&CK Tactics after CVE Sample Augmentation. Green
+bars indicate paraphrased samples for underrepresented TTPs.
+Overlaps across tactics explain broader coverage gains. A total
+of 117,725 augmented CVEs are added to 92,632 originals,
+with higher per-tactic counts due to multiple pattern pairings.
+E. Manual Validation of Our Dataset
+We perform a small manual validation (using ten CVEs)
+to support our ground-truth construction, summarized in Ta-
+ble VIII. The parentheses under TP, FP, and FN show how
+many additional true positives, false positives, and false neg-
+atives were introduced by the adjustment step relative to the
+initial dataset. For FN, we evaluate only the 67 additional TTPs
+introduced during label adjustment, since these are directly
+affected by the adjustment logic. The 141 linkage-derived
+TTPs are not counted as false negatives unless the adjustment
+step explicitly removed one of their valid assignments. Thus,
+the FN values in parentheses reﬂect only cases where the ad-
+justment step incorrectly dropped a linkage-derived technique.
+Overall, the table shows that the fully automatic adjust-
+ment procedure greatly improves TTP coverage—often adding
+many correct mappings (e.g., CVE-2022-27805, CVE-2023-
+28705)—while keeping false positives low. Despite requir-
+ing no human input, it consistently yields reliable preci-
+sion (69.23–94.74%), recall (63.64–100%), and F1-scores
+(68.29–92.31%) across varied platforms and vulnerability
+types. The operational impact ofNEXUS false positives and
+negatives is discussed in Section VI-A.
+F . Impact of Model Adaptation on Mapping Accuracy
+To evaluate Model Adaptation, we use two public datasets:
+D4 (MITRE-curated APT reports [38]) and D5 (SMET
+CVE–TTP mappings [3], [75]). As D4–D5 follow different
+annotation strategies,NEXUS starts with weaker baseline per-
+formance than on D1–D3. We tune two parameters: clustering
+distance X and coverage thresholdω . Initial tests showX=0.0
+yields overly ﬁne clusters, whileX=0.2 overgeneralizes; thus
+X=0.1 is used. We evaluateω =40 and ω =80 to test robustness
+under different feedback-matching strictness.
+Table IX summarizes D4 adaptation results, where each
+review cycle corrects false positives and negatives using author
+feedback. Across bothω thresholds, Precision improves from
+28.57% to 46.81% (ω = 40) and 47.15% (ω = 80), while
+F1-score rises from 43.17% to 62.41% and 63.41%. Recall
+remains consistently high. These results show that NEXUS
+effectively reﬁnes predictions through cumulative feedback,
+even from a weaker baseline on narrative-heavy APT reports.
+Table X shows D5 adaptation results, with 50 CVEs cor-
+rected per cycle. Adaptation has a strong effect: Precision
+increases from 12.83% to 53.80% (ω=40) and 47.63% (ω=80),
+while F1 improves from 21.05% to 67.30% and 62.52%
+after three cycles (recall also rises steadily). Table XI further
+shows the beneﬁt of using Llama-3.1-8B during adaptation: F1
+improves from 46.87% to 63.41% on D4 and from 26.15%
+to 67.30% on D5, conﬁrming that model-based veriﬁcation
+reduces erroneous feedback and enhances adaptation accuracy.
+Feedback Efﬁciency.As shown in Table IX (D4) and Table X
+(D5), NEXUS stabilizes after only a few revision cycles. For
+D4 (MITRE-APT reports, one report per cycle), the F1-score
+increases from 43.17% to 56.15% in three cycles, then slows,
+reaching 62.41% by cycle six. For D5 (SMET CVEs, 50
+CVEs per cycle), the F1-score jumps from 21.05% to 67.30%
+within three cycles. On average, D5 gains about 15% F1 per
+cycle, while later D4 cycles (4–6) add only↑ 2%, indicating
+convergence after 2–3 cycles. Even in the worst case (APT-
+style text in D4), stable accuracy emerges after 5–6 cycles,
+requiring only moderate analyst effort (↔150 CVEs or ↗ six
+APT reports) to reach consistent mapping quality.
+V. I
+NFERENCE COST
+We evaluate the computational efﬁciency of NEXUS in
+terms of ﬁne-tuning time, prediction latency, memory usage,
+and CPU utilization. As shown in Figure 20,NEXUS demon-
+strates linear scalability, low resource usage, and practical
+runtime for large-scale deployments. Figure 20a reports the
+ﬁne-tuning time of the TTP Classiﬁer Model Building step
+after preparing datasets from the Ground Truth Building,
+Attack Pattern Extraction, Label Adjustment, and CVE Sample
+Augmentation steps. Although CVE Sample Augmentation
+generates the largest dataset, its ﬁne-tuning time is shorter
+due to a more powerful HPC cluster (128 CPU cores, 100GB
+memory, one NVIDIA A100 20GB GPU). Other steps used
+smaller or similar datasets with varying hardware, causing
+minor timing differences. A batch size of 4 was used con-
+sistently for uniformity, though a batch size of 16 could have
+11

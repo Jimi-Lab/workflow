@@ -1,0 +1,37 @@
+approach to detect unpatched code clones in OS-distribution
+scale code bases, and VUDDY uses coarse-grained function
+feature values to detect code clones. Our vulnerability database
+includes Linux kernel (totally 1,367 CVE-IDs, 2,664 security
+patches by Sep. 2020), OpenSSL (totally 91 CVE-IDs, 165
+patches by Jan. 2021), BusyBox (totally 13 CVE-IDs, 20 patches
+by Jan.2021), Wget (totally 22 CVE-IDs, 31 patches by Jan.
+2021), QEMU (totally 114 CVE-IDs, 145 patches by Jan.2021).
+To measure and compare the accuracy of the three vulnera-
+bility detection methods, we randomly select one version from
+each of the above ﬁve pieces of software, as shown in the ﬁrst
+column of TableIII. We check each version against all the 2,576
+CVE-IDs. With the ground truth (in total 69 vulnerabilities)
+established by the developer logs (i.e., changelogs and git logs),
+we show the accuracy of the three methods in TableIII.O n e
+can observe that neither ReDeBug[32] nor VUDDY[43] could
+achieve high precision and recall here, whereas our method has
+94.3% precision and 95.6% recall. Some CVEs released by NVD
+do not have corresponding patch(es), and these CVEs slipped out
+from the detection of our tool, which is the reason for the 95.6%
+recall of our tool. As shown in Fig.16, under these ﬁve data sets,
+we show the number of repatches collected by year. After manual
+veriﬁcation, it is found that some partially matched code reported
+by our tool do not have the CVE vulnerability, which is also the
+reason for the 94.3% precision of our tool. We summarized the
+reasons that led to the false positives and false negatives with
+ReDebug and VUDDY: (1) they wrongly identiﬁed repatched
+code (i.e., repatched in a different way) as a vulnerability, and
+(2) some exact or partial matching vulnerable code were not
+identiﬁed. Further, ReDebug detects by comparing the similarity
+between patch and vulnerability code, and the granularity is
+coarse, resulting in a large number of false positives. VUDDY
+is designed to achieve low false positive rates, which appear to
+be inherent to the approach of detecting vulnerabilities caused
+by code clones. However, when using this approach to detecting
+vulnerabilities that are not caused by code clones, high false
+negative rates occur. Note that although here the measurement

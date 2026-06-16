@@ -1,0 +1,29 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- [NEEDS EVIDENCE] formal definitions not cleanly extracted
+Objective:
+- 1 Introduction Identifying the commit that introduced a bug, known as the Bug-Inducing Commit (BIC), is a foundational task in software maintenance.
+- For two decades, the dominant BIC identification approach has been the SZZ algorithm [32] and its variants [7, 8, 19, 24, 35, 36], which trace deleted (and modified) code in a bug-fixing commit (BFC) via git blame to identify commits that last modified those lines.
+- Presumably, one or more of those commits are the BIC.
+- While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify the same code elements [42], this assumption does not always hold: prior work has shown that over 13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain only added lines where blame cannot be applied [23].
+Constraints:
+- The temporal dimension is essential for BIC identification: a commit can only induce a bug if it precedes the fix, and understanding causal relationships requires reasoning about the sequence of code changes over time.
+- However, this approach requires test execution for candidate filtering and does not model the tem- poral structure of commit history.
+Evaluation Target:
+- Evaluation on three datasets shows that AgenticSZZ achieves F1-scores of 0.48 to 0.74, with statistically significant improvements over state-of-the-art by up to 27%.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- While our evaluation did not directly measure the relationship between blame count and accuracy, this pattern suggests that blame complexity could serve as an indicator of case difficulty, warranting future investigation.
+- Simple cases may benefit from fast-path heuristics.Projects with predominantly single- blame cases (e.g., DS_LINUX where 47% have 1 to 2 deleted lines with 1 blame commit) may benefit from fast-path optimizations that resolve cases with minimal LLM interaction.
+- Future work should systematically evaluate accuracy stratified by blame complexity to confirm this hypothesis.
+- For contexts where BIC identification directly impacts downstream tasks such as defect prediction model training or automated program repair, this cost may be justified by the improved accuracy.
+- While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify the same code elements [42], this assumption does not always hold: prior work has shown that over 13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain only added lines where blame cannot be applied [23].
+- Despite these fundamental limitations, prior work has focused primarily on improving precision of the git blame-based approach through filtering heuristics [7, 19], refactoring detection [24, 25], deep learning [35], semantic analysis [4, 37], and LLM-based reasoning [36], leaving the recall problem unaddressed.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

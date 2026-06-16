@@ -1,0 +1,29 @@
+Domain Concepts Introduced:
+- 2 Background and Related Work SZZ Algorithm and Its Variants.The SZZ algorithm [ 32] pioneered automated BIC identification by tracing deleted or modified lines in bug-fixing commits via git blame.
+- Over two decades, numerous variants have improved precision through annotation graphs and cosmetic change filtering [19], meta-change exclusion [7], refactoring detection [24, 25], deep learning [35], and LLM- based reasoning [36, 40].
+- Most recently, LLM4SZZ [36] leverages LLMs to rank blame candidates and expands context around modified lines for candidate collection.
+- Despite these advances, all approaches share a fundamental limitation: they restrict the search space to commits returned by git blame, inherently missing BICs that require broader history traversal.
+- AgenticSZZ addresses this limitation by structuring the commit history as a temporal knowledge graph and navigating it through agent-guided exploration.
+- Knowledge Graphs (KGs) in Software Engineering (SE).A KG is a graph-based data structure where nodes represent entities and edges encode relationships between them, enabling queries that traverse and reason over these connections [16].
+- For automated program repair, repository-aware KGs bridge semantic gaps between issue descriptions and code patches [ 45], and unified code KGs enable multilingual issue resolution [ 5].
+- However, none of these works address BIC identification or model the temporal evolution of commits.
+Task Definition:
+- Inferred from title and extracted sections: identify vulnerability-introducing commits, bug-introducing commits, vulnerable/affected versions, or evidence useful for version validation. [NEEDS CITATION VERIFICATION]
+Threat Model / Assumptions:
+- [NEEDS EVIDENCE] not asserted unless explicitly stated in the paper.
+Motivating Case:
+- [NEEDS EVIDENCE] no clean motivating case extracted
+Why the Case Is Chosen:
+- [NEEDS EVIDENCE]
+Definitions Needed by Readers:
+- Vulnerability-introducing commit / bug-inducing commit, patch evidence, developer log, vulnerable version, SZZ-style tracing, depending on the paper scope.
+How Background Leads to Method:
+- approach to apply TKGs to software evolution analysis.
+- LLM Agents for SE.LLM-based agents have emerged as powerful tools for complex SE tasks, marking a shift toward Agentic SE (SE 3.0) where agents work as AI teammates [14, 20].
+- Simpler pipelines without persistent agent state have also proven effective [43], general-purpose agent frameworks provide flexible foundations [41], and unified agents have been proposed to orchestrate multiple SE capabilities [1].
+- For bug fixing specifically, combining code KGs with agentic reasoning has shown promise [22].
+Writing Pattern:
+- Build from concrete artifact evidence toward why naive blame or simple version matching is insufficient.
+Relevance to Our Paper:
+- Useful for affected versions background and related-work positioning.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json

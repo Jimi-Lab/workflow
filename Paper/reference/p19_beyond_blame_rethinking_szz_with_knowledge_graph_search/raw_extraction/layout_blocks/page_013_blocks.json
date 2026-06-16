@@ -1,0 +1,137 @@
+[
+  {
+    "page": 13,
+    "block_id": "page_013:block_001",
+    "block_type": "text",
+    "text": "Beyond Blame: Rethinking SZZ with Knowledge Graph Search 13",
+    "bbox": [
+      45.827999114990234,
+      60.6286735534668,
+      440.172607421875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_002",
+    "block_type": "text",
+    "text": "Table 2. AgenticSZZ effectiveness across all datasets (averaged over three runs). Underlined: best baseline; “-”: Java-only baselines not applicable to C projects.",
+    "bbox": [
+      44.797000885009766,
+      84.34700775146484,
+      440.7655334472656,
+      105.71598052978516
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_003",
+    "block_type": "text",
+    "text": "Method DS_LINUX DS_GITHUB-c DS_GITHUB-j DS_APACHE",
+    "bbox": [
+      52.34700012207031,
+      121.03233337402344,
+      419.53717041015625,
+      136.710205078125
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_004",
+    "block_type": "text",
+    "text": "Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1",
+    "bbox": [
+      106.42400360107422,
+      134.91363525390625,
+      433.65228271484375,
+      145.92831420898438
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_005",
+    "block_type": "text",
+    "text": "B-SZZ 0.452 0.578 0.507 0.361 0.656 0.466 0.285 0.680 0.401 0.251 0.435 0.318 AG-SZZ 0.448 0.553 0.495 0.410 0.592 0.484 0.421 0.533 0.470 0.328 0.310 0.318 MA-SZZ 0.421 0.538 0.472 0.335 0.624 0.436 0.239 0.560 0.335 0.307 0.345 0.329 R-SZZ 0.583 0.448 0.507 0.671 0.582 0.620 0.538 0.467 0.500 0.497 0.288 0.364 L-SZZ 0.560 0.430 0.486 0.486 0.422 0.452 0.492 0.427 0.457 0.366 0.211 0.267 RA-SZZ - - - - - - 0.337 0.440 0.382 0.264 0.325 0.293 Neural-SZZ - - - - - - 0.556 0.486 0.520 0.563 0.364 0.442 LLM4SZZ 0.628 0.552 0.588 0.687 0.641 0.663 0.607 0.569 0.587 0.610 0.398 0.482",
+    "bbox": [
+      52.34700012207031,
+      149.87762451171875,
+      433.65277099609375,
+      230.63134765625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_006",
+    "block_type": "text",
+    "text": "AgenticSZZ 0.669 0.643 0.656 0.708 0.706 0.707 0.743 0.743 0.743 0.590 0.405 0.480",
+    "bbox": [
+      52.34700012207031,
+      235.46632385253906,
+      433.6522216796875,
+      246.16220092773438
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_007",
+    "block_type": "text",
+    "text": "LLM4SZZ, the previous state-of-the-art, with improvements of 6.6% on DS_GITHUB-c, 11.6% on DS_LINUX, and 26.6% on DS_GITHUB-j; DS_APACHE shows comparable performance. Comparing the best-performing runs, the improvement is statistically significant (McNemar’s test, 𝑝 < 0 . 001, Cohen’s 𝑔 = 0 . 19, medium effect). Even AgenticSZZ’s worst -performing run significantly outper- forms LLM4SZZ’s best run ( 𝑝 < 0 . 001, 𝑔 = 0 . 17), demonstrating robust improvements across runs. Among baselines, traditional SZZ variants like B-SZZ achieve higher recall by returning multiple candidates, but suffer from low precision; conversely, heuristics like R-SZZ improve precision but sacrifice recall. AgenticSZZ achieves both the highest recall and highest precision by expanding the search space through the TKG while using intelligent agent reasoning to filter candidates. The recall improvements validate our RQ0 findings about BIC distribution. AgenticSZZ achieves higher recall than LLM4SZZ across all datasets, with the largest gains on DS_GITHUB-j (+0.174) and DS_LINUX (+0.091). These improvements reflect our RQ0 finding that 28% of BICs require exploration beyond immediate blame commits. While LLM4SZZ’s context expansion can reach some of these BICs, at first sight AgenticSZZ’s TKG-based history traversal seems to provide a more systematic approach to exploring ancestor commits (a deeper analysis of this is performed in RQ2). The simultaneous precision improvements indicate that the agent’s reasoning effectively filters false positives introduced by search space expansion. DS_APACHE presents unique challenges that limit improvement. While AgenticSZZ matches LLM4SZZ on DS_APACHE, it does not achieve the same gains as on other datasets, and the difference is not statistically significant ( 𝑝 = 0 . 74). As shown in Figure 2 , DS_APACHE has the highest blame complexity: 30% of cases involve ≥ 10 deleted lines with ≥ 3 blame commits, whereas DS_LINUX and DS_GITHUB concentrate on the low-complexity region (47% and 43% respectively have 1 to 2 deleted lines with only 1 blame commit). This complexity increases the difficulty of identifying the correct BIC among many candidates. Additionally, DS_APACHE projects span diverse Apache Software Foundation repositories with varying coding conventions, making it harder for the agent to reason about code relationships consistently. These observed performance improvements come with moderate time overhead. Table 3",
+    "bbox": [
+      45.479000091552734,
+      273.39007568359375,
+      441.8505554199219,
+      598.6997680664062
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_008",
+    "block_type": "text",
+    "text": "presents the average processing time per case. AgenticSZZ requires 34 to 54 seconds per case, compared to 20 to 30 seconds for LLM4SZZ [ 36 ]. The additional time is primarily due to TKG construction (7 to 30 seconds depending on repository size), while agent reasoning time (23 to 26 seconds) is comparable to LLM4SZZ’s LLM interaction. Notably, DS_LINUX has the longest TKG construction time (30 seconds) because git operations are slower on large repositories, but the total",
+    "bbox": [
+      45.827999114990234,
+      596.1790771484375,
+      441.266357421875,
+      657.7683715820312
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 13,
+    "block_id": "page_013:block_009",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      260.1289978027344,
+      671.4816284179688,
+      440.1734313964844,
+      682.496337890625
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

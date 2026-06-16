@@ -1,0 +1,39 @@
+: Accuracy of ReDeBug, VUDDY, and MOVERY in vulnerable code clone discovery.
+Target software #Discovered
+VCCs
+ReDeBug VUDDY M OVERY
+#TP #FP #FN Precision Recall #T P #FP #FN Precision Recall #T P #FP #FN Precision Recall
+ReactOS 210 31 9 179 0.78 0.15 8 0 202 1.00 0.04 207 3 3 0.99 0.99
+OpenCV 72 38 15 34 0.72 0.53 26 2 46 0.93 0.36 72 3 0 0.96 1.00
+Emscripten 56 22 8 34 0.73 0.39 9 1 47 0.90 0.16 50 4 6 0.93 0.89
+FreeBSD 33 25 44 8 0.36 0.76 6 16 27 0.27 0.18 27 4 6 0.87 0.82
+Crown 23 22 2 1 0.92 0.96 14 2 9 0.88 0.61 23 2 0 0.92 1.00
+OpenMVG 23 15 5 8 0.75 0.65 4 0 19 1.00 0.17 19 0 4 1.00 0.83
+ArangoDB 6 4 1 2 0.80 0.67 2 0 4 1.00 0.33 6 2 0 0.75 1.00
+FFmpeg 5 2 2 3 0.50 0.40 0 1 5 0.00 0.00 5 1 0 0.83 1.00
+Redis 5 3 0 2 1.00 0.60 3 0 2 1.00 0.60 5 0 0 1.00 1.00
+Git 1 1 1 0 0.50 1.00 0 0 1 N/A 0.00 1 0 0 1.00 1.00
+Total 434 163 87 271 0.65 0.38 72 22 362 0.77 0.17 415 19 19 0.96 0.96
+Table 5: VCCs that are hardly discovered by existing techniques.
+Types Description
+T1 VCCs without code lines deleted in security patches.
+T2 VCCs with various syntaxes derived from fo.
+T3 VCCs with heavy syntax change.
+Listing 10: A patch snippet for CVE-2017-14039 in OpenJPEG.
+1 static OPJ_BOOL opj_j2k_write_sot(opj_j2k_t *p_j2k, ...,
+2 const opj_stream_private_t *p_stream,
+3 opj_event_mgr_t * p_manager){
+4 ...
+5 OPJ_UNUSED(p_stream);
+6 - OPJ_UNUSED(p_manager);
+code to which non-security changes were not applied to be
+vulnerable. In addition, ReDeBug misinterpreted a patched
+function as vulnerable when the last few added code lines are
+the same as the code lines before the added code lines [17,49].
+The FPs of VUDDY were caused by abstraction; if a security
+patch only fixes VUDDY’s abstraction targets (e.g., variable
+names), VUDDY cannot differentiate between vulnerable and
+patched functions, producing FPs.
+The accuracy ofMOVERY . Table 5 summarizes the types
+of VCCs that were discovered by MOVERY but hardly discov-
+ered 

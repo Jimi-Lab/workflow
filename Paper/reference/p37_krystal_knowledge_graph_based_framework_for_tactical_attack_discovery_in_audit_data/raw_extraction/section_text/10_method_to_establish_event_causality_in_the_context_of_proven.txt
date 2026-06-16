@@ -1,0 +1,26 @@
+method to establish event causality in the context of provenance 
+graphs. It is based on a set of rules to assign tag values onto sys- 
+tem object nodes (i.e., process, ﬁle, socket, etc.) upon interaction 
+between them ( Hossain et al., 2017 ). In order to trace the impact of 
+malicious events, tags and values will be propagated sequentially 
+through a provenance graph to other system objects if a given tag 
+propagation rule is satisﬁed. 
+Figure 6 illustrates tag propagation with an example. It 
+introduces integrity and conﬁdentiality tags to identify the 
+suspicion level of a node. We express propagation rules 
+Hossain et al. (2020) as SPARQL queries processed by our tag prop- 
+agation component. Listing 3 shows the query matching the illus- 
+tration in Fig. 6 . It checks if a socket connection ( < socket > ) 
+is received by ( :isReceivedBy ) a process ( < process > ) and 
+then compares the minimum ( afn:min ) integrity tag value 
+( :intTag ) of the < socket > (identiﬁed by ?oit variable) and 
+< process > (identiﬁed by ?sit variable). 15 If ?oit is not the 
+same as ?sit , it updates 16 ?sit with the new value (identiﬁed 
+by the ?nit variable). 
+Attenuation & Decay are techniques to tackle the “dependence 
+explosion” problem ( Hossain et al., 2017 ), which occurs when a 
+node in the provenance graph interacts with a large number of sys- 
+tem objects, causing a large number of benign events to be ﬂagged 
+as being part of an attack ( Hossain et al., 2020 ). This leads to a 
+large number of false-positive alerts, making it diﬃcult to identify 
+relevant alerts. Tag attenuation ( Hossain et al., 2020 ) aims to alle-

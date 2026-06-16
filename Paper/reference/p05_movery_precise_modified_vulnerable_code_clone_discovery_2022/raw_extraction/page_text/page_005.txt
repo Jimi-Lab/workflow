@@ -1,0 +1,98 @@
+Listing 3: A patch snippet for CVE-2014-5461 in Lua 5.2.3.
+1 index aafa3dca2..d02e11328 100644
+2 ––– a/ldo.c
+3 +++ b/ldo.c
+4 @@ -326,7 +327,13 @@ int luaD_precall (...) {
+5 Proto *p = clLvalue(func)->p;
+6 - luaD_checkstack(L, p->maxstacksize);
+7 - func = restorestack(L, funcr);
+8 n = cast_int(L->top - func) - 1;
+9 + luaD_checkstack(L, p->maxstacksize);
+10 for (; n < p->numparams; n++)
+11 setnilvalue(L->top++);
+12 - base = (!p->is_vararg)? func + 1:
+adjust_varargs(L, p, n);
+13 + if (!p->is_vararg) {
+14 + func = restorestack(L, funcr);
+15 + base = func + 1;
+16 + }
+Listing 4: A backporting patch for CVE-2014-5461 in Redis.
+1 ––– a/deps/lua/src/ldo.c
+2 +++ b/deps/lua/src/ldo.c
+3 @@ -276,3 +276,3 @@ int luaD_precall (...) {
+4 Proto *p = cl->p;
+5 - luaD_checkstack(L, p->maxstacksize);
+6 + luaD_checkstack(L, p->maxstacksize + p->numparams);
+7 func = restorestack(L, funcr);
+8 // No "base = (!p->is_vararg)? func + 1:..." code line
+However, VUDDY [17], a scalable VCC discovery tech-
+nique that only considers limited changes in the vulnerable
+function, cannot discover such VCCs. ReDeBug [14], a VCC
+discovery technique that considers nearby three (by default)
+lines of deleted and added code lines from the patch, also fails
+to discover such a VCC because the three lines immediately
+above the lines deleted from the patch (i.e., lines #9, #10, and
+#11 in Listing 1) differ from those of the function in PHP (i.e.,
+lines #6, #7, and #8 in Listing 2).
+Example 2) As an example of a VCC that does not in-
+clude the code lines deleted from the patch, we introduce a
+buffer overflow vulnerability that existed in Lua2 v5.1 through
+v5.2.2, which allows context-dependent attackers to cause
+a denial of service attack ( i.e., CVE-2014-5461). Listing 3
+shows the patch snippet applied in Lua v5.2.3. We confirmed
+that Redis3, which reused vulnerable Lua with code modifica-
+tions, backported the security patch for CVE-2014-5461 in
+September 2020 (see Listing 4).
+Specifically, we noted that the patch applied in Redis was
+different from that applied in the Lua repository. This is be-
+cause Redis reused an old version of Lua (v5.1.5) where the
+syntax of the vulnerable function is different from what is
+disclosed, it was infeasible for the Redis team to apply the
+patch for CVE-2014-5461 as it was (e.g., line #12 of Listing 3
+did not exist in the reused code parts of Lua within Redis),
+and thus they followed the patch suggested on the official bug
+tracker of Lua4.
+2https://github.com/lua/lua
+3https://github.com/redis/redis
+4http://www.lua.org/bugs.html#5.2.2-1
+fo
+ fd
+ fp
+INPUT
+OUTPUT
+INPUT
+OUTPUT
+Figure 2: High-level overview of the workflow of M OVERY .
+This case highlights the need to discover VCCs that were
+propagated with the syntax of older versions, which may
+not contain the code lines deleted from security patches.
+MOVERY makes this possible by collating vulnerable func-
+tions between the oldest and the disclosed vulnerable ver-
+sions (see Section 3). However, existing VCC discovery tech-
+niques [14, 17, 49] fail to discover such a VCC when vul-
+nerable lines they defined (e.g., in this case, line #12 in List-
+ing 3) are not contained in the VCC. In contrast, existing SCA
+techniques [9, 48] misinterpret that Redis still contains the
+vulnerability because a vulnerable version of Lua (i.e., v5.1.5)
+is reused in Redis, despite the Redis team has backported the
+security patch.
+3 Methodology of M OVERY
+In this section, we describe the methodology of MOVERY .
+MOVERY comprises the following two phases: signature gen-
+eration phase (P1) and VCC discovery phase (P2). In P1,
+MOVERY uses techniques called function collation and core
+line extractionto generate extensible signatures for addressing
+the syntax diversity of vulnerable codes. In P2, for scalability,
+MOVERY reduces the search space of the target software by
+focusing only on the code parts borrowed from other OSS. On
+top of that, MOVERY discovers a VCC in the target software:
+a function that is distinct from patch signatures and simulta-
+neously matches the vulnerability signatures. The high-level
+workflow of MOVERY is shown in Figure 2.
+3.1 Signature generation (P1)
+Given a 3-tuple of functions, the oldest vulnerable function
+( fo), the disclosed vulnerable function ( fd), and the patched
+function ( fp), MOVERY generates vulnerability and patch
+signatures (the method for collecting vulnerable and patched
+functions is introduced in Section 4.1).
+3040    31st USENIX Security Symposium USENIX Association

@@ -1,0 +1,511 @@
+III. P ROBLEM AND GOAL STA TEMENT
+A. Problem formulation
+1) Clone detector: First, we deﬁne a clone detector. For-
+mally, letF be the set of all functions in a program (e.g., a
+C program). LetV ⊆ F, and T ⊆ F be a set of vulnerable
+functions, and a set of target functions, respectively. Then, a
+clone detectorC is a function of the type:
+C : F →{0,1} (1)
+which takes a program and returns 1 (i.e., vulnerable) or 0.
+Deﬁnition 1(Completeness). A clone detectorC is complete
+with respect toV and T iﬀ
+∀f ∈T : f ∈V ⇒C(f)=1 . (2)
+2) Abstract clone detector: Now, we denote the set of
+abstract functions byˆF, which is generated fromF by applying
+an abstraction functionα:
+α: F → ˆF (3)
+such thatα is deterministic for∀f,f ′ ∈F:
+f =f′ ⇒α(f)= α(f′). (4)
+With V ⊆ F being a set of vulnerable functions, we can
+deﬁne the abstract clone detectorˆC : F →{0,1} in terms of
+the abstraction functionα:
+ˆCV (f)≡∃f′ ∈V : α(f′)= α(f) (5)
+Obviously, the abstract clone detectorˆC is complete:
+∀f ∈F : f ∈V ⇒ ˆC(f)=1 . (6)
+B. Goals
+The goals of this research are as follows:
+1) Designing a clone detectorC that satisﬁes completeness.
+2) Designing an abstraction functionα and associated ab-
+stract clone detector ˆC, which is effective in detecting
+Type-1 and Type-2 code clones of known vulnerabilities.
+With a given vulnerable functionf, ˆC should detect its
+abstract clonesf′, such that ˆC(f)= ˆC(f′)=1 . This implies
+that ˆC completely detects exact clones of vulnerability, as
+well as clones in which variable names, identiﬁers, data types,
+comments, and whitespace are modiﬁed.
+Type-3 and Type-4 code clones have characteristics which
+make us exclude them from the scope of our abstract clone
+detector ˆC. Most importantly, Type-3 and Type-4 code clones
+can be subjective to the loss of syntactic information which
+are crucial for a vulnerability to be triggered, because security
+vulnerabilities are often very sensitive to the constants and the
+order of statements. For example, vulnerability that leverages
+race condition in thekeyctl_read_keyfunction in securi-
+ty/keys/keyctl.c of the Linux kernel before 4.3.4 (CVE-2015-
+7550) was ﬁxed by merely changing the order of statements
+within the function1. This incident implies that if the order
+information is lost after abstraction, the vulnerable condition
+is lost as well. Moreover, constants, referring to ﬁxed values
+that do not change during the execution of a program, are key
+elements in many types of vulnerabilities. Intuitively, even a
+1See commit b4a1b4f5047e4f54e194681125c74c0aa64d637d in the Linux
+kernel source tree.
+598
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 005 =====
+35(352&(66,1*
+6)XQFWLRQ
+UHWULHYDO
+&/21('(7(&7,21
+3URJUDP
+6$EVWUDFWLRQ
+DQGQRUPDOL]DWLRQ
+6)LQJHUSULQW
+JHQHUDWLRQ
+)XQFWLRQV
+3UHSURFHVVHG
+IXQFWLRQV
+)LQJHUSULQW
+GLFWLRQDU\
+6+DVK
+ORRNXS
+6.H\
+ORRNXS
+IRXQG
+5HSRUWFORQH
+IRXQG
+)LQJHUSULQW
+GLFWLRQDU\
+RIYXOQHUDELOLWLHV
+)LQJHUSULQW
+GLFWLRQDU\
+RIWDUJHW
+SURJUDPV
+Fig. 1: Two stages of VUDDY: preprocessing and clone
+detection.
+slight modiﬁcation of the value of constants, (e.g., assigning 0
+instead of 1 for a ﬂag variable which is later used for initiating
+an input sanitation sequence) may suppress a vulnerability, or
+rather introduce a new vulnerability. For example, the denial-
+of-service (DoS) ﬂaw (CVE-2012-0876) in the Expat XML
+parser (xmlparse.c) [32] is patched by changing the constant
+value 0 in the problematic function, hash(), into a salt
+variable. In that sense, if the abstraction functionα does not
+preserve constants, it will not be able to preserve vulnerability
+and cause false positive.
+IV . THE PROPOSED METHOD : VUDDY
+In this section, we describe the main ideas and principles
+behind VUDDY (VUlnerable coDe clone DiscoverY), which
+is a scalable approach to code clone detection that can be
+seamlessly applied to the massive OSS pool.
+Based on the aforementioned goals, we propose two-stage
+modeling of VUDDY: preprocessing and clone detection. The
+preprocessing stage includes three substeps:
+S1. Function retrieval
+S2. Abstraction and normalization
+S3. Fingerprint generation
+Then in the clone detection stage, VUDDY conducts:
+S4. Key lookup
+S5. Hash lookup
+Fig. 1 illustrates the overall stages and substeps of VUDDY .
+Once preprocessing is complete, the resulting ﬁngerprint
+dictionary can be permanently reused, unless some portion
+of the program is changed. In addition, if a user speciﬁes
+the changed portion, only the difference can be applied to
+the ﬁngerprint in a very short time, rather than having to
+completely regenerate the ﬁngerprint. This efﬁcient design
+enables VUDDY to perform real-time clone detection.
+A. Preprocessing
+S1. Function retrieval: VUDDY begins by retrieving
+functions from a given program by using a robust parser.
+VUDDY then performs a syntax analysis to identify formal
+parameters, data types in use, local variables, and function
+calls. This supplementary information is used in the next stage:
+abstraction and normalization.
+S2. Abstraction and normalization: In this stage, an
+abstraction and normalization feature is offered. Blindly gen-
+erating a ﬁngerprint with an original function will lead to
+the omission of renamed (Type-2) clones, and cause false
+negatives. Thus, we establish abstraction rules to transform
+the function body strings before generating its ﬁngerprint.
+We fashioned four levels of abstraction which makes our
+approach resilient to common code modiﬁcations, while pre-
+serving vulnerability. Fig. 2 shows the transformation of a
+sample function at varying abstraction levels. Here, higher
+levels of abstraction include subordinate levels.
+• Level 0: No abstraction.Do not abstract the code, for
+detecting exact (Type-1) clones.
+• Level 1: Formal parameter abstraction.Gather formal
+parameters from the arguments of the function header,
+and replace every occurrence of the parameter variables
+inside the body with a symbolFPARAM. Then, the code
+clones that modify the parameter names are captured.
+• Level 2: Local variable abstraction.Replace all local
+variables that appear in the body of a function with
+a symbol LVAR. From this level onwards, VUDDY is
+tolerant to modiﬁcations of the names of variables in
+copy-pasted functions, which is a common practice.
+• Level 3: Data type abstraction.Replace the data types
+with a symbolDTYPE. The data types include not only
+standard C data types, and qualiﬁers, but also user-
+deﬁned types. However, modiﬁers (e.g., unsigned) are not
+replaced because for certain types of vulnerabilities, the
+signedness of a variable matters. After level 3 abstrac-
+tion, code clones of which the variable types have been
+changed (e.g., “int” to “static int”) can be detected.
+• Level 4: Function call abstraction.Replace the name
+of every called function with a symbol FUNCCALL.
+Researchers have pointed out that function calls and
+shared APIs are typical causes of recurring vulnerabilities
+[12], [27], [33]. This procedure is necessary for detecting
+cloned functions with similar API usage.
+With the abstraction scheme, VUDDY completely detects
+Type-2 vulnerable code clones. Cases in which abstraction is
+highly effective and critical for detecting vulnerable clones are
+introduced in section IX.
+The abstracted function body is then normalized by remov-
+ing the comments, whitespaces, tabs, and line feed characters,
+and by converting all characters into lowercase. This guar-
+antees that the performance, especially the detection accu-
+racy, of VUDDY is not affected by syntactically meaningless
+modiﬁcations. For example, if a function is inlined after
+cloning, or if comments in a function are greatly changed, code
+normalization still enables VUDDY to detect the function.
+S3. Fingerprint generation: VUDDY generates ﬁnger-
+prints for the retrieved function bodies that are abstracted and
+normalized. A ﬁngerprint of a function is represented as a
+599
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 006 =====
+Level 0: No abstraction.
+1 void avg (float arr[], int len){
+2 static float sum = 0;
+3 unsigned int i;
+4 for (i = 0; i < len; i++);
+5 sum += arr[i];
+6 printf("%f %d",sum/len,validate(sum));
+7 }
+Level 1: Formal parameter abstraction.
+1 void avg (floatFPARAM[], intFPARAM) {
+2 static float sum = 0;
+3 unsigned int i;
+4 f o r( i=0 ;i< FPARAM; i++)
+5 sum += FPARAM[i];
+6 printf("%f %d",sum/FPARAM,validate(sum);
+7 }
+Level 2: Local variable name abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 static floatLVAR = 0;
+3 unsigned intLVAR;
+4 for (LVAR = 0; LVAR < FPARAM;LVAR++)
+5 LVAR += FPARAM[LVAR];
+6 printf("%f %d",LVAR/FPARAM,validate(LVAR));
+7 }
+Level 3: Data type abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 DTYPE LVAR = 0;
+3 unsigned DTYPE LVAR;
+4 for (LVAR = 0; LVAR < FPARAM; LVAR++)
+5 LVAR += FPARAM[LVAR];
+6 printf("%f %d",LVAR/FPARAM,validate(LVAR));
+7 }
+Level 4: Function call abstraction.
+1 void avg (float FPARAM[], int FPARAM){
+2 DTYPE LVAR = 0;
+3 unsigned DTYPE LVAR;
+4 for (LVAR = 0; LVAR < FPARAM; LVAR)
+5 LVAR += FPARAM[LVAR];
+6 FUNCCALL("%f %d",LVAR/FPARAM,FUNCCALL(LVAR));
+7 }
+Fig. 2: Level-by-level application of abstraction schemes on a
+sample function.
+2-tuple. The length of the normalized function body string
+becomes one element, and the hash value of the string becomes
+the other. Fig. 3 shows the ﬁngerprinting of example functions.
+After ﬁngerprinting, VUDDY stores the tuples in a dictio-
+nary that maps keys to values, where the length values (i.e.,
+the ﬁrst element of a tuple) are keys, and the hash values that
+share the same key are mapped to each key. Fig. 4 shows how
+the example functions of Fig. 3 are classiﬁed and stored in a
+dictionary.
+In the dictionary shown in Fig. 4, the two functions in Fig. 3
+(sumand increment) are classiﬁed under the same integer
+key, because the length of their abstracted and normalized
+bodies are identical as 20. The ﬁngerprint of the other function
+(printer) is assigned to another key, 23, in the dictionary. In
+practice, we ignore functions of which the lengths are shorter
+than 50, to prevent VUDDY from identifying short functions
+as clones. Intuitively, short functions are hardly vulnerable by
+themselves. Further discussion on a proper threshold setting
+is provided in subsection V-A.
+B. Clone detection
+VUDDY detects code clones between two programs, by
+performing at most two membership tests for each prepro-
+Original: int sum (int a, int b){
+returna+b ;
+}
+Preprocessed: returnfparam+fparam;
+Length: 20
+Hash value: c94d99100e084297ddbf383830f655d1
+Fingerprint: {20, c94d99100e084297ddbf383830f655d1}
+Original: void increment (){
+int num = 80;
+num++; /* no return val*/
+}
+Preprocessed: dtypelvar=80;lvar++;
+Length: 20
+Hash value: d6e77882a5c55c67f45f5fd84e1d616b
+Fingerprint: {20, d6e77882a5c55c67f45f5fd84e1d616b}
+Original: void printer (char* src) {
+printf("%s", src);
+}
+Preprocessed: funccall("%s",fparam);
+Length: 23
+Hash value: 9a45e4a15c928699afe867e97fe839d0
+Fingerprint: {23, 9a45e4a15c928699afe867e97fe839d0}
+Fig. 3: Example functions and corresponding ﬁngerprints.
+20: {
+‘c94d99100e084297ddbf383830f655d1’,
+‘d6e77882a5c55c67f45f5fd84e1d616b’
+}
+23: {
+‘9a45e4a15c928699afe867e97fe839d0’
+}
+Fig. 4: A dictionary that stores the ﬁngerprints of the example
+functions. A set containing two hash values is mapped to the
+key 20, which is the length value, and another set is mapped
+to the key 23.
+cessed, length-classiﬁed ﬁngerprint dictionary: a key lookup,
+and a subsequent hash lookup. This approach is based on the
+fact that two identical functions are required to have the same
+lengths after abstraction and normalization, even if variables
+are renamed and comments are changed.
+S4. Key lookup: VUDDY performs the ﬁrst membership
+testing, by iterating over every key in a source dictionary, and
+looking for the existence of the key (i.e., the length of the
+preprocessed function) in the target ﬁngerprint dictionary. If
+the key lookup fails, then VUDDY concludes that there is no
+clone in the target program. If it succeeds to ﬁnd the existence
+of the same integer key, then it proceeds to the next substep:
+Hash lookup.
+S5. Hash lookup: As a last substep of clone detection,
+VUDDY searches for the presence of the hash value in the
+set mapped to the integer key. If the hash value is discovered,
+then the function is considered to be a clone.
+For example, when comparing dictionary A and B, VUDDY
+iterates S4 over every key in dictionary A, searching for the
+key in dictionary B. For each key shared by dictionary A and
+B, VUDDY performs S5 to retrieve all shared hash values,
+which are the clones we are looking for.
+This design of VUDDY accelerates the process of clone
+searching by taking advantage of the following two facts:
+1) The time complexity of an operation that checks the
+existence of a value from a set of unique elements is
+O(1) on average, andO(n) in the worst case.
+600
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 007 =====
+2) It is guaranteed that even in the worst case,n is small
+because of the length classiﬁcation. For example, the
+ﬁngerprint dictionary of Linux kernel 4.7.6 (stable kernel
+released on Sep. 30, 23K ﬁles with over 15.4 MLoC)
+only contains 5,245 integer keys, and among the hash sets
+associated to the keys, the largest set has 1,019 elements.
+The average number of elements of the hash sets is 67.85,
+the median is 5, and the mode (the value that occurs most
+often) is 1. This implies that most of the hash set will
+have only one element.
+The efﬁciency of VUDDY in terms of discovering code
+clones from large programs is further evaluated in section VII.
+V. APPLICA TION:V ULNERABILITY DETECTION
+In this section we describe the application of VUDDY to
+detect vulnerabilities from small to massive real-world pro-
+grams. To obtain vulnerable functions from reliable software
+projects when establishing a vulnerability database, we lever-
+aged the Git repositories of well-known and authoritative open
+source projects: Google Android, Codeaurora Android Project,
+Google Chromium Project, FreeBSD, Linux Kernel, Ubuntu-
+Trusty, Apache HTTPD, and OpenSSL. Then, by using the
+general clone detection procedure explained in section IV,
+VUDDY searches for the code clones of vulnerable functions
+from a target program.
+A. Establishing a vulnerability database
+The process of collecting vulnerable code and establishing
+a vulnerability database is fully automated. The process of
+reconstructing vulnerable functions out of Git commit logs
+consists of the following steps:
+1) git clone repository.This is to download speciﬁed
+Git repository into a local directory.
+2) git log --grep=‘CVE-20’for each repository.
+This searches the commits regarding Common Vulner-
+ability and Exposures (CVEs) [34]. This works for any
+general keywords, such as vulnerability types, or vulner-
+ability names. If it is required to collect certain types of
+bugs, such as buffer overﬂow, the keyword for grep would
+be “buffer overﬂow.” Well-known vulnerability names,
+such as Heartbleed, can also be queried.
+3) git showthe searched commits.This shows the full
+commit log that contains a description of the vulnerability
+related to CVE, as well as a security patch information
+in uniﬁed diff format. Diffs have a dedicated line for
+recording ﬁle metadata, in which reference IDs to old
+and new ﬁles addressed by the patch are written.
+4) Filter irrelevant commits.The steps listed could fetch
+commits that are inappropriate for vulnerability detection.
+For example, some commits have the keyword “CVE-
+20” in their message, which is actually “Revert the patch
+for CVE-20XX-XXXX.” Merging commits or updating
+commits which usually put all the messages of associated
+commits together are another problem, particularly if one
+of the commits happens to be a CVE patch. In such cases,
+our automated approach would end up retrieving a benign
+function. Thus, commits which revert, merge, or update
+are discarded in this step.
+5) git show the old ﬁle ID. This shows the old, un-
+patched version of the ﬁle. We then retrieve the vulnerable
+function from the ﬁle.
+Listing 1 is the patch for CVE-2013-4312, found in the
+Codeaurora Android repository. This patch adds lines 9 and 10
+to ensure that the per-user amount of pages allocated in pipes
+is limited so that the system can be protected against memory
+abuse. The ﬁle metadata in line 2 indicate the references to
+the old ﬁle (d2cbeff) and the new ﬁle (19078bd), and line
+5 conveys information about the line numbers of the affected
+portion in the ﬁle.
+We could retrieve the old function, namely the vulnerable
+version of the function, by querying “git show d2cbeff”
+to the cloned Git object, obtaining the old ﬁle, and parsing
+the relevant function. Listing 2 is the retrieved vulnerable
+function, which includes both the vulnerable part, and the
+context around it.
+Listing 1: Patch for CVE-2013-4312.
+1 diff --git a/fs/pipe.c b/fs/pipe.c
+2 index d2cbeff..19078bd 100644
+3 --- a/fs/pipe.c
+4 +++ b/fs/pipe.c
+5 @@ -607,6 +642,8 @@void free_pipe_info(struct
+pipe_inode_info*pipe)
+6 {
+7 int i;
+8 + account_pipe_buffers(pipe, pipe->buffers, 0);
+9 + free_uid(pipe->user);10
+for (i = 0; i < pipe->buffers; i++) {11
+struct pipe_buffer*buf = pipe->bufs + i;12
+if (buf->ops)
+Listing 2: Snippet of the vulnerable function retrieved from
+the patch for CVE-2013-4312.
+1 void free_pipe_info(struct pipe_inode_info*pipe)
+2 {
+3 int i;
+4 for (i = 0; i < pipe->buffers; i++) {
+5 struct pipe_buffer*buf = pipe->bufs + i;
+6 if (buf->ops)
+Applying the same method to 9,770 vulnerability patches,
+we collected 5,664 vulnerable functions that address 1,764
+unique CVEs. These vulnerable functions have well-known
+vulnerabilities such as buffer overﬂow, integer overﬂow, input
+validation error, permission-related vulnerabilities, and others.
+The shortest vulnerable function consists of 51 characters after
+abstraction and normalization. Single-lined functions (e.g., a
+guard function which returns by calling another function) are
+excluded from the database, since these functions frequently
+cause false positives when our abstraction is applied.
+B. Vulnerability detection
+The application of VUDDY for vulnerability detection does
+not require any supplementary procedure. VUDDY processes
+the functions in the vulnerability database in the same way as
+it does with a normal program, then discovers vulnerability
+601
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 008 =====
+in the target program by detecting code clones between the
+vulnerability database and the program.
+Here, we can determine which vulnerability VUDDY is
+capable of discovering. As illustrated in Fig. 5(a), if setK
+is the set of every known vulnerability, thenK ⊂ V where
+V is the set consisting of all vulnerabilities. Naturally, we
+can regard U, the set of unknown vulnerabilities, andK as
+being disjoint, so that K ∪ U = V and K ∩ U = φ.I fa
+clone detector C only considers exact (Type-1) clones, then
+the coverage ofC is K. However, by the use of our abstraction
+strategy, the coverage of an abstract clone detectorˆC can also
+cover vulnerabilities inK′ as depicted in Fig. 5(b), which is
+a set of abstract vulnerabilities. This means that VUDDY can
+detect known vulnerabilities, as well as variants of the known
+vulnerabilities, which are inK′, where|K′∩U| >0. K′∩U is
+the set of unknown code clones discovered by VUDDY . The
+examples are provided in subsection IX-C.
+.8
+9
+(a) K and U are disjoint
+8
+9
+8.͛
+(b) K′ and U intersect
+Fig. 5: Relationship between known, unknown and variants of
+known vulnerabilities.
+VI. I MPLEMENTA TION
+We implemented VUDDY2 in Python 2.7.11, and the robust
+parser with the ANTLR parser generator 4.5.3 [35]. In this
+section, we discuss issues related to the implementation.
+A. Generating a robust parser
+One intuitive approach for obtaining functions from a
+program and analyzing their syntax is to use a compiler.
+However, the use of parsers integrated in compilers is evidently
+restricted to the occasions when a working build environment
+is available. In addition, even if we succeed to replicate the
+working environment, the source code may not be complete
+or may contain syntax errors, which blights the whole parsing
+procedure [36], [37]. Thus, we ensure that our method is
+feasible and sufﬁciently general to be used in practice by
+generating and utilizing a robust parser for C/C++ based on
+the concept of fuzzy parsing with the utilization of island
+grammars [38], [39]. This parser does not require a build
+environment or header information, which means it is able to
+parse an individual ﬁle, and does not fail when it encounters
+syntactic errors during parsing. Even when a broken or partial
+code is given, it parses as much as it understands.
+B. Selection of hash function
+Any hash function can be used for ﬁngerprint generation.
+However, we impose three constraints that need to be con-
+sidered in order to maximize the scalability and speed of
+2Our implementation is available at https://iotcube.net/
+our approach. First, to prevent two or more different and
+irrelevant functions from having the same hash value, it is
+necessary to avoid hash collision as much as possible. Second,
+building the smallest possible ﬁngerprint dictionary requires
+us to choose a hash function that produces the fewest possible
+bits of hash values. Third, to minimize the hashing time, the
+chosen function needs to be fast, and its implementation well-
+optimized. For VUDDY , we selected the MD5 hash algorithm,
+which completed hashing 20 million randomly generated al-
+phanumeric strings with their size ranging from 51 to 1,000
+bytes, in only 15 seconds without collision. Non-cryptographic
+hash algorithms such as CityHash [40], MurmurHash [41], and
+SpookyHash [42] were also considered, but they required a
+similar amount of time for the experiment. Thus, we decided
+to adopt MD5 which is provided as a built-in method of
+the Python Hashlib package, rather than taking unidentiﬁed
+risks by using third party hash libraries. Although we are
+aware that the MD5 hash algorithm suffers from cryptographic
+weaknesses [43], two facts make MD5 sufﬁcient: Our use of
+MD5 is not for cryptography; and VUDDY is designed such
+that hash collision occurs only when two different functions
+have identical lengths. Note that we exclude the use of fuzzy
+hash algorithms, which produce similar hash values for similar
+plaintexts, as distinguishing slightly modiﬁed clones from
+semantically changed code presents another problem.
+C. Dictionary implementation
+The ﬁngerprint dictionary is a crucial data structure in the
+implementation of VUDDY because it dramatically reduces
+the search space of possible clones and thus expedites the
+whole process. As previously stated, a dictionary is an asso-
+ciative container that maps keys to values. We chose to use
+the built-in dictionary data structure of Python, with which the
+average time complexity isO(1)for theinoperation to check
+the existence of an element among the keys of a dictionary,
+regardless of the number of elements.

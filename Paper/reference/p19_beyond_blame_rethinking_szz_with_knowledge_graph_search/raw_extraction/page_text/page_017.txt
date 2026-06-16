@@ -1,0 +1,40 @@
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 17
+211 18998
+(a) Blame
+19 35 (b) Ancestor
+68 11112 (c) Blameless
+Fig. 5. True positives overlap by BIC category. Green: AgenticSZZ only; Orange: LLM4SZZ only.
+Summary of RQ2
+•Both TKG and agent components are necessary for optimal performance.
+•Category-level analysis (Table 6) shows how AgenticSZZ’s gains over LLM4SZZ come from better
+Blame (+193) and Blameless (+57) identification, while LLM4SZZ finds more Ancestor-category BICs.
+Implication:The TKG-agent synergy reflects an exploration-exploitation trade-off: expansion without
+intelligent selection introduces noise, while reasoning without expanded search hits a coverage ceiling.
+7 Discussion
+7.1 Project-Level Patterns Affecting BIC Identification
+Blame complexity varies across datasets.As shown in Figure 2, projects differ substantially
+in their blame complexity. DS_APACHE averages 3.3 blame commits per case, compared to 1.7
+for DS_LINUX and 2.2 for DS_GITHUB. This correlates with our observation that AgenticSZZ’s
+improvement on DS_APACHE is smaller and not statistically significant ( 𝑝= 0.74), while im-
+provements on DS_LINUX and DS_GITHUB are significant. While our evaluation did not directly
+measure the relationship between blame count and accuracy, this pattern suggests that blame
+complexity could serve as an indicator of case difficulty, warranting future investigation.
+Simple cases may benefit from fast-path heuristics.Projects with predominantly single-
+blame cases (e.g., DS_LINUX where 47% have 1 to 2 deleted lines with 1 blame commit) may benefit
+from fast-path optimizations that resolve cases with minimal LLM interaction. Future work should
+systematically evaluate accuracy stratified by blame complexity to confirm this hypothesis.
+7.2 Practical Considerations
+Cost-effectiveness.AgenticSZZ requires LLM API calls for agent reasoning, incurring computa-
+tional costs not present in traditional SZZ variants. However, as shown in Table 3, the average cost
+per case remains low ($0.003 to $0.004) due to DeepSeek-V3.2’s competitive pricing. For contexts
+where BIC identification directly impacts downstream tasks such as defect prediction model training
+or automated program repair, this cost may be justified by the improved accuracy.
+Integration with existing workflows.The TKG construction phase operates entirely on local
+repository data and can be cached across multiple queries to the same repository. This makes
+AgenticSZZ suitable for integration into CI/CD pipelines where the same repository is analyzed
+repeatedly, amortizing the graph construction cost.
+8 Threats to Validity
+Internal Validity.AgenticSZZ uses DeepSeek-V3.2 while LLM4SZZ employs GPT-4o-mini. We
+selected DeepSeek-V3.2 because it demonstrated more reliable tool invocation in our preliminary
+experiments, which is essential for TKG navigation. The controlled comparison in RQ1 (Table 4)
+, Vol. 1, No. 1, Article . Publication date: February 2026.

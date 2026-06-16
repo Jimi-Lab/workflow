@@ -1,0 +1,154 @@
+Paper ID: p25_how_and_why_agents_can_identify_bug_introducing_commits
+Snapshot Dir: E:\AI\Agent\workflow\Paper\reference\p25_how_and_why_agents_can_identify_bug_introducing_commits\raw_extraction\artifact_static_snapshot
+Analysis Mode: downloaded static snapshot only
+File Count: 11
+Execution: [EXECUTION NOT REQUESTED]
+
+File Layout By Kind:
+- data_or_result: 4 listed
+  - download_log.json
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_GITHUB.json
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_LINUX-26.json
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_LINUX.json
+- other: 5 listed
+  - downloads/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip.zip
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/.env.template
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/.gitattributes
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/.gitignore
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/LICENSE
+- readme: 1 listed
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/README.md
+- script: 1 listed
+  - extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/clone_repos.sh
+
+Key Static Snippets:
+
+## download_log.json (data_or_result)
+{
+  "generated_at": "2026-05-29",
+  "paper_id": "p25_how_and_why_agents_can_identify_bug_introducing_commits",
+  "downloads": [
+    {
+      "kind": "zip",
+      "url": "https://github.com/niklasrisse/agents-for-szz/archive/refs/heads/main.zip",
+      "path": "E:\\AI\\Agent\\workflow\\Paper\\reference\\p25_how_and_why_agents_can_identify_bug_introducing_commits\\raw_extraction\\artifact_static_snapshot\\downloads\\github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip.zip",
+      "ok": true,
+      "error": "",
+      "extracted": false,
+      "extract_error": "FileNotFoundError: [WinError 3] 系统找不到指定的路径。: 'E:\\\\AI\\\\Agent\\\\workflow\\\\Paper\\\\reference\\\\p25_how_and_why_agents_can_identify_bug_introducing_commits\\\\raw_extraction\\\\artifact_static_snapshot\\\\extracted\\\\github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip\\\\agents-for-szz-main\\\\experiments\\\\rq1_effectiveness'",
+      "extract_dir": "E:\\AI\\Agent\\workflow\\Paper\\reference\\p25_how_and_why_agents_can_identify_bug_introducing_commits\\raw_extraction\\artifact_static_snapshot\\extracted\\github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip"
+    }
+  ]
+}
+
+
+## extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/clone_repos.sh (script)
+#!/bin/bash
+# Clone all repositories required for running experiments.
+#
+# Repositories come from two datasets:
+#   - DS_LINUX: Linux kernel (repos/linux-kernel/)
+#   - DS_GITHUB: Various GitHub projects (repos/<owner>/<repo>/)
+#
+# Usage:
+#   bash clone_repos.sh          # Clone all repositories
+#   bash clone_repos.sh --dry-run  # Show what would be cloned without cloning
+#
+# Note: This requires ~50+ GB of disk space and significant time for large repos
+#       (especially linux, qemu, cpython, mesa).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPOS_DIR="$SCRIPT_DIR/repos"
+DRY_RUN=false
+
+if [ "${1:-}" = "--dry-run" ]; then
+    DRY_RUN=true
+fi
+
+# Each line: <local_path>|<git_url>
+# Local path is relative to repos/
+REPOS=(
+    # DS_LINUX dataset (Linux kernel)
+    "linux-kernel|https://github.com/torvalds/linux.git"
+
+    # DS_GITHUB dataset — owner/repo structure
+    "abarisain/dmix|https://github.com/abarisain/dmix.git"
+    "adamretter/exist|https://github.com/adamretter/exist.git"
+    "analogdevicesinc/linux|https://github.com/analogdevicesinc/linux.git"
+    "andrewphorn/ClassiCube-Client|https://github.com/andrewphorn/ClassiCube-Client.git"
+    "apache/bookkeeper|https://github.com/apache/bookkeeper.git"
+    "AsherBond/qemu|https://github.com/AsherBond/qemu.git"
+    "aviaryan/PopularMovies|https://github.com/aviaryan/PopularMovies.git"
+    "benpicco/RIOT|https://github.com/benpicco/RIOT.git"
+    "BenzoRoms/packages_providers_TelephonyProvider|https://github.com/BenzoRoms/packages_providers_TelephonyProvider.git"
+    "Bioconductor/Rsamtools|https://github.com/Bioconductor/Rsamtools.git"
+    "bminor/mesa-mesa|https://gitlab.freedesktop.org/mesa/mesa.git"
+    "bvanassche/net-snmp|https://github.com/bvanassche/net-snmp.git"
+    "CCI/cci|https://github.
+
+## extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/README.md (readme)
+# How and Why Agents Can Identify Bug-Introducing Commits
+
+Code and Data for the paper "How and Why Agents Can Identify Bug-Introducing Commits" (Currently Under Review).
+
+## Citation
+
+If you use this work, please cite:
+
+```bibtex
+@misc{risse2026simpleszzagent,
+      title={How and Why Agents Can Identify Bug-Introducing Commits},
+      author={Niklas Risse and Marcel Böhme},
+      year={2026},
+      eprint={2603.29378},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE},
+      url={https://arxiv.org/abs/2603.29378},
+}
+```
+
+## Repository Structure
+
+```
+├── README.md
+├── requirements.txt              # Python dependencies
+├── .env.template                 # API key template
+├── clone_repos.sh                # Script to clone all 153 required repositories
+├── generate_all_tables_and_figures.sh  # Regenerate all tables/figures (no API calls)
+├── src/                          # Source code
+│   ├── simple_szz_agent.py       # Simple-SZZ-Agent implementation
+│   ├── szz_agent_stage_01.py     # SZZ-Agent Stage 1 (candidate identification)
+│   ├── szz_agent_stage_02.py     # SZZ-Agent Stage 2 (candidate selection)
+│   ├── prompts.py                # LLM prompt templates
+│   ├── evaluation_utils.py       # Evaluation metric computation
+│   ├── statistical_comparison.py # Statistical significance tests
+│   ├── collect_DS_LINUX-26.py    # Data collection script
+│   └── baselines/                # Baseline implementations
+│       ├── baseline_bszz.py      # B-SZZ (Basic SZZ)
+│       ├── baseline_agszz.py     # AG-SZZ
+│       ├── baseline_lszz.py      # L-SZZ
+│       ├── baseline_rszz.py      # R-SZZ
+│       ├── baseline_maszz.py     # MA-SZZ
+│       ├── baseline_raszz.py     # RA-SZZ
+│       ├── baseline_vszz.py      # V-SZZ
+│       ├── baseline_llm4szz.py   # LLM4SZZ
+│       
+
+## extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_GITHUB.json (data_or_result)
+version https://git-lfs.github.com/spec/v1
+oid sha256:cc0dcd34b815a442eb5a6807bcbb05c1cc3707290f01f024ad6a200f34a93f63
+size 110129
+
+
+## extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_LINUX-26.json (data_or_result)
+version https://git-lfs.github.com/spec/v1
+oid sha256:8c904accdded0774f00a59314639710b2c4690da3161c3a6ddf2f17773391255
+size 1533215
+
+
+## extracted/github.com_niklasrisse_agents-for-szz_archive_refs_heads_main.zip/agents-for-szz-main/data/DS_LINUX.json (data_or_result)
+version https://git-lfs.github.com/spec/v1
+oid sha256:5d8a83b3f52195c9b6650c0b00113494b7879495779a43585745c8d5f1bc9d09
+size 22166529
+

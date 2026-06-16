@@ -1,0 +1,31 @@
+Page: 5
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+Prevalent version identification. We then need to identify
+the version of each reused component. However, precise iden-
+tification of the version to which reused modified OSS com-
+ponents belong is challenging (see Section 2.3). Therefore,
+V1SCAN is designed such that it is not critically affected by
+the correctness of the identified versions.
+Our approach is to first roughly detect vulnerabilities and
+then refine the results. In particular, we define the prevalent
+version of the OSS component as the version to which the
+functions contained in the reused OSS codebase most closely
+correspond. To identify the prevalent version, V1SCAN first
+compares all functions in the target program with those in
+every version of the OSS component. V1SCAN extracts the
+OSS functions that are exactly included in the target program,
+and then verifies the versions to which each extracted function
+belongs. The most frequently identified version is designated
+the prevalent version of the OSS component.
+Reused code classification. Next, V1SCAN classifies func-
+tions reused in OSS components based on the reused code
+classification defined in Section 2.2. Because we consider
+the function unit in the version-based approach, V1SCAN
+classifies reused OSS functions based on code modifications.
+When an OSS is reused in the target program, the functions
+in the original OSS can be in one of three states: (1) exactly
+reused, (2) changed, or (3) unused. Subsequently, V1SCAN
+examines the state of all the functions included in the preva-
+lent version of the OSS component. We consider the function
+relationships

@@ -1,0 +1,24 @@
+Method Deep Analysis
+
+Core idea:
+KRYSTAL frames tactical attack discovery as knowledge-graph construction over audit/provenance data. The paper argues that earlier provenance and attack-graph systems often use custom internal graph models and hard-coded rules; KRYSTAL instead normalizes heterogeneous audit events into RDF, uses a KRYSTAL provenance ontology, and expresses detection/reconstruction logic through SPARQL and declarative rules.
+
+Pipeline:
+1. Provenance graph building: audit events from Linux, Windows, and FreeBSD-style logs are parsed and transformed into RDF triples under the KRYSTAL ontology. The local source supports this with JsonRDFReader.java and LogParserWin/Ubuntu/FreeBSD/Linux parser classes.
+2. Threat detection and alerting: KRYSTAL combines tag propagation, attenuation/decay, provenance-based alert policies, and signature/rule-based detection. The paper explicitly mentions Sigma rule translation into SPARQL; local artifacts include experiment/rule and experiment/rule_win TTL rule files.
+3. Attack graph/scenario reconstruction: once suspicious nodes or alerts are found, the system reconstructs attack paths with backward-forward chaining and graph-pattern queries. Local AttackConstruction.java and experiment/query/*.sparql are consistent with this design.
+4. External knowledge linking: the paper uses SPARQL query federation to link provenance alerts to background cyber-threat knowledge such as ATT&CK-style knowledge graphs.
+
+Design pattern useful for VulnVersion:
+- Normalize heterogeneous evidence first, reason second. For VulnVersion, CVE text, patch commit metadata, repository history, version tags, package release metadata, and static code deltas can be represented as typed graph facts before an agent judges a target version.
+- Keep reasoning logic declarative where possible. KRYSTAL's SPARQL layer is a strong analogue for VulnVersion rules such as "target version contains vulnerable function before fix", "release branch lacks patch commit", or "backport patch appears with renamed file/function".
+- Separate raw evidence graph from high-level scenario graph. This can inspire VulnVersion's distinction between evidence nodes (commit, file, function, release tag, advisory statement) and decision nodes (affected, fixed, unknown, backported).
+
+Not directly transferable:
+- KRYSTAL analyzes runtime audit logs and attack provenance, not affected-version ranges. Its graph edges are event/causality edges; VulnVersion needs version/release/patch-containment edges.
+- The evaluation reports provenance generation and detection over DARPA-TC logs; those metrics cannot be reused for vulnerability affected-version performance. [NEEDS EXPERIMENT]
+
+Evidence anchors:
+- raw_extraction/full_text.txt lines around abstract, Sections 5-8, Fig. 5, Fig. 6, Fig. 7, Fig. 8.
+- source_static_inventory.txt for local Java/Maven, config, ontology, SPARQL, rule, input, and output artifacts.
+- [EXECUTION NOT REQUESTED]

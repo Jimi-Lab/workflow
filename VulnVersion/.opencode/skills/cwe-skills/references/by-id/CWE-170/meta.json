@@ -1,0 +1,291 @@
+{
+  "cwe_id": "CWE-170",
+  "name": "Improper Null Termination",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product does not terminate or incorrectly terminates a string or array with a null character or equivalent terminator.",
+  "extended_description": "Null termination errors frequently occur in two different ways. An off-by-one error could cause a null to be written out of bounds, leading to an overflow. Or, a program could use a strncpy() function call incorrectly, which prevents a null terminator from being added at all. Other scenarios are possible.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-707",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization"
+      },
+      {
+        "cwe_id": "CWE-20",
+        "nature": "ChildOf",
+        "view_id": "700",
+        "ordinal": "Primary",
+        "name": "Improper Input Validation"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-120",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"
+      },
+      {
+        "cwe_id": "CWE-126",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Buffer Over-read"
+      },
+      {
+        "cwe_id": "CWE-147",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Neutralization of Input Terminators"
+      },
+      {
+        "cwe_id": "CWE-464",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Addition of Data Structure Sentinel"
+      },
+      {
+        "cwe_id": "CWE-463",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Deletion of Data Structure Sentinel"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not terminate or incorrectly terminates a string or array with a null character or equivalent terminator.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "null",
+      "incorrectly",
+      "termination",
+      "terminator"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "null",
+      "incorrectly",
+      "termination",
+      "terminator",
+      "could",
+      "equivalent",
+      "frequently",
+      "off-by-one"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code reads from cfgfile and copies the input into inputbuf using strcpy(). The code mistakenly assumes that inputbuf will always contain a NULL...",
+        "snippet": "#define MAXLEN 1024 ... char *pathbuf[MAXLEN]; ... read(cfgfile,inputbuf,MAXLEN); //does not null terminate strcpy(pathbuf,inputbuf); //requires null terminated input ..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following code, readlink() expands the name of a symbolic link stored in pathname and puts the absolute path into buf. The length of the resulting value...",
+        "snippet": "char buf[MAXPATH]; ... readlink(pathname, buf, MAXPATH); int length = strlen(buf); ..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "While the following example is not exploitable, it provides a good example of how nulls can be omitted or misplaced, even when \"safe\" functions are used:",
+        "snippet": "#include <stdio.h> #include <string.h> int main() { char longString[] = \"String signifying nothing\"; char shortString[16]; strncpy(shortString, longString, 16); printf(\"The last character in shortString is: %c..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2000-0312",
+        "description": "Attacker does not null-terminate argv[] when invoking another program.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2000-0312"
+      },
+      {
+        "reference": "CVE-2003-0777",
+        "description": "Interrupted step causes resultant lack of null termination.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0777"
+      },
+      {
+        "reference": "CVE-2004-1072",
+        "description": "Fault causes resultant lack of null termination, leading to buffer expansion.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-1072"
+      },
+      {
+        "reference": "CVE-2001-1389",
+        "description": "Multiple vulnerabilities related to improper null termination.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-1389"
+      },
+      {
+        "reference": "CVE-2003-0143",
+        "description": "Product does not null terminate a message buffer after snprintf-like call, leading to overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0143"
+      },
+      {
+        "reference": "CVE-2009-2523",
+        "description": "Chain: product does not handle when an input string is not NULL terminated (CWE-170), leading to buffer over-read (CWE-125) or heap-based buffer overflow (CWE-122).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2523"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

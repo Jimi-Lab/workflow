@@ -1,0 +1,29 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- Stage 1: SZZ-based Identification.The approach starts from a fix commit, defined by its diff, showing which lines were added and/or deleted, and its commit message.
+Objective:
+- 1 Introduction The problem of identifying bug-introducing commits from fix com- mits has seen remarkable interest from the software engineering research community, demonstrated by the more than 1300 citations of the award-winning paper by Śliwerski, Zimmermann, and Zeller (SZZ) [31].
+- The problem is also highly relevant for practitioners, since identifying bug-introducing changes is essential to determine which software versions are affected by security-critical bugs [5].
+- In this paper, we study LLM-based agents for the task of identi- fying bug-introducing commits (BICs) from fix commits.
+- Part 1: SZZ-Agent.First, we introduceSZZ-Agent, which targets fix commits where the original SZZ algorithm struggles: cases where SZZ finds no candidate BICs (e.g., because the fix adds code rather than removing it), or where its prediction is likely wrong.
+Constraints:
+- [NEEDS EVIDENCE] constraints require manual section verification
+Evaluation Target:
+- 3.3 Experiments 3.3.1 RQ1: Effectiveness.We evaluate whether SZZ-Agent outper- forms existing SZZ variants.
+- Table 3: RQ2b: LLM4SZZ with different LLM backbones vs.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- 5 Discussion We discuss directions for future work motivated by our findings.
+- Second, the 4 cases where the bug-introducing commit is not in the candidate set reveal a limitation of the current candidate collection strategy: Simple-SZZ-Agent only searches the commit histories of files modified by the fix, so when the bug was introduced in a different file, the correct commit is never considered.
+- How to expand the candidate set beyond the files touched by the fix without introducing prohibitive infrastructure costs is an open question that we leave for future work.
+- This compression itself may have value beyond identifying the bug-introducing commit: it captures, in a concise form, what made the code buggy.
+- Our context ablation (§3.3.4) showed that the agent achieves 0.73 F1-score with only the diff and no commit message, demonstrating that it can extract the essential characteristics of a bug from code changes alone.
+- Whether these patterns can be used to generate useful explanations of how a bug was introduced— especially when the fix commit message is uninformative—is an open question for future work.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

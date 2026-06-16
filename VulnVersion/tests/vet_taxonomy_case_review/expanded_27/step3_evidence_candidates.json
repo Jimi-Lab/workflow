@@ -1,0 +1,2249 @@
+{
+  "CVE-2020-22019": [
+    {}
+  ],
+  "CVE-2020-20453": [
+    {
+      "file_patterns": [
+        "libavcodec/aacenc.c"
+      ],
+      "function_patterns": [
+        "aac_encode_frame"
+      ],
+      "vulnerable_tokens": [
+        "FFMIN(s->lambda * ratio, 65536.f)"
+      ],
+      "fix_tokens": [
+        "av_clipf(s->lambda * ratio, FLT_MIN, 65536.f)",
+        "FLT_MIN"
+      ],
+      "grep_patterns": [
+        "s->lambda = FFMIN\\(s->lambda \\* ratio",
+        "s->lambda = av_clipf\\(s->lambda \\* ratio, FLT_MIN",
+        "lambda / "
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "One-sided FFMIN clamp on s->lambda allows underflow to 0",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-20453:00446f74ad5d8b89202f5f5234b1720ed3b901a4:libavcodec/aacenc.c:git_diff:8004",
+            "step1_region region_0001"
+          ]
+        },
+        {
+          "signal": "Two-sided av_clipf with FLT_MIN lower bound prevents underflow",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-20453:00446f74ad5d8b89202f5f5234b1720ed3b901a4:libavcodec/aacenc.c:git_diff:8005",
+            "step1_region region_0001"
+          ]
+        },
+        {
+          "signal": "lambda used as divisor in aaccoder.c quantization path",
+          "evidence_type": "file",
+          "scope": "family",
+          "strength": "medium",
+          "source_refs": [
+            "libavcodec/aaccoder.c:126 (lambda / band->threshold)",
+            "libavcodec/aaccoder.c:349 (lambda / band->threshold)",
+            "libavcodec/aaccoder.c:400 (lambda / 120.f)",
+            "libavcodec/aaccoder.c:554 (100.0f/lambda)",
+            "libavcodec/aaccoder.c:557 (lambda / 140.f)",
+            "libavcodec/aaccoder.c:675 (s->lambda / global_quality)"
+          ]
+        },
+        {
+          "signal": "All 7 fix commits are identical backports of the same FFMIN-to-av_clipf replacement",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "show_patch_only for all 7 commit hashes"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-22037": [
+    {
+      "file_patterns": [
+        "libavcodec/frame_thread_encoder.c",
+        "libavcodec/frame_thread_encoder.h"
+      ],
+      "function_patterns": [
+        "ff_frame_thread_encoder_init"
+      ],
+      "vulnerable_tokens": [
+        "AVCodecContext *thread_avctx = avcodec_alloc_context3",
+        "thread_avctx = avcodec_alloc_context3",
+        "avcodec_close(thread_avctx)",
+        "av_freep(&thread_avctx)"
+      ],
+      "fix_tokens": [
+        "avcodec_close(thread_avctx)",
+        "av_freep(&thread_avctx)",
+        "thread_avctx->hw_frames_ctx = NULL",
+        "AVCodecContext *thread_avctx = NULL;"
+      ],
+      "grep_patterns": [
+        "avcodec_close\\(thread_avctx\\)",
+        "av_freep\\(&thread_avctx\\)",
+        "AVCodecContext \\*thread_avctx = NULL",
+        "AVCodecContext \\*thread_avctx = avcodec_alloc_context3",
+        "goto fail"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Loop-scoped allocation without fail-path deallocation — exact pattern is 'AVCodecContext *thread_avctx = avcodec_alloc_context3(...)' inside for-loop body with fail: label lacking free",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-22037:4c34f00ce8:libavcodec/frame_thread_encoder.c:192-214",
+              "kind": "git_snapshot",
+              "commit": "4c34f00ce8",
+              "file_path": "libavcodec/frame_thread_encoder.c",
+              "function_context": "ff_frame_thread_encoder_init",
+              "line_start": 192,
+              "line_end": 214,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "fail label lacks avcodec_close(thread_avctx) and av_freep(&thread_avctx) — hard VULN certificate",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-22037:4c34f00ce8:libavcodec/frame_thread_encoder.c:220-223",
+              "kind": "git_snapshot",
+              "commit": "4c34f00ce8",
+              "file_path": "libavcodec/frame_thread_encoder.c",
+              "function_context": "ff_frame_thread_encoder_init",
+              "line_start": 220,
+              "line_end": 223,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "fail label contains avcodec_close(thread_avctx) and av_freep(&thread_avctx) — hard FIXED certificate",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-22037:9e84c17a43d8:libavcodec/frame_thread_encoder.c:221-222",
+              "kind": "git_diff",
+              "commit": "9e84c17a43d84f4ba8e282f448dea04882b229cf",
+              "file_path": "libavcodec/frame_thread_encoder.c",
+              "function_context": "ff_frame_thread_encoder_init",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "thread_avctx hoisted to function scope — enables safe cleanup but alone is not a complete fix without the fail label cleanup",
+          "evidence_type": "token",
+          "scope": "function",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-22037:7bba0dd6382e:libavcodec/frame_thread_encoder.c:129",
+              "kind": "git_diff",
+              "commit": "7bba0dd6382e30d646cb406034a66199e071d713",
+              "file_path": "libavcodec/frame_thread_encoder.c",
+              "function_context": "ff_frame_thread_encoder_init",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "",
+              "strength_hint": "priority"
+            }
+          ]
+        },
+        {
+          "signal": "thread_avctx->hw_frames_ctx = NULL added before av_opt_copy — secondary hardening against dangling pointer in avcodec_close fail path",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-22037:7bba0dd6382e:libavcodec/frame_thread_encoder.c:212",
+              "kind": "git_diff",
+              "commit": "7bba0dd6382e30d646cb406034a66199e071d713",
+              "file_path": "libavcodec/frame_thread_encoder.c",
+              "function_context": "ff_frame_thread_encoder_init",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "",
+              "strength_hint": "priority"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-27771": [
+    {
+      "file_patterns": [
+        "coders/pdf.c"
+      ],
+      "function_patterns": [
+        "RestoreMSCWarning"
+      ],
+      "vulnerable_tokens": [
+        "(unsigned char) GetPixelIndex(image,p)",
+        "(unsigned char) GetPixelIndex(tile_image,p)"
+      ],
+      "fix_tokens": [
+        "(unsigned char) ((ssize_t) GetPixelIndex(image,p))",
+        "(unsigned char) ((ssize_t) GetPixelIndex(tile_image,p))"
+      ],
+      "grep_patterns": [
+        "GetPixelIndex\\((image|tile_image),p\\)",
+        "unsigned char\\) GetPixelIndex",
+        "unsigned char\\) \\(ssize_t\\) GetPixelIndex"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Direct '(unsigned char) GetPixelIndex(' without '(ssize_t)' intermediate cast is CWE-190 vulnerable pattern",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-27771:9dd1c7e1f8f6:coders/pdf.c:git_diff:1004",
+              "kind": "git_diff",
+              "commit": "9dd1c7e1f8f6c137bfd3293be2554f59456c7b62",
+              "file_path": "coders/pdf.c",
+              "function_context": "RestoreMSCWarning",
+              "line_start": 1992,
+              "line_end": 1992,
+              "snippet": "removed: *q++=(unsigned char) GetPixelIndex(image,p);",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "GetPixelIndex() returns Quantum (double in HDRI builds) — the wide return type enables the narrowing UB",
+          "evidence_type": "token",
+          "scope": "family",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-27771:a9d563d3d7:MagickCore/pixel-accessor.h:195",
+              "kind": "git_snapshot",
+              "commit": "a9d563d3d73874312080d30dc4ba07cecad56192",
+              "file_path": "MagickCore/pixel-accessor.h",
+              "function_context": "GetPixelIndex",
+              "line_start": 195,
+              "line_end": 200,
+              "snippet": "static inline Quantum GetPixelIndex(...)",
+              "strength_hint": "context_only"
+            }
+          ]
+        },
+        {
+          "signal": "4 call sites in RestoreMSCWarning must all be fixed; partial fix is not possible in any release",
+          "evidence_type": "history",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-27771:9dd1c7e1f8f6:coders/pdf.c:git_diff:1005",
+              "kind": "git_diff",
+              "commit": "9dd1c7e1f8f6c137bfd3293be2554f59456c7b62",
+              "file_path": "coders/pdf.c",
+              "function_context": "RestoreMSCWarning",
+              "line_start": 1992,
+              "line_end": 1992,
+              "snippet": "added: *q++=(unsigned char) ((ssize_t) GetPixelIndex(image,p));",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2021-4219": [
+    {
+      "file_patterns": [
+        "MagickCore/draw.c"
+      ],
+      "function_patterns": [
+        "DrawPrimitive"
+      ],
+      "vulnerable_tokens": [
+        "SetImageInfo(clone_info,0,exception)"
+      ],
+      "fix_tokens": [
+        "SetImageInfo(clone_info,1,exception)"
+      ],
+      "grep_patterns": [
+        "SetImageInfo\\([^,]+,\\s*0\\s*,"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "SetImageInfo called with frames=0 in DrawPrimitive triggers unnecessary file open (AcquireImage+OpenBlob) for magic sniffing",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-4219:d7f1b2b9b816:MagickCore/draw.c:git_diff:2004",
+              "kind": "git_diff",
+              "commit": "d7f1b2b9b816baaa956381ff80c3b120e83faa95",
+              "file_path": "MagickCore/draw.c",
+              "function_context": "MagickExport MagickBooleanType DrawPrimitive(Image *image,",
+              "line_start": 5538,
+              "line_end": 5538,
+              "snippet": "status&=SetImageInfo(clone_info,0,exception);",
+              "strength_hint": "high"
+            },
+            {
+              "source_ref": "src:CVE-2021-4219:SetImageInfo:frames_zero_block:image.c",
+              "kind": "git_snapshot",
+              "commit": "e2ce77517df3cbe7e53cca5cb63125846646096a",
+              "file_path": "MagickCore/image.c",
+              "function_context": "MagickExport MagickBooleanType SetImageInfo(ImageInfo *image_info, const unsigned int frames, ExceptionInfo *exception)",
+              "line_start": 3008,
+              "line_end": 3060,
+              "snippet": "if (frames == 0) { AcquireImage; OpenBlob; ReadBlob; CloseBlob; DestroyImage; }",
+              "strength_hint": "high"
+            }
+          ]
+        },
+        {
+          "signal": "Filename is immediately overwritten after SetImageInfo, making the opened-file-for-magic-sniffing wasted I/O",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-4219:step1:region_0002:source_ref:2006",
+              "kind": "git_diff",
+              "commit": "d7f1b2b9b816baaa956381ff80c3b120e83faa95",
+              "file_path": "MagickCore/draw.c",
+              "function_context": "MagickExport MagickBooleanType DrawPrimitive(Image *image,",
+              "line_start": 5540,
+              "line_end": 5540,
+              "snippet": "(void) CopyMagickString(clone_info->filename,primitive_info->text, MagickPathExtent);",
+              "strength_hint": "medium"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2021-39212": [
+    {
+      "file_patterns": [
+        "MagickCore/static.c",
+        "MagickCore/module.c"
+      ],
+      "function_patterns": [
+        "RegisterStaticModules",
+        "RegisterStaticModule",
+        "OpenModule"
+      ],
+      "vulnerable_tokens": [
+        "RegisterStaticModules",
+        "register_module",
+        "AllPolicyRights",
+        "ReadPolicyRights"
+      ],
+      "fix_tokens": [
+        "ReadPolicyRights|WritePolicyRights",
+        "IsRightsAuthorized(ModulePolicyDomain,rights,"
+      ],
+      "grep_patterns": [
+        "IsRightsAuthorized\\(ModulePolicyDomain",
+        "rights=AllPolicyRights",
+        "rights=ReadPolicyRights[^|]",
+        "RegisterStaticModules"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "No IsRightsAuthorized call before register_module() in RegisterStaticModules()",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-39212:35893e7cad78^:MagickCore/static.c:git_snapshot:283-302",
+              "kind": "git_snapshot",
+              "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+              "file_path": "MagickCore/static.c",
+              "function_context": "RegisterStaticModules",
+              "line_start": 283,
+              "line_end": 302,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "rights=AllPolicyRights in OpenModule() — over-broad rights incompatible with policy model",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-39212:01faddbe2711^:MagickCore/module.c:git_snapshot:1255-1262",
+              "kind": "git_snapshot",
+              "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+              "file_path": "MagickCore/module.c",
+              "function_context": "OpenModule",
+              "line_start": 1255,
+              "line_end": 1262,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "rights=ReadPolicyRights in RegisterStaticModule() — missing WritePolicyRights, incomplete authorization",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-39212:35893e7cad78^:MagickCore/static.c:git_snapshot:240-260",
+              "kind": "git_snapshot",
+              "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+              "file_path": "MagickCore/static.c",
+              "function_context": "RegisterStaticModule",
+              "line_start": 240,
+              "line_end": 260,
+              "snippet": "",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2024-2379": [
+    {
+      "file_patterns": [
+        "lib/vquic/vquic-tls.c"
+      ],
+      "function_patterns": [
+        "curl_wssl_init_ctx"
+      ],
+      "vulnerable_tokens": [
+        "goto out",
+        "failf(data, \"wolfSSL failed to set ciphers\"",
+        "failf(data, \"wolfSSL failed to set curves\"",
+        "failf(data, \"wolfSSL was built without keylog callback\"",
+        "failf(data, \"error setting certificate verify locations\""
+      ],
+      "fix_tokens": [
+        "result = CURLE_BAD_FUNCTION_ARGUMENT",
+        "result = CURLE_NOT_BUILT_IN",
+        "result = CURLE_SSL_CACERT"
+      ],
+      "grep_patterns": [
+        "curl_wssl_init_ctx",
+        "wolfSSL.*goto out",
+        "failf.*goto out[^;]*$"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "goto out without prior result=CURLE_* assignment in wolfSSL error path",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2024-2379:aedbbdf18e689a5eee8dc39600914f5eda6c409c:lib/vquic/vquic-tls.c:git_diff:1005",
+              "kind": "git_diff",
+              "commit": "aedbbdf18e689a5eee8dc39600914f5eda6c409c",
+              "file_path": "lib/vquic/vquic-tls.c",
+              "line_start": 378,
+              "line_end": 379,
+              "snippet": "goto out without prior result=CURLE_* in cipher error path",
+              "strength_hint": "priority"
+            }
+          ]
+        },
+        {
+          "signal": "result=CURLE_OK set unconditionally after all wolfSSL operations, creating stale-OK risk for early-exit error paths",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2024-2379:aedbbdf18e689a5eee8dc39600914f5eda6c409c:lib/vquic/vquic-tls.c:1007",
+              "kind": "git_snapshot",
+              "commit": "14d9afdfe72935df1078a97936e6406ee3e0a824",
+              "file_path": "lib/vquic/vquic-tls.c",
+              "line_start": 443,
+              "line_end": 444,
+              "snippet": "result = CURLE_OK;  out:",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "function curl_wssl_init_ctx uses centralized goto out; error pattern unlike curl_ossl_init_ctx which uses direct return",
+          "evidence_type": "function",
+          "scope": "function",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2024-2379:aedbbdf18e689a5eee8dc39600914f5eda6c409c:lib/vquic/vquic-tls.c:1008",
+              "kind": "git_snapshot",
+              "commit": "14d9afdfe72935df1078a97936e6406ee3e0a824",
+              "file_path": "lib/vquic/vquic-tls.c",
+              "line_start": 344,
+              "line_end": 445,
+              "snippet": "Entire curl_wssl_init_ctx function showing centralized goto out; pattern",
+              "strength_hint": "context_only"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2024-6197": [
+    {
+      "file_patterns": [
+        "lib/vtls/x509asn1.c"
+      ],
+      "function_patterns": [
+        "utf8asn1str"
+      ],
+      "vulnerable_tokens": [
+        "free(buf)",
+        "char buf["
+      ],
+      "fix_tokens": [],
+      "grep_patterns": [
+        "free\\(buf\\)",
+        "char buf\\[4\\]"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "free(buf) called within utf8asn1str where buf is stack-allocated",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "3a537a4db9e6:lib/vtls/x509asn1.c:377",
+            "185a05e9:lib/vtls/x509asn1.c:396"
+          ]
+        },
+        {
+          "signal": "char buf[4] stack declaration without matching heap allocation preceding free(buf)",
+          "evidence_type": "token",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "3a537a4db9e6:lib/vtls/x509asn1.c:377"
+          ]
+        },
+        {
+          "signal": "Guard condition wc >= 0x00200000 gates the vulnerable free(buf) call",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            "185a05e9:lib/vtls/x509asn1.c:394-395"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2021-22922": [
+    {
+      "file_patterns": [
+        "src/tool_metalink.c",
+        "src/tool_metalink.h",
+        "src/tool_getparam.c",
+        "src/tool_operate.c",
+        "src/tool_operate.h",
+        "src/tool_cfgable.h"
+      ],
+      "function_patterns": [
+        "post_per_transfer",
+        "single_transfer",
+        "metalink_check_hash",
+        "check_hash",
+        "getparameter.*case 'J'"
+      ],
+      "vulnerable_tokens": [
+        "metalink_check_hash",
+        "per->metalink",
+        "per->metalink_next_res",
+        "per->mlfile",
+        "config->use_metalink",
+        "metalinkfile_list",
+        "GETOUT_METALINK",
+        "metalink_parser_context_new",
+        "metalink_parser_context_delete",
+        "clean_metalink",
+        "delete_metalinkfile"
+      ],
+      "fix_tokens": [
+        "\"--metalink is disabled\"",
+        "PARAM_BAD_USE",
+        "\"--metalink is disabled\\n\""
+      ],
+      "grep_patterns": [
+        "src/tool_metalink\\.c",
+        "src/tool_metalink\\.h",
+        "use_metalink",
+        "metalinkfile_list",
+        "metalink_next_res",
+        "GETOUT_METALINK",
+        "metalink_check_hash",
+        "metalink is disabled"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Hash mismatch logged but no file deletion or error return",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:9cf516adc67b:src/tool_operate.c:git_snapshot:431-437",
+              "kind": "git_snapshot",
+              "commit": "9cf516adc67b",
+              "file_path": "src/tool_operate.c",
+              "function_context": "post_per_transfer",
+              "line_start": 431,
+              "line_end": 437,
+              "snippet": "rv = metalink_check_hash(...); if(!rv) per->metalink_next_res = 1;",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "TODO comment confirms retry from alternative URL was never implemented",
+          "evidence_type": "history",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:9cf516adc67b:src/tool_operate.c:git_snapshot:608-609",
+              "kind": "git_snapshot",
+              "commit": "9cf516adc67b",
+              "file_path": "src/tool_operate.c",
+              "function_context": "post_per_transfer",
+              "line_start": 608,
+              "line_end": 609,
+              "snippet": "/* TODO We want to try next resource when download was not successful. How to know that? */",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "check_hash returns check_ok value but caller only uses it to set a dead flag",
+          "evidence_type": "sequence",
+          "scope": "file",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:9cf516adc67b:src/tool_metalink.c:git_snapshot:516-529",
+              "kind": "git_snapshot",
+              "commit": "9cf516adc67b",
+              "file_path": "src/tool_metalink.c",
+              "function_context": "check_hash",
+              "line_start": 516,
+              "line_end": 529,
+              "snippet": "return check_ok; (0 on mismatch, 1 on match)",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "metalink_next_res is written but never read by any scheduling or retry code",
+          "evidence_type": "sequence",
+          "scope": "repo",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:9cf516adc67b:src/tool_operate.c:git_snapshot:417,431,436,617,626",
+              "kind": "git_snapshot",
+              "commit": "9cf516adc67b",
+              "file_path": "src/tool_operate.c",
+              "function_context": "post_per_transfer",
+              "line_start": 417,
+              "line_end": 626,
+              "snippet": "metalink_next_res is only written at 4 locations, never read for scheduling decisions",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Entire metalink feature removed in fix commit (files deleted, option disabled)",
+          "evidence_type": "guard",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:265b14d6b37c:commit_message",
+              "kind": "commit_message",
+              "commit": "265b14d6b37c",
+              "file_path": "N/A",
+              "function_context": "N/A",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "metalink: remove",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Affected files include tool_metalink.c existence and struct fields",
+          "evidence_type": "file",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:9cf516adc67b:src/tool_metalink.c:git_snapshot:1",
+              "kind": "git_snapshot",
+              "commit": "9cf516adc67b",
+              "file_path": "src/tool_metalink.c",
+              "function_context": "N/A",
+              "line_start": 1,
+              "line_end": 1,
+              "snippet": "file exists (873 lines, USE_METALINK feature)",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Fix indicator: --metalink returns PARAM_BAD_USE with disabled message",
+          "evidence_type": "token",
+          "scope": "function",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-22922:265b14d6b37c:src/tool_getparam.c:git_diff:36027-36028",
+              "kind": "git_diff",
+              "commit": "265b14d6b37c",
+              "file_path": "src/tool_getparam.c",
+              "function_context": "case 'J'",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "errorf(global, \"--metalink is disabled\\n\"); return PARAM_BAD_USE;",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-11985": [
+    {
+      "file_patterns": [
+        "modules/metadata/mod_remoteip.c"
+      ],
+      "function_patterns": [
+        "remoteip_modify_request"
+      ],
+      "vulnerable_tokens": [
+        "c->client_addr",
+        "temp_sa = c->client_addr"
+      ],
+      "fix_tokens": [
+        "r->useragent_addr",
+        "r->useragent_addr ? r->useragent_addr : c->client_addr"
+      ],
+      "grep_patterns": [
+        "temp_sa\\s*=\\s*c->client_addr",
+        "temp_sa\\s*=\\s*r->useragent_addr\\s*\\?\\s*r->useragent_addr\\s*:\\s*c->client_addr"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "temp_sa = c->client_addr;  (vulnerable: uses raw TCP connection address as root trusted address, allowing IP re-derivation during subrequests)",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-11985:d0c4af10ab713734de906b5634cfc15cd370fdf4:modules/metadata/mod_remoteip.c:git_diff:3003"
+          ]
+        },
+        {
+          "signal": "temp_sa = r->useragent_addr ? r->useragent_addr : c->client_addr;  (fix: prefers already-parsed useragent_addr over raw connection address)",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-11985:d0c4af10ab713734de906b5634cfc15cd370fdf4:modules/metadata/mod_remoteip.c:git_diff:3004"
+          ]
+        },
+        {
+          "signal": "r->useragent_addr = req->useragent_addr;  (downstream: the value later assigned to the request record)",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            "src:CVE-2020-11985:d0c4af10ab713734de906b5634cfc15cd370fdf4:modules/metadata/mod_remoteip.c:git_snapshot:415"
+          ]
+        },
+        {
+          "signal": "Commit message: 'This fixes issue resulting in setting of bad useragent_ip when internal redirection has been generated as response to the request (typically as result of \"ErrorDocument 40x\").'",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-11985:d0c4af10ab713734de906b5634cfc15cd370fdf4:commit_message.txt"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-9490": [
+    {
+      "file_patterns": [
+        "modules/http2/h2_push.c",
+        "modules/http2/h2_push.h",
+        "modules/http2/h2_stream.c",
+        "modules/http2/h2_request.c",
+        "modules/http2/h2_request.h",
+        "modules/http2/h2_util.c",
+        "modules/http2/h2_util.h"
+      ],
+      "function_patterns": [
+        "h2_push_diary_digest_set",
+        "h2_push_diary_digest64_set",
+        "h2_push_collect_update",
+        "h2_stream_add_header",
+        "h2_request_add_header",
+        "h2_req_add_header",
+        "add_trailer",
+        "set_h1_header",
+        "move_to_last",
+        "h2_push_diary_append",
+        "remove_first"
+      ],
+      "vulnerable_tokens": [
+        "h2_push_diary_digest_set",
+        "h2_push_diary_digest64_set",
+        "gset_decoder",
+        "gset_decode_next",
+        "Cache-Digest",
+        "++stream->request_headers_added",
+        "lastidx = diary->entries->nelts-1",
+        "APR_ARRAY_PUSH(diary->entries, h2_push_diary_entry) = *e"
+      ],
+      "fix_tokens": [
+        "max_field_len",
+        "pwas_added",
+        "was_added",
+        "remove_first",
+        "if (diary->entries->nelts <= 0)",
+        "goto cleanup;",
+        "if (session->s->limit_req_fields > 0",
+        "if (max_field_len && ((existing? strlen(existing)+2 : 0) + vlen + nlen + 2 > max_field_len))"
+      ],
+      "grep_patterns": [
+        "h2_push_diary_digest_set",
+        "gset_decoder",
+        "gset_decode_next",
+        "++stream->request_headers_added",
+        "max_field_len",
+        "pwas_added",
+        "remove_first",
+        "LimitRequestFields",
+        "Cache-Digest"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "h2_push_diary_digest_set function defined in source (Cache-Digest GCS parser present)",
+          "evidence_type": "function",
+          "scope": "repo",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:a61223e9cb90:modules/http2/h2_push.c:git_diff"
+          ]
+        },
+        {
+          "signal": "gset_decoder/gset_decode_next present (bit-level parser for GCS from user input)",
+          "evidence_type": "token",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:a61223e9cb90:modules/http2/h2_push.c:git_diff"
+          ]
+        },
+        {
+          "signal": "++stream->request_headers_added outside was_added guard (unconditional header counting)",
+          "evidence_type": "sequence",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:971fc8f5b5d6:modules/http2/h2_stream.c:git_diff:8011"
+          ]
+        },
+        {
+          "signal": "lastidx = diary->entries->nelts - 1 with apr_size_t type (underflow risk when nelts==0)",
+          "evidence_type": "token",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:a61223e9cb90:modules/http2/h2_push.c:git_diff:18008"
+          ]
+        },
+        {
+          "signal": "h2_req_add_header signature without max_field_len, pwas_added parameters",
+          "evidence_type": "function",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:971fc8f5b5d6:modules/http2/h2_util.c:git_diff:12003"
+          ]
+        },
+        {
+          "signal": "Cache-Digest header processed in h2_push_collect_update",
+          "evidence_type": "sequence",
+          "scope": "tag",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-9490:a61223e9cb90:modules/http2/h2_push.c:git_diff"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-11993": [
+    {
+      "file_patterns": [
+        "modules/http2/h2_mplx.c",
+        "modules/http2/h2_conn.c",
+        "modules/http2/h2_task.c",
+        "modules/http2/h2_stream.c"
+      ],
+      "function_patterns": [
+        "h2_mplx.c:t_out_open",
+        "h2_mplx.c:s_task_done",
+        "h2_mplx.c:s_out_close",
+        "h2_mplx.c:m_stream_destroy_iter",
+        "h2_mplx.c:s_next_stream_task",
+        "h2_conn.c:h2_secondary_create",
+        "h2_conn.c:h2_secondary_destroy",
+        "h2_task.c:h2_task_pre_conn",
+        "h2_stream.c:h2_stream_add_header"
+      ],
+      "vulnerable_tokens": [
+        "m->c",
+        "h2_slave_create",
+        "h2_slave_destroy",
+        "h2_slave_run_pre_connection",
+        "m->spare_slaves",
+        "H2_SLAVE_IN",
+        "H2_SLAVE_OUT",
+        "h2_mplx_pop_task",
+        "h2_mplx_out_open",
+        "h2_mplx_out_trywait",
+        "h2_mplx_process",
+        "h2_mplx_stream_do"
+      ],
+      "fix_tokens": [
+        "stream->task->c",
+        "task->c",
+        "secondary",
+        "h2_secondary_create",
+        "h2_secondary_destroy",
+        "h2_secondary_run_pre_connection",
+        "m->spare_secondary",
+        "H2_SECONDARY_IN",
+        "H2_SECONDARY_OUT",
+        "h2_mplx_s_pop_task",
+        "h2_mplx_t_out_open",
+        "h2_mplx_m_out_trywait",
+        "h2_mplx_m_process",
+        "h2_mplx_m_stream_do",
+        "was_added",
+        "goto cleanup"
+      ],
+      "grep_patterns": [
+        "ap_log_cerror\\(APLOG_MARK, APLOG_TRACE[123], 0, m->c,",
+        "h2_beam_log\\(.*m->c,",
+        "h2_slave_create\\(",
+        "H2_SLAVE_IN\\b",
+        "h2_mplx_pop_task\\(",
+        "h2_mplx_out_open\\(",
+        "stream->task->c",
+        "h2_secondary_create\\(",
+        "h2_mplx_s_pop_task\\("
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, m->c, ...) or h2_beam_log(..., m->c, ...) inside a function that is called from a worker/secondary thread (e.g., functions with s_, t_, or worker callback patterns)",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:63a0a87efa09:modules/http2/h2_mplx.c:git_diff:42006",
+              "kind": "git_diff",
+              "commit": "63a0a87efa0925514d15c211b508f6594669888c",
+              "file_path": "modules/http2/h2_mplx.c",
+              "function_context": "t_out_open",
+              "line_start": 536,
+              "line_end": 544,
+              "snippet": "Changed m->c to stream->task->c in both logging calls",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Functions named h2_slave_* or containing 'slave' variable names in mod_http2 source files",
+          "evidence_type": "token",
+          "scope": "file",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:63a0a87efa09:modules/http2/h2_conn.c:git_diff:5001-7022",
+              "kind": "git_diff",
+              "commit": "63a0a87efa0925514d15c211b508f6594669888c",
+              "file_path": "modules/http2/h2_conn.c",
+              "function_context": "h2_slave_create/h2_slave_destroy/h2_slave_run_pre_connection",
+              "line_start": 277,
+              "line_end": 360,
+              "snippet": "Entire family of h2_slave_* functions renamed to h2_secondary_*",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "m->spare_slaves token in h2_mplx.c indicating the old spare connection pool",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:63a0a87efa09:modules/http2/h2_mplx.c:git_diff:29005-30023",
+              "kind": "git_diff",
+              "commit": "63a0a87efa0925514d15c211b508f6594669888c",
+              "file_path": "modules/http2/h2_mplx.c",
+              "function_context": "m_stream_destroy_iter / h2_mplx_create",
+              "line_start": 296,
+              "line_end": 360,
+              "snippet": "spare_slaves -> spare_secondary in both creation and destruction paths",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Unconditional ++stream->request_headers_added before validation in h2_stream_add_header",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:971fc8f5b5d6:modules/http2/h2_stream.c:git_diff:133011",
+              "kind": "git_diff",
+              "commit": "971fc8f5b5d664ddeb5d22f8adef2137c7980fc7",
+              "file_path": "modules/http2/h2_stream.c",
+              "function_context": "h2_stream_add_header",
+              "line_start": 695,
+              "line_end": 695,
+              "snippet": "Removed line: '++stream->request_headers_added;' that ran before any header validation",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "H2_SLAVE_IN or H2_SLAVE_OUT filter name strings in mod_http2 source files",
+          "evidence_type": "token",
+          "scope": "repo",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:63a0a87efa09:modules/http2/h2_task.c:git_diff:114004-114010",
+              "kind": "git_diff",
+              "commit": "63a0a87efa0925514d15c211b508f6594669888c",
+              "file_path": "modules/http2/h2_task.c",
+              "function_context": "h2_task_pre_conn",
+              "line_start": 495,
+              "line_end": 498,
+              "snippet": "H2_SLAVE_IN/OUT -> H2_SECONDARY_IN/OUT",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "h2_mplx_pop_task function name indicating the old secondary-thread task pool API",
+          "evidence_type": "function",
+          "scope": "repo",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11993:63a0a87efa09:modules/http2/h2_mplx.c:git_diff:53003",
+              "kind": "git_diff",
+              "commit": "63a0a87efa0925514d15c211b508f6594669888c",
+              "file_path": "modules/http2/h2_mplx.c",
+              "function_context": "next_stream_task / h2_mplx_s_pop_task",
+              "line_start": 762,
+              "line_end": 764,
+              "snippet": "h2_mplx_pop_task -> h2_mplx_s_pop_task",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2022-2602": [
+    {
+      "file_patterns": [
+        "include/linux/skbuff.h",
+        "io_uring/rsrc.c",
+        "net/unix/garbage.c"
+      ],
+      "function_patterns": [
+        "unix_gc",
+        "__io_scm_file_account"
+      ],
+      "vulnerable_tokens": [
+        "__skb_queue_purge",
+        "hitlist",
+        "gc_candidates",
+        "unix_destruct_scm"
+      ],
+      "fix_tokens": [
+        "scm_io_uring",
+        "__skb_unlink",
+        "skb_queue_tail",
+        "gc_inflight_list",
+        "list_move_tail"
+      ],
+      "grep_patterns": [
+        {
+          "pattern": "skb->scm_io_uring\\s*=",
+          "description": "Presence indicates fixed versions (marker set in __io_scm_file_account). Absence when __io_scm_file_account exists indicates vulnerable.",
+          "scope": "io_uring/rsrc.c"
+        },
+        {
+          "pattern": "if\\s*\\(skb->scm_io_uring\\)",
+          "description": "Presence indicates the unix_gc guard exists (fixed). Absence when unix_gc has __skb_queue_purge(&hitlist) indicates vulnerable.",
+          "scope": "net/unix/garbage.c"
+        },
+        {
+          "pattern": "scm_io_uring",
+          "description": "Broad search for the fix marker in struct sk_buff definition. Presence indicates the flag field was added (fix prerequisite).",
+          "scope": "include/linux/skbuff.h"
+        },
+        {
+          "pattern": "__io_scm_file_account",
+          "description": "Presence indicates io_uring file registration exists, which is the prerequisite for the vulnerability.",
+          "scope": "io_uring/rsrc.c"
+        },
+        {
+          "pattern": "__skb_queue_purge\\(&hitlist\\)",
+          "description": "The dangerous operation in unix_gc. Vulnerable versions have this WITHOUT a preceding scm_io_uring filter loop.",
+          "scope": "net/unix/garbage.c"
+        },
+        {
+          "pattern": "list_move_tail\\(&u->link,\\s*&gc_inflight_list\\)",
+          "description": "Presence indicates fixed versions (gc_candidates restoration guard).",
+          "scope": "net/unix/garbage.c"
+        }
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "__skb_queue_purge(&hitlist) in unix_gc() without preceding scm_io_uring filter",
+          "evidence_type": "sequence",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-2602:0091bfc81741b8d3aeb3b7ab8636f911b2de6e80:net/unix/garbage.c:git_diff:5014",
+              "kind": "git_diff",
+              "commit": "0091bfc81741b8d3aeb3b7ab8636f911b2de6e80",
+              "file_path": "net/unix/garbage.c",
+              "function_context": "unix_gc",
+              "line_start": 314,
+              "line_end": 315,
+              "snippet": "__skb_queue_purge(&hitlist) without guard",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "skb->sk = sk + skb->destructor = unix_destruct_scm in __io_scm_file_account() creates skbs that unix_gc() will mistake for normal SCM references",
+          "evidence_type": "sequence",
+          "scope": "file",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-2602:0091bfc81741b8d3aeb3b7ab8636f911b2de6e80:io_uring/rsrc.c:git_diff:3002",
+              "kind": "git_diff",
+              "commit": "0091bfc81741b8d3aeb3b7ab8636f911b2de6e80",
+              "file_path": "io_uring/rsrc.c",
+              "function_context": "__io_scm_file_account",
+              "line_start": 857,
+              "line_end": 859,
+              "snippet": "skb->sk = sk; skb->destructor = unix_destruct_scm;",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "gc_candidates list not restored to gc_inflight_list after unix_gc() cycle breaking",
+          "evidence_type": "sequence",
+          "scope": "family",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-2602:0091bfc81741b8d3aeb3b7ab8636f911b2de6e80:net/unix/garbage.c:git_diff:5019",
+              "kind": "git_diff",
+              "commit": "0091bfc81741b8d3aeb3b7ab8636f911b2de6e80",
+              "file_path": "net/unix/garbage.c",
+              "function_context": "unix_gc",
+              "line_start": 319,
+              "line_end": 323,
+              "snippet": "list_for_each_entry_safe(u, next, &gc_candidates, link) list_move_tail(&u->link, &gc_inflight_list);",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Fixes: 6b06314c47e1 (io_uring: add file set registration) introduced the prerequisite code path",
+          "evidence_type": "history",
+          "scope": "repo",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-2602:0091bfc81741b8d3aeb3b7ab8636f911b2de6e80:commit_message:Fixes_tag",
+              "kind": "commit_message",
+              "commit": "0091bfc81741b8d3aeb3b7ab8636f911b2de6e80",
+              "file_path": "",
+              "function_context": "",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "Fixes: 6b06314c47e1",
+              "strength_hint": "priority"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2022-44034": [
+    {
+      "file_patterns": [
+        "drivers/char/pcmcia/scr24x_cs.c"
+      ],
+      "function_patterns": [
+        "scr24x_open",
+        "scr24x_remove",
+        "scr24x_release"
+      ],
+      "vulnerable_tokens": [
+        "kref_get",
+        "kref_put",
+        "dev->dev = NULL",
+        "dev->private_data = dev"
+      ],
+      "fix_tokens": [],
+      "grep_patterns": [
+        "scr24x_open",
+        "scr24x_remove",
+        "kref_get.*refcnt",
+        "dev->dev = NULL"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "open() calls kref_get(&dev->refcnt) without dev->lock and without dev->dev validity check",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-44034:9b12f050c76f:drivers/char/pcmcia/scr24x_cs.c:git_diff:80-89"
+          ]
+        },
+        {
+          "signal": "remove() sets dev->dev = NULL then calls kref_put which can trigger kfree via scr24x_delete, without synchronizing with open()",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-44034:9b12f050c76f:drivers/char/pcmcia/scr24x_cs.c:git_diff:297-310"
+          ]
+        },
+        {
+          "signal": "release() explicitly avoids dev->lock (comment confirms awareness of scr24x_delete risk), creating asymmetric lock discipline between open/release and remove",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-44034:9b12f050c76f:drivers/char/pcmcia/scr24x_cs.c:git_diff:91-102"
+          ]
+        },
+        {
+          "signal": "read() and write() check dev->dev but open() does not, creating inconsistency where a raced-open fd can have dev==NULL but still be handed to userspace",
+          "evidence_type": "token",
+          "scope": "file",
+          "strength": "medium",
+          "source_refs": [
+            "src:CVE-2022-44034:9b12f050c76f:drivers/char/pcmcia/scr24x_cs.c:git_diff:133-138",
+            "src:CVE-2022-44034:9b12f050c76f:drivers/char/pcmcia/scr24x_cs.c:git_diff:179-184"
+          ]
+        },
+        {
+          "signal": "Del_only patch removes entire driver files (vulnerable_branch_removed archetype); no guards added",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-44034:9b12f050c76f:commit_message:lines-1-12"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2022-47938": [
+    {
+      "file_patterns": [
+        "fs/ksmbd/smb2misc.c"
+      ],
+      "function_patterns": [
+        "static int smb2_get_data_area_len(unsigned int *off, unsigned int *len, struct smb2_hdr *hdr)"
+      ],
+      "vulnerable_tokens": [
+        "hdr->Status",
+        "STATUS_MORE_PROCESSING_REQUIRED",
+        "SMB2_ERROR_STRUCTURE_SIZE2_LE",
+        "((struct smb2_err_rsp *)hdr)->StructureSize"
+      ],
+      "fix_tokens": [],
+      "grep_patterns": [
+        "if \\(hdr->Status && hdr->Status != STATUS_MORE_PROCESSING_REQUIRED",
+        "smb2_get_data_area_len"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Early return for error status skips data area validation in smb2_get_data_area_len",
+          "evidence_type": "sequence",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-47938:824d4f64c20093275f72fc8101394d75ff6a249e:fs/ksmbd/smb2misc.c:git_diff:1004",
+              "kind": "git_diff",
+              "commit": "824d4f64c20093275f72fc8101394d75ff6a249e",
+              "file_path": "fs/ksmbd/smb2misc.c",
+              "function_context": "static int smb2_get_data_area_len(unsigned int *off, unsigned int *len, struct smb2_hdr *hdr)",
+              "line_start": 94,
+              "line_end": 96,
+              "snippet": "if (hdr->Status && hdr->Status != STATUS_MORE_PROCESSING_REQUIRED && ... return ret;",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "smb2_tree_connect uses req->PathLength for smb_strndup_from_utf16 without length validation against actual buffer",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2022-47938:824d4f64c200~1:fs/ksmbd/smb2pdu.c:git_snapshot:1876",
+              "kind": "git_snapshot",
+              "commit": "824d4f64c200~1",
+              "file_path": "fs/ksmbd/smb2pdu.c",
+              "function_context": "int smb2_tree_connect(struct ksmbd_work *work)",
+              "line_start": 1876,
+              "line_end": 1877,
+              "snippet": "treename = smb_strndup_from_utf16(req->Buffer, le16_to_cpu(req->PathLength), true, conn->local_nls);",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-6851": [
+    {
+      "file_patterns": [
+        "src/lib/openjp2/j2k.c"
+      ],
+      "function_patterns": [
+        "opj_j2k_update_image_dimensions"
+      ],
+      "vulnerable_tokens": [
+        "(OPJ_INT32)p_image->x0",
+        "(OPJ_INT32)p_image->y0",
+        "(OPJ_INT32)p_image->x1",
+        "(OPJ_INT32)p_image->y1"
+      ],
+      "fix_tokens": [
+        "x0 > (OPJ_UINT32)INT_MAX",
+        "y0 > (OPJ_UINT32)INT_MAX",
+        "x1 > (OPJ_UINT32)INT_MAX",
+        "y1 > (OPJ_UINT32)INT_MAX",
+        "Image coordinates above INT_MAX are not supported"
+      ],
+      "grep_patterns": [
+        "opj_j2k_update_image_dimensions",
+        "OPJ_INT32)p_image->x[01]",
+        "OPJ_INT32)p_image->y[01]",
+        "INT_MAX",
+        "opj_int_ceildiv.*p_image"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Unsigned-to-signed cast on attacker-controlled image coordinate without INT_MAX guard",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-6851:024b8407392cb0b82b04b58ed256094ed5799e04~1:src/lib/openjp2/j2k.c:snapshot:9225",
+              "kind": "git_snapshot",
+              "commit": "024b8407392cb0b82b04b58ed256094ed5799e04~1",
+              "file_path": "src/lib/openjp2/j2k.c",
+              "function_context": "opj_j2k_update_image_dimensions",
+              "line_start": 9225,
+              "line_end": 9225,
+              "snippet": "l_img_comp->x0 = (OPJ_UINT32)opj_int_ceildiv((OPJ_INT32)p_image->x0,",
+              "strength_hint": "certificate_candidate"
+            },
+            {
+              "source_ref": "src:CVE-2020-6851:024b8407392cb0b82b04b58ed256094ed5799e04:git_diff:1004-1011",
+              "kind": "git_diff",
+              "commit": "024b8407392cb0b82b04b58ed256094ed5799e04",
+              "file_path": "src/lib/openjp2/j2k.c",
+              "function_context": "opj_j2k_update_image_dimensions",
+              "line_start": 9224,
+              "line_end": 9231,
+              "snippet": "if (p_image->x0 > (OPJ_UINT32)INT_MAX || ...) { return OPJ_FALSE; }",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Guard added rejecting image coordinates above INT_MAX",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-6851:024b8407392cb0b82b04b58ed256094ed5799e04:git_diff:1004-1011",
+              "kind": "git_diff",
+              "commit": "024b8407392cb0b82b04b58ed256094ed5799e04",
+              "file_path": "src/lib/openjp2/j2k.c",
+              "function_context": "opj_j2k_update_image_dimensions",
+              "line_start": 9224,
+              "line_end": 9231,
+              "snippet": "if (p_image->x0 > (OPJ_UINT32)INT_MAX || ...) { return OPJ_FALSE; }",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-27823": [
+    {
+      "file_patterns": [
+        "src/bin/jp2/convertpng.c"
+      ],
+      "function_patterns": [
+        "pngtoimage"
+      ],
+      "vulnerable_tokens": [
+        "+ image->x0",
+        "+ image->y0"
+      ],
+      "fix_tokens": [],
+      "grep_patterns": [
+        "subsampling_dx \\+ 1 \\+ image->x0",
+        "subsampling_dy \\+ 1 \\+ image->y0",
+        "image->x1 = .*subsampling_dx \\+ 1\\)",
+        "image->y1 = .*subsampling_dy \\+ 1\\)"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "image->x1 = (OPJ_UINT32)(image->x0 + (width  - 1) * (OPJ_UINT32) params->subsampling_dx + 1 + image->x0)",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27823:a2b2980a4bcb4d3903375de31495f99dde0e98a8:src/bin/jp2/convertpng.c:agent_git_inspection:225-226"
+          ]
+        },
+        {
+          "signal": "image->y1 = (OPJ_UINT32)(image->y0 + (height - 1) * (OPJ_UINT32) params->subsampling_dy + 1 + image->y0)",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27823:a2b2980a4bcb4d3903375de31495f99dde0e98a8:src/bin/jp2/convertpng.c:agent_git_inspection:227-228"
+          ]
+        },
+        {
+          "signal": "image->x1 = (OPJ_UINT32)(image->x0 + (width  - 1) * (OPJ_UINT32) params->subsampling_dx + 1) [no double-count]",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27823:b2072402b7e14d22bba6fb8cde2a1e9996e9a919:src/bin/jp2/convertpng.c:git_diff:1005"
+          ]
+        },
+        {
+          "signal": "image->y1 = (OPJ_UINT32)(image->y0 + (height - 1) * (OPJ_UINT32) params->subsampling_dy + 1) [no double-count]",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27823:b2072402b7e14d22bba6fb8cde2a1e9996e9a919:src/bin/jp2/convertpng.c:git_diff:1008"
+          ]
+        },
+        {
+          "signal": "opj_image_create allocates width*height per component BEFORE x1/y1 are set with inflated values",
+          "evidence_type": "function",
+          "scope": "line",
+          "strength": "medium",
+          "source_refs": [
+            "src:CVE-2020-27823:a2b2980a4bcb4d3903375de31495f99dde0e98a8:src/bin/jp2/convertpng.c:agent_git_inspection:215-228"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-27824": [
+    {
+      "file_patterns": [
+        "src/lib/openjp2/dwt.c"
+      ],
+      "function_patterns": [
+        "opj_dwt_calc_explicit_stepsizes"
+      ],
+      "vulnerable_tokens": [
+        "opj_dwt_norms_real[orient][level]"
+      ],
+      "fix_tokens": [
+        "opj_dwt_getnorm_real"
+      ],
+      "grep_patterns": [
+        "opj_dwt_norms_real\\[orient\\]\\[level\\]",
+        "opj_dwt_getnorm_real",
+        "opj_dwt_calc_explicit_stepsizes"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Direct static 2D array access opj_dwt_norms_real[orient][level] without bounds checking on user-controlled index 'level'",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27824:6daf5f3e1ec6eff03b7982889874a3de6617db8d:src/lib/openjp2/dwt.c:git_diff:1004"
+          ]
+        },
+        {
+          "signal": "opj_dwt_getnorm_real added as bounds-safe replacement with level-clamping logic",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2020-27824:6daf5f3e1ec6eff03b7982889874a3de6617db8d:src/lib/openjp2/dwt.c:git_diff:1005"
+          ]
+        },
+        {
+          "signal": "opj_dwt_getnorm_real function has level-clamping guard (if orient==0 && level>=10 / if orient>0 && level>=9)",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "agent_git_inspection:CVE-2020-27824:parent_2d119d03:src/lib/openjp2/dwt.c:1950-1960"
+          ]
+        },
+        {
+          "signal": "Static array opj_dwt_norms_real[4][10] defines the fixed bound that the vulnerable code overruns",
+          "evidence_type": "file",
+          "scope": "file",
+          "strength": "medium",
+          "source_refs": [
+            "agent_git_inspection:CVE-2020-27824:parent_2d119d03:src/lib/openjp2/dwt.c:209-214"
+          ]
+        },
+        {
+          "signal": "Function opj_dwt_calc_explicit_stepsizes iterates over 3*numresolutions-2 bands with level computed as numresolutions-1-resno",
+          "evidence_type": "function",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "agent_git_inspection:CVE-2020-27824:parent_2d119d03:src/lib/openjp2/dwt.c:1963-1982"
+          ]
+        },
+        {
+          "signal": "Fix commit message: Encoder: avoid global buffer overflow on irreversible conversion when too many decomposition levels are specified (fixes #1286)",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "medium",
+          "source_refs": [
+            "src:CVE-2020-27824:6daf5f3e1ec6eff03b7982889874a3de6617db8d:commit_message"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2023-0217": [
+    {
+      "file_patterns": [
+        "crypto/ffc/ffc_key_validate.c",
+        "include/internal/ffc.h"
+      ],
+      "function_patterns": [
+        "ossl_ffc_validate_public_key_partial",
+        "ossl_ffc_validate_private_key",
+        "ossl_ffc_validate_public_key"
+      ],
+      "vulnerable_tokens": [
+        "BN_copy",
+        "params->p",
+        "BN_cmp"
+      ],
+      "fix_tokens": [
+        "FFC_ERROR_PASSED_NULL_PARAM",
+        "params == NULL || pub_key == NULL || params->p == NULL",
+        "priv == NULL || upper == NULL"
+      ],
+      "grep_patterns": [
+        "ossl_ffc_validate_public_key_partial",
+        "ossl_ffc_validate_private_key",
+        "FFC_ERROR_PASSED_NULL_PARAM",
+        "BN_copy"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "ossl_ffc_validate_public_key_partial 在第 27-30 行缺少 NULL 守卫",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2023-0217:23985bac83fd50c8e29431009302b5442f985096:9f6525a2c8:crypto/ffc/ffc_key_validate.c:git_snapshot"
+          ]
+        },
+        {
+          "signal": "ossl_ffc_validate_private_key 在第 115-118 行缺少 NULL 守卫",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2023-0217:23985bac83fd50c8e29431009302b5442f985096:9f6525a2c8:crypto/ffc/ffc_key_validate.c:git_snapshot"
+          ]
+        },
+        {
+          "signal": "BN_copy 是在未检查 params->p 是否为 NULL 的情况下唯一被调用的函数",
+          "evidence_type": "token",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2023-0217:23985bac83fd50c8e29431009302b5442f985096:crypto/ffc/ffc_key_validate.c:git_diff:1007-1009"
+          ]
+        },
+        {
+          "signal": "区域_0003 缺少函数上下文（include/internal/ffc.h:79）",
+          "evidence_type": "file",
+          "scope": "tag",
+          "strength": "low",
+          "source_refs": [
+            "src:CVE-2023-0217:23985bac83fd50c8e29431009302b5442f985096:include/internal/ffc.h:git_diff:3004"
+          ]
+        },
+        {
+          "signal": "EVP_PKEY_public_check() 触发调用链",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "medium",
+          "source_refs": [
+            "src:CVE-2023-0217:23985bac83fd50c8e29431009302b5442f985096:commit_message"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2022-2097": [
+    {
+      "file_patterns": [
+        "crypto/aes/asm/aesni-x86.pl"
+      ],
+      "function_patterns": [
+        "aesni_ocb_encrypt",
+        "aesni_ocb_decrypt"
+      ],
+      "vulnerable_tokens": [
+        "jb",
+        "grandloop"
+      ],
+      "fix_tokens": [
+        "jbe"
+      ],
+      "grep_patterns": [
+        "cmp.*\\$inp.*\\$len",
+        "jb.*grandloop",
+        "jbe.*grandloop"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "jb used instead of jbe in OCB grandloop continuation comparison",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-2097:a98f339ddd7e8f487d6e0088d4a9a42324885a93:crypto/aes/asm/aesni-x86.pl:git_diff:1004",
+            "src:CVE-2022-2097:a98f339ddd7e8f487d6e0088d4a9a42324885a93:crypto/aes/asm/aesni-x86.pl:git_diff:2004"
+          ]
+        },
+        {
+          "signal": "cmp ($inp,$len) followed by jb (strict) at grandloop exit — off-by-one in loop boundary",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "parent_snapshot:a98f339ddd7e~1:crypto/aes/asm/aesni-x86.pl:2025-2032",
+            "parent_snapshot:a98f339ddd7e~1:crypto/aes/asm/aesni-x86.pl:2451-2458"
+          ]
+        },
+        {
+          "signal": "Both aesni_ocb_encrypt and aesni_ocb_decrypt grandloop tails have identical fencepost error",
+          "evidence_type": "function",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2022-2097:a98f339ddd7e8f487d6e0088d4a9a42324885a93:crypto/aes/asm/aesni-x86.pl:git_diff:1001",
+            "src:CVE-2022-2097:a98f339ddd7e8f487d6e0088d4a9a42324885a93:crypto/aes/asm/aesni-x86.pl:git_diff:2001"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2022-3996": [
+    {
+      "file_patterns": [
+        "crypto/x509/pcy_map.c",
+        "crypto/x509/pcy_cache.c"
+      ],
+      "function_patterns": [
+        "ossl_policy_cache_set_mapping",
+        "policy_cache_new",
+        "ossl_policy_cache_set"
+      ],
+      "vulnerable_tokens": [
+        "CRYPTO_THREAD_write_lock",
+        "bad_mapping"
+      ],
+      "fix_tokens": [],
+      "grep_patterns": [
+        "CRYPTO_THREAD_write_lock.*x->lock.*bad_mapping",
+        "ossl_policy_cache_set_mapping"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "Double lock at bad_mapping: CRYPTO_THREAD_write_lock(x->lock) while caller already holds x->lock",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "git_diff:1003-1006",
+            "git_snapshot:pcy_cache.c:191-193"
+          ]
+        },
+        {
+          "signal": "ossl_policy_cache_set_mapping returns -1 -> caller bad_cache: sets EXFLAG_INVALID_POLICY (redundant with removed block)",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "medium",
+          "source_refs": [
+            "git_snapshot:pcy_cache.c:154-156",
+            "git_snapshot:pcy_cache.c:169"
+          ]
+        },
+        {
+          "signal": "Commit 9aa4be69 introduced the double-lock",
+          "evidence_type": "history",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "git_diff:9aa4be69:pcy_map.c:76-79"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-14394": [
+    {}
+  ],
+  "CVE-2021-3544": [
+    {
+      "file_patterns": [
+        "contrib/vhost-user-gpu/virgl.c",
+        "contrib/vhost-user-gpu/vhost-user-gpu.c"
+      ],
+      "function_patterns": [
+        "virgl_cmd_resource_unref",
+        "virgl_resource_attach_backing",
+        "vg_resource_create_2d",
+        "vg_resource_destroy",
+        "vg_resource_attach_backing"
+      ],
+      "vulnerable_tokens": [
+        "g_free",
+        "g_free(res_iovs)",
+        "g_free(res->iov)",
+        "vugbm_buffer_destroy",
+        "virgl_renderer_resource_detach_iov",
+        "virgl_renderer_resource_attach_iov",
+        "vg_create_mapping_iov",
+        "res->iov"
+      ],
+      "fix_tokens": [
+        "g_free(res_iovs)",
+        "g_free(res->iov)",
+        "vugbm_buffer_destroy(&res->buffer)",
+        "virgl_renderer_resource_detach_iov",
+        "if (res->iov)",
+        "if (ret != 0)"
+      ],
+      "grep_patterns": [
+        "g_free\\(res->iov\\)",
+        "g_free\\(res_iovs\\)",
+        "virgl_renderer_resource_detach_iov",
+        "vugbm_buffer_destroy\\(&res->buffer\\)",
+        "if \\(res->iov\\)",
+        "if \\(ret != 0\\) \\{.*g_free\\(res_iovs\\)"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "missing g_free(res->iov) in vg_resource_destroy",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-3544:b7afebcf9e6e:contrib/vhost-user-gpu/vhost-user-gpu.c:git_diff:4003",
+              "kind": "git_diff",
+              "commit": "b7afebcf9e6ecf3cf9b5a9b9b731ed04bca6aa3e",
+              "file_path": "contrib/vhost-user-gpu/vhost-user-gpu.c",
+              "function_context": "vg_resource_destroy",
+              "line_start": 403,
+              "line_end": 403,
+              "snippet": "g_free(res->iov)",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "missing virgl_renderer_resource_detach_iov before unref in virgl_cmd_resource_unref",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-3544:f6091d86ba9e:contrib/vhost-user-gpu/virgl.c:git_diff:1007",
+              "kind": "git_diff",
+              "commit": "f6091d86ba9ea05f4e111b9b42ee0005c37a6779",
+              "file_path": "contrib/vhost-user-gpu/virgl.c",
+              "function_context": "virgl_cmd_resource_unref",
+              "line_start": 116,
+              "line_end": 117,
+              "snippet": "virgl_renderer_resource_detach_iov",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "missing vugbm_buffer_destroy on error path in vg_resource_create_2d",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-3544:86dd8fac2acc:contrib/vhost-user-gpu/vhost-user-gpu.c:git_diff:3004",
+              "kind": "git_diff",
+              "commit": "86dd8fac2acc366930a5dc08d3fb1b1e816f4e1e",
+              "file_path": "contrib/vhost-user-gpu/vhost-user-gpu.c",
+              "function_context": "vg_resource_create_2d",
+              "line_start": 352,
+              "line_end": 352,
+              "snippet": "vugbm_buffer_destroy(&res->buffer)",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "ret from attach_iov ignored, res_iovs leaked on failure",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-3544:63736af5a657:contrib/vhost-user-gpu/virgl.c:git_diff:2006",
+              "kind": "git_diff",
+              "commit": "63736af5a6571d9def93769431e0d7e38c6677bf",
+              "file_path": "contrib/vhost-user-gpu/virgl.c",
+              "function_context": "virgl_resource_attach_backing",
+              "line_start": 292,
+              "line_end": 294,
+              "snippet": "if (ret != 0) { g_free(res_iovs); }",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "no guard against double-attach_backing overwriting res->iov",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2021-3544:b9f79858a614:contrib/vhost-user-gpu/vhost-user-gpu.c:git_diff:5003",
+              "kind": "git_diff",
+              "commit": "b9f79858a614d95f5de875d0ca31096eaab72c3b",
+              "file_path": "contrib/vhost-user-gpu/vhost-user-gpu.c",
+              "function_context": "vg_resource_attach_backing",
+              "line_start": 492,
+              "line_end": 494,
+              "snippet": "if (res->iov) { cmd->error; return; }",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2021-3416": [
+    {
+      "file_patterns": [
+        "net/net.c",
+        "net/queue.c",
+        "include/net/net.h",
+        "include/net/queue.h",
+        "hw/net/*.c"
+      ],
+      "function_patterns": [
+        "qemu_receive_packet",
+        "qemu_net_queue_receive",
+        "qemu_can_receive_packet",
+        "qemu_can_send_packet",
+        "_send_packet",
+        "_transmit",
+        "do_tx_packet",
+        "dma_tx"
+      ],
+      "vulnerable_tokens": [
+        "nc->info->receive(",
+        "nc->info->receive_iov(",
+        "rtl8139_do_receive(",
+        "lan9118_receive(",
+        "gem_receive(",
+        "pcnet_receive("
+      ],
+      "fix_tokens": [
+        "qemu_receive_packet(",
+        "qemu_receive_packet_iov(",
+        "qemu_can_receive_packet(",
+        "qemu_net_queue_receive("
+      ],
+      "grep_patterns": [
+        "nc->info->receive\\(nc",
+        "qemu_receive_packet\\(",
+        "qemu_can_receive_packet",
+        "queue->delivering"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "direct nc->info->receive() call in loopback path without reentrancy guard",
+          "evidence_type": "sequence",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-3416:1caff0340f49:hw/net/e1000.c:git_diff:e1000_send_packet",
+            "src:CVE-2021-3416:8c92060d3c02:hw/net/sungem.c:git_diff:sungem_send_packet",
+            "src:CVE-2021-3416:331d2ac9ea30:hw/net/dp8393x.c:git_diff:dp8393x_do_transmit_packets",
+            "src:CVE-2021-3416:26194a58f4eb:hw/net/msf2-emac.c:git_diff:msf2_dma_tx",
+            "src:CVE-2021-3416:8c552542b81e:hw/net/net_tx_pkt.c:git_diff:net_tx_pkt_send"
+          ]
+        },
+        {
+          "signal": "queue->delivering flag checked to detect and prevent reentrant delivery",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-3416:705df5466c98:net/queue.c:git_diff:qemu_net_queue_receive"
+          ]
+        },
+        {
+          "signal": "receive_disabled and can_receive combined check in qemu_can_receive_packet",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-3416:705df5466c98:net/net.c:git_diff:qemu_can_receive_packet"
+          ]
+        },
+        {
+          "signal": "NIC-specific receive function replaced with qemu_receive_packet in loopback path",
+          "evidence_type": "token",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-3416:5311fb805a44:hw/net/rtl8139.c:git_diff:rtl8139_transfer_frame",
+            "src:CVE-2021-3416:37cee01784ff:hw/net/lan9118.c:git_diff:do_tx_packet",
+            "src:CVE-2021-3416:e73adfbeec9d:hw/net/cadence_gem.c:git_diff:gem_transmit",
+            "src:CVE-2021-3416:99ccfaa1edaf:hw/net/pcnet.c:git_diff:pcnet_transmit"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-11647": [
+    {
+      "file_patterns": [
+        "epan/dissectors/packet-bacapp.c"
+      ],
+      "function_patterns": [
+        "fAbstractSyntaxNType",
+        "fPropertyValue",
+        "fActionList",
+        "fSimpleArrayComponent"
+      ],
+      "vulnerable_tokens": [
+        "fAbstractSyntaxNType",
+        "while (tvb_reported_length_remaining",
+        "offset = fAbstractSyntaxNType"
+      ],
+      "fix_tokens": [
+        "BACAPP_MAX_RECURSION_DEPTH",
+        "p_get_proto_data",
+        "p_add_proto_data",
+        "ei_bacapp_max_recursion_depth_reached",
+        "recursion_depth"
+      ],
+      "grep_patterns": [
+        "fAbstractSyntaxNType",
+        "BACAPP_MAX_RECURSION_DEPTH",
+        "recursion_depth"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "fAbstractSyntaxNType recursive call sites identified in parent commit (15+ invocations at lines 8655, 9305, 9521, 9690, 9700, 10117, 10377, 10884, 11484, 11564, 12110, 12913, 13219, 13838)",
+          "evidence_type": "sequence",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11647:8511253ab74280cb736e6ae1e6a0885dc9dbdca1:epan/dissectors/packet-bacapp.c:agent_git_inspection",
+              "kind": "agent_git_inspection",
+              "commit": "8511253ab74280cb736e6ae1e6a0885dc9dbdca1",
+              "file_path": "epan/dissectors/packet-bacapp.c",
+              "function_context": "fAbstractSyntaxNType",
+              "line_start": 8655,
+              "line_end": 13838,
+              "snippet": "15+ call sites showing mutual recursion topology",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Absence of recursion depth guard in fAbstractSyntaxNType function body at lines 7972-7999 (parent commit)",
+          "evidence_type": "guard",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11647:8511253ab74280cb736e6ae1e6a0885dc9dbdca1:epan/dissectors/packet-bacapp.c:agent_git_inspection",
+              "kind": "agent_git_inspection",
+              "commit": "8511253ab74280cb736e6ae1e6a0885dc9dbdca1",
+              "file_path": "epan/dissectors/packet-bacapp.c",
+              "function_context": "fAbstractSyntaxNType",
+              "line_start": 7972,
+              "line_end": 7999,
+              "snippet": "Function entry: no recursion_depth guard before the while loop",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "Added guard sequence in fix commit at fAbstractSyntaxNType entry (lines 7994-7999 new) and exit (lines 8654-8656 new)",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11647:6f56fc9496db:epan/dissectors/packet-bacapp.c:git_diff:4004-4010",
+              "kind": "git_diff",
+              "commit": "6f56fc9496db158218243ea87e3660c874a0bab0",
+              "file_path": "epan/dissectors/packet-bacapp.c",
+              "function_context": "fAbstractSyntaxNType",
+              "line_start": 7994,
+              "line_end": 7999,
+              "snippet": "Added recursion depth increment, guard check, and early return",
+              "strength_hint": "priority"
+            }
+          ]
+        },
+        {
+          "signal": "Protocol dissector in epan/dissectors/ directory processes BACnet application layer data",
+          "evidence_type": "file",
+          "scope": "repo",
+          "strength": "medium",
+          "source_refs": [
+            {
+              "source_ref": "src:CVE-2020-11647:6f56fc9496db:epan/dissectors/packet-bacapp.c:git_diff",
+              "kind": "git_diff",
+              "commit": "6f56fc9496db158218243ea87e3660c874a0bab0",
+              "file_path": "epan/dissectors/packet-bacapp.c",
+              "function_context": "",
+              "line_start": null,
+              "line_end": null,
+              "snippet": "BACapp protocol dissector file",
+              "strength_hint": "context_only"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2021-4182": [
+    {
+      "file_patterns": [
+        "epan/dissectors/file-rfc7468.c"
+      ],
+      "function_patterns": [
+        "dissect_rfc7468"
+      ],
+      "vulnerable_tokens": [
+        "for (;;)",
+        "for (;;) {",
+        "tvb_find_line_end"
+      ],
+      "fix_tokens": [
+        "while (tvb_offset_exists(tvb, offset))",
+        "tvb_offset_exists"
+      ],
+      "grep_patterns": [
+        "for \\(;;\\)",
+        "tvb_offset_exists\\(tvb, offset\\)",
+        "while \\(tvb_offset_exists"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "for (;;) loop with tvb_find_line_end call — no progress guarantee for offset when past tvb end",
+          "evidence_type": "sequence",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:1004",
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:2004",
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:3004"
+          ]
+        },
+        {
+          "signal": "Missing tvb_offset_exists() guard before loop body — required to prevent infinite iteration",
+          "evidence_type": "guard",
+          "scope": "line",
+          "strength": "high",
+          "source_refs": [
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:1005",
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:2005",
+            "src:CVE-2021-4182:b3215d99cacbcd2613157d10f11b233b35b5d10b:epan/dissectors/file-rfc7468.c:git_diff:3005"
+          ]
+        },
+        {
+          "signal": "tvb_find_line_end() with length=-1 and reassembly=FALSE returns linelen=0 without advancing next_offset when past tvb end",
+          "evidence_type": "function",
+          "scope": "family",
+          "strength": "high",
+          "source_refs": [
+            "b3215d99cacbcd2613157d10f11b233b35b5d10b commit message"
+          ]
+        }
+      ]
+    }
+  ],
+  "CVE-2020-28030": [
+    {
+      "file_patterns": [
+        "epan/dissectors/packet-gquic.c"
+      ],
+      "function_patterns": [
+        "dissect_gquic_tag"
+      ],
+      "vulnerable_tokens": [
+        "total_tag_len += tag_len",
+        "return offset + total_tag_len",
+        "tag_offset += tag_len"
+      ],
+      "fix_tokens": [
+        "offset + total_tag_len <= offset",
+        "goto end",
+        "tvb_reported_length_remaining",
+        "ei_gquic_length_invalid"
+      ],
+      "grep_patterns": [
+        "total_tag_len \\+=",
+        "offset \\+ total_tag_len <= offset",
+        "dissect_gquic_tag",
+        "ei_gquic_length_invalid"
+      ],
+      "line_risk_signals": [
+        {
+          "signal": "total_tag_len accumulation without overflow check",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "f1e28064ec0:epan/dissectors/packet-gquic.c:1389",
+              "kind": "git_snapshot",
+              "commit": "f1e28064ec0ab1b11749fbd1ebf4ae71153ecf07",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "default: case advances tag_offset and continues loop instead of exiting",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "f1e28064ec0:epan/dissectors/packet-gquic.c:1656..1665",
+              "kind": "git_snapshot",
+              "commit": "f1e28064ec0ab1b11749fbd1ebf4ae71153ecf07",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        },
+        {
+          "signal": "return offset + total_tag_len without overflow guard",
+          "evidence_type": "sequence",
+          "scope": "function",
+          "strength": "high",
+          "source_refs": [
+            {
+              "source_ref": "f1e28064ec0:epan/dissectors/packet-gquic.c:1674",
+              "kind": "git_snapshot",
+              "commit": "f1e28064ec0ab1b11749fbd1ebf4ae71153ecf07",
+              "strength_hint": "certificate_candidate"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

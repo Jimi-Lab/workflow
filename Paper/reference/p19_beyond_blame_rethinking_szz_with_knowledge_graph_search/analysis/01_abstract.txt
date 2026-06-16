@@ -1,0 +1,44 @@
+Problem:
+- 1 Introduction Identifying the commit that introduced a bug, known as the Bug-Inducing Commit (BIC), is a foundational task in software maintenance.
+- For two decades, the dominant BIC identification approach has been the SZZ algorithm [32] and its variants [7, 8, 19, 24, 35, 36], which trace deleted (and modified) code in a bug-fixing commit (BFC) via git blame to identify commits that last modified those lines.
+- Presumably, one or more of those commits are the BIC.
+- While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify the same code elements [42], this assumption does not always hold: prior work has shown that over 13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain only added lines where blame cannot be applied [23].
+- As the git blamemechanism constrains the search space to commits that directly touched the fixed lines, it misses BICs introduced through earlier code that was subsequently refactored [ 24, 25], or bugs in related code where the fix addresses the issue by adding new functionality.
+Gap:
+- To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee.
+- While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify the same code elements [42], this assumption does not always hold: prior work has shown that over 13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain only added lines where blame cannot be applied [23].
+- Despite these fundamental limitations, prior work has focused primarily on improving precision of the git blame-based approach through filtering heuristics [7, 19], refactoring detection [24, 25], deep learning [35], semantic analysis [4, 37], and LLM-based reasoning [36], leaving the recall problem unaddressed.
+- We evaluate AgenticSZZ on the same datasets used in prior work [36], comprising 2,102 validated BFC-BIC pairs.
+Core Idea:
+- approach to apply TKGs to software evolution analysis.
+- LLM Agents for SE.LLM-based agents have emerged as powerful tools for complex SE tasks, marking a shift toward Agentic SE (SE 3.0) where agents work as AI teammates [14, 20].
+- Simpler pipelines without persistent agent state have also proven effective [43], general-purpose agent frameworks provide flexible foundations [41], and unified agents have been proposed to orchestrate multiple SE capabilities [1].
+- For bug fixing specifically, combining code KGs with agentic reasoning has shown promise [22].
+- However, this approach requires test execution for candidate filtering and does not model the tem- poral structure of commit history.
+- In contrast, AgenticSZZ operates over a TKG of commit history, using specialized tools designed for BIC search.
+Method:
+- approach to apply TKGs to software evolution analysis.
+- LLM Agents for SE.LLM-based agents have emerged as powerful tools for complex SE tasks, marking a shift toward Agentic SE (SE 3.0) where agents work as AI teammates [14, 20].
+- Simpler pipelines without persistent agent state have also proven effective [43], general-purpose agent frameworks provide flexible foundations [41], and unified agents have been proposed to orchestrate multiple SE capabilities [1].
+- For bug fixing specifically, combining code KGs with agentic reasoning has shown promise [22].
+- However, this approach requires test execution for candidate filtering and does not model the tem- poral structure of commit history.
+- In contrast, AgenticSZZ operates over a TKG of commit history, using specialized tools designed for BIC search.
+Evaluation Setup:
+- Evaluation on three datasets shows that AgenticSZZ achieves F1-scores of 0.48 to 0.74, with statistically significant improvements over state-of-the-art by up to 27%.
+Main Results:
+- Evaluation on three datasets shows that AgenticSZZ achieves F1-scores of 0.48 to 0.74, with statistically significant improvements over state-of-the-art by up to 27%.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- While our evaluation did not directly measure the relationship between blame count and accuracy, this pattern suggests that blame complexity could serve as an indicator of case difficulty, warranting future investigation.
+- Simple cases may benefit from fast-path heuristics.Projects with predominantly single- blame cases (e.g., DS_LINUX where 47% have 1 to 2 deleted lines with 1 blame commit) may benefit from fast-path optimizations that resolve cases with minimal LLM interaction.
+- Future work should systematically evaluate accuracy stratified by blame complexity to confirm this hypothesis.
+- For contexts where BIC identification directly impacts downstream tasks such as defect prediction model training or automated program repair, this cost may be justified by the improved accuracy.
+- While SZZ operates on an implicit assumption that bug-inducing and bug-fixing commits modify the same code elements [42], this assumption does not always hold: prior work has shown that over 13% of BICs share no files with their corresponding bug-fixing commits, and 17% of bug fixes contain only added lines where blame cannot be applied [23].
+- Despite these fundamental limitations, prior work has focused primarily on improving precision of the git blame-based approach through filtering heuristics [7, 19], refactoring detection [24, 25], deep learning [35], semantic analysis [4, 37], and LLM-based reasoning [36], leaving the recall problem unaddressed.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

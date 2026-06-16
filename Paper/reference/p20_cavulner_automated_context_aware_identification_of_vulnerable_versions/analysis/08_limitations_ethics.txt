@@ -1,0 +1,35 @@
+Stated Limitations:
+- However, they heavily rely on the lines of changes in fix commits to trace the introduction of vulnerable code, while vulnerable code may not always be covered in fix commit diffs [36].
+- The severity of these limitations was highlighted by the latest comprehensive empirical study [13] on this topic.
+- The first stage focuses on coarse-grained localization by narrowing down candidate methods based on fix commit change patterns, such as whether a method contains only deletions, only additions, or both, and by incorporating relevant vulnerability information from CVE descriptions and CWE classifications.
+- On average, the LLM cost per vulnerability is only around $0.06.
+- To manage this growing threat, organizations such as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate critical information on disclosed vulnerabilities, to support the wide usage of software supply chain tools like Software Composition Analysis (SCA), to assess potential risks.
+Threats to Validity:
+- •We manually audited all 176 CVEs and identified the vulnerable versions, constructing a high- quality ground truth dataset containing 17,436 of these.
+- •We have releasedCaVulner and related experiment datasets on our website [1] to facilitate further research.
+- To mitigate stochastic noise in LLM-generated responses and reduce logical bias, we set the temperature to zero for LLMs.
+- We leveraged the dataset compiled by Ponta et al.
+- [35], who manually collected and curated vulnerabilities in open-source software along with their corresponding fixing commits.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+Ethical Considerations:
+- The second stage performs fine-grained reasoning by prompting the LLM to analyze semantic differences between the pre- and post-fix code within the selected method to identify the precise code fragment responsible for the vulnerability.
+- The original SZZ algorithm fundamentally operates by systematically tracing backward through the version control history starting from a known bug-fixing commit, with the objective of precisely identifying and isolating the specific earlier commits that were responsible for introducing the particular lines of code that were later modified or deleted in that fix, a process typically and effectively using built-in version control annotation or blame mechanisms.
+Security / Misuse Discussion:
+- Furthermore, none of them analyze the nature of the vulnerability and the semantics of the code and are unable to distinguish between security fixes and non-security fixes.
+- Challenge 1: How to distinguish security fixes from non-security fixes within a fix commit and accurately identify the vulnerability- introducing code.
+- While the reuse of OSS significantly improves development efficiency and reduces costs, it also introduces substantial security risks.
+- In this case, SCA tools rely heavily on the accuracy of vulnerability data, especially the correct vulnerable versions, for automated mappings of security risks in downstream user projects.
+Responsible Disclosure:
+- The second stage performs fine-grained reasoning by prompting the LLM to analyze semantic differences between the pre- and post-fix code within the selected method to identify the precise code fragment responsible for the vulnerability.
+- The original SZZ algorithm fundamentally operates by systematically tracing backward through the version control history starting from a known bug-fixing commit, with the objective of precisely identifying and isolating the specific earlier commits that were responsible for introducing the particular lines of code that were later modified or deleted in that fix, a process typically and effectively using built-in version control annotation or blame mechanisms.
+Scope Boundaries:
+- The severity of these limitations was highlighted by the latest comprehensive empirical study [13] on this topic.
+- The first stage focuses on coarse-grained localization by narrowing down candidate methods based on fix commit change patterns, such as whether a method contains only deletions, only additions, or both, and by incorporating relevant vulnerability information from CVE descriptions and CWE classifications.
+- On average, the LLM cost per vulnerability is only around $0.06.
+- However, this direct adaptation introduces significant limitations.
+- Specifically, V-SZZ assumes all deleted lines are vulnerable and fails to address fix commits that only contain added lines.
+- Consequently, the effectiveness of existing SZZ-based approaches in vulnerability detection remains limited, as they fail to accommodate the unique characteristics of VICs.
+Writing Pattern:
+- Separate dataset/tool limitations, generalizability, and artifact/reproducibility gaps.
+Relevance to Our Paper:
+- Useful for explicitly bounding affected-version claims and separating static evidence from execution/reproduction evidence.

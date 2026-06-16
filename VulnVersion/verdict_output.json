@@ -1,0 +1,20 @@
+{
+  "tag": "n0.10.9",
+  "line": "0.10",
+  "verdict": "AFFECTED",
+  "run_status": "OK",
+  "confidence": 1.0,
+  "matched_predicates": ["vuln_direct_segment_url_probe"],
+  "failed_predicates": ["fix_strdup_segment_url_probe"],
+  "triggered_guards": ["guard_file_exists", "guard_free_segment_list", "guard_read_data_calls_parse_playlist"],
+  "evidence_snippets": [
+    {"ref": "n0.10.9:libavformat/applehttp.c:515-516", "source": "git_show", "snippet": "ret = av_probe_input_buffer(&v->pb, &in_fmt, v->segments[0]->url,\n                                    NULL, 0, 0);"},
+    {"ref": "n0.10.9:libavformat/applehttp.c:116-122", "source": "git_show", "snippet": "static void free_segment_list(struct variant *var) {\n    for (i = 0; i < var->n_segments; i++)\n        av_free(var->segments[i]);\n    av_freep(&var->segments);\n    var->n_segments = 0;\n}"},
+    {"ref": "n0.10.9:libavformat/applehttp.c:373-391", "source": "git_show", "snippet": "static int read_data(...) {\n    ...\n        if ((ret = parse_playlist(c, v->url, v, NULL)) < 0)"},
+    {"ref": "n0.10.9:libavformat/applehttp.c:228", "source": "git_show", "snippet": "parse_playlist -> free_segment_list(var);"},
+    {"ref": "n0.10.9:libavformat/applehttp.c:291", "source": "git_show", "snippet": "seg = av_malloc(sizeof(struct segment));"},
+    {"ref": "n0.10.9:libavformat/utils.c:540", "source": "git_show", "snippet": "AVProbeData pd = { filename ? filename : \"\", NULL, -offset };"},
+    {"ref": "n0.10.9:libavformat/utils.c:360-366", "source": "git_show", "snippet": "av_match_ext(lpd.filename, fmt1->extensions)"}
+  ],
+  "reasoning_summary": "AFFECTED. File is libavformat/applehttp.c (pre-rename). Fix predicate FAIL: no av_strdup/av_free around the av_probe_input_buffer call. Vuln predicate PASS: applehttp_read_header at line 515-516 passes v->segments[0]->url (heap-embedded array in av_malloc'd segment) directly to av_probe_input_buffer. AVProbeData.pd.filename stores raw pointer (utils.c:540). During probing, avio_read triggers read_data callback (line 373) which calls parse_playlist (line 391) on live reload, which calls free_segment_list (line 228) av_free'ing segments (line 119). After callback, av_probe_input_format3 accesses dangling lpd.filename via av_match_ext (utils.c:360/366). Full UAF chain present."
+}

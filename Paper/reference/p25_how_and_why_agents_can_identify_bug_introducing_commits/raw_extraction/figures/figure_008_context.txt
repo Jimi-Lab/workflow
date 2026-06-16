@@ -1,0 +1,149 @@
+Page: 9
+Caption: Figure 6: Manual error analysis of Simple-SZZ-Agent on 100 fix commits from DS_LINUX-26.
+
+Page text context:
+How and Why Agents Can Identify Bug-Introducing Commits
+Preprint, Under Submission, arXiv
+100 fix commits
+87 correct
+13 incorrect
+4 BIC not in
+candidate set
+9 BIC in candidate
+set, wrong selection
+1 could not
+determine
+3 incorrect
+analysis
+2 near miss
+(≤3 positions)
+3 questionable
+ground truth label
+Figure 6: Manual error analysis of Simple-SZZ-Agent on 100 fix commits from DS_LINUX-26.
+Table 8: RQ4c: Simple-SZZ-Agent with different underlying models and agents. Best results in bold.
+Avg. per Fix Commit
+Agent
+Model
+Precision
+Recall
+F1-Score
+Cost
+Tool Calls
+Tokens
+Claude Code
+claude-haiku-4-5
+0.75
+0.73
+0.74
+$0.09
+14.2
+339k
+Claude Code
+claude-sonnet-4-5
+0.81
+0.80
+0.80
+$0.25
+16.7
+290k
+Claude Code
+claude-opus-4-5
+0.83
+0.81
+0.82
+$0.38
+14.3
+284k
+OpenHands
+claude-haiku-4-5
+0.80
+0.79
+0.79
+$0.14
+15.7
+1.3M
+OpenHands
+claude-sonnet-4-5
+0.87
+0.86
+0.86
+$0.38
+14.0
+1.0M
+OpenHands
+claude-opus-4-5
+0.84
+0.82
+0.83
+$0.63
+16.9
+1.0M
+OpenHands
+minimax-m2.5
+0.80
+0.78
+0.79
+$0.04
+20.0
+1.3M
+OpenHands
+glm-5
+0.79
+0.78
+0.78
+$0.26
+17.8
+754k
+5
+Discussion
+We discuss directions for future work motivated by our findings.
+While these directions are beyond the scope of this paper, we hope
+they inspire other researchers to explore them. We cover research
+on identifying bug-introducing commits (SZZ research), root cause
+understanding, bug detection, and program repair.
+5.1
+SZZ Research
+Closing the Gap. Our results represent a substantial step toward
+solving the problem of identifying bug-introducing commits from
+fix commits. Simple-SZZ-Agent achieves up to 0.86 F1-score on the
+Linux kernel dataset, compared to 0.62 for the previous state of the
+art. Still, the problem is not fully solved. Our error analysis (§4.3.3)
+revealed that of the 13 failures, 4 occur because the bug-introducing
+commit is not in the candidate set, 3 are due to incorrect agent
+analysis, 2 are near misses, 3 involve questionable ground truth
+labels, and 1 we could not categorize. These failure modes point to
+two main areas for improvement.
+First, the incorrect analyses and near misses (5 cases total) sug-
+gest that the agent’s reasoning about which commit introduced a
+bug can still be improved. Our results in §4.3.4 show that differ-
+ent model and agent combinations yield meaningful performance
+differences, indicating that continued model improvements are a
+promising avenue.
+Second, the 4 cases where the bug-introducing commit is not
+in the candidate set reveal a limitation of the current candidate
+collection strategy: Simple-SZZ-Agent only searches the commit
+histories of files modified by the fix, so when the bug was introduced
+in a different file, the correct commit is never considered. How to
+expand the candidate set beyond the files touched by the fix without
+introducing prohibitive infrastructure costs is an open question
+that we leave for future work.
+5.2
+Root Cause Understanding
+Our analysis in §4.3.2 revealed that agents compress information
+about a bug into short greppable patterns that locate its introducing
+changes. This compression itself may have value beyond identifying
+the bug-introducing commit: it captures, in a concise form, what
+made the code buggy.
+A practitioner who knows how to fix a bug does not always
+understand how it was introduced. The patterns the agent derives
+and the bug-introducing changes it identifies could help provide this
+understanding. Our context ablation (§3.3.4) showed that the agent
+achieves 0.73 F1-score with only the diff and no commit message,
+demonstrating that it can extract the essential characteristics of
+a bug from code changes alone. Whether these patterns can be
+used to generate useful explanations of how a bug was introduced—
+especially when the fix commit message is uninformative—is an
+open question for future work.
+
+
+Figure Readiness: page-crop+caption; exact subfigure crop still [NEEDS FIGURE EXTRACTION] if visual details are cited.

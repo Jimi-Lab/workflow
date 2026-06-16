@@ -1,0 +1,37 @@
+6.2.3 Results.The full pipeline consistently outperforms all ablation configurations,
+demonstrating that both TKG and agent components are necessary for optimal per-
+formance.Table 5 presents results across five configurations. AgenticSZZ achieves the highest
+F1-score on all datasets, with the largest margin on DS_GITHUB where diverse project structures
+benefit most from TKG-based exploration. The consistent improvements indicate that neither
+component alone is sufficient: the TKG provides structured search space expansion while the agent
+provides intelligent navigation. McNemar’s tests confirm all differences are statistically significant
+(𝑝<0.05) with large effect sizes (Cohen’s𝑔from 0.40 to 0.44) [6].
+Among configurations without LLM reasoning, Blame-fallback provides the best base-
+line, while TKG-only suffers from noise introduced by search space expansion.Blame-only
+serves as the simplest baseline: it returns the most recent blame commit without handling blame-
+less cases. Blame-fallback improves over Blame-only on all datasets by providing candidates for
+blameless cases, where Blame-only returns no prediction. However, TKG-only performs worse than
+Blame-fallback despite expanding the search space, particularly on DS_GITHUB and DS_APACHE.
+This reveals that deterministic ranking cannot effectively filter the expanded candidate set of a
+TKG: commits that coincidentally modified the same files are scored similarly to those that actually
+introduced the bug, reducing precision.
+Agent-only outperforms TKG-only, but the full pipeline shows the TKG’s value when
+combined with intelligent navigation.Agent-only applies LLM reasoning to the same candidate
+set as Blame-fallback (blame commits with the fallback strategy for blameless cases). It outperforms
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 016 =====
+16 Yu Shi et al.
+Table 5. Ablation study of AgenticSZZ components. All differences between AgenticSZZ and ablations are
+statistically significant (∗𝑝<0.05, McNemar’s test).
+DS_LINUX DS_GITHUB DS_APACHE
+AblationsPrec. Recall F1-score Prec. Recall F1-score Prec. Recall F1-score
+Blame-only 0.491 0.471 0.481 0.587 0.585 0.586 0.546 0.374 0.444
+Blame-fallback 0.555 0.533 0.544 0.629 0.627 0.628 0.558 0.383 0.454
+TKG-only 0.544 0.523 0.533 0.483 0.482 0.482 0.400 0.274 0.325
+Agent-only 0.567 0.545 0.556 0.590 0.588 0.589 0.537 0.369 0.437
+AgenticSZZ 0.670 0.644 0.657 ∗ 0.722 0.720 0.721 ∗ 0.608 0.417 0.495 ∗
+Table 6. True positives by BIC category. Each BFC is assigned to a single category using priority (Blame >
+Ancestor > Blameless). Ancestor combines Blame Ancestor and BFC Ancestor categories. For fair comparison,
+LLM4SZZ uses the same LLM (DeepSeek-V3.2) as AgenticSZZ (Table 4). Results are based on the best run
+(highest F1-score) for each approach.

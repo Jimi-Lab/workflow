@@ -1,0 +1,100 @@
+Toward a Knowledge Graph of
+Cybersecurity Countermeasures
+Peter E. Kaloroumakis
+The MITRE Corporation
+Annapolis Junction, MD
+pk@mitre.org
+Michael J. Smith
+The MITRE Corporation
+Annapolis Junction, MD
+smithmj@mitre.org
+Abstract—This paper describes our research and development
+toward a precise, unambiguous, and information-dense knowl-
+edge graph of cybersecurity countermeasures. In project work
+for our sponsors we have repeatedly encountered the need for
+a model that can identify and precisely specify cybersecurity
+countermeasure components and capabilities. Furthermore, it
+is necessary that practitioners know not only what threats a
+capability claims to address, but, speciﬁcally how those threats
+are addressed from an engineering perspective, and under
+what circumstances the solution would work. This knowledge
+is essential to estimate operational applicability, vulnerabilities,
+and develop enterprise solutions comprising multiple capabilities.
+To address this recurring need in the near-term, we created
+D3FEND, a framework in which we encode a countermeasure
+knowledge base, but more speciﬁcally, a knowledge graph. The
+graph contains semantically rigorous types and relations that
+deﬁne both the key concepts in the cybersecurity countermeasure
+domain and the relations necessary to link those concepts to
+each other. We ground each of the concepts and relations to
+particular references in the cybersecurity literature. Numerous
+sources of research and development literature were analyzed,
+including a targeted sample of over 500 countermeasure patents
+drawn from the U.S. Patent Ofﬁce corpus over the years 2001 to
+2018. To demonstrate the value of this approach in practice, we
+describe how the graph supports queries that can inferentially
+map cybersecurity countermeasures to offensive TTPs. As part
+of a larger vision, we outline future D3FEND work to leverage
+the linked open data available on research literature and apply
+machine learning, in particular semi-supervised methods, to assist
+in maintaining the D3FEND knowledge graph over time. Finally,
+we welcome community feedback on D3FEND.
+Index Terms—countermeasures, cybersecurity, cyber defense,
+intrusion detection, knowledge acquisition, knowledge engineer-
+ing, knowledge graph, linked data, network security, ontology,
+procedures, tactics, techniques, TTPs
+I. I NTRODUCTION
+The cybersecurity defense market comprises more than
+5,000 companies [1]. More than 6,000 cybersecurity patent
+applications were ﬁled in 2018 (Figure 1). Cyber defense
+teams also implement their own countermeasures to address
+what vendor products do not. These custom capabilities are
+often shared through open-source software communities. In a
+cycle of adaptation, countermeasures are rapidly developed in
+response to rapidly changing offensive techniques.
+Funded by the United States Department of Defense. Approved for Public
+Release; Distribution Unlimited. Case 20-2034. Copyright 2021 The MITRE
+Corporation. All Rights Reserved.
+A cybersecurity countermeasure is any process or tech-
+nology developed to negate or offset offensive cyber activi-
+ties. It is not enough to understand what a countermeasure
+does—what it detects, what it prevents. We must understand
+how it does it. A security architect must understand their
+organization’s countermeasures—precisely what they do, how
+they do it, and their limitations—if countermeasures are to
+be effectively employed. A red team conducting an exercise
+to identify security gaps must plan their engagement with
+expert knowledge of a countermeasure’s functionality if they
+are to evade it. A venture capitalist considering a cybersecurity
+startup must understand what problem it is trying to solve,
+whether and how it has been solved before, and why the
+proposed solution is better or novel.
+Existing cybersecurity knowledge bases do not explain with
+enough ﬁdelity and structure what these countermeasures do
+to meet these needs, we reviewed prominent knowledge bases
+discussed in section II. Furthermore, no framework or model
+exists that has had its knowledge content sustained at the rate
+of change in the cybersecurity space. D3FEND™ establishes
+a ﬁne-grained semantic model of countermeasures, their prop-
+erties, relationships, and history of development. We have also
+deﬁned a semantic model of a portion of MITRE’s ATT&CK®
+framework [15] to represent the offensive TTPs with the same
+common, standardized semantic language (OWL DL). This
+enables us to incorporate ATT&CK by mapping its concepts
+directly to D3FEND’s model of defensive techniques and ar-
+tifacts. D3FEND provides a methodology for curating content
+into new knowledge and tying it to its source information in
+meaningful ways. Finally, this paper provides a research road
+map for harvesting and analyzing content at the industry’s
+pace, using and extending the promising human language
+technologies and semi-supervised learning.
+D3FEND’s longer-term goals are to (1) create a sustain-
+able knowledge framework for characterizing and relating
+cybersecurity countermeasure technology; and (2) accelerate
+knowledge discovery and acquisition efforts required to keep
+pace with technological changes in the cyber domain. The
+D3FEND knowledge graph we have constructed can be di-
+rectly embedded within the much larger web of datasets
+available within the Linked Open Data Cloud [41]. These
+will be used to connect our knowledge to research literature,
+organizations, authors, inventors, and investors. We believe

@@ -1,0 +1,582 @@
+{
+  "scope": "deterministic_postprocess_no_model_call",
+  "cases_total": 30,
+  "accepted_candidate_pool_cases": 21,
+  "blocked_cases": 9,
+  "root_cause_blocked_count": 3,
+  "szz_handoff_blocked_count": 6,
+  "all_cases_metrics": {
+    "denominator": 30,
+    "release_top1": {
+      "precision": 0.9003703703703704,
+      "recall": 0.859575397942271,
+      "f1": 0.8535963901875838
+    },
+    "release_topk": {
+      "precision": 0.5473885880194589,
+      "recall": 0.6083513931888545,
+      "f1": 0.5374215912957705
+    },
+    "release_oracle": {
+      "precision": 0.9158139657909258,
+      "recall": 0.8812737057453134,
+      "f1": 0.8771331764250903
+    },
+    "diagnostic_all_top1": {
+      "precision": 0.6816390445664978,
+      "recall": 0.859575397942271,
+      "f1": 0.6662931944506273
+    },
+    "diagnostic_all_oracle": {
+      "precision": 0.6877453015152891,
+      "recall": 0.8812737057453134,
+      "f1": 0.6826969637721865
+    }
+  },
+  "accepted_only_metrics": {
+    "denominator": 21,
+    "release_top1": {
+      "precision": 0.8576719576719576,
+      "recall": 0.7993934256318157,
+      "f1": 0.7908519859822625,
+      "exact_match_count": 10,
+      "denominator": 21
+    },
+    "release_topk": {
+      "precision": 0.7819836971706555,
+      "recall": 0.8690734188412206,
+      "f1": 0.7677451304225291,
+      "exact_match_count": 9,
+      "denominator": 21
+    },
+    "release_oracle": {
+      "precision": 0.8797342368441796,
+      "recall": 0.8303910082075904,
+      "f1": 0.8244759663215575,
+      "exact_match_count": 10,
+      "denominator": 21
+    },
+    "diagnostic_all_top1": {
+      "precision": 0.5451986350949969,
+      "recall": 0.7993934256318157,
+      "f1": 0.5232759920723248,
+      "exact_match_count": 4,
+      "denominator": 21
+    },
+    "diagnostic_all_oracle": {
+      "precision": 0.5539218593075559,
+      "recall": 0.8303910082075904,
+      "f1": 0.5467099482459807,
+      "exact_match_count": 4,
+      "denominator": 21
+    }
+  },
+  "blocked_denominator_impact": {
+    "all_case_denominator": 30,
+    "accepted_only_denominator": 21,
+    "excluded_from_accepted_only": 9,
+    "excluded_cves": [
+      "CVE-2020-12284",
+      "CVE-2020-13904",
+      "CVE-2020-14212",
+      "CVE-2020-19667",
+      "CVE-2020-8169",
+      "CVE-2022-0433",
+      "CVE-2020-27814",
+      "CVE-2020-1971",
+      "CVE-2020-15466"
+    ]
+  },
+  "error_attribution_counts": {
+    "anchor_or_blame_likely_problem": 10,
+    "candidate_pool_has_signal": 0,
+    "conversion_likely_problem": 0,
+    "dataset_or_tag_mapping_problem": 0,
+    "non_release_tag_noise": 7,
+    "release_line_overreach": 5,
+    "requires_manual_review": 8,
+    "root_cause_blocked": 3,
+    "szz_handoff_blocked": 6
+  },
+  "blocked_stage_attribution": [
+    {
+      "cve_id": "CVE-2020-12284",
+      "stage": "szz_handoff_blocked",
+      "repo": "FFmpeg",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-13904",
+      "stage": "root_cause_blocked",
+      "repo": "FFmpeg",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-14212",
+      "stage": "szz_handoff_blocked",
+      "repo": "FFmpeg",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-10251",
+      "stage": "accepted_candidate_pool",
+      "repo": "ImageMagick",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "release_line_overreach",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-19667",
+      "stage": "root_cause_blocked",
+      "repo": "ImageMagick",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-25663",
+      "stage": "accepted_candidate_pool",
+      "repo": "ImageMagick",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-8169",
+      "stage": "szz_handoff_blocked",
+      "repo": "curl",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-8177",
+      "stage": "accepted_candidate_pool",
+      "repo": "curl",
+      "candidate_commit_count": 3,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-8231",
+      "stage": "accepted_candidate_pool",
+      "repo": "curl",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11984",
+      "stage": "accepted_candidate_pool",
+      "repo": "httpd",
+      "candidate_commit_count": 3,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11985",
+      "stage": "accepted_candidate_pool",
+      "repo": "httpd",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11993",
+      "stage": "accepted_candidate_pool",
+      "repo": "httpd",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0171",
+      "stage": "accepted_candidate_pool",
+      "repo": "linux",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0185",
+      "stage": "accepted_candidate_pool",
+      "repo": "linux",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0264",
+      "stage": "accepted_candidate_pool",
+      "repo": "linux",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0286",
+      "stage": "accepted_candidate_pool",
+      "repo": "linux",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0322",
+      "stage": "accepted_candidate_pool",
+      "repo": "linux",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2022-0433",
+      "stage": "szz_handoff_blocked",
+      "repo": "linux",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-15389",
+      "stage": "accepted_candidate_pool",
+      "repo": "openjpeg",
+      "candidate_commit_count": 3,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-27814",
+      "stage": "root_cause_blocked",
+      "repo": "openjpeg",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2020-27823",
+      "stage": "accepted_candidate_pool",
+      "repo": "openjpeg",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-1967",
+      "stage": "accepted_candidate_pool",
+      "repo": "openssl",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-1971",
+      "stage": "szz_handoff_blocked",
+      "repo": "openssl",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    },
+    {
+      "cve_id": "CVE-2021-23840",
+      "stage": "accepted_candidate_pool",
+      "repo": "openssl",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "requires_manual_review",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-10702",
+      "stage": "accepted_candidate_pool",
+      "repo": "qemu",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "release_line_overreach",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11869",
+      "stage": "accepted_candidate_pool",
+      "repo": "qemu",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "release_line_overreach",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11947",
+      "stage": "accepted_candidate_pool",
+      "repo": "qemu",
+      "candidate_commit_count": 1,
+      "probe_error_bucket": "non_release_tag_noise",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-11647",
+      "stage": "accepted_candidate_pool",
+      "repo": "wireshark",
+      "candidate_commit_count": 3,
+      "probe_error_bucket": "release_line_overreach",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-13164",
+      "stage": "accepted_candidate_pool",
+      "repo": "wireshark",
+      "candidate_commit_count": 2,
+      "probe_error_bucket": "release_line_overreach",
+      "blame_status": "success"
+    },
+    {
+      "cve_id": "CVE-2020-15466",
+      "stage": "szz_handoff_blocked",
+      "repo": "wireshark",
+      "candidate_commit_count": 0,
+      "probe_error_bucket": "anchor_or_blame_likely_problem",
+      "blame_status": "not_evaluable"
+    }
+  ],
+  "release_tag_universe": {
+    "repos": {
+      "FFmpeg": {
+        "repo": "FFmpeg",
+        "all_tag_count": 423,
+        "release_tag_count": 388,
+        "filtered_non_release_tag_count": 35,
+        "examples_filtered_tags": [
+          "N",
+          "n0.11-dev",
+          "n0.12-dev",
+          "n1.1-dev",
+          "n1.2-dev",
+          "n1.3-dev",
+          "n2.1-dev",
+          "n2.2-dev",
+          "n2.2-rc1",
+          "n2.2-rc2",
+          "n2.3-dev",
+          "n2.4-dev",
+          "n2.5-dev",
+          "n2.6-dev",
+          "n2.7-dev",
+          "n2.8-dev",
+          "n2.9-dev",
+          "n3.1-dev",
+          "n3.2-dev",
+          "n3.3-dev"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "ImageMagick": {
+        "repo": "ImageMagick",
+        "all_tag_count": 402,
+        "release_tag_count": 402,
+        "filtered_non_release_tag_count": 0,
+        "examples_filtered_tags": [],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "curl": {
+        "repo": "curl",
+        "all_tag_count": 229,
+        "release_tag_count": 202,
+        "filtered_non_release_tag_count": 27,
+        "examples_filtered_tags": [
+          "before_ftp_statemachine",
+          "before_urldata_rename",
+          "curl-7_15_6-prepipeline",
+          "curl-7_17_0-preldapfix",
+          "curl-7_6-pre4",
+          "curl-7_6_1-pre1",
+          "curl-7_6_1-pre2",
+          "curl-7_6_1-pre3",
+          "curl-7_7-beta1",
+          "curl-7_7-beta2",
+          "curl-7_7-beta3",
+          "curl-7_7-beta5",
+          "curl-7_7_alpha2",
+          "curl-7_8-pre2",
+          "curl-7_8_1-pre3",
+          "curl-7_9_3-pre1",
+          "curl-7_9_3-pre2",
+          "curl-7_9_3-pre3",
+          "curl-7_9_5-pre2",
+          "curl-7_9_5-pre4"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "httpd": {
+        "repo": "httpd",
+        "all_tag_count": 306,
+        "release_tag_count": 215,
+        "filtered_non_release_tag_count": 91,
+        "examples_filtered_tags": [
+          "2.4.53-rc1-candidate",
+          "2.4.53-rc2-candidate",
+          "2.4.54-rc1-candidate",
+          "2.4.54-rc2-candidate",
+          "2.4.54-rc3-candidate",
+          "2.4.55-rc1-candidate",
+          "2.4.56-candidate",
+          "2.4.56-rc1-candidate",
+          "2.4.57-rc1-candidate",
+          "2.4.58-rc1-candidate",
+          "2.4.58-rc2-candidate",
+          "2.4.58-rc3-candidate",
+          "2.4.59-rc1-candidate",
+          "2.4.60-rc1-candidate",
+          "2.4.60-rc2-candidate",
+          "2.4.60-rc3-candidate",
+          "2.4.60-rc4-candidate",
+          "2.4.61-rc1-candidate",
+          "2.4.62-rc1-candidate",
+          "2.4.63-candidate"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "linux": {
+        "repo": "linux",
+        "all_tag_count": 935,
+        "release_tag_count": 112,
+        "filtered_non_release_tag_count": 823,
+        "examples_filtered_tags": [
+          "v2.6.11-tree",
+          "v2.6.12-rc2",
+          "v2.6.12-rc3",
+          "v2.6.12-rc4",
+          "v2.6.12-rc5",
+          "v2.6.12-rc6",
+          "v2.6.13-rc1",
+          "v2.6.13-rc2",
+          "v2.6.13-rc3",
+          "v2.6.13-rc4",
+          "v2.6.13-rc5",
+          "v2.6.13-rc6",
+          "v2.6.13-rc7",
+          "v2.6.14-rc1",
+          "v2.6.14-rc2",
+          "v2.6.14-rc3",
+          "v2.6.14-rc4",
+          "v2.6.14-rc5",
+          "v2.6.15-rc1",
+          "v2.6.15-rc2"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "openjpeg": {
+        "repo": "openjpeg",
+        "all_tag_count": 26,
+        "release_tag_count": 22,
+        "filtered_non_release_tag_count": 4,
+        "examples_filtered_tags": [
+          "arelease",
+          "opj0-97",
+          "start",
+          "wg1n6848"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "openssl": {
+        "repo": "openssl",
+        "all_tag_count": 425,
+        "release_tag_count": 222,
+        "filtered_non_release_tag_count": 203,
+        "examples_filtered_tags": [
+          "3.0-POST-CLANG-FORMAT-WEBKIT",
+          "3.0-PRE-CLANG-FORMAT-WEBKIT",
+          "3.3-POST-CLANG-FORMAT-WEBKIT",
+          "3.3-PRE-CLANG-FORMAT-WEBKIT",
+          "3.4-POST-CLANG-FORMAT-WEBKIT",
+          "3.4-PRE-CLANG-FORMAT-WEBKIT",
+          "3.5-POST-CLANG-FORMAT-WEBKIT",
+          "3.5-PRE-CLANG-FORMAT-WEBKIT",
+          "3.6-POST-CLANG-FORMAT-WEBKIT",
+          "3.6-PRE-CLANG-FORMAT-WEBKIT",
+          "4.0-POST-CLANG-FORMAT-WEBKIT",
+          "4.0-PRE-CLANG-FORMAT-WEBKIT",
+          "AFTER_COMPAQ_PATCH",
+          "BEFORE_COMPAQ_PATCH",
+          "BEFORE_engine",
+          "BEN_FIPS_TEST_1",
+          "BEN_FIPS_TEST_2",
+          "BEN_FIPS_TEST_3",
+          "BEN_FIPS_TEST_4",
+          "BEN_FIPS_TEST_5"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "qemu": {
+        "repo": "qemu",
+        "all_tag_count": 445,
+        "release_tag_count": 208,
+        "filtered_non_release_tag_count": 237,
+        "examples_filtered_tags": [
+          "initial",
+          "staging-mjt-test",
+          "trivial-patches-pull-request",
+          "v0.11.0-rc0",
+          "v0.11.0-rc1",
+          "v0.11.0-rc2",
+          "v0.12.0-rc0",
+          "v0.12.0-rc1",
+          "v0.12.0-rc2",
+          "v0.13.0-rc0",
+          "v0.13.0-rc1",
+          "v0.13.0-rc2",
+          "v0.13.0-rc3",
+          "v0.14.0-rc0",
+          "v0.14.0-rc1",
+          "v0.14.0-rc2",
+          "v0.15.0-rc0",
+          "v0.15.0-rc1",
+          "v0.15.0-rc2",
+          "v1.0-rc0"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      },
+      "wireshark": {
+        "repo": "wireshark",
+        "all_tag_count": 1096,
+        "release_tag_count": 739,
+        "filtered_non_release_tag_count": 357,
+        "examples_filtered_tags": [
+          "2.2.1rc0",
+          "NCP_sync_with_greg-20020218",
+          "NCP_sync_with_greg-20020330",
+          "POST_Novell_NCP_branch_MERGE",
+          "PRE_Novell_NCP_branch_MERGE",
+          "backups/Novell_NCP_branch@18706",
+          "backups/ethereal@18706",
+          "backups/master-0.99.2@18755",
+          "backups/master-0.99.3@19109",
+          "backups/master-0.99.4@19765",
+          "backups/master-0.99.5@21263",
+          "backups/master-0.99.6@22326",
+          "backups/master-0.99.7@24033",
+          "backups/master-0.99.8@24544",
+          "backups/master-1.0@18703",
+          "backups/win32-native@18706",
+          "release-0-8-6-real",
+          "ssv0.9.0rc0",
+          "ssv0.9.0rc1",
+          "ssv0.9.2rc0"
+        ],
+        "release_filter_source": "generic_numeric_release_tag_filter_excluding_rc_beta_alpha_pre_dev_snapshot_candidate_backup_test_internal",
+        "universe_used_for_primary_metrics": "release_tag_universe"
+      }
+    },
+    "universe_used_for_primary_metrics": "release_tag_universe"
+  },
+  "oracle_interpretation": "raw candidate pool upper bound only; not system result, not BIC validation."
+}

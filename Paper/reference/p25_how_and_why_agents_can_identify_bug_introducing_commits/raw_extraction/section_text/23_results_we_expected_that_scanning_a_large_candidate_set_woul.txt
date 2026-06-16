@@ -1,0 +1,70 @@
+Results.We expected that scanning a large candidate set would
+degrade performance and require substantially more resources. To
+our surprise, neither turned out to be the case. Figure 3a shows the
+relationship between candidate set size and F1-score. Performance
+remains stable across candidate set sizes, with F1-scores above
+0.80 for sets of up to 1,000 candidates. Only for the largest sets
+(>1,000 candidates) does F1-score decrease to 0.72. Figure 3 shows
+the relationship between the number of candidate commits and
+resource consumption. Cost, token usage, and tool calls show no
+strong correlation with the number of candidates, indicating that
+the agent does not scale linearly with the candidate set size.
+To understand how the agent achieves this, we examined its
+tool usage. Figure 4 shows the distribution of tool calls. The agent
+predominantly uses Read (9.8 calls on average) and Grep (2.7 calls),
+with few calls to other tools. This reveals that the agent does not
+read all candidates sequentially; instead, it uses targeted searches
+to narrow down the candidate set. Figure 5 shows what the agent
+greps for. The most frequent grep patterns are derived from the
+removed lines of the fix commit diff (48.1% of grep calls) and the
+fix commit message (43.6%). The agent distills these sources into
+short patterns and uses them to search the candidate commits for
+matches. Across 243 grep calls, patterns have a median length of 21
+characters (mean 25.2, std. dev. 14.8, min 6, max 104); the majority
+(63.8%) are plain strings rather than regular expressions.
+Three examples illustrate this strategy:
+(1) Pattern from fix commit message.The fix [ 15] replaces
+fsleep()with udelay()because fsleep()must not be called
+from atomic context. The agent greps for"fsleep"and directly
+locates the bug-introducing commit [14], which introduced the
+fsleep()call.
+(2) Pattern from removed lines.The fix [ 16] corrects a firmware
+parser that assumed dword-aligned block sizes. The agent greps
+for "blk->size » 2", the faulty expression removed by the fix,
+and matches it to the bug-introducing commit [12] that added
+this line. This is analogous to what SZZ does—tracing removed
+
+===== Page 008 =====
+Preprint, Under Submission, arXiv Risse et al.
+Read Grep Write Glob Task
+0
+5
+10
+9.8
+2.7
+1.0 0.8
+0.01
+Avg. number of tool calls
+Figure 4: Distribution of tool calls per tool type during agent
+execution.
+lines back to the commit that introduced them—but the agent
+performs it via grep rather thangit blame.
+(3) Pure-addition fix.The fix [ 17] adds a NULL-pointer check for
+smc_ib_is_sg_need_sync() (3 insertions, 0 deletions). Stan-
+dard SZZ cannot handle this case at all, because there are
+no removed lines to trace back via git blame. The agent in-
+stead extracts the function name from the commit message,
+greps for "smc_ib_is_sg_need_sync", and identifies the bug-
+introducing commit [13] that introduced this function.
+Finding 6 (Key):Cost and performance are largely independent
+of the candidate commit set size: the agent finds the needle without
+examining the full haystack. It does so by deriving short greppable
+patterns (median 21 characters) from the fix commit diff and
+message and using them to search the candidate set.
+4.3.3 RQ4b: Where Does Simple-SZZ-Agent Fail?We perform a
+manual error analysis to understand the failure cases.
+Setup.We manually inspect all incorrect predictions of Simple-
+SZZ-Agent on DS_LINUX-26 (100 fix commits). For each failure,
+we investigate the fix commit, the ground truth bug-introducing
+commit, the predicted bug-introducing commit, and the explanation
+provided by the agent, and categorize them by failure mode.

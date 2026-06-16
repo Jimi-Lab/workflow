@@ -1,0 +1,182 @@
+[
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:001",
+    "block_type": "text",
+    "text": "II. REDEBUG\n",
+    "bbox": [
+      146.58709716796875,
+      70.83988952636719,
+      206.19677734375,
+      82.72528839111328
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:002",
+    "block_type": "text",
+    "text": "A. The Core System\n",
+    "bbox": [
+      56.10309982299805,
+      85.78294372558594,
+      137.97918701171875,
+      97.55984497070312
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:003",
+    "block_type": "text",
+    "text": "Finding all unpatched code clones is tricky and involves\nnumerous considerations. For example, how many lines of\ncode need to be similar for a case to be reported? Is one\ncopied line enough, or are we only interested in multiple\nline matches? Should whitespace matter? Should the order\nof statements matter, and if so, should we only consider\nsome syntactic classes? Do we consider the syntactic text,\ntokens, or the parse of ﬁles? For example, in C the order\nof declarations likely does not matter, but the order of\ncomputation may. What if two segments are equivalent up\nto variable naming? What about semantic equivalence, e.g.,\none code sequence multiples by 2 while the other performs\na logical left shift. Are these similar or different?\nThese questions all involve trade-offs between accuracy,\nefﬁciency, and how easy it is to implement a robust algo-\nrithm. For example, consider code that is the same up to\nvariable names and variable declaration order. A straight\nstring match of the ﬁles may ﬁnd virtually no commonality.\nWe could certainly address these problems by normalizing\ndeclaration order, and parse code to determine variable name\nequivalence (so-called α-equivalence) [11]. However, run-\nning such algorithms require we implement parsing engines\n(which can be fragile) and run additional algorithms that\ncost time, thus reducing overall throughput. If we are not\ncareful we may end up subtly analyzing a model of the\noriginal program that is not right, e.g., declaration order\nmatters when looking for buggy code clones of incorrect\nshadow variable declarations.\nReDeBug’s choices are motivated by the design space\ngoals of: (1) focusing on unpatched code clones, (2) scaling\nto large and diverse code bases such as OS distributions, (3)\nminimizing false detection, (4) being modular when possible\nand offer a user choice of parameters, and (5) be language-\nagnostic as much as possible so that we work with the wealth\nof languages found within an OS distribution code base. The\ncore of the ReDeBug system accomplishes these goals using\nthe following steps:\n1) ReDeBug normalizes each ﬁle. By default ReDeBug\nremoves typical language comments, removes all non-\nASCII characters, removes redundant whitespace ex-\ncept new lines, and converts all characters to lower\ncase. We also ignore curly braces if the ﬁle is C, C++,\nJava, or Perl (as identiﬁed by extension or the UNIX\nfile command).\nNormalization is modularized so that the exact nor-\nmalization steps can easily be changed.\n2) The normalized ﬁle is tokenized based upon new lines\nand regex substrings.\n3) ReDeBug slides a window of length n over the token\nstream. Each n tokens are considered a unit of code\nto compare.\n",
+    "bbox": [
+      56.093238830566406,
+      100.72599792480469,
+      296.7030944824219,
+      706.387939453125
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:004",
+    "block_type": "text",
+    "text": "4) Given two sets fa and fb of n-tokens, we compute the\namount of code in common. When ﬁnding unpatched\ncode clones, if fa is the original buggy code snippet\nwe calculate\n",
+    "bbox": [
+      324.3580017089844,
+      70.19993591308594,
+      555.0703125,
+      117.59326934814453
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:005",
+    "block_type": "text",
+    "text": "CONTAINTMENT(fa, fb) = |fa ∩fb|\n",
+    "bbox": [
+      372.7337951660156,
+      121.36947631835938,
+      519.8753051757812,
+      145.15509033203125
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:006",
+    "block_type": "text",
+    "text": "|fa|\n(1)\n",
+    "bbox": [
+      494.9284973144531,
+      126.57084655761719,
+      555.06591796875,
+      151.9197998046875
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:007",
+    "block_type": "text",
+    "text": "When we want to measure the total amount of sim-\nilarity between ﬁles, we calculate the percentage of\ntokens in common (i.e., the Jaccard index):\n",
+    "bbox": [
+      338.49530029296875,
+      149.18760681152344,
+      555.0857543945312,
+      184.74513244628906
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:008",
+    "block_type": "text",
+    "text": "SIMILARITY(fa, fb) = |fa ∩fb|\n",
+    "bbox": [
+      381.3982849121094,
+      190.13394165039062,
+      511.2108459472656,
+      213.9185791015625
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:009",
+    "block_type": "text",
+    "text": "|fa ∪fb|\n(2)\n",
+    "bbox": [
+      476.3887939453125,
+      195.33518981933594,
+      555.0634765625,
+      222.16424560546875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:010",
+    "block_type": "text",
+    "text": "With either calculation it is common to only con-\nsider cases where the similarity or containment is\ngreater than or equal to some pre-determined threshold\nθ. In our implementation, we also perform obvious\noptimizations such as when θ = 1 only verifying\nfa ⊆fb instead of calculating an actual ratio for\nCONTAINMENT.\n5) ReDeBug performs an exact match test on the iden-\ntiﬁed unpatched code clones to remove Bloom ﬁlter\nerrors. ReDeBug also uses the compiler to identify\nwhen a code clone is dead code when possible.\nFor example, suppose we have two ﬁles A = t1t2t3t4\nand B = t1t3t4t2 where each ti is a token (note to-\nkens are written in the order that they appear in the\nﬁle). The tokenization is then A = {t1, t2, t3, t4} and\nB = {t1, t3, t4, t2}. When n = 2, there are 3 2-token\nstrings in each set: fA = {(t1, t2), (t2, t3), (t3, t4)} and\nfB = {(t1, t3), (t3, t4), (t4, t2)}. The similarity is 1/5 since\n1 out of 5 2-token sets are shared, (t3, t4), even though the\nshared token sequence appears at different places in the ﬁle.\nAs a result, ReDeBug works with reordering, insertions, and\ndeletions of up to n-tokens.\nReDeBug is parametrized in two ways: the number of\nconsecutive tokens to consider together, n, and the threshold,\nθ. n determines the sensitivity for statement reordering,\ne.g., if n = 1 then statement order does not matter at all,\nn = 2 looks at statement pairs, and so on. θ acts as a\nknob to tell us what is a signiﬁcant amount of copying.\nWhen θ = 1, two ﬁles must have exactly the same n-tokens\n(after normalization). When θ = 0, any match is considered\nsigniﬁcant. Values in between represent thresholds for the\namount of similarity of interest. There is no “right” value\nfor these parameters. In our experiments we show typical\nvalues that produce meaningful results. For example, n = 4\nworks well with existing patches.\nDesign point comparison: Our approach is in stark contrast\nwith current research trends in code clone detection, such as\nDeckard [23], CP-Miner [25], Deja Vu [21], and others [1,\n24], that focus on minimizing missed code clones at the\nexpense of other factors. These approaches also normalize\nthe code, but then perform additional steps such as parsing\n",
+    "bbox": [
+      314.4922180175781,
+      217.9519500732422,
+      555.08349609375,
+      705.2448120117188
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:011",
+    "block_type": "text",
+    "text": "50\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 3,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:003:012",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

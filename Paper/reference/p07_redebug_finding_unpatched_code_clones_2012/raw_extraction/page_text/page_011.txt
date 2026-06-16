@@ -1,0 +1,144 @@
+Listing 7 shows a recent patch for CVE-2011-3145, which
+was successfully patched in an Ubuntu Oneiric package,
+but not in a Debian Squeeze package. This patch ﬁxed
+an incorrect /etc/mtab ownership error in the ecryptfs-
+utils package, which might cause to unmount arbitrary
+location [27].
+if (setreuid(uid, uid) < 0) {
+perror("setreuid");
+}
++
+if (setregid(gid, gid) < 0) {
++
+perror("setregid");
++
+}
+goto fail;
+}
+} else {
+Listing 7: CVE-2011-3145
+After we contacted the developers, the same patch applied
+to the Ubuntu Oneiric package was issued for the Debian
+Squeeze package to ﬁx the vulnerability.
+Listing 8 shows a security patch applied to the Ubuntu
+Oneiric apache2 package to ﬁx the vulnerability where
+remote attackers can send requests to intranet servers with
+a well-crafted URI [19]. The same patch was applied to the
+Debian Squeeze package to ﬁx the bug after we reported it.
+ap_parse_uri(r, uri);
++/* RFC 2616:
++ *
+Request-URI
+= "*" | absoluteURI | ←
+abs_path | authority
++ *
++ * authority is a special case for CONNECT.
+If←
+the request is not
++ * using CONNECT, and the parsed URI does not ←
+have scheme, and
++ * it does not begin with ’/’, and it is not ←
+’*’, then, fail
++ * and give a 400 response. */
++if (r->method_number != M_CONNECT
++ && !r->parsed_uri.scheme
++ && uri[0] != ’/’
++ && !(uri[0] == ’*’ && uri[1] == ’\0’)) {
++ ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
++
+"invalid request-URI %s", uri);
++ r->args = NULL;
++ r->hostname = NULL;
++ r->status = HTTP_BAD_REQUEST;
++ r->uri = apr_pstrdup(r->pool, uri);
++}
++
+if (ll[0]) {
+r->assbackwards = 0;
+pro = ll;
+Listing 8: CVE-2011-3368
+In § I, we motivated the need to handle many languages.
+Here, we show a non-C example in Ruby. Listing 9 shows a
+security patch for the puppet package to ﬁx the vulnerability
+where an attacker can impersonate a master by exploiting
+a non-default certdnsnames option when generating
+certiﬁcates [20]. After we reported this bug, the package
+maintainer ﬁxed the vulnerability by issuing a security patch.
+# Sign a given certificate request.
+-def sign(hostname, cert_type = :server, ←
+self_signing_csr = nil)
++def sign(hostname, allow_dns_alt_names = false,←
+self_signing_csr = nil)
+# This is a self-signed certificate
+if self_signing_csr
++
+# # This is a self-signed certificate, ←
+which is for the CA.
+Since this
++
+# # forces the certificate to be self-←
+signed, anyone who manages to trick
++
+# # the system into going through this path←
+gets a certificate they could
++
+# # generate anyway.
+There should be no ←
+security risk from that.
+csr = self_signing_csr
++
+cert_type = :ca
+issuer = csr.content
+else
++
+allow_dns_alt_names = true if hostname == ←
+Puppet[:certname].downcase
+unless csr = Puppet::SSL::←
+CertificateRequest.find(hostname)
+raise ArgumentError, "Could not find ←
+certificate request for #{hostname}"
+end
++
++
+cert_type = :server
+issuer = host.certificate.content
++
++
+# Make sure that the CSR conforms to our ←
+internal signing policies.
++
+# This will raise if the CSR doesn’t ←
+conform, but just in case...
++
+check_internal_signing_policies(hostname, ←
+csr, allow_dns_alt_names) or
++
+raise CertificateSigningError.new(←
+hostname), "CSR had an unknown failure ←
+checking internal signing policies, will not←
+sign!"
+end
+cert = Puppet::SSL::Certificate.new(hostname)
+-
+cert.content = Puppet::SSL::←
+CertificateFactory.new(cert_type, csr.←
+content, issuer, next_serial).result
++
+cert.content = Puppet::SSL::←
+CertificateFactory.
++
+build(cert_type, csr, issuer, next_serial)
+cert.content.sign(host.key.content, OpenSSL::←
+Digest::SHA1.new)
+Listing 9: CVE-2011-3872
+H. Copied Similarity Metrics
+In order to understand the overall amount of code dupli-
+cation, we also ran a large scale experiment to measure the
+similarity within the entire Debian Lenny source base. These
+experiments required the pairwise computations discussed
+in § II-C. We ran these experiments on an SGI UV 1000
+cc-NUMA shared-memory system consisting of 256 blades.
+Each blade has 2 Intel Xeon X7560 (Nehalem) eight-core
+processors and 128 Gbytes of local memory [2].
+58
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

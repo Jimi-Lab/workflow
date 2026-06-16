@@ -1,0 +1,1091 @@
+===== Page 001 =====
+A TT&CK to CVE: A Large-Scale Automated
+Knowledge Graph for Threat Intelligence
+Moqsadur Rahman ∗, Monika Akbar ∗, Joseph T . Aguayo †, Mahmud Shahriar Hossain ∗, Tina M. Ellis †,
+Siddhartha Shankar Das †, Mohammad F . Babar ‡, Monowar Hasan ‡, Aaron Sanchez ‡,
+Luis Fernando de la T orre ‡, Mahantesh Halappanavar †
+∗The University of T exas at El Paso, USA
+{mrahman20, makbar, mhossain }@utep.edu
+†Paciﬁc Northwest National Laboratory , USA
+{joseph.aguayo, tina.ellis, siddhartha.das, hala }@pnnl.gov
+‡W ashington State University , USA
+{m.babar, monowar.hasan, aaron.m.sanchez, luis.delatorre }@wsu.edu
+Abstract—Cyber threat intelligence (CTI) includes collecting
+and analyzing cybersecurity-related information across diverse
+and heterogeneous sources. Those sources may include repos-
+itories that curate vulnerabilities, weaknesses, attack pattern
+related data in different formats with varying degrees of detail.
+Analysts must continuously reconcile these sources to gain a
+coherent view of the evolving threat landscape, yet this process
+is often manual, incomplete, and error-prone. In this work,
+we present a fully automated cybersecurity knowledge graph
+pipeline that systematically ingests and normalizes data from
+the National V ulnerability Database (CVE and CVSS), MITRE
+CWE, CAPEC, and A TT&CK frameworks, and integrates them
+into a Neo4j graph database. Our system extracts a rich set of
+properties and inter- and intra-entity relationships from each
+dataset, including hierarchical links, cross-domain mappings,
+and temporal metadata, while ensuring daily synchronization
+with upstream feeds. The resulting knowledge graph contains
+hundreds of thousands of interconnected entities and edges,
+enabling multi-hop analysis in various directions (e.g., from
+attack techniques to vulnerabilities, from vulnerabilities to attack
+techniques). W e demonstrate the usefulness of the knowledge
+graph for comprehensive weakness analysis, linking adversary
+groups to exploited vulnerabilities, and graph-based inference
+tasks that include variable-length path traversal and link discov-
+ery . Our case studies on CISA advisories show that hierarchical
+graph traversals uncover CVEs beyond those explicitly listed,
+bridging critical gaps in threat intelligence. By combining au-
+tomation, completeness, and semantic richness, our knowledge
+graph provides a scalable, continuously updated foundation for
+cyber defense analytics, supporting both operational decision-
+making and advanced research in graph learning and reasoning
+over CTI.
+Index T erms—Cyber Threat Intelligence, Knowledge Graph,
+Graph Databases, CWE, CVE, A TT&CK, CAPEC
+I. I N T RO D U C T I O N
+The modern cyber threat landscape is vast, dynamic, and
+fragmented across multiple authoritative but heterogeneous
+sources of intelligence. The National V ulnerability Database
+(NVD) [1] provides detailed records of disclosed Common
+V ulnerabilities and Exposures (CVEs [2]) and their severity
+scores, while MITRE [3] curates complementary catalogs:
+Common W eakness Enumeration (CWE [4]), which lists hard-
+ware and software security weakness classes; Common Attack
+Pattern Enumeration and Classiﬁcation (CAPEC [5]), which
+describes adversary attack patterns; and Adversarial T actics,
+T echniques, and Common Knowledge (A TT&CK [6]), which
+captures tactics, techniques, and procedures (TTPs) observed
+in cyberattacks. Each of these resources is indispensable in
+its own domain, yet their siloed formats, differing schemas,
+and inconsistent cross-references present signiﬁcant hurdles
+for analysts who need an integrated and holistic view that
+interconnects vulnerabilities, weaknesses, attack patterns, and
+adversarial behaviors.
+Existing efforts to unify CTI often focus on one or two
+sources, rely on static or manually curated mappings, or lack
+mechanisms to keep pace with daily updates. As a result,
+organizations are left with incomplete or outdated views of
+how newly published vulnerabilities may be exploited, which
+weaknesses cause recurring attacks, or how defensive mea-
+sures align with adversary techniques. Without automation and
+the full-spectrum integration of diverse security-related data
+sources, the potential for utilizing CTI in proactive defense
+and explainable analytics remains signiﬁcantly limited.
+In this paper, we introduce a fully automated cybersecurity
+knowledge graph that bridges these gaps. Our system develops
+dedicated ingestion pipelines for CVE, CWE, CAPEC, and
+A TT&CK, handling their native formats (e.g., JSON, XML,
+STIX bundles), normalizing properties into a uniﬁed schema,
+and encoding explicit relationships among entities in a Neo4j
+graph database (detailed in §III). This automation ensures
+that knowledge is refreshed regularly , requiring no manual
+intervention while continuously incorporating new informa-
+tion. The resulting knowledge graph is both comprehensive
+and expressive: it captures hundreds of thousands of nodes
+representing vulnerabilities, weaknesses, attack patterns, tech-
+niques, malware, tools, intrusion sets, mitigations, etc. The en-
+tities are linked through rich, typed relationships. This enables
+analysts to run multi-hop queries that explain, for example,
+how a speciﬁc CVE maps to underlying weaknesses, which
+
+===== Page 002 =====
+CAPEC attack patterns exploit them, and which A TT&CK
+techniques adversaries have used in real-world operations.
+Beyond integration, the graph unlocks advanced analytics.
+Analysts can identify software weaknesses most frequently
+linked to techniques, perform shortest-path traversals across
+heterogeneous entities, or enrich vulnerabilities with contex-
+tual data such as Common Platform Enumerations (CPEs)
+[7], mitigations, and Common V ulnerability Scoring System
+(CVSS) [8] severity . Moreover, through graph-based topology
+analysis, the system anticipates potential future or missing
+connections between entities. In doing so, it elevates CTI
+from disparate feeds into a continuously updated, queryable,
+and comprehensible foundation for proactive defense, threat
+hunting, and cyber risk assessment (detailed in §IV).
+The key contributions of this work are as follows.
+• End-to-end automation: W e develop a fully automated
+pipeline that ingests CVE, CWE, CAPEC, and A TT&CK
+data sources, enabling bidirectional reasoning between vul-
+nerabilities and adversary techniques.
+• Rich extraction of nodes and relationships: W e construct
+a large-scale knowledge graph that captures extensive nodes,
+relationships, and properties, ensuring semantic richness and
+comprehensive cross-domain coverage.
+• Comprehensive A TT&CK framework representation:
+W e provide a ﬁne-grained representation of all A TT&CK
+entities, including techniques, tactics, mitigations, and re-
+lated objects, and thus enabling a structured exploration of
+adversary behaviors.
+• T opology-based link discovery: W e introduce topology-
+based methods that reveal plausible but unobserved relation-
+ships in the graph, demonstrating how structural similarity
+can uncover meaningful connections between weaknesses
+and attack patterns.
+• Neo4j-based querying and analytics: W e deploy the graph
+in Neo4j and leverage the expressive Cypher query lan-
+guage to support advanced analytics, including multi-hop
+reasoning, shortest-path discovery , and pattern analysis.
+II. R E L AT E D WO R K
+Cybersecurity knowledge graphs (KGs) have emerged as a
+powerful paradigm for integrating heterogeneous threat intelli-
+gence, enabling advanced reasoning and decision support. Sev-
+eral efforts have focused on constructing KGs by linking ex-
+isting security standards and repositories such as CVE, CWE,
+CAPEC, A TT&CK, and CPE. One of the earliest systematic
+efforts was the SEPSES Cybersecurity Knowledge Graph,
+which provided vocabularies and a continuously updated KG
+integrating sources such as CVE, CWE, and CAPEC [9].
+Similarly , the CyberGraph framework demonstrated the auto-
+matic construction of a Neo4j-based KG unifying CVE, CWE,
+CAPEC, and CPE, allowing for advanced graph querying and
+visualization [10]. However, these works primarily focus on
+structural integration of a limited subset of sources and do not
+scale to large, enriched graphs with extensive properties.
+Beyond structural integration, several works have leveraged
+KGs for reasoning and predictive tasks. Shi et al. developed
+a threat knowledge graph linking CVE, CWE, and CPE,
+and applied KG completion techniques to uncover previously
+unknown associations, evaluated using ranking metrics such as
+MRR and Hits@N [11]. Ampel et al. proposed CVET , a self-
+distillation model that maps CVEs to MITRE A TT&CK tac-
+tics, thus bridging vulnerability-centric data with adversary be-
+haviors [12]. Das et al. introduced V2W -BER T , a Transformer-
+based hierarchical multi-class classiﬁcation framework for au-
+tomated mapping of CVEs to CWEs, achieving state-of-the-art
+performance even for rare classes [13]. While these approaches
+introduce reasoning capabilities, they often depend on small-
+scale datasets and lack an end-to-end automated pipeline that
+continuously incorporates updates from all relevant threat
+intelligence repositories.
+In parallel, large-scale multi-source integration has also
+been studied. Hemberg et al. introduced the BRON knowledge
+graph, which links A TT&CK, CWE, CAPEC, and CVE,
+supporting bidirectional traversal across tactics, weaknesses,
+and vulnerabilities for cyber threat hunting applications [14].
+Shen et al. explored a similar approach in the industrial control
+systems (ICS) domain, using data-driven extraction and graph
+construction techniques to model ICS-speciﬁc vulnerabilities
+and threats [15]. These works achieve broader coverage, but
+remain domain-speciﬁc, rely on static integration, and do not
+incorporate enriched property sets needed for ﬁne-grained
+reasoning and explainability .
+Beyond vulnerability-centric graphs, countermeasure-
+oriented KGs have also been proposed. The D3FEND
+framework, developed by MITRE, provides a semantically
+rigorous representation of defensive techniques and their
+mapping to A TT&CK TTPs, thereby supporting explainable
+reasoning about mitigation strategies [16]. Recently , retrieval-
+augmented generation (RAG) approaches such as CyKG-RAG
+have integrated KGs with language models, leveraging
+structured cybersecurity knowledge for improved reasoning
+over unstructured CTI reports [17], [18]. These initiatives
+focus either on defensive knowledge or integration with
+language models, but they do not provide a large-scale,
+uniﬁed, and automated knowledge graph that captures both
+vulnerabilities and attack techniques in an explainable manner.
+In contrast to the above works, our approach advances
+the state of the art by delivering a fully automated, end-to-
+end pipeline for constructing large-scale cybersecurity knowl-
+edge graphs. Our KG integrates CVE, CWE, CAPEC, and
+A TT&CK while scaling to more than 300K nodes and 250K
+relationships with 86 property types, offering a semantically
+enriched representation that supports advanced threat intel-
+ligence. W e deploy the KG in Neo4j, enabling powerful
+query capabilities, link discovery based on graph topology ,
+and adversarial activity analytics, thereby addressing both the
+scalability and analytical gaps identiﬁed in prior research.
+
+===== Page 003 =====
+III. M E T H O D O L O G Y
+Our methodology automates the collection and integration
+of heterogeneous cyber threat intelligence from CVE, CWE,
+CAPEC, and MITRE A TT&CK. Through cross-source nor-
+malization and automated upsertion into Neo4j, the system
+produces a uniﬁed, continuously updated knowledge graph that
+preserves semantic links across vulnerabilities, weaknesses,
+attack patterns, and techniques. This enables efﬁcient querying
+and analysis without manual curation (see Fig. 1).
+A. Automation Process
+T o ensure that the cybersecurity knowledge graph remains
+comprehensive, up to date, and consistent across multi-
+ple threat intelligence sources, we developed an automated
+multi-source data acquisition and integration framework. This
+framework consists of dedicated pipelines for four key
+datasets—CVE, CWE, CAPEC, and MITRE A TT&CK—that
+systematically retrieve the latest releases from their respective
+authoritative sources, process and normalize the information,
+and ingest it into a Neo4j graph database. Each pipeline
+is tailored to handle the speciﬁc data formats and update
+mechanisms of its source, enabling seamless integration while
+preserving data ﬁdelity . A lightweight scheduler orchestrates
+the execution of these pipelines on a ﬁxed daily cycle, ensuring
+that the graph continuously reﬂects the most recent threat
+intelligence without the need for manual intervention.
+The automation framework executes on a ﬁxed 24-hour
+cycle with integrated logging and error handling. On a weekly
+basis, it updates the MITRE A TT&CK dataset, while daily
+runs refresh CAPEC, CWE, and CVE (with a full CVE
+synchronization on the ﬁrst pass, followed by incremental
+updates). A TT&CK is updated weekly since its framework
+evolves more slowly , with new techniques, groups, and mit-
+igations published less frequently , whereas the other datasets
+either exhibit frequent changes or are lightweight to process–
+particularly CVE, which receives daily vulnerability disclo-
+Fig. 1. End-to-end pipeline for constructing an automated cybersecurity
+knowledge graph.
+sures. The update order follows the dependency chain—
+A TT&CK→CAPEC→CWE→CVE—since relationships orig-
+inate from CAPEC to A TT&CK, from CWE to CAPEC, and
+from CVE to CWE. This design ensures that upstream entities
+are processed before downstream links are established, keep-
+ing the knowledge graph continuously synchronized without
+manual intervention. The following narrative describes the
+dataset-speciﬁc pipelines:
+Common V ulnerabilities and Exposures (CVE) system
+is a globally recognized catalog of disclosed software and
+hardware vulnerabilities. Our framework retrieves CVE data
+from the NVD CVE 2.0 JSON feeds, initially ingesting all
+yearly archives from 2002 through 2025. After this baseline,
+the system continuously synchronizes with the “recent” and
+“modiﬁed” datasets, incorporating new or updated vulnera-
+bilities without reprocessing history . Data is downloaded, ex-
+tracted, normalized for schema consistency , and upserted into
+Neo4j, ensuring the graph always reﬂects the latest disclosures.
+Common W eakness Enumeration (CWE) catalog, curated
+by MITRE, deﬁnes recurring software and hardware weakness
+types. Unlike CVE’s instance-level vulnerabilities, CWE ab-
+stracts structural ﬂaws such as buffer overﬂows or input vali-
+dation errors. Our system downloads the CWE XML release,
+parses all Weakness entries, captures metadata, descriptions,
+and cross-references, normalizes them, and ingests the results
+into Neo4j as an updated graph representation of weaknesses.
+Common Attack Pattern Enumeration and Classiﬁcation
+(CAPEC) catalog describes adversarial attack patterns that
+exploit weaknesses. Our framework downloads the CAPEC
+archive, parses Attack_Pattern entries, and extracts meta-
+data, descriptions, and hierarchies. The processed data is
+upserted into Neo4j, producing a continuously updated attack-
+pattern entity linked directly to CWE weaknesses.
+MITRE A TT&CK framework captures tactics, techniques,
+and procedures (TTPs) across the Enterprise, Mobile, and
+ICS domains. Our system retrieves A TT&CK STIX bundles,
+extracts entities such as techniques, tactics, intrusion sets,
+tools, courses of action, etc. and processes their relationship
+objects. Data is normalized and ingested into Neo4j with typed
+edges from STIX references, producing a refreshed knowledge
+layer that spans the full A TT&CK ecosystem and supports
+graph-based analytics.
+These pipelines ensure that the cybersecurity knowledge
+graph remains comprehensive, consistent, and continuously
+synchronized with authoritative sources. By automating data
+ingestion, normalization, and integration across CVE, CWE,
+CAPEC, and A TT&CK, the framework eliminates manual
+curation and provides a reliable foundation for downstream
+analytics and reasoning tasks.
+B. Nodes, Properties, and Relationships
+This section provides a detailed overview of the properties
+collected from each source, the relationships encoded between
+them, and the overall distribution of nodes and edges within
+the constructed knowledge graph (Fig. 2).
+CVE (NVD) : The CVE pipeline collects the following
+
+===== Page 004 =====
+Fig. 2. Schema visualization of node labels and relationship types in the
+Neo4j cybersecurity knowledge graph.
+properties: the vulnerability identiﬁer ( id), mapped CWE
+identiﬁers, a textual description, CVSS metrics (including
+vector string, base score, and severity — where CVSS, the
+Common V ulnerability Scoring System, is an industry-standard
+method for rating the severity of software vulnerabilities),
+exploitability and impact scores, and extracted CPE ( Common
+Platform Enumeration ) criteria, which specify the affected
+hardware, operating systems, or software products.
+Relationships created: The framework establishes relation-
+ships that link CVE to its corresponding CWE ( CVE → CWE).
+CWE (MITRE) : The CWE extraction process gathers
+identiﬁers and metadata (ID, name, abstraction level, structural
+type, and status), rich text ﬁelds (description, extended descrip-
+tion, background), and a wide range of structured or nested
+elements, including alternative terms, applicable platforms,
+modes of introduction (describing when and how the weakness
+can be introduced during development), likelihood of exploit,
+weakness ordinalities (sequence in which weaknesses might
+occur), common consequences, detection methods, potential
+mitigations etc.
+Relationships created: The pipeline forms hierarchical
+parent–child links between CWEs ( CWE → CWE), precedence
+links that indicate which weaknesses can occur before others,
+and cross-references connecting CWEs to related CAPEC
+attack patterns ( CWE → CAPEC).
+CAPEC (MITRE) : For CAPEC data, the collected prop-
+erties include identiﬁers and metadata (ID, name, abstraction,
+status), description, likelihood, severity , mid-level structured
+sections such as mitigations, prerequisites, indicators, required
+skills and resources, example instances, notes, consequences,
+execution ﬂow (sequence of attacker actions), and content
+history .
+Relationships created: W e establish hierarchical parent–child
+links between CAPEC entries ( CAPEC → CAPEC), precedence
+links, and mappings from CAPEC attack patterns to A TT&CK
+techniques ( CAPEC → ATT&CK).
+A TT&CK (Enterprise/Mobile/ICS STIX) : Across all
+supported A TT&CK domains, the pipeline collects common
+properties such as ID, external ID, object type, name,
+description, external references, timestamps/versioning, and
+domains. Depending on the object type, additional ﬁelds may
+include platforms (target operating systems or environments),
+aliases (alternative names), detection guidance etc.
+Extracted nodes include attack-pattern, campaign,
+course-of-action, intrusion-set, malware,
+tool, x-mitre-asset, x-mitre-data-source,
+x-mitre-tactic, x-mitre-matrix, etc.
+Relationships created: In our system, STIX-deﬁned
+relationship objects are materialized as graph edges by
+leveraging the relationship_type, source_ref, and
+target_ref ﬁelds, or, when APOC is unavailable,
+through a fallback naming scheme of the form
+sourceType_to_targetType.
+As shown in T able I, the largest node set in the constructed
+knowledge graph comes from the CVE dataset, with 307,142
+vulnerability entries. This is followed by 1,106 A TT&CK
+technique (STIX attack
+pattern) nodes from the A TT&CK
+framework. The third-largest group consists of 968 CWE
+nodes, reﬂecting common software and hardware weaknesses,
+while the fourth is 795 malware nodes, also extracted from
+A TT&CK. The 615 CAPEC nodes rank ﬁfth, capturing com-
+mon adversarial attack patterns.
+T ABLE I
+NO D E T Y P E S A N D T H E I R C O R R E S P O N D I N G E N T I T Y C O U N T S I N T H E NE O4J
+K N OW L E D G E G R A P H , S O RT E D F RO M H I G H E S T TO L OW E S T C O U N T .
+Node T ype Entity Count Node T ype Entity Count
+cve 307,142 tool 93
+attack pattern 1,106 campaign 51
+cwe 968 data source 42
+malware 795 tactic 40
+capec 615 asset 14
+course of action 334 matrix 4
+intrusion set 185 identity 1
+data component 122 marking deﬁnition 1
+The knowledge graph encodes a rich set of relationships
+across entities, capturing both structural and behavioral
+connections. The largest is the related_cwe relation
+(CVE→CWE) with 227,981 edges, followed by
+malware_to_attack_pattern (10,694 edges),
+intrusion_set_to_attack_pattern (4,095 edges),
+data_component_to_attack_pattern (2,522
+edges), course_of_action_to_attack_pattern
+(1,915 edges), related_capec (CWE→CAPEC, 1,212
+edges), cwe_child (1,151 edges), etc.
+T ogether, these interconnected entities and their rich set of
+relationships form a comprehensive, multi-perspective knowl-
+edge graph that represents vulnerabilities, weaknesses, attack
+patterns, malware, and adversarial behaviors across multiple
+MITRE knowledge sources. By capturing hierarchical, se-
+
+===== Page 005 =====
+quential, and cross-domain associations among nodes such as
+courses of action, intrusion sets, tools, tactics, and campaigns,
+the graph enables uniﬁed and in-depth analysis of the complex
+landscape of cybersecurity threats and defenses.
+C. Graph Querying and Multi-Hop Traversal
+One of the key advantages of representing cyber threat
+intelligence as a knowledge graph is the ability to perform
+multi-hop traversal across heterogeneous entities. Unlike tradi-
+tional tabular or siloed repositories, the graph structure allows
+analysts to traverse explicit paths that connect vulnerabilities
+(CVEs) to weaknesses (CWEs), to adversarial attack patterns
+(CAPEC), and ultimately to real-world adversary techniques
+in A TT&CK. These traversals not only provide the interme-
+diate steps involved in analyzing a threat, but also enhance
+individual data points (e.g., a CVE) by connecting them to a
+broader threat context—such as severity , affected platforms,
+available mitigations, and associated adversarial techniques.
+For instance, consider a forward traversal that begins with
+the vulnerability CVE-2016-6225, which affects Percona Xtra-
+Backup and stems from improper handling of the initial-
+ization vector (IV) in its xbcrypt encryption utility . This
+ﬂaw , which allows chosen-plaintext attacks against encrypted
+backup ﬁles, is associated with the weakness CWE-326 (In-
+adequate Encryption Strength). This weakness connects to
+the attack pattern CAPEC-112 (Brute Force), which in turn
+maps to the A TT&CK technique T1110 (Brute Force). This
+traversal illustrates how a speciﬁc cryptographic vulnerability
+can be situated within a broader chain of adversarial behavior,
+revealing plausible exploitation methods and aligning low-
+level technical ﬂaws with high-level attacker tactics. The
+corresponding Cypher query for the forward path is shown
+in Fig. 3 (left), and its graphical representation in Fig. 4.
+Conversely , a reverse traversal starting from the A TT&CK
+technique T1110 (Brute Force) uncovers associated upstream
+weaknesses and vulnerabilities that could facilitate brute-
+force exploitation. Speciﬁcally , the knowledge graph links this
+technique to the attack pattern CAPEC-112, which maps to
+multiple underlying weaknesses: CWE-326 (Inadequate En-
+cryption Strength), CWE-330 (Use of Insufﬁciently Random
+V alues), and CWE-521 (W eak Password Requirements). These
+weaknesses are in turn linked to various CVEs, enabling
+defenders to identify and prioritize vulnerable systems likely
+to be targeted using brute-force methods. The Cypher query
+for this reverse traversal is shown in Fig. 3 (right), and the
+corresponding path visualization is provided in Fig. 5.
+T ogether, these forward and reverse queries and their corre-
+sponding visualizations demonstrate the bidirectional multi-
+hop traversal capabilities of knowledge graphs—supporting
+both top-down and bottom-up threat analysis across the cyber
+kill chain.
+D. T opology-Based Link Scoring in Cybersecurity Knowledge
+Graphs
+One of the most valuable analytical capabilities of our inte-
+grated cybersecurity knowledge graph is the ability to compute
+MATCH path =
+(c:cve {id:
+"CVE-2016-6225"})
+-[:related_cwe]->
+(w:cwe)
+-[:related_capec]->
+(p:capec)
+-[:related_attack]->
+(a:attack_pattern)
+RETURN a.external_id AS
+attack_id, path
+ORDER BY a.external_id
+LIMIT 100;
+MATCH path =
+(a:attack_pattern
+{external_id: "T1110"})
+<-[:related_attack]-
+(p:capec)
+<-[:related_capec]-
+(w:cwe)
+<-[:related_cwe]-
+(c:cve)
+RETURN c.id AS
+cve_id, path
+ORDER BY c.id
+LIMIT 100;
+Fig. 3. Cypher queries for traversing the knowledge graph. Left: forward
+traversal from CVE →CWE→CAPEC→A TT&CK. Right: reverse traversal
+from A TT&CK back to CVE.
+Fig. 4. Path visualization for CVE (”CVE-2016-6225”) to A TT&CK.
+Fig. 5. Path visualization for A TT&CK (“T1110”) to CVEs.
+topology-based link scores . Here, only the graph’s structural
+properties (topology) are leveraged to quantify how strongly
+two entities are related, without requiring external features.
+For example, such scoring allows analysts to identify plausible
+connections between entities in a graph, such as CVE ↔CWE,
+CWE↔CAPEC, or CAPEC ↔A TT&CK techniques.
+The Neo4j Graph Data Science (GDS) library provides
+several well-established structural similarity algorithms [19].
+W e highlight two representative measures below (with Cypher
+examples shown in Fig. 6):
+• Adamic–Adar (AA): Assigns higher weight to shared
+neighbors that are themselves rare:
+AA(u, v) =
+∑
+w∈Γ(u)∩Γ(v)
+1
+log |Γ(w)|.
+• Common Neighbors (CN): Simply counts the number of
+shared neighbors:
+CN (u, v) = |Γ(u) ∩ Γ(v)|.
+
+===== Page 006 =====
+// Adamic Adar
+MATCH (c1:cwe{id: "308"})
+MATCH (c2:capec{id: "151"})
+RETURN gds.alpha.linkprediction.adamicAdar(c1, c2) AS
+score
+// Common Neighbors
+MATCH (c1:cwe{id: "308"})
+MATCH (c2:capec{id: "151"})
+RETURN gds.alpha.linkprediction.commonNeighbors(c1, c2) AS
+score
+Fig. 6. Cypher queries for selected link discovery algorithms between CWE
+and CAPEC nodes.
+Notations: u and v denote two nodes in the knowledge graph,
+and Γ(u) represents the set of neighbors directly connected to
+node u.
+• |Γ(u)| is the degree of node u (i.e., the number of its
+neighbors).
+• Γ(u) ∩ Γ(v) is the set of common neighbors of u and v.
+• w is an individual node belonging to the set of common
+neighbors.
+• The functions assign similarity scores, where a higher score
+indicates a greater structural proximity between u and v,
+and thus a higher likelihood of an unobserved link.
+Other metrics such as Preferential Attachment (which as-
+sumes high-degree nodes are more likely to connect), Resource
+Allocation (a variant of Adamic–Adar that weights neighbors
+by the inverse of their degree), Same Community (binary score
+based on graph community detection), and T otal Neighbors
+(combined neighborhood size) can also be applied to enrich
+the analysis.
+By applying these measures, we can infer plausible but
+unobserved relationships—such as identifying CWEs that may
+be associated with CAPECs. These insights enable analysts
+to anticipate potential threat paths before they are explicitly
+reported in advisories, supporting proactive defense.
+IV . E M P I R I C A L EV A L UAT I O N
+W e demonstrate how our knowledge graph enables com-
+prehensive and actionable cyber threat intelligence analysis,
+supporting end-to-end workﬂows. W e highlight mappings from
+top software weaknesses to A TT&CK techniques; technique-
+centric views that connect to groups, tools, and mitiga-
+tions; and group-to-vulnerability traversals for Scattered Spi-
+der (G1015) and V olt T yphoon (G1017). Case studies on CISA
+advisories and link scoring further demonstrate how the graph
+discovers missing relationships.
+A. T op 25 Software CWEs to ATT&CK T echniques
+W e leveraged our automated knowledge graph pipeline to
+connect CWEs with MITRE A TT&CK techniques through
+CAPEC attack patterns. In particular, we focused on the CWE
+T op 25 Most Dangerous Software W eaknesseslist, an annually
+curated resource maintained by the MITRE Corporation in
+collaboration with the U.S. Department of Homeland Secu-
+rity (DHS) and the Cybersecurity and Infrastructure Security
+Agency (CISA). This list highlights the most common and
+impactful software weaknesses, based on real-world data such
+as CVEs, CVSS scores, and their prevalence in vulnerability
+databases. It helps developers and security teams prioritize
+mitigation efforts by identifying the most frequently exploited
+programming ﬂaws and guiding secure software design. Using
+automated graph traversals, we observe that not all 25 CWEs
+yield direct mappings to A TT&CK techniques.
+As an illustrative example, shown in Fig. 7 and T able II,
+consider CWE-20 (Improper Input V alidation). It is linked to
+multiple A TT&CK techniques such as T1539: Steal Web
+Session Cookie and T1027: Obfuscated Files
+or Information. This mapping underscores the critical-
+ity of input validation failures: adversaries routinely exploit
+unchecked inputs to manipulate control ﬂow , inject malicious
+payloads, or bypass security mechanisms, making this CWE
+foundational to a wide range of attacks. Similarly , CWE-
+94 (Code Injection) maps directly to T1027.006: HTML
+Smuggling, highlighting how code injection vulnerabilities
+directly enable adversaries to deliver and execute obfuscated
+malicious code, often as part of initial access or delivery
+phases. These cases illustrate how our knowledge graph pro-
+duces multi-hop paths from critical software weaknesses to
+threat actor methodologies, bridging the gap between software
+engineering errors and operational TTPs.
+By enumerating and analyzing such mappings, defenders
+can proactively prioritize mitigation efforts around weakness
+classes most commonly tied to adversary behaviors, ensuring
+that secure coding practices, patching strategies, and monitor-
+ing controls align with real-world attack techniques.
+Fig. 7. Mapping of a top software CWE (CWE-287) to its corresponding
+CAPECs (light blue circles) and A TT&CK T echniques (light green circles).
+B. ATT&CK T echniques, Groups, and Mitigations
+Our pipeline centers each A TT&CK technique within its
+surrounding ecosystem by materializing typed, cross-domain
+relationships to the entities that cyber analysts regularly
+use: adversary groups (intrusion sets and campaigns), op-
+erational capabilities (tools and malware), and defensive
+knowledge (courses of action/mitigations, data sources, and
+
+===== Page 007 =====
+T ABLE II
+MA P P I N G O F T H E TO P 25 S O F T WA R E CWE S TO A TT&CK T E C H N I QU E S V I A CAPEC, L I M I T E D TO CWE S W I T H A V A I L A B L E M A P P I N G S .
+CWE ID A TT&CK T echniques
+20 (Improper Input
+V alidation)
+T1539 (Steal W eb Session Cookie); T1036.001 (Invalid Code Signature); T1027 (Obfuscated Files or Information);
+T1562.003 (Impair Command History Logging)
+94 (Improper Control of
+Generation of Code (’Code
+Injection’))
+T1027.006 (HTML Smuggling)
+200 (Exposure of Sensitive
+Information to an
+Unauthorized Actor)
+T1057 (Process Discovery); T1087 (Account Discovery); T1124 (System Time Discovery); T1018 (Remote System
+Discovery); T1135 (Network Share Discovery); T1007 (System Service Discovery); T1046 (Network Service
+Discovery); T1033 (System Owner/User Discovery); T1069 (Permission Groups Discovery); T1120 (Peripheral
+Device Discovery); T1082 (System Information Discovery); T1083 (File and Directory Discovery); T1134.001 (T oken
+Impersonation/Theft); T1217 (Browser Information Discovery); T1562.003 (Impair Command History Logging);
+T1016 (System Network Conﬁguration Discovery); T1111 (Multi-Factor Authentication Interception); T1036.005
+(Match Legitimate Resource Name or Location)
+269 (Improper Privilege
+Management)
+T1548 (Abuse Elevation Control Mechanism)
+287 (Improper
+Authentication)
+T1505.003 (W eb Shell); T1040 (Network Snifﬁng); T1557 (Adversary-in-the-Middle); T1134 (Access T oken
+Manipulation); T1185 (Browser Session Hijacking); T1548 (Abuse Elevation Control Mechanism)
+400 (Uncontrolled
+Resource Consumption)
+T1499 (Endpoint Denial of Service)
+434 (Unrestricted Upload
+of File with Dangerous T ype)
+T1574.010 (Services File Permissions W eakness)
+798 (Use of Hard-coded
+Credentials)
+T1078.001 (Default Accounts); T1552.001 (Credentials In Files)
+862 (Missing Authorization) T1211 (Exploitation for Defense Evasion)
+data components). Because all A TT&CK object types are
+represented as distinct node labels with native relationships
+in Neo4j, technique-centric queries become straightforward:
+starting from a single technique, analysts can pivot outward
+to who uses it, how it is executed, what to monitor, and
+how to mitigate—without manual cross-referencing. This de-
+sign supports both forward (technique →entities) and reverse
+(entities→technique) traversals, enabling explainable paths
+that tie behaviors to controls and evidence.
+As shown in Fig. 8, a Cypher query can directly extract all
+entities connected to a given A TT&CK technique, spanning
+mitigations, data components, groups, malware, tools, and
+campaigns. These results can then be rendered as a graph
+structure (Fig. 9), providing analysts with an immediate view
+of how the technique relates to both adversary behaviors and
+defensive measures.
+WITH "T1110.001" AS ap_id
+MATCH (a:attack_pattern {external_id: ap_id})
+MATCH p = (a)-[
+:malware_to_attack_pattern
+|course_of_action_to_attack_pattern
+|data_component_to_attack_pattern
+|intrusion_set_to_attack_pattern
+|campaign_to_attack_pattern
+|tool_to_attack_pattern
+*1..1]-(n)
+RETURN p
+LIMIT 100;
+Fig. 8. Cypher Query to obtain the one-hop neighborhood around a given
+A TT&CK technique (”T1110.001”), paths from the technique to connected
+mitigation, data components, groups, malware, tools, and campaigns.
+Applied to a concrete technique (e.g., T1110.001) the
+one-hop neighborhood already yields actionable context: the
+graph links the technique to mitigations (Account Use Poli-
+cies, Multi-factor Authentication, Password Policies, Update
+Software), to detection-relevant telemetry via data components
+(Application Log Content, User Account Authentication), to
+adversary groups (intrusion sets APT28 and APT29), and to
+concrete capabilities observed in the wild, including malware
+(China Chopper, Emotet, HermeticWizard, Lucifer, P .A.S.
+W ebshell, Pony , SpeakUp, Xbash) and tools (CrackMapExec).
+By modeling these entities as nodes and typed edges, the
+graph contextualizes a single technique within an integrated
+framework that captures adversaries ( who), capabilities ( with
+what), relevant telemetry ( where to look), and mitigations ( how
+to respond ).
+Fig. 9. V isualizing A TT&CK “T1110.001” mapped to its respective Groups
+(in blue), Mitigations (in brown), and T ools (in pink).
+
+===== Page 008 =====
+Operationally , this structure accelerates common workﬂows:
+pivoting from techniques to groups for threat hunting and
+reporting; expanding to tools/malware for behavioral detec-
+tions and emulation; and anchoring prevention plans by map-
+ping courses of action to control requirements and relevant
+telemetry . In practice, the technique-centric view becomes a
+repeatable playbook for prioritization, detection engineering,
+and defensive validation—grounded in explicit, queryable re-
+lationships that remain current through automated updates.
+C. Group to W eakness and V ulnerability Mapping
+Our knowledge graph enables automatic extraction of the
+CWE classes and concrete CVE vulnerabilities that any
+given intrusion set is positioned to exploit. Starting from
+an intrusion_set, we traverse intrusion_set →
+attack_pattern ↔ capec ↔ cwe → cve. For each
+attack technique, we preserve provenance (which CAPEC pro-
+duced which CWE) and compute the union of CWE identiﬁers
+per technique. When required, we extend further by one hop to
+enumerate the corresponding CVEs. The summarized outputs
+for two representative groups– Scattered Spider (G1015) and
+V olt T yphoon (G1017)—are shown in T ables III, and IV, with
+corresponding path visualizations in Figs. 10 and 11.
+Scattered Spider (G1015) is a ﬁnancially motivated intrusion
+set notorious for its social-engineering expertise. In September
+2023, the group was behind the MGM Resorts breach, where
+operators successfully tricked a helpdesk employee into reset-
+ting credentials, leading to a multi-day outage that disrupted
+hotel operations and slot machines in Las V egas [20]. Despite
+many of its members reportedly being teenagers, Scattered
+Spider has demonstrated advanced persistence by bypassing
+MF A protections and abusing trust relationships.
+T able III summarizes how Scattered Spider’s techniques
+map through CAPEC patterns to software weaknesses. A
+closer look at the ﬁrst two rows illustrates the dynamics:
+• T1018 (Remote System Discovery) links via CAPEC-292
+to CWE-200 (Exposure of Sensitive Information to an
+Unauthorized Actor), highlighting how adversaries in G1015
+abuse weaknesses in information exposure to enumerate
+networked assets and identify targets for lateral movement.
+• T1083 (File and Directory Discovery) aggregates CAPEC-
+127 and CAPEC-497, yielding a diverse set of CWEs such
+as CWE-732 (Incorrect Permission Assignment), CWE-
+693 (Protection Mechanism Failure), and CWE-425 (Direct
+Request). This breadth shows that Scattered Spider leverages
+multiple ﬁle-system and access-control weaknesses to gain
+insight into system conﬁgurations and stored assets.
+Beyond reconnaissance, techniques such as T1539 (Steal W eb
+Session Cookie) connect through CAPEC-31 to a large family
+of weaknesses, including CWE-311 (Missing Encryption of
+Sensitive Data) and CWE-642 (External Control of Critical
+State Data), indicating the group’s ability to abuse poor
+session and credential protections. Likewise, T1553.002 (Sub-
+vert Code Signing) and T1556.006 (Modify Authentication
+Process) map to critical weaknesses in trust boundaries (e.g.,
+T ABLE III
+A TT&CK T E C H N I QU E S W I T H RE L AT E D CAPEC S A N D CWE S F O R
+IN T RU S I O N SE T - S C AT T E R E D SP I D E R (G1015)
+Attack
+T echnique CAPEC IDs CWE IDs
+T1018 292 200
+T1083 127, 497 732, 693, 425, 424, 288, 285, 276, 200
+T1217 169 200
+T1539 31 642, 602, 565, 539, 472, 384, 315, 311,
+302, 20, 113
+T1552.001 191 798
+T1552.004 485, 474 330, 522
+T1553.002 206, 68 732, 328, 325, 1326
+T1556.006 578 284
+CWE-284: Improper Access Control), underscoring Scattered
+Spider’s focus on authentication and persistence mechanisms.
+V olt T yphoon (G1017) is a Chinese state-sponsored threat
+group disclosed in 2023 for its long-term inﬁltration of U.S.
+critical infrastructure networks, including telecommunications,
+energy , transportation, and water systems [21]. The group
+is distinguished not by immediate data theft but by “pre-
+positioning” — maintaining covert access and deploying mal-
+ware in ways that could enable sabotage during a U.S.–China
+conﬂict. Intrusions have even been discovered on Guam, a
+strategic U.S. territory in the Paciﬁc, raising concerns about
+operational resilience in crisis scenarios.
+T able IV presents V olt T yphoon’s mappings through
+CAPEC patterns to CWEs. One technique stands out:
+• T1005 (Data from Local System) connects through CAPECs
+37, 204, 545, 647 to an extensive set of CWEs, includ-
+ing CWE-1239 (Improper Zeroization), CWE-1258 (Sensi-
+tive Information Uncleared Before Release), and CWE-311
+(Missing Encryption of Sensitive Data). This large mapping
+demonstrates that V olt T yphoon’s ability to retrieve sensi-
+tive artifacts from local systems is rooted in wide-ranging
+systemic failures in data handling and conﬁdentiality .
+• T1078 (V alid Accounts) maps via CAPEC-560 to CWEs
+such as CWE-262 (Not Using Password Aging), CWE-
+263 (Password Aging with Insufﬁcient Complexity), and
+CWE-654 (Reliance on a Single Factor), underscoring the
+group’s reliance on credential abuse and insufﬁcient account
+protection as a persistence vector.
+Other reconnaissance-oriented techniques—including T1007
+(System Service Discovery), T1016 (System Network Con-
+ﬁguration Discovery), and T1018 (Remote System Discov-
+ery)—again concentrate on CWE-200 (Information Exposure),
+mirroring patterns observed with Scattered Spider. Meanwhile,
+techniques such as T1083 (File and Directory Discovery) and
+T1505.003 (W eb Shell) connect to broader CWE sets (e.g.,
+CWE-732, CWE-287, CWE-553), illustrating V olt T yphoon’s
+use of misconﬁgured permissions and inadequate service con-
+trols to deepen operational footholds.
+Beyond the CWE-level mappings, extending one additional
+hop in the graph yields the concrete CVE vulnerabilities
+associated with each intrusion set. For example, in the cases of
+G1015 and G1017, the resulting mappings are visualized in
+Figs. 12 and 13, where the diagrams displayed with fewer
+
+===== Page 009 =====
+T ABLE IV
+A TT&CK T E C H N I QU E S W I T H RE L AT E D CAPEC S A N D CWE S F O R
+IN T RU S I O N SE T - V O LT TY P H O O N (G1017)
+Attack
+T echnique CAPEC IDs CWE IDs
+T1005 204, 647, 545, 37
+524, 311, 1258, 1239, 285, 1330,
+1323, 1278, 1272, 1266, 1243, 525,
+318, 315, 314, 312, 226, 1301
+T1007 574 200
+T1016 309 200
+T1018 292 200
+T1033 577 200
+T1036.005 616 200
+T1046 300 200
+T1057 573 200
+T1069 576 200
+T1078 560 654, 522, 309, 308, 307, 263,
+262, 1273
+T1082 312, 580, 313 200, 208, 205, 204
+T1083 127, 497 732, 693, 425, 424, 288, 285,
+276, 200
+T1090.001 465 441
+T1112 203 15
+T1113 648 267
+T1120 646 200
+T1124 295 200
+T1217 169 200
+T1505.003 650 553, 287
+T1552.004 485, 474 330, 522
+T1614 694 497
+nodes than actual. In both cases, the full traversal reveals
+30,433 CVEs for G1015 and 19,242 for G1017, highlighting
+the wide range of exploitable vulnerabilities. This highlights
+how systemic weaknesses (CWEs) serve as bridges to a broad
+set of concrete vulnerabilities, offering both ﬁne-grained detail
+for defenders and a scalable means of tracking group-level
+exploit potential.
+D. CISA Advisory
+CISA advisories list MITRE A TT&CK techniques and
+selected CVEs, but they do not fully map high-level TTPs
+to the broader set of relevant vulnerabilities. Traditionally ,
+analysts must manually connect A TT&CK techniques to
+CAPECs, CWEs, and CVEs, a time-consuming and error-
+prone process. Our knowledge graph automates this bridging
+by traversing semantic relationships, including direct links
+(related_capec, related_cwe) and hierarchical expan-
+Fig. 10. V isualizing group-to-CWE mappings for Scattered Spider (G1015).
+The blue node represents group G1015, and dark green nodes represent CWEs.
+sions (child and precedence relations up to depth three), as
+illustrated in the Cypher query shown in Fig. 14.
+Case Study 1: Russian GRU T argeting W estern Logistics
+Entities and T echnology Companies. On May 21, 2025,
+CISA released advisory AA25-141A, which highlights a Rus-
+sian state-sponsored cyber campaign attributed to the GRU’s
+85th Main Special Service Center (Unit 26165). The campaign
+has targeted W estern logistics entities and technology com-
+panies involved in coordinating, transporting, and delivering
+foreign assistance to Ukraine. Since 2022, these sectors have
+faced an elevated risk as targets. The advisory warns that
+executives and network defenders in these industries should
+recognize the heightened threat level, increase monitoring for
+known TTPs and indicators of compromise (IOCs), and adopt
+defensive postures that assume persistent targeting.
+The advisory details a set of initial access techniques
+used by the threat actors, including brute force login at-
+tempts (T1110.001, T1110.003), spearphishing (T1566), ex-
+ploitation of Internet-facing infrastructure (T1133, T1190),
+WinRAR and Outlook vulnerabilities (CVE-2023-38831,
+CVE-2023-23397), and abuse of SOHO devices (T1665).
+These techniques only partially reveal the broader vul-
+nerability surface. When executed in the canonical or-
+der (T echnique →CAPEC→CWE→CVE), the query does
+not return all CVEs cited in the advisory . Incorporat-
+ing hierarchical relations such as capec_precedence,
+capec_child, cwe_precedence, and cwe_child sur-
+faces CVE-2023-23397, a critical Outlook NTLM vulner-
+ability . With two-hop expansions, the query retrieves not only
+the explicitly mentioned CVEs but also nearly 60% of all
+CVEs in the graph, showing how our framework operational-
+izes advisories to uncover latent vulnerabilities beyond those
+listed in CISA reports.
+Case Study 2: #StopRansomware Medusa Ransomware.
+In February 2025, the FBI, CISA, and MS-ISAC released a
+joint #StopRansomware advisory on the Medusa ransomware
+variant. Medusa, ﬁrst identiﬁed in 2021, has impacted more
+Fig. 11. V isualizing group-to-CWE mappings for V olt T yphoon (G1017). The
+blue node represents group G1017, and dark green nodes represent CWEs.
+
+===== Page 010 =====
+Fig. 12. Mappings for intrusion set G1015 to CVEs. Blue nodes represent
+groups, green nodes represent CWEs, and violet represents CVEs.
+Fig. 13. Mappings for intrusion set G1017 to CVEs. Blue nodes represent
+groups, green nodes represent CWEs, and violet represents CVEs.
+than 300 victims across healthcare, education, legal, insur-
+ance, technology , and manufacturing. Unlike MedusaLocker or
+Medusa mobile malware, Medusa is a distinct ransomware-as-
+a-service (RaaS) operation, with afﬁliates frequently purchas-
+ing access from initial access brokers (IABs).
+The advisory highlights common TTPs for initial ac-
+cess, including phishing campaigns [T1566] and exploita-
+tion of unpatched software vulnerabilities [T1190]. Specif-
+ically , Medusa afﬁliates leveraged the ScreenConnect vul-
+nerability CVE-2024-1709 (CWE-288: Authentication By-
+pass) and the Fortinet EMS SQL injection vulnerability
+CVE-2023-48788 (CWE-89: SQL Injection). These exam-
+ples illustrate how Medusa combines social engineering with
+the exploitation of critical software ﬂaws.
+When we mapped the advisory’s A TT&CK techniques into
+our knowledge graph, their connections to CWEs and CVEs
+did not immediately retrieve the speciﬁc CVEs listed in the
+advisory using direct traversals (T echnique → CAPEC →
+CWE → CVE). However, by enabling two-hop hierarchical
+expansions across CAPEC and CWE relations, the graph
+MATCH (a:attack_pattern)
+WHERE a.external_id IN [
+"T1110.001","T1110.003","T1566", "T1133","T1190","T1665"
+]
+// CAPECs (base + expansion)
+MATCH (capec0:capec)-[:related_attack]->(a)
+OPTIONAL MATCH (capec0)-[:capec_precedence|
+capec_child*1..2]-(capecX:capec)
+WITH [c IN (collect(DISTINCT capec0) + collect(DISTINCT
+capecX)) WHERE c IS NOT NULL] AS capecs
+UNWIND capecs AS capec
+WITH DISTINCT capec
+// Base CWEs
+MATCH (capec)-[:related_capec]-(cwe0:cwe)
+// CWE expansion
+OPTIONAL MATCH (cwe0)-[:cwe_precedence|
+cwe_child*1..2]-(cweX:cwe)
+WITH [w IN (collect(DISTINCT cwe0) + collect(DISTINCT
+cweX)) WHERE w IS NOT NULL] AS cwes
+UNWIND cwes AS cwe
+WITH DISTINCT cwe
+// To CVEs
+MATCH (cve:cve)-[:related_cwe]-(cwe)
+RETURN DISTINCT cve.id AS cve_id
+ORDER BY cve_id;
+Fig. 14. Cypher Query to traverse from A TT&CK techniques to CVEs via
+CAPECs and CWEs.
+successfully revealed all of the reported CVEs while also
+identifying further related vulnerabilities.
+T ogether, these case studies demonstrate how the knowledge
+graph can operationalize CISA advisories by systematically
+bridging A TT&CK techniques to underlying CWEs and CVEs.
+By incorporating hierarchical expansions, the framework not
+only recovers explicitly listed vulnerabilities but also uncovers
+a broader set of latent CVEs, providing defenders with a more
+comprehensive view of potential exploitation surfaces.
+E. T opology-Based Discovery of Missing Links
+T opology-based similarity measures can be applied to the
+cybersecurity knowledge graph to identify plausible but un-
+observed relationships between entities. For example, while
+some CWE and CAPEC nodes are not explicitly linked, their
+structural context within the graph may suggest a strong latent
+association. Using Cypher queries, we can systematically
+enumerate candidate CWE–CAPEC pairs within a bounded
+hop distance and rank them by metrics such as Common
+Neighbors, Adamic–Adar, and Preferential Attachment. This
+allows analysts to focus on the most promising high-scoring
+pairs, highlighting potential links that warrant examination.
+W e illustrate this approach through two case studies. In both,
+the CWE and CAPEC nodes are not directly connected , yet
+their similarity scores from the Neo4j Graph Data Science
+(GDS) library indicate likely relationships.
+Case Study 3 (CWE-308 and CAPEC-151) These nodes
+share 14 common neighbors and have an Adamic–Adar score
+of 5.41, indicating strong and distinctive structural overlap.
+Semantically , CWE-308 (Use of Single-Factor Authentication)
+and CAPEC-151 (Identity Spooﬁng) are closely related, as
+weak authentication mechanisms inherently enable spooﬁng-
+based attacks. The structural and semantic evidence together
+highlight the plausibility of a missing edge.
+
+===== Page 011 =====
+Case Study 4 (CWE-20 and CAPEC-100) These nodes share
+13 common neighbors with an Adamic–Adar score of 4.95,
+showing signiﬁcant and informative contextual overlap. CWE-
+20 (Improper Input V alidation) and CAPEC-100 (Overﬂow
+Buffers) are conceptually linked, since insufﬁcient input vali-
+dation frequently leads to buffer overﬂow vulnerabilities. The
+alignment of structural similarity with semantic meaning rein-
+forces the likelihood of a missing but meaningful relationship.
+These results suggest plausible direct relationships that
+may be absent in the current graph representation. From an
+analytical perspective, such scoring provides valuable guid-
+ance for uncovering missing links that reﬂect real-world at-
+tack–weakness associations, thereby enriching the knowledge
+graph and supporting proactive cybersecurity analysis.
+V . C O N C L U S I O N
+W e presented a fully automated framework for building a
+cybersecurity knowledge graph that uniﬁes heterogeneous cy-
+ber threat intelligence (CTI) sources—including CVE, CWE,
+CAPEC, and MITRE A TT&CK—into a large-scale, continu-
+ously updated Neo4j graph database. Our framework ingests,
+normalizes, and integrates hundreds of thousands of entities
+and relationships, capturing vulnerabilities, weaknesses, attack
+patterns, techniques, adversary groups, tools, defensive mea-
+sures, etc. within a single queryable structure. By automating
+cross-domain integration and materializing rich semantic rela-
+tionships, the graph enables bidirectional, multi-hop traversals
+that provide analysts with explainable connections from low-
+level CVEs to high-level A TT&CK techniques, and vice versa.
+Through case studies on CISA advisories, group-to-
+vulnerability traversals, and topology-based link scoring, we
+demonstrated how the knowledge graph not only recovers
+explicitly reported vulnerabilities but also uncovers latent
+and plausible connections. These capabilities highlight the
+utility of graph-based CTI for proactive defense, adversary
+emulation, and explainable cyber risk assessment.
+Our future work will explore enriching the graph with real-
+time streaming threat feeds, extending coverage to additional
+CTI standards (e.g., STIX/T AXII threat sharing, malware
+repositories, and open-source threat reports), and applying ad-
+vanced graph learning models such as Graph Neural Networks
+(GNNs) to enhance predictive reasoning and link prediction.
+By combining automation, scalable analytics, and predictive
+modeling, we aim to advance knowledge graphs as a founda-
+tional capability for next-generation cyber threat intelligence.
+AC K N OW L E D G M E N T
+This work was supported by the U.S. Department of En-
+ergy’s Ofﬁce of Science at the Paciﬁc Northwest National
+Laboratory , which is operated by Battelle for the U.S. Depart-
+ment of Energy under contract DE-AC05-76RL01830. This
+work was also partially supported by the National Science
+Foundation (NSF) under Grant 2442595.
+RE F E R E N C E S
+[1] “National V ulnerability Database (NVD), ” National Institute of
+Standards and T echnology (NIST), 2005–2025, comprehensive
+repository of standards-based vulnerability management data. [Online].
+A vailable: https://nvd.nist.gov/
+[2] “Common V ulnerabilities and Exposures (CVE), ” MITRE, 1999–2025,
+publicly disclosed cybersecurity vulnerabilities. [Online]. A vailable:
+https://cve.mitre.org/
+[3] “MITRE Corporation, ” Nonproﬁt organization managing federally
+funded research and development centers (FFRDCs), 1958–2025.
+[Online]. A vailable: https://www .mitre.org/
+[4] “Common W eakness Enumeration (CWE), ” MITRE, 2006–2025,
+community-developed catalog of software and hardware weakness
+types. [Online]. A vailable: https://cwe.mitre.org/
+[5] “Common Attack Pattern Enumeration and Classiﬁcation (CAPEC), ”
+MITRE, 2007–2025, catalog of adversary attack patterns. [Online].
+A vailable: https://capec.mitre.org/
+[6] “Adversarial T actics, T echniques, and Common Knowledge
+(A TT&CK), ” MITRE, 2013–2025, knowledge base of adversary tactics,
+techniques, and procedures. [Online]. A vailable: https://attack.mitre.org/
+[7] “Common Platform Enumeration (CPE), ” National Institute of
+Standards and T echnology (NIST), 2007–2025, standardized method of
+naming software, operating systems, and hardware platforms. [Online].
+A vailable: https://nvd.nist.gov/products/cpe
+[8] “Common V ulnerability Scoring System (CVSS), ” National Institute of
+Standards and T echnology (NIST), 2005–2025, standardized framework
+for rating the severity of security vulnerabilities. [Online]. A vailable:
+https://nvd.nist.gov/vuln- metrics/cvss
+[9] E. Kiesling, A. Ekelhart, K. Kurniawan, and F . Ekaputra, “The sepses
+knowledge graph: an integrated resource for cybersecurity , ” in Interna-
+tional Semantic W eb Conference. Springer, 2019, pp. 198–214.
+[10] P . Falcarin, R. Dainese, and M. Morelli, “Building a cybersecurity
+knowledge graph with cybergraph, ” in Proc. of EnCyCriS/SVM , 2024.
+[11] Z. Shi, N. Matyunin, K. Grafﬁ, and D. Starobinski, “Uncovering
+cwe–cve–cpe relations with threat knowledge graphs, ” arXiv preprint
+arXiv:2305.00632, 2023.
+[12] B. Ampel, S. Samtani, S. Ullman, and H. Chen, “Linking common
+vulnerabilities and exposures to the mitre att&ck framework: A self-
+distillation approach, ” arXiv preprint arXiv:2108.01696 , 2021.
+[13] S. S. Das, E. Serra, M. Halappanavar, A. Pothen, and E. Al-Shaer, “V2w-
+bert: A framework for effective hierarchical multiclass classiﬁcation of
+software vulnerabilities, ” in 2021 IEEE 8th International Conference on
+Data Science and Advanced Analytics (DSAA) . IEEE, 2021, pp. 1–12.
+[14] E. Hemberg, J. Kelly , M. Shlapentokh-Rothman, B. Reinstadler, K. Xu,
+N. Rutar, and U.-M. O’Reilly , “Linking threat tactics, techniques, and
+patterns with defensive weaknesses, vulnerabilities and affected platform
+conﬁgurations for cyber hunting, ” arXiv preprint arXiv:2010.00533 ,
+2020.
+[15] G. Shen, W . W ang, Q. Mu, and M. Y u, “Data-driven cybersecurity
+knowledge graph construction for industrial control system security , ”
+Wireless Communications and Mobile Computing , 2020.
+[16] P . E. Kaloroumakis and M. J. Smith, “T oward a knowledge graph of
+cybersecurity countermeasures (d3fend), ” MITRE Corporation, T ech.
+Rep., 2019.
+[17] K. Kurniawan, E. Kiesling, and A. Ekelhart, “Cykg-rag: T owards
+knowledge-graph enhanced retrieval for cybersecurity , ” in Proceedings
+of CEUR W orkshop on Knowledge-Augmented AI , 2025.
+[18] M. Rahman, K. O. Piryani, A. M. Sanchez, S. Munikoti, L. De La T orre,
+M. S. Levin, M. Akbar, M. Hossain, M. Hasan, and M. Halappanavar,
+“Retrieval augmented generation for robust cyber defense, ” Paciﬁc
+Northwest National Laboratory (PNNL), Richland, W A (United States),
+T ech. Rep., 2024.
+[19] Neo4j, Inc., Link Prediction Algorithms - Neo4j Graph Data Science
+Library, 2025, accessed: 2025-08-29. [Online]. A vailable: https:
+//neo4j.com/docs/graph- data- science/current/algorithms/linkprediction/
+[20] Reuters, “Moody’s says mgm breach is credit negative
+as disruption lingers, ” https://www .reuters.com/technology/
+moodys- says- breach- mgm- is- credit- negative- disruption- lingers- 2023- 09- 13/,
+2023, accessed: 2025-08-26.
+[21] Cybersecurity and Infrastructure Security Agency (CISA), “People’s
+republic of china state-sponsored cyber actor living off the land to evade
+detection, ” https://www .cisa.gov/news- events/cybersecurity- advisories/
+aa24- 038a, 2024, accessed: 2025-08-26.

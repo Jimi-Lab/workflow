@@ -1,0 +1,242 @@
+[
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:001",
+    "block_type": "text",
+    "text": "language-dependent. Deckard [23] and Deja Vu [21] build\nparse trees for C code, and then reduce part of the parse trees\nto a vector. Comparisons are done on the vector. CP-Miner\nalso parses the program: currently the parser is implemented\nonly for C and C++. It then hashes these tokens and assigns\na numeric value to each, and runs the CloSpan frequent\nsubsequence mining algorithm to detect code clones.\nEach of the above techniques represent a unique and\ndifferent point in the design space. For example, building the\nparse tree, CFG, etc. all require implementing a robust parser\nfor the language. Implementing good parsers is a difﬁcult\nproblem with which even professional software assurance\ncompanies struggle [7], but once done will give them a\nrobust level of abstraction not available to ReDeBug. The\nhighest false positive rate for reported errors among the code\nclones was 90% for CP-Miner, and 66-74% for Deja Vu. In\nterms of scalability, the largest code base we are aware of is\nDeja Vu, which looked at a proprietary code base consisting\nof about 75 million lines of C code. They used a cluster\nof 5 machines, and integrated the product into the build\ncycle. It found 2070-2760 likely bugs. Our experiments are\non code bases upon to billions of lines of code (two orders\nof magnitude larger). If their techniques could be scaled\nup, they would likely ﬁnd more unpatched code clones, but\nthe number of falsely detected clones would also scale up\nand the overall system would require more resources than\navailable to a typical end-developer.\nSYDIT [26] is a program transformation tool, which\ncharacterizes edits as AST node modiﬁcations and generates\ncontext-aware edit scripts from example edits. It was tested\non an oracle data set of 56 pairs of example edits from\nopen source projects in Java. SYDIT complements ReDeBug\nin that SYDIT looks at abstract, semantic changes while\nReDeBug focuses on syntactic changes at large scale.\nPattern Insight’s Code Assurance [1] (aka Patch Miner)\nis advertised as ﬁnding unpatched code clones, as with\nReDeBug. Their whitepaper does not contain any technical\ninformation to compare on a usage, algorithmic, perfor-\nmance, or accuracy basis, but does mention it performs a\nkind of “fuzzy matching”. We have contacted Pattern Insight\nto get more details, but they have not made the product\navailable to us for comparison.\nPrevious work has also done clustering. Much previous\nwork, like us, uses the Jaccard distance metric, e.g., Deja Vu.\nDeckard and Deja Vu use locality sensitive hashing (LSH)\nto speed up the pairwise comparison using Jaccard. We use\nfeature hashing. Theoretical analysis shows feature hashing\noutperforms LSH alone [29], and Jang et al. back this up\nwith an empirical evaluation for malware clustering [22].\nHowever, a hybrid approach that ﬁrst uses LSH to ﬁnd near-\nduplicates which are then compared using feature hashing\nmay be possible. We leave these types of optimizations as\nfuture work.\nBrumley et al. have shown once a patch becomes avail-\n",
+    "bbox": [
+      55.742401123046875,
+      70.00572204589844,
+      296.33050537109375,
+      709.2031860351562
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:002",
+    "block_type": "text",
+    "text": "able, an attacker may be able to use it to reverse engineer the\nproblem and create an exploit automatically [10]. We leave\nexploring the ramiﬁcation of this problem as future work.\n",
+    "bbox": [
+      314.1339111328125,
+      70.02525329589844,
+      554.7123413085938,
+      105.58277130126953
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:003",
+    "block_type": "text",
+    "text": "VI. CONCLUSION\n",
+    "bbox": [
+      396.503173828125,
+      112.19126892089844,
+      472.3414306640625,
+      124.07666778564453
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:004",
+    "block_type": "text",
+    "text": "In this paper we presented ReDeBug, an architecture\ndesigned for unpatched code clone detection. ReDeBug\nwas designed for scalability to entire OS distributions, the\nability to handle real code, and minimizing false detec-\ntion. ReDeBug found 15,546 unpatched code clones, which\nlikely represent real vulnerabilities, by analyzing 2.1 billion\nlines of code on a commodity desktop. We demonstrate\nthe practical impact of ReDeBug by conﬁrming 145 real\nbugs in the latest version of Debian Squeeze packages. We\nbelieve ReDeBug can be a realistic solution for regular\ndevelopers to enhance the security of their code in day-to-\nday development.\n",
+    "bbox": [
+      314.13238525390625,
+      127.11289978027344,
+      554.7108764648438,
+      269.1949462890625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:005",
+    "block_type": "text",
+    "text": "ACKNOWLEDGMENT\n",
+    "bbox": [
+      391.40228271484375,
+      275.8034362792969,
+      477.438232421875,
+      287.6888122558594
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:006",
+    "block_type": "text",
+    "text": "This research was supported in part by sub-award\nPO4100074797 from Lockheed Martin Corporation originat-\ning from DARPA Contract FA9750-10-C-0170 for BAA 10-\n36. This research was also supported in part by the National\nScience Foundation through TeraGrid resources provided\nby Pittsburgh Supercomputing Center. We would like to\nthank the anonymous referees, Debian developers, Spencer\nWhitman, Edward Schwartz, JongHyup Lee, Yongsu Park,\nTyler Nighswander, and Maverick Woo for their feedback in\npreparing this paper.\n",
+    "bbox": [
+      314.13238525390625,
+      290.7401428222656,
+      554.7107543945312,
+      409.15032958984375
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:007",
+    "block_type": "text",
+    "text": "REFERENCES\n",
+    "bbox": [
+      406.7990417480469,
+      424.18218994140625,
+      462.0478820800781,
+      436.06756591796875
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:008",
+    "block_type": "text",
+    "text": "[1] Code Assurance.\nhttp://patterninsight.com/products/\ncode-assurance/. Page checked 3/4/2012.\n",
+    "bbox": [
+      319.0635986328125,
+      439.11541748046875,
+      554.7101440429688,
+      462.8368835449219
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:009",
+    "block_type": "text",
+    "text": "[2] Pittsburgh Supercomputing Center.\nhttp://www.psc.\nedu/. Page checked 3/4/2012.\n",
+    "bbox": [
+      319.0635986328125,
+      466.2397766113281,
+      554.7002563476562,
+      489.96124267578125
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:010",
+    "block_type": "text",
+    "text": "[3] QuickLZ.\nhttp://www.quicklz.com/.\nPage checked\n3/4/2012.\n",
+    "bbox": [
+      319.0635986328125,
+      493.3641357421875,
+      554.7100219726562,
+      517.0855712890625
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:011",
+    "block_type": "text",
+    "text": "[4] SimMetrics.\nhttp://sourceforge.net/projects/\nsimmetrics/. Page checked 3/4/2012.\n",
+    "bbox": [
+      319.0635986328125,
+      520.488525390625,
+      554.7100219726562,
+      544.2099609375
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:012",
+    "block_type": "text",
+    "text": "[5] Ira D. Baxter, Christopher Pidgeon, and Michael\nMehlich. DMS: program transformations for practical\nscalable software evolution. In Proceedings of the In-\nternational Conference on Software Engineering, 2004.\n",
+    "bbox": [
+      319.0635681152344,
+      547.6128540039062,
+      554.710205078125,
+      595.0064697265625
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:013",
+    "block_type": "text",
+    "text": "[6] Daniel Bernstein.\nhttp://www.cse.yorku.ca/∼oz/hash.\nhtml. Page checked 3/4/2012.\n",
+    "bbox": [
+      319.0635681152344,
+      598.4034423828125,
+      554.7041625976562,
+      622.1248779296875
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:014",
+    "block_type": "text",
+    "text": "[7] Al Bessey, Ken Block, Ben Chelf, Andy Chou, Bryan\nFulton, Seth Hallem, Charles Henri-Gros, Asya Kam-\nsky, Scott McPeak, and Dawson Engler. A few billion\nlines of code later: using static analysis to ﬁnd bugs in\nthe real world. Communications of the Association for\nComputing Machinery, 53(2):66–75, 2010.\n",
+    "bbox": [
+      319.0675964355469,
+      625.5277709960938,
+      554.7241821289062,
+      696.5935668945312
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:015",
+    "block_type": "text",
+    "text": "61\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 14,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:014:016",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

@@ -1,0 +1,33 @@
+Domain Concepts Introduced:
+- Speciﬁcally: Challenge 1: No Large-Scale Labeled Datasets.Developing large-scale annotated datasets mapping CVEs to ATT&CK TTPs is challenging [14] due to vague and ambiguous CVE descriptions, requiring expert annotators for precise alignment.
+- Existing datasets [4]–[8], [15], [16] remain limited, typically covering fewer than 8K of over 276K CVEs and fewer than 52 of 656 enterprise techniques [17], leading to poor model generalization.
+- Challenge 2: Difﬁculty in Accurately Mapping CVEs to TTPs.
+- Extracting attack behaviors from CVE descriptions and map- ping them to TTPs remains difﬁcult for both supervised and unsupervised methods [3], [10].
+- CVEs often contain irrelevant information (such as version histories, patch notes, or meta- data) that obscures exploitation details, reduces model effec- tiveness [18]–[20], and hinders detection of attack patterns [3], [9], [11], [21].
+- Variability in CVE length, structure, and extraneous content also consumes model capacity, especially for LLMs with token limits, lowering accuracy and efﬁciency.
+- Data imbalance in datasets leads to over- representation of certain TTPs, causing supervised models to favor common techniques and miss rare or emerging ones [14] (e.g., ENISA dataset [15], [16] has 2,699 CVEs for T1027 vs.
+- 427 forT1190), especially in multi-label cases where CVEs map to multiple TTPs [22].
+Task Definition:
+- Inferred from title and extracted sections: identify vulnerability-introducing commits, bug-introducing commits, vulnerable/affected versions, or evidence useful for version validation. [NEEDS CITATION VERIFICATION]
+Threat Model / Assumptions:
+- [NEEDS EVIDENCE] not asserted unless explicitly stated in the paper.
+Motivating Case:
+- Speciﬁcally: Challenge 1: No Large-Scale Labeled Datasets.Developing large-scale annotated datasets mapping CVEs to ATT&CK TTPs is challenging [14] due to vague and ambiguous CVE descriptions, requiring expert annotators for precise alignment.
+- Existing datasets [4]–[8], [15], [16] remain limited, typically covering fewer than 8K of over 276K CVEs and fewer than 52 of 656 enterprise techniques [17], leading to poor model generalization.
+- Challenge 2: Difﬁculty in Accurately Mapping CVEs to TTPs.
+- Extracting attack behaviors from CVE descriptions and map- ping them to TTPs remains difﬁcult for both supervised and unsupervised methods [3], [10].
+- CVEs often contain irrelevant information (such as version histories, patch notes, or meta- data) that obscures exploitation details, reduces model effec- tiveness [18]–[20], and hinders detection of attack patterns [3], [9], [11], [21].
+Why the Case Is Chosen:
+- [NEEDS EVIDENCE]
+Definitions Needed by Readers:
+- Vulnerability-introducing commit / bug-inducing commit, patch evidence, developer log, vulnerable version, SZZ-style tracing, depending on the paper scope.
+How Background Leads to Method:
+- system calls and provenance graphs, but these approaches do not apply to CVE-to-TTP mapping, which depends only on unstructured text.
+- TREC [88] uses few-shot learning on provenance graphs to detect APT tactics and techniques, and HOLMES [89] correlates audit-log ﬂows to recognize TTPs in real time; however, both require detailed runtime activity that CVE descriptions do not provide.
+- These studies use su- pervised models to map CVEs to ATT&CK techniques.
+- [7] rely on traditional models (random forests, SVMs), which struggle to capture the complex semantics needed for CVE-to-TTP mapping.
+Writing Pattern:
+- Build from concrete artifact evidence toward why naive blame or simple version matching is insufficient.
+Relevance to Our Paper:
+- Useful for affected versions background and related-work positioning.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json

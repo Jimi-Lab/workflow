@@ -1,0 +1,32 @@
+Problem:
+Security patches may not propagate to all copied code. These unpatched code clones can leave latent bugs or vulnerabilities in downstream projects and distributions.
+
+Gap:
+Prior clone-detection work can be more thorough but often does not scale to entire OS distributions, may depend on language-specific parsers, and can produce high false detection rates.
+
+Core Idea:
+ReDeBug occupies a conservative, syntax-based design point: it may miss some clones, but it gains scale, speed, language agnosticism, and lower matching-induced false detections.
+
+Method:
+The system normalizes source/patch code, tokenizes into n-token windows, uses Bloom filters/feature hashing for scalable matching, and performs exact-match post-processing to remove Bloom-filter errors.
+
+Evaluation Setup:
+The abstract states evaluation over Debian Lenny/Squeeze, Ubuntu Maverick/Oneiric, all SourceForge C/C++ projects, and the Linux kernel using 376 Debian/Ubuntu security-related patches. Exact dataset/table values require [NEEDS TABLE REPAIR].
+
+Main Results:
+The abstract reports processing over 2.1 billion lines of code, building at 700,000 LoC/min, checking 376 patches in 8 minutes, finding 15,546 unpatched copies, and confirming 145 real bugs. These numbers are from paper text; local reproduction is [EXECUTION NOT REQUESTED].
+
+Contribution Wording:
+The abstract uses a clear tradeoff contribution: "may find fewer clones, but gains scale/speed/lower false detections/language agnosticism."
+
+Limitations or Scope Boundaries:
+The method is intentionally conservative and syntax-based. It is not designed to find semantically equivalent but syntactically distant vulnerabilities.
+
+Reusable Writing Pattern:
+Present a severe operational problem, identify why existing high-accuracy methods fail at scale, then claim a deliberately conservative design point with measurable scale and impact.
+
+Relevance to Our Paper:
+High for related work and baseline motivation. It is a representative matching-based method that emphasizes vulnerable-code clone detection from patches.
+
+Do Not Borrow:
+Do not claim ReDeBug's performance can be reproduced from the local Python source; README says the S&P evaluation used a different faster C implementation.

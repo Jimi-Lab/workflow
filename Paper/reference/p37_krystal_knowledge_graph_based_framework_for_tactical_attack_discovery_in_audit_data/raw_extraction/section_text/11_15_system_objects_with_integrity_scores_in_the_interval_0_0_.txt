@@ -1,0 +1,420 @@
+15 System objects with integrity scores in the interval [0 . 0 − 0 . 5 | are considered 
+suspicious and scores in the interval [0 . 5 − 1 . 0] are considered benign. 
+16 SPARQL uses DELETE and INSERT to perform update operations on triple(s); 
+cf. https://www.w3.org/TR/sparql11-update/ 
+Listing 4. Attenuation rule for a benign write propagation. 
+viate this issue by considering objects imperfect intermediaries for 
+propagating malicious behavior through a benign process. In the 
+previous example (cf. Fig. 6 ), for instance, the low integrity process 
+p 1 writes a ﬁle f 1 , lowering its integrity. To avoid excessive propa- 
+gation to other objects from there, the integrity and conﬁdentiality 
+tags of a benign subject get attenuated before they propagate to 
+another benign object. This can be achieved by applying an addi- 
+tive factor af to the original tag value. 
+Tag decay is based on the assumption that in case a benign 
+subject gets compromised and becomes suspicious, it will do so 
+soon after consuming a suspicious input (e.g., read low integrity 
+ﬁle) ( Hossain et al., 2020 ). Consequently, this technique gradually 
+lifts the score of the low integrity subject and limits benign ob- 
+jects from being propagated and ﬂagged as suspicious, particularly 
+for long-running processes. 
+Listing 4 illustrates how the KRYSTAL framework enables declar- 
+ative deﬁnitions of such rules using SPARQL queries. It shows an 
+example of an attenuation rule for a benign write propagation that 
+checks for a < process > that :writes a conﬁdential < file > . 
+The rule gradually increments the conﬁdentiality tag ( :confTag ) 
+value ( ?sct ) of processes. 
+Provenance-Based Alerting Provenance-based alerting policies 
+detect attacks based on the simultaneous fulﬁllment of sev- 
+eral conditions in the provenance graph. These conditions (cf. 
+Hossain et al., 2020 ) take data integrity tags as well as informa- 
+tion associated with nodes (e.g., permissions, users) into account. 
+For example, a suspicious ﬁle execution can be detected under the 
+following alert policy: 
+• a ﬁle f is executed by a process p , 
+• f has a low integrity tag value ( < 0.5) and p is benign (integrity 
+> = 0.5). 
+The KRYSTAL framework facilitates provenance-based alerting by 
+expressing alert policies as SPARQL queries and matching them 
+against the provenance log graph. Listing 5 provides an exam- 
+ple of an alerting policy for suspicious ﬁle execution. The query 
+matches a ﬁle ( ?file ) with a low integrity value that has been 
+executed by a benign process. Speciﬁcally, ﬁles with a tag value 
+8 
+
+===== Page 008 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 7. Signature/rule-based threat detection example using the translated Sigma -rule query. 
+Listing 5. Alerting policy represented as SPARQL query. 
+below 0.5 are considered low integrity and the respective triple 
+?file :isExecutedBy ?process ) will be marked with the 
+detected rule. 17 
+Signature/Rule-based Threat Detection We complement the 
+provenance-based mechanisms with a signature/rule-based detec- 
+tion approach that utilizes IoC deﬁnitions to identify known at- 
+tacks in log events. This illustrates that the uniform KG representa- 
+tion facilitates the combination of a variety of approaches by using 
+a common declarative query language. 
+Signatures are an established and effective approach in de- 
+tecting known attack patterns, but maintaining the set of rules 
+and signatures can be labour-intensive ( Li et al., 2021 ). To tackle 
+this problem, KRYSTAL leverages Sigma 18 –a n open, shareable, 
+community-driven and generic rule format for threat detection in 
+logs. 
+Figure 7 part (1) shows an example of signature/rule-based 
+threat detection deﬁned in Sigma . 19 Each Sigma -rule is written 
+in YAML 20 and deﬁnes the detection rule and its metadata ( ti- 
+tle, id, date, author, log-source etc.). A key beneﬁt of these rules 
+is that the tags metadata links rules to speciﬁc TTPs from MITRE 
+ATT&CK. For example, attack.t1204.002 corresponds to the tech- 
+nique T1204.002 21 ( User Execution: Malicious File ). As per November 
+2021 22 , Sigma contains more than 1497 rules/signatures for differ- 
+ent log sources (e.g., application, network, web logs) and platforms 
+(e.g., Linux & Windows). 
+17 We used the SPARQL CONSTRUCT syntax to generate new triples and link the 
+detected alert to the respective rule. 
+18 https://github.com/SigmaHQ/sigma 
+19 https://github.com/SigmaHQ/sigma 
+20 https://en.wikipedia.org/wiki/YAML 
+21 https://attack.mitre.org/techniques/T1204/003/ 
+22 Last access: 11/26/2021 
+Our framework translates these Sigma rule speciﬁcations 23 au- 
+tomatically and transforms them into SPARQL query expressions. 
+Speciﬁcally, we identiﬁed two search-identiﬁers under the detec- 
+tion attribute: (i) lists that contain strings applied to the full log 
+message and joined with a logical ’OR’, and (ii) maps that consist 
+of key/value pairs, where key is a ﬁeld in the log data and value 
+is a string or integer. Lists of maps are joined with a logical “OR”
+while all elements of a map are joined with a logical “AND”. 
+We express lists as SPARQL ﬁlters with regex matching, while 
+maps are represented as triple patterns, i.e. Subject (S), Predicate 
+(P), and Object (O). S is a log object, P is a log property i.e., key/ﬁeld 
+in the log data and O is the value. Similar to lists , we express 
+the key/value pair matching using regex ﬁlters in SPARQL. Fur- 
+thermore, we also map and transform the rule metadata into RDF. 
+Figure 7 part (2) shows an example translation of a Sigma rule into 
+SPARQL and RDF. 
+The translated Sigma rules are executed against the provenance 
+graph to detect potential attacks/threats in the Threat Detection and 
+Alerting module of our framework. As we can see in Fig. 7 part (3), 
+we detect an alert called “Program Executions in Suspicious Folder ”
+in the provenance graph since the execution of the /tmp/vUgefal 
+process is located in the /tmp/ folder as deﬁned in the Sigma rule. 
+Subsequently, the generated alert will be linked automatically to 
+the T1204.002 ( User Execution: Malicious File ) technique from the 
+ATT&CK knowledge graph ( Kurniawan et al., 2021 ) in the back- 
+ground knowledge (cf. Fig. 7 part (4)). We explain this linking 
+mechanism further in Section 6.3 . 
+6.3. Attack graph reconstruction 
+The next important step once the provenance graph has been 
+constructed and alerts have been raised is to understand how the 
+alerts are connected and to reconstruct potential attack steps. To 
+this end, we construct an attack graph and the attack scenario 
+out of the provenance graph through (i) Backward-Forward Chain- 
+ing and (ii) Graph Querying . 
+Backward-Forward Chaining Backward-Forward Chaining is 
+used to ﬁrst identify the potential root cause of an attack and then 
+reconstruct the overall attack steps. As provenance-based alerting 
+may produce a lot of alerts, we need to prioritize them and iden- 
+tify potential root cause alerts of an attack. This can be done by 
+assigning an alert score during backward searching , i.e., increment- 
+ing alert scores of each predecessor alert on a path. 
+23 https://github.com/SigmaHQ/sigma/wiki/Speciﬁcation 
+9 
+
+===== Page 009 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Listing 6. Backward searching expressed as SPARQL query. 
+Listing 7. Forward chaining mechanism expressed as SPARQL query. 
+For this search, we leverage Property Paths 24 , a SPARQL feature 
+that allows us to ﬁnd routes between nodes in the RDF provenance 
+graph. Recall that we used rdfs7 inference to automatically gener- 
+ate an upper-level relation :provRel between system objects. 
+As shown in Listing 6 , the backward search query consists of 
+a triple pattern [ ?currentAlert ∧ :provRel ∗ ?s ], in which 
+∧ . ∗ represents the property path that ﬁnds all possible back- 
+ward connections from a node ?currentAlert to a node ?s 
+via the relation property :provRel , where ?s is classiﬁed as 
+part of another alert. We represent this condition as an RDF-star 25 
+statement, i.e., [ << ?s ?p ?o >> rule:hasDetectedRule 
+?rule ]. 
+Next, we iteratively update the alert scores for each prede- 
+cessor alert (+1). After scoring all alerts, we can construct attack 
+sequences, starting with the alerts with the highest values and 
+performing forward chaining to construct attack scenario graphs. 
+We use the same technique as we did for backward chaining, 
+i.e., property paths to ﬁnd forward routes connected to the de- 
+ﬁned starting nodes. Listing 7 shows the generic SPARQL query 
+to construct an attack scenario from the provenance graph. From 
+the ?startingNode , it ﬁnds possible routes and visits connected 
+nodes via the :provRel relation. A threshold deﬁnes which nodes 
+will be connected, e.g., only low integrity nodes with an integrity 
+tag lower than 0.5. 
+Graph Querying Graph querying can detect attack behavior in a 
+provenance graph based on attack patterns. The graph query pat- 
+terns can be constructed from observed behavior or existing in- 
+formation in published CTI, incident reports, public malware doc- 
+umentation, etc. Based on that, the patterns can be constructed 
+manually or –p o t e n t i a l l y –a l s o through automated extraction 
+methods such as AttacKG ( King and Chen, 2003b ). 
+Figure 8 visualizes a graph query example. A subset of the 
+graph (red box) represents an observed attack pattern inside the 
+provenance graph. Unlike previous work ( Gao et al., 2018a; 2018b; 
+Milajerdi et al., 2019a ) that use custom domain-speciﬁc languages 
+to perform graph querying, KRYSTAL provides a uniform graph 
+querying mechanism with a high expressivity through SPARQL. Fur- 
+thermore, it also supports linking to other datasets. 
+To formulate graph patterns in SPARQL 26 , we can deﬁne sys- 
+tem object types as nodes (i.e., via Classes ) and their interac- 
+tions as relation properties (i.e., via Object Properties ). The formu- 
+lated graph queries can be executed against the provenance graphs 
+24 https://www.w3.org/TR/sparql11-query/#propertypaths 
+25 https://w3c.github.io/rdf- star/cg- spec/editors _ draft.html 
+26 Graph pattern that identiﬁes a speciﬁc known attack pattern; deﬁned based on 
+the DARPA Transparent Computing TA5.1 Ground Truth Report ( DAR, 2021 ). 
+Fig. 8. Graph query alignment example: Graph query (red box) is aligned over the 
+provenance graph to detect potential attack patterns. The constructed attack graph 
+below represents a detected pattern. (For interpretation of the references to colour 
+in this ﬁgure legend, the reader is referred to the web version of this article.) 
+Listing 8. SPARQL graph query 26 for Fig. 8 . 
+to match potential attack patterns. Listing 8 27 depicts an exam- 
+ple graph query visualized in Fig. 8 . It detects a potential attack 
+where a browser receives a connection from a socket ( ?socket 
+:isReceivedBy ?browser ). The fact that ?browser is of 
+type :Browser is established in the background knowledge (i.e. 
+< http://w3id.org/sepses/..knowledge > ). The SPARQL 
+query federation mechanism is used to include the background 
+knowledge in the query ( SERVICE syntax). 
+Subsequently, the browser creates a ﬁle in the local system 
+(deﬁned by ?browser :writes ?file1 ). This ﬁle is then exe- 
+27 Note that the automatic construction of graph patterns from existing resources 
+is out of scope for this paper. 
+10 
+
+===== Page 010 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 9. Background linking example, to automatically link alerts detected by the 
+threat detection module to external background knowledge (e.g. ATT&CK-KG). 
+cuted as a new process ( :file1 :isExecutedBy :process2 ) 
+and reads another conﬁdential ﬁle ( ?file1 :reads ?file2 ). 
+Next, the process sends the conﬁdential ﬁle to another socket 
+( process :sends ?socket2 ). We can use the FILTER syntax 
+(i.e. FILTER (?fit < 0.5) ) to focus on conﬁdential ﬁles (i.e., 
+with a tag value ( ?file2 rule:confTag ?fit ) lower than 
+0.5). 28 
+To reconstruct the resulting attack graph, we used SPARQL 
+CONSTRUCT queries to generate new triples in RDF. The generated 
+attack graph can be shared and reused – e.g., for further threat 
+hunting activities and analysis. 
+6.4. Contextualization & linking 
+Security-related events are typically highly context-speciﬁc and 
+hence, their interpretation requires extensive background knowl- 
+edge ( Ekelhart et al., 2018 ). Such knowledge plays an important 
+role in our approach and can enrich and provide additional infor- 
+mation – e.g., to identify high-level attack steps in the generated 
+attack graph. 
+In particular, we link results to our previously developed SEPSES 
+CSKG ( Kiesling et al., 2019 ), a continuously updated cybersecu- 
+rity knowledge graph that integrates data from various publicly 
+available sources, including CAPEC, CPE, CVE, CVSS, and CWE. Fur- 
+thermore, we extend the SEPSES CSKG with attack patterns from 
+MITRE ATT&CK that consist of 665 attack techniques and 14 attack 
+tactics (ATT&CK-KG Kurniawan et al., 2021 ). 
+Figure 9 illustrates this background knowledge link- 
+ing. The example relation :isExecutedBy between a ﬁle 
+:/home/admin/clean and a process :Clean can be linked to 
+attack techniques and tactics in the background knowledge: in this 
+case, the technique “exploitation for client execution ”, identiﬁed by 
+node :T1203 ) from the MITRE ATT&CK matrix 29 ( Kurniawan et al., 
+2021 ). Since node :T1203 also provides links to additional infor- 
+mation (tactics, mitigations, etc.), we can use this node to abstract 
+from concrete indicators to a higher-level conceptualization of 
+attacks and their techniques, tactics, procedures. 
+Listing 9 shows an excerpt of background linking dur- 
+ing forward chaining via SPARQL query federation. We mod- 
+iﬁed the query from Listing 7 and introduced additional 
+28 Recall that semantic reasoning infers the type (i.e. Class ) of system objects auto- 
+matically based on their relations (i.e., rdfs2 & rdfs3 ), hence, we can deﬁne attack 
+patterns based on their relations only. 
+29 https://attack.mitre.org/techniques/T1203/ 
+Listing 9. Contextualization and linking through semantic query federation 
+(SPARQL Service). 
+Fig. 10. Implementation Setup. 
+query patterns such as SERVICE followed by an endpoint e.g. 
+http://w3id.org/sepses/repositories/knowledge which references exter- 
+nal background knowledge. This links a detected rule with a cor- 
+responding attack technique in the background knowledge (iden- 
+tiﬁed by the triple pattern ?r rule:hasAttackTechnique 
+?tech ). Finally, we also link the identiﬁed technique to a tactic 
+(identiﬁed by ?tech at:accomplishesTactic ?tt ). This il- 
+lustrates how the SPARQL federation mechanism makes it possible 
+to query and link an entity to additional resources, such as mitiga- 
+tion techniques, impacts, etc. 
+7. Implementation & application scenarios 
+In this section, we describe the implementation of our frame- 
+work and demonstrate its feasibility in several scenarios. 
+7.1. Implementation 
+Figure 10 visualizes the implementation architecture of our ap- 
+proach. We developed a Java-based log processing tool called the 
+KRYSTAL engine 30 that consumes log data from three different log 
+sources, i.e., Linux auditd , FreeBSD DTrace 31 , and Windows ETW . 
+We used the KRYSTAL Ontology to parse and map log data into 
+an RDF-based provenance graph. By means of the Jena 32 reason- 
+ing engine, we can infer new knowledge during provenance graph 
+building. 
+30 https://github.com/sepses/SimpleLogProvenance 
+31 https://wiki.freebsd.org/DTrace/ 
+32 https://jena.apache.org/documentation/inference/ 
+11
+
+===== Page 011 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 3 
+Attack Scenarios. 
+Scenario 
+ID Dataset ID OS Platform Scenario Name Scenario description 
+1 Cadets I FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . An attacker sent a malformed HTTP request to a 
+vulnerable Nginx web server that leads to several malicious ﬁle creations and process 
+executions in the local system ( Figure 11 ). 
+2 Cadets I FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . A vulnerable Nginx webserver downloads several 
+malicious ﬁles after being exploited by a malformed HTTP request ( Figure 12 ). 
+3 Cadets II FreeBSD Nginx 
+backdoor 
+Nginx backdoor w/ Drakon in-memory . Similar to Scenario 3, the vulnerable Nginx webserver 
+was successfully exploited by an attacker. It downloads a payload ﬁle which leads to 
+sensitive information leaking ( Figure 13 ). 
+4 Theia Ubuntu 
+12.04 
+Firefox 
+backdoor 
+Firefox backdoor w/ Drakon in-memory . Firefox process gets exploited by a malicious website 
+to download and execute ﬁles to steal sensitive information from users ( Figure 11 ). 
+5 Five 
+Direction 
+Windows 
+10 
+Firefox 
+backdoor 
+Firefox backdoor w/ Drakon in-memory . Firefox process gets exploited via a drakor memory 
+payload after browsing a malicious website ( Figure 15 ). 
+Furthermore, we extended the existing SEPSES Cybersecurity 
+Knowledge Graph ( Kiesling et al., 2019 ) by including attack tech- 
+niques and tactics from MITRE ATT&CK and incorporate it as exter- 
+nal background knowledge. Furthermore, we translate existing IoC 
+Sigma ( Roth and Patzke, 2021 ) rules into SPARQL queries. 
+To construct attack graphs (through backward-forward chaining 
+and graph querying ), link internal and external background knowl- 
+edge (via SPARQL query federation), as well as to visualize the re- 
+sulting attack graphs, we use the in-memory Jena TDB 33 and the 
+Stardog Enterprise Knowledge Graph platform . 34 
+7.2. Application scenarios 
+In the following application scenarios, we demonstrate how 
+the KRYSTAL framework automatically constructs compact attack 
+graphs, links and contextualizes them with background knowledge, 
+and ﬁnally maps them to high-level attack steps via TTPs deﬁned 
+in MITRE ATT&CK. 
+We use a DARPA dataset ( DAR, 2021 ) that contains attack sce- 
+narios carried out by a red team as part of the DARPA Transpar- 
+ent Computing (TC) program. An overview of the attack scenarios 
+can be found in Table 3 . Due to space limitation, we only explain 
+one scenario in this section (Scenario 1), and include the remaining 
+scenarios in the appendix. Scenario 1 - Nginx backdoor w/ Drakon 
+in-memory This attack scenario has been used as motivation exam- 
+ple in Section 1 . As shown in Fig. 11 , our system detected a num- 
+ber of alerts including ﬁle creation, change permission, ﬁle execu- 
+tion, and data-leak . After performing backward and forward chain- 
+ing, we successfully constructed the attack graph of this scenario. 
+Furthermore, we performed query federation during forward chain- 
+ing to include external background knowledge. Our query yields 
+an attack graph that automatically links the detected alerts to the 
+MITRE ATT&CK techniques and tactics. Finally, we can see the re- 
+constructed attack graph together with its kill-chain phases such 
+as Reconnaissance, Defense Evasion, Execution and Exﬁltration . 
+8. Evaluation 
+In this section, we evaluate the KRYSTAL framework through a 
+set of experiments and discuss the results. 
+8.1. Experimental setup 
+We performed the experiments on two machines: (i) an Ubuntu 
+18.04 Server (Intel 2.59 GHz vCPU, 32 GB RAM) was used for 
+provenance graph building and evaluation of threat detection and 
+alerting techniques. (ii) a Windows 10 (Intel 2.90 GHz vCPU, 16 GB 
+33 https://jena.apache.org/documentation/tdb/ 
+34 https://www.stardog.com/platform/ 
+RAM) machine was used for scenario reconstruction, graph query- 
+ing and attack graph visualization using Stardog Studio . 35 
+Dataset Overview For the evaluation, we used well-established 
+datasets from red vs. blue team adversarial engagements produced 
+as part of the third Transparent Computing (TC) program organized 
+by DARPA ( DAR, 2021 ). The datasets are organized into ﬁve cat- 
+egories, namely Cadets, Trace, Theia, FiveDirections and ClearScope . 
+Each dataset includes log events generated during the engage- 
+ments on a speciﬁc targeted host and platform. For example, Cadets 
+represents dtrace 36 log data from FreeBSD OS, Trace and Theia have 
+been generated from auditd 37 Ubuntu log data, and FiveDirection 
+contains ETW 38 log data from Microsoft Windows and ClearScope 
+collected from Android logs. In addition, a description of attack 
+steps is available as ground truth. Table 4 summarizes the ﬁve at- 
+tack scenarios from the Theia (TH), Cadets (CD), and FiveDirection 
+(FD) datasets that we evaluated. In total, the scenarios covers more 
+than 7 days of log data from three datasets, with more than 53 GB 
+of logs in JSON format. 39 
+8.2. Experiment results 
+We collect the following evaluations metrics in our experi- 
+ments: (i) provenance graph size reduction and compression per- 
+formance, (ii) run-time performance, (iii) provenance-based alert 
+detection, (iv) rule-based alert detection. 
+Graph Size Reduction & Compression Performance Table 4 shows 
+the evaluation results for provenance graph generation and com- 
+pression in the ﬁve scenarios. 
+Our system generates RDF-based provenance graphs in RDF 
+TURTLE format. 40 Out of the 18.7 GB Theia log dataset, for instance, 
+we generated a 280 MB provenance graph (i.e., 66x smaller), the 
+set of Cadets datasets (19 GB) resulted in a 400 MB provenance 
+graph (i.e., 48x smaller), and out of the Five direction dataset 
+(16 GB), we generated a 25 MB provenance graph (i.e., 640x 
+smaller). 
+The last column of Table 4 shows the compression re- 
+sults of the generated provenance graphs for each dataset in 
+HDT ( Fernández et al., 2013 ) format. On average, the resulting com- 
+pressed provenance graphs are approximately smaller by a factor 
+of 22 than the generated provenance graphs in TURTLE format. 
+Run-time Performance We evaluate three aspects to measure 
+the run-time performance of our approach: (i) Time for generating 
+the provenance graphs from the log data, including time for tag- 
+propagation, attenuation & decay and provenance-based alerting ; (ii) 
+35 https://www.stardog.com/studio/ 
+36 https://en.wikipedia.org/wiki/DTrace 
+37 https://linux.die.net/man/8/auditd 
+38 https://docs.microsoft.com/en-us/windows/win32/etw/event-tracing-portal 
+39 Note that DARPA published the datasets in both binary and JSON formats, we 
+used the JSON data as input in our evaluation. 
+40 https://www.w3.org/TR/turtle/ 
+12 
+
+===== Page 012 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 11. Scenario 1 ( Nginx backdoor w/ Drakon in-memory ). This attack begins with a vulnerable Nginx web server hosted on a FreeBSD server that gets exploited by a 
+malformed HTTP request. The exploit leads to multiple ﬁle creations on the local system. The attacker successfully creates an executable ﬁle (“/tmp/XIM”), changes the 
+permissions and runs it as an elevated process. This process reads a sensitive ﬁle (“/etc/passwd”) and forwards data to an external network ( 53.158.101.118:80 ). 
+Table 4 
+Graph size reduction & compression. 
+Scenario ID Dataset ID Duration (hh:mm) Log data in JSON (GB) Prov. in RDF (MB) Prov. in HDT (MB) 
+1,2 CD I 48:59 7 150 7 
+3 CD II 90:01 12 250 10 
+4 TH 25:33 18.7 280 16 
+5 FD 19:27 16 25 0.9 
+Table 5 
+Scenario graph construction run-time. 
+Scenario ID Total Events (M) Prov. Graph Building & Alerting (events/sec) Forward Chaining (sec) Graph Querying (sec) 
+1,2 7.8 16.8 K 0.79 0.31 
+3 12.9 17.5 K 0.99 0.26 
+4 23.4 15.6 K 1.6 0.41 
+5 19.3 37.8 K 1.99 0.42 
+Time for constructing the scenario graphs via list:forward-chaining ; 
+and (iii) Time for generating scenario graphs through graph query- 
+ing . 
+We repeated each experiment ﬁve times and present average

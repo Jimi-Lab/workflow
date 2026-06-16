@@ -1,0 +1,110 @@
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:7
+SMU Classification: Restricted
+Preparation
+ Commits Identification
+root 
+cause
+related 
+files
+… 
+  flush_work(&deferred_probe_work);
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list,    
+deferred_probe)
++             dev_info(private->device, "deferred probe pending\n");
+…
+…
+  flush_work(&deferred_probe_work);
+  list_for_each_entry_safe(private, p,  &deferred_probe_pending_list, 
+deferred_probe)
+- dev_info(private->device, "deferred probe pending");
+  …
+Based on the commit message, the root cause 
+and the patch provided below, you need to:
+1. explain how the bug occurs, including code 
+statements that are likely to lead to the bug 
+and why. 
+2. explain how the bug is fixed, including code 
+statements fixing the bug and why. 
+Prompt
+LLM hints
+and 𝑪𝑪𝒇𝒇𝒇𝒇𝒇𝒇
+^ 1𝑪𝑪𝒇𝒇𝒇𝒇𝒇𝒇refined contexts for
+The code statements that lead to the bug are:
+…
+Reason:
+…
+The code statements that fix the bug are:
+Reason:
+…
+bug-fixing
+commit
+Based on the summary and commit 
+message, you need to:
+1. analyze the root cause of the bug in 
+detail. 
+2. output the file name that is most 
+likely to cause the bug.
+Prompt
+shuffle expanded
+context
+refine
+You will be given details about a bug, including:
+[a commit with refined context]
+[root cause]
+[LLM hints]
+Based on these details, your task is to 
+determine whether the provided code snippet 
+contains the bug.
+Prompt
+ability check
+Rank-based 
+identificationshuffled 
+patch
+context 
+expanding
+LLM
+1
+2
+3
+4
+Context-enhanced Assessment
+Context-enhanced
+identification
+Change 
+summary
+buggy statements
+Fig. 3. Overview of LLM4SZZ
+LLM demonstrates this ability, we employ the context-enhanced identification approach during the
+commit identification process; otherwise, we fall back to the rank-based identification approach.
+3.1 Preparation
+In this step, we use the large language model (LLM) to analyze bug-fixing commits. We aim to
+summarize the root cause of the bug based on the bug-fixing commit and filter out irrelevant files.
+In motivation example one, we have shown that irrelevant files undermine the LLM’s ability and
+we need to filter them out.
+Following the chain-of-thought (CoT) concept [Wei et al . 2022], we first require the LLM to
+analyze the patch, summarizing the modifications and their interrelationships within the bug-fixing
+commit. Next, we ask the LLM to identify the root cause of the bug and the related files based on
+the modification summary and the commit message.
+To enhance performance when handling large bug-fixing commits with multiple modified files,
+we employ two additional approaches. First, we shuffle the sequence of modified files in the patch,
+ensuring that each file has an equal chance of being identified as related to the root cause. Previous
+studies [Liu et al. 2024] reveal that LLMs tend to ignore content in the middle of text when handling
+long texts. Second, we run the LLM three times for the same question and shuffle the patch at each
+run-time. This approach is similar to a voting system [Wang et al. 2022]. However, instead of only
+considering files with majority votes, we take a more conservative approach: if a file name appears
+in any of the LLM outputs, we regard it as related to the root cause. This strategy helps minimize
+the risk of omitting important files. After this step, we obtain the root cause of the bug and filter
+out all irrelevant files.
+3.2 Context-Enhanced Assessment
+In this section, we explain the necessity of the assessment and our approach to it. In the first
+motivation example, we demonstrate that LLMs can determine whether a bug exists in a commit,
+allowing us to use them to select the final bug-inducing commit from a set of candidates. The second
+example illustrates that providing more context can enhance the LLM’s ability to understand the
+patch and help identify buggy statements more accurately. However, previous studies in automatic
+program repair have shown that LLMs still do not comprehend certain bugs [Bouzenia et al .
+2024; Parasaram et al. 2024], even with enough context. This indicates that LLMs are unable to
+determine whether these kinds of bugs exist in programs because they cannot understand the bugs.
+If LLMs cannot understand the bug even with additional context, providing more context becomes
+meaningless, and alternative methods are required to address these cases. Therefore, it is crucial to
+assess the LLM’s ability to comprehend the bug and identify its presence.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

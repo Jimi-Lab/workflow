@@ -1,0 +1,137 @@
+[
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2235",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:002",
+    "block_type": "text",
+    "text": "Fig. 8.\nComparative Outputs for the Same Input Across Different Models:\nGPT-4, CodeT5+, and CodeGen2.0.",
+    "bbox": [
+      37.58,
+      597.63,
+      288.65,
+      615.5
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:003",
+    "block_type": "text",
+    "text": "After using the same prompt with CodeT5+ and CodeGen2.0,\nwe found that neither model provided a reasonable answer\nbased on the bug-ﬁxing commit. For instance, when querying\nCodeT5+ about Cross-File Detections, where the bug-inducing\ncommit is not in the same ﬁle as the bug-ﬁxing commit, we\nsought to identify which ﬁle in the Linux kernel might be\nresponsible. Unlike GPT-4, which typically suggests potential\nﬁlenames or directories, CodeT5+ and CodeGen2.0 returned\na nonsensical sentence. For example, as shown in Fig. 8, all",
+    "bbox": [
+      37.58,
+      637.64,
+      288.65,
+      744.4
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:004",
+    "block_type": "text",
+    "text": "Fig. 9.\nExample of Failure Reason: Mapping Ghost.",
+    "bbox": [
+      300.6,
+      141.64,
+      478.83,
+      150.53
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:005",
+    "block_type": "text",
+    "text": "three models were prompted to identify which Linux kernel\nﬁle might be the cause of the bug-ﬁxing commit 1e45d043 (as\nillustrated in Fig. 8(a)). GPT-4 correctly identiﬁed the potential\ndirectories related to the bug-inducing commit, and its response\nis displayed in Fig. 8(b). In contrast, CodeT5+ repeated re-\nsponded with “#PF error: [normal kernel read fault]” (Fig. 8(c)),\na sentence from the bug-ﬁxing commit itself, offering no insight\ninto the ﬁlename. CodeGen2.0’s response was also off target,\nreturning unrelated license content, as detailed in Fig. 8(d).\nSimilarly, with Function-Blame Detections, when attempting\nto use prompts to have CodeT5+ or CodeGen2.0 pinpoint the\nproblematic line, both failed to specify a line, instead generating\nan extensive amount of code.\nOur results demonstrate a signiﬁcant limitation in the ca-\npabilities of current models, such as CodeT5+ and CodeGen,\nto offer precise, context-relevant assistance in identifying bug-\ninducing commits, particularly in complex scenarios involving\ncross-ﬁle analysis and speciﬁc line identiﬁcation within large\ncodebases like the Linux kernel. It also motivates the need for\ndeveloping more sophisticated LLMs, incorporating instruction\ntuning and domain knowledge, to improve performance in de-\ntecting bug-inducing commits, possibly even surpassing GPT-\n4’s capabilities.",
+    "bbox": [
+      300.6,
+      173.56,
+      551.72,
+      447.7
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:006",
+    "block_type": "text",
+    "text": "VIII. DISCUSSION",
+    "bbox": [
+      389.64,
+      467.31,
+      462.62,
+      478.42
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:007",
+    "block_type": "text",
+    "text": "Although we categorized the failures of SZZ algorithms\nbased on their location (i.e., function-log, within-ﬁle, or cross-\nﬁle detection) in Section VI-C, we did not explore the reasons\nbehind these failures, which could lead to improvements in the\nSZZ algorithm. In this section, we give a brief discussion based\non our qualitative analysis.\n(1) Mapping Ghost: This category of cases are similar to the\nRemove Mapping Ghost situation, where the lines removed in\nthe bug-ﬁxing commit do not directly assist in identifying the\nbug-inducing commit. However, they are crucial for resolving\nthe bug. For instance, as shown in Fig. 9, in the bug-ﬁxing\ncommit 5e154df,25 the ﬁx creates a wrapper that causes the\noriginal function to be called via a function pointer (line 1818-\n1821). Thus, it is necessary to change the name of the original\nfunction (line 1655), and this is an integral part of the bug ﬁx.\nHowever, the removed line in line 1655, while crucial for the\nbug-ﬁx, does not assist in identifying the bug-inducing commit.\nThe core issue lies in the absence of a functionality rather than\na defect in the existing functionality.",
+    "bbox": [
+      300.6,
+      485.23,
+      551.71,
+      711.55
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:008",
+    "block_type": "text",
+    "text": "25https://github.com/torvalds/linux/commit/5e154dfb4f9995096aa6d342df7\n5040ae802c17e",
+    "bbox": [
+      300.6,
+      725.08,
+      550.37,
+      743.96
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 17,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:017:009",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

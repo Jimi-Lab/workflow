@@ -1,0 +1,46 @@
+ABSTRACT
+Despite the security community’s best eﬀort, the number
+of serious vulnerabilities discovered in software is increasing
+rapidly. In theory, security audits should find and remove
+the vulnerabilities before the code ever gets deployed. How-
+ever, due to the enormous amount of code being produced,
+as well as a the lack of manpower and expertise, not all code
+is suﬃciently audited. Thus, many vulnerabilities slip into
+production systems. A best-practice approach is to use a
+code metric analysis tool, such as Flawfinder, to flag poten-
+tially dangerous code so that it can receive special attention.
+However, because these tools have a very high false-positive
+rate, the manual eﬀort needed to find vulnerabilities remains
+overwhelming.
+In this paper, we present a new method of finding poten-
+tially dangerous code in code repositories with a significantly
+lower false-positive rate than comparable systems. We com-
+bine code-metric analysis with metadata gathered from code
+repositories to help code review teams prioritize their work.
+The paper makes three contributions. First, we conducted
+the first large-scale mapping of CVEs to GitHub commits
+in order to create a vulnerable commit database. Second,
+based on this database, we trained a SVM classifier to flag
+suspicious commits. Compared to Flawfinder, our approach
+reduces the amount of false alarms by over 99 % at the same
+level of recall. Finally, we present a thorough quantitative
+and qualitative analysis of our approach and discuss lessons
+learned from the results. We will share the database as
+a benchmark for future research and will also provide our
+analysis tool as a web service.
+Categories and Subject Descriptors
+D.2.4 [Software Engineering]: Software/Program Verifi-
+cation; K.6.5 [ Management of Computing and Infor-
+mation Systems]: Security and Protection
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full cita-
+tion on the first page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior specific permission
+and/or a fee. Request permissions from Permissions@acm.org.
+CCS’15,October 12-16, 2015, Denver, Colorado, USA.
+c⃝2015 ACM. ISBN 978-1-4503-3832-5/15/10 ...$15.00.
+DOI: http://dx.doi.org/10.1145/2810103.2813604.
+Keywords
+Vulnerabilities; Static Analysis; Machine Learning

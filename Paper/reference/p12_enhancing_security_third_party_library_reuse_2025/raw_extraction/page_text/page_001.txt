@@ -1,0 +1,93 @@
+Enhancing Security in Third-Party Library Reuse -
+Comprehensive Detection of 1-day Vulnerability
+through Code Patch Analysis
+Shangzhi Xu§, Jialiang Dong §, Weiting Cai†, Juanru Li ‡, Arash Shaghaghi §, Nan Sun §, Siqi Ma §*
+§The University of New South Wales
+Emails: {shangzhi.xu, jialiang.dong, a.shaghaghi, nan.sun, siqi.ma }@unsw.edu.au
+†Delft University of Technology
+Email: weitingcai2020@gmail.com
+‡Feiyu Tech
+Email: romangol t@hotmail.com
+Abstract—Nowadays, software development progresses
+rapidly to incorporate new features. To facilitate such growth
+and provide convenience for developers when creating and
+updating software, reusing open-source software (i.e., third-
+party library reuses) has become one of the most effective
+and efficient methods. Unfortunately, the practice of reusing
+third-party libraries (TPLs) can also introduce vulnerabilities
+(known as 1-day vulnerabilities) because of the low maintenance
+of TPLs, resulting in many vulnerable versions remaining in
+use. If the software incorporating these TPLs fails to detect the
+introduced vulnerabilities and leads to delayed updates, it will
+exacerbate the security risks. However, the complicated code
+dependencies and flexibility of TPL reuses make the detection of
+1-day vulnerability a challenging task. To support developers in
+securely reusing TPLs during software development, we design
+and implement V ULTURE , an effective and efficient detection
+tool, aiming at identifying 1-day vulnerabilities that arise from
+the reuse of vulnerable TPLs. It first executes a database creation
+method, TPLF ILTER , which leverages the Large Language
+Model (LLM) to automatically build a unique database for the
+targeted platform. Instead of relying on code-level similarity
+comparison, V ULTURE employs hashing-based comparison to
+explore the dependencies among the collected TPLs and identify
+the similarities between the TPLs and the target projects.
+Recognizing that developers have the flexibility to reuse TPLs
+exactly or in a custom manner, V ULTURE separately conducts
+version-based comparison and chunk-based analysis to capture
+fine-grained semantic features at the function levels. We applied
+VULTURE to 10 real-world projects to assess its effectiveness
+and efficiency in detecting 1-day vulnerabilities. V ULTURE
+successfully identified 175 vulnerabilities from 178 reused TPLs.
+I. I NTRODUCTION
+As software evolves various innovative functionalities
+nowadays (e.g., AI-based classification, unmanned operations),
+it makes software increasingly complicated and challenging to
+develop and maintain because of intricate dependencies among
+its massive functions. Open-source software (OSS) reuse en-
+ables developers to integrate the functionalities faster, which
+facilitates more efficient development and code maintenance.
+Simultaneously, reusing OSS supports flexible development of
+features because developers can either deploy OSS as TPLs
+exactly or in a custom manner [46]. However, this convenience
+also makes it more likely for developers to unintentionally in-
+troduce vulnerabilities, known as 1-day vulnerabilities, through
+TPL reuse [21] [43]. Such security issues are commonly
+brought because 1) some TPLs may no longer be actively
+maintained anymore, leaving their functionalities incomplete
+or vulnerable to security risks, especially when vulnerabilities
+are exploited; 2) the decentralized nature of OSSes makes it
+difficult to keep track of all code changes made by contributors,
+complicating the enforcement of security reviews and practices
+when reusing the TPLs; 3) TPLs are not always developed by
+following the best practices, which can make them more vul-
+nerable. For instance, MOVEit Transfer, a file transfer project,
+experienced a security breach due to SQL injection in June
+2023, which puts all dependent software at risk of unauthorized
+access; thus the dependent software is required to install the
+patched version to safeguard their data promptly [35].
+To explore 1-day vulnerabilities brought by TPL reuses,
+some studies [26] [28] [48] only analyze the reuses without
+any modifications (i.e. exact reuse) by employing similarity
+comparison, which identifies whether the functions from TPLs
+are invoked in the target program. Unfortunately, exact reuse
+is only a small portion of TPL reuse because of its functional
+restrictions during software development. The flexibility of
+custom TPL reuse enhances functionality customization, yet
+it simultaneously introduces challenges in recognizing TPL
+reuse and detecting 1-day vulnerabilities caused by TPL reuse.
+Although some existing tools, such as V1SCAN [46] and
+MVP [51], claimed that they are capable of analyzing custom
+TPL deployment, these tools can only handle simple custom
+reuses with minor modifications, which leaves the problem far
+away from being fully resolved. Making 1-day vulnerability
+detection more complicated, developers may fix vulnerable
+TPL functions in a custom way, rather than using official
+updates or upgrading the entire TPLs [19].
+To bridge the above gaps, we propose V ULTURE , a novel
+vulnerability detection tool, to explore the potential 1-day vul-
+Network and Distributed System Security (NDSS) Symposium 2025
+24-28 February 2025, San Diego, CA, USA
+ISBN 979-8-9894372-8-3
+https://dx.doi.org/10.14722/ndss.2025.240576
+www.ndss-symposium.org

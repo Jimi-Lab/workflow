@@ -1,0 +1,19 @@
+System Overview: VUDDY uses two stages: preprocessing and clone detection.
+Pipeline Stages:
+1. Function retrieval.
+2. Abstraction and normalization.
+3. Fingerprint generation from normalized function body length and hash.
+4. Key lookup by length.
+5. Hash lookup inside the length bucket.
+6. Vulnerability database construction and clone checking for vulnerable functions.
+Core Algorithm: Function-level fingerprint tuple plus length-classified dictionary membership tests; exact symbolic formatting requires formula/layout repair.
+Data Structures: Fingerprint dictionary keyed by normalized function length and mapped to hash sets; local source includes hidx-oriented scripts and checker entrypoints.
+Model / Agent Components: none.
+Design Choices: Function-level granularity and length-first lookup trade broad semantic clone coverage for scalability and low-cost exact/abstract matching.
+Why Each Choice Is Needed: Function-level extraction makes indexing manageable; abstraction handles common renaming/comment/format changes; length keys reduce hash comparison space.
+Failure Handling: [NEEDS EVIDENCE] Runtime behavior was not checked.
+Complexity / Cost Discussion: Text layer states O(1) average membership lookup and scale claims, but exact numeric reuse needs table repair.
+Pseudocode or Algorithm Blocks: not cleanly extracted. [NEEDS ALGORITHM REPAIR]
+Static Reproducibility Signals: hmark.py, parseutility2.py, checker/check_clones.py, src/vul_hidx_generator.py, src/get_cvepatch_from_git.py, FuncParser-opt Java/ANTLR parser sources, parser JARs, README instructions.
+Agent Evidence Anchors: raw_extraction/section_text/04_method.txt; raw_extraction/source_static_inventory.txt
+Writing Pattern: Present algorithm as staged transformation from code to reusable index, then online lookup.

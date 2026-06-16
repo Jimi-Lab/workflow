@@ -1,0 +1,107 @@
+[
+  {
+    "page": 5,
+    "block_id": "page_005:block_001",
+    "block_type": "text",
+    "text": "380 IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026",
+    "bbox": [
+      42.345001220703125,
+      32.515541076660156,
+      556.4161987304688,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_003",
+    "block_type": "text",
+    "text": "Fig. 2. V ERCATION Workﬂow.",
+    "bbox": [
+      42.345001220703125,
+      260.1397399902344,
+      147.4249725341797,
+      269.03448486328125
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_004",
+    "block_type": "text",
+    "text": "In P2, V ERCATION retraces historical commits to collect pre- vious modiﬁcations of vulnerable statements. For each state- ment before and after modiﬁcation, V ERCATION expands the functions within the statement, generates ASTs, and normalizes them. Then we utilize an in-order traversal algorithm to com- pare the AST before and after the modiﬁcation as code similar- ity, which determines if the commit is the initial introduction of the vulnerable statements. In P3, V ERCATION identiﬁes the affected versions based on the CVE’s vfc and the corresponding vic . To note, V ERCATION supports patches that span multiple functions and ﬁles. In P1, we extract dangerous ﬂows from each affected function independently, then combine all extracted dangerous ﬂows as input to the LLM for uniﬁed vulnerability logic analysis. In P2, we perform a backtrack analysis for vul- nerable statements from all affected functions.",
+    "bbox": [
+      42.345062255859375,
+      280.0135803222656,
+      293.4095458984375,
+      470.4573974609375
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_005",
+    "block_type": "text",
+    "text": "A. Vulnerable Code Extraction",
+    "bbox": [
+      42.345062255859375,
+      489.3415222167969,
+      169.1958770751953,
+      500.3003845214844
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_006",
+    "block_type": "text",
+    "text": "Taking a vfc as an input, V ERCATION identiﬁes and extracts program statements related to a vulnerability in three steps, as explained in the following subsections respectively. 1) Dangerous Flow Extraction: Firstly, V ERCATION con- ducts program slicing [44] on the source code to extract crucial program statements that may contribute to the vulnerability, which we call dangerous ﬂow . The slicing is based on the following criteria: deleted/added statements and patch-related variables. Building upon existing techniques [12] , [13] , [15] , we execute program slicing on the program dependency graph of the patched function according to the slicing criteria. We performed slicing in two directions: backward and forward. Backward slicing is used to trace the source of patch-related variables and forward slicing is used to ﬁnd the trigger behavior that causes the vulnerability. For different statement types, we customize different slicing rules: • Assignment statement affects the data-ﬂow values of vul- nerability behavior. We conduct normal slicing in the as- signment statements and the assigned variables should be added to the slicing criterion. For example, if we take",
+    "bbox": [
+      42.34397888183594,
+      506.12957763671875,
+      293.404541015625,
+      744.4006958007812
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_007",
+    "block_type": "text",
+    "text": "item_num of Line 12 and 13 in Listing 1 as slicing criterion and perform forward slicing, Line 21 and 24 are included. • Conditional statement affects the reaching condition of the vulnerability trigger. We aim to slice the condition statement that takes the variables of slicing criterion as condition check, and the result also includes all the subse- quent statements of condition statement (e.g., subsequent statement Line 14-15 of condition statement Line 13, sub- sequent statement Line 23 of condition statement Line 22). • Function call statement. If the function call statement’s parameters contain patch-related variables included in the slicing criterion, we conduct slicing on the statement. • Return statement. There is no need for forward slicing because there is no dependency between the return value and the statements following the return statement. For example, there is no need for forward slicing on Line 15 and 23 in Listing 1 . 2) Dangerous Flow-Based Prompt Construction: Secondly, we leverage an LLM to reﬁne these dangerous ﬂows further since the dangerous ﬂows extracted in the above step (program slicing) may include false positives (unrelated to vulnerability logic). We explore prompting strategies to assist LLM in the vulnerability comprehension task and in reﬁning vulnerable statements from the dangerous ﬂows extracted through program slicing. It is important to note that the LLM’s role is to perform code understanding and vulnerability logic analysis rather than to recall speciﬁc CVE information from its training data. Most vulnerability reports do not provide detailed vulnerability logic analysis or identify speciﬁc vulnerable code statements [45] , where the LLM’s semantic analysis capabilities become essen- tial. Our method utilizes an LLM that supports interaction with system prompts and user prompts. The system prompt sets the role and background of the LLM. The user prompt consists of speciﬁc instructions issued by the user. At the beginning of the system prompt, we assign the role of a security researcher to the model with the statement, “You are a security researcher and expert in detecting security vulnerabilities,” and indicate that we will provide the CVE information and dangerous ﬂow. The",
+    "bbox": [
+      305.34661865234375,
+      280.0169982910156,
+      556.427978515625,
+      745.4326171875
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_008",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

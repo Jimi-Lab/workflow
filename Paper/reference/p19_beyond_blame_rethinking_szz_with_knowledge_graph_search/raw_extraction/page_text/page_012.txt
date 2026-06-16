@@ -1,0 +1,46 @@
+12 Yu Shi et al.
+(5) Computational Resources.Experiments were conducted on a 48-core server with 1.5TB RAM. For
+parallel evaluation, each worker runs an isolated Neo4j instance in Docker, enabling concurrent
+processing across multiple cases.
+For the main comparison (Table 2) and controlled comparison (Table 4), we follow the evaluation
+protocol of LLM4SZZ [ 36]: both approaches are run three times independently, and we report
+metrics averaged across runs to reduce variance from LLM non-determinism. For statistical tests, we
+compare the best-performing run from each approach; we additionally test robustness by comparing
+our worst run against baselines’ best. For cost analysis (Table 3), we report the average processing
+time and cost per case across all three runs. For the ablation study and category breakdown analysis
+(RQ2), we report results from a single run, as our RQ1 results showed that performance overall is
+stable across runs (both for AgenticSZZ and LLM4SZZ).
+5.4 Data Leakage Prevention
+Commit messages in real repositories can contain explicit references to the BIC, added by developers
+who manually identified the bug-inducing commit. This is particularly prevalent in the Linux kernel,
+which follows a structured commit message format including Fixes:tags that directly reference
+the bug-inducing commit (this convention is how the DS_LINUX BIC dataset was constructed).
+Since SZZ aims to automate this manual identification process, we must prevent the agent from
+exploiting these ground truth hints during evaluation.
+For this reason, we sanitize all commit messages during TKG construction by removing Fixes:
+lines, Reverts: tags, and replacing inline commit SHA references with placeholder tokens. This
+ensures the agent must reason about code relationships rather than exploiting metadata leakage.
+6 Evaluation Results
+6.1 RQ1: How Effective is TKG-Guided Agentic Search for BIC Identification?
+6.1.1 Motivation.Our preliminary study (RQ0) revealed that existing blame-based approaches face
+fundamental limitations: a significant portion of BICs require traversing commit history beyond
+direct blame results, and many cases involve multiple candidates requiring intelligent selection.
+Current state-of-the-art approaches like LLM4SZZ [ 36] expand context around modified lines
+for blame candidate collection (Section 5.1) but do not traverse commit history to systematically
+explore ancestor commits.
+6.1.2 Approach.We evaluate AgenticSZZ on the complete set of 2,102 bug-fixing cases across
+DS_LINUX (1,500 cases), DS_APACHE (241 cases), and DS_GITHUB (361 cases). DS_GITHUB is
+further split into DS_GITHUB-c (C language, 286 cases) and DS_GITHUB-j (Java, 75 cases) to
+enable language-specific analysis, as Neural-SZZ and RA-SZZ are Java-only baselines. For each
+case, AgenticSZZ constructs a TKG through blame analysis and commit history traversal from
+two starting points, then employs an LLM agent to navigate the graph using the four specialized
+tools described in Section 4.2. We compare against eight baselines (Section 5.1), including six SZZ
+variants, Neural-SZZ, and LLM4SZZ.
+For the controlled comparison (Table 4), both approaches use DeepSeek-V3.2, isolating the
+architectural contribution from LLM selection.
+All approaches are evaluated using Precision, Recall, and F1-score as defined in Section 5.2. We
+use McNemar’s test for paired binary outcomes (correct/incorrect per case) and report Cohen’s 𝑔
+as effect size, where𝑔≥0.15indicates a medium effect and𝑔≥0.25indicates a large effect [6].
+6.1.3 Results.AgenticSZZ achieves the best or comparable F1-score across all datasets.
+Table 2 presents results across all four dataset splits. AgenticSZZ outperforms all baselines including
+, Vol. 1, No. 1, Article . Publication date: February 2026.

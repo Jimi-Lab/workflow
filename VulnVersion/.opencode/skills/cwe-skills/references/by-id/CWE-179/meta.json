@@ -1,0 +1,255 @@
+{
+  "cwe_id": "CWE-179",
+  "name": "Incorrect Behavior Order: Early Validation",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product validates input before applying protection mechanisms that modify the input, which could allow an attacker to bypass the validation via dangerous inputs that only arise after the modification.",
+  "extended_description": "Product needs to validate data at the proper time, after data has been canonicalized and cleansed. Early validation is susceptible to various manipulations that result in dangerous inputs that are produced by canonicalization and cleansing.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-20",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Input Validation"
+      },
+      {
+        "cwe_id": "CWE-696",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Behavior Order"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product validates input before applying protection mechanisms that modify the input, which could allow an attacker to bypass the validation via dangerous inputs that only arise after the modification.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "dangerous",
+      "inputs",
+      "early",
+      "canonicalization"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "dangerous",
+      "inputs",
+      "early",
+      "canonicalization",
+      "canonicalized",
+      "manipulations",
+      "modification",
+      "susceptible"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code attempts to validate a given input path by checking it against an allowlist and then return the canonical path. In this specific case, the...",
+        "snippet": "String path = getInputPath(); if (path.startsWith(\"/safe_dir/\")) { File f = new File(path); return f.getCanonicalPath(); }"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This script creates a subdirectory within a user directory and sets the user as the owner.",
+        "snippet": "function createDir($userName,$dirName){ $userDir = '/users/'. $userName; if(strpos($dirName,'..') !== false){ echo 'Directory name contains invalid sequence'; return; } //filter out '~' because other scripts identify..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "The following code attempts to validate a given input path by checking it against an allowlist and then return the canonical path. In this specific case, the...",
+        "snippet": "String path = getInputPath(); File f = new File(path); if (f.getCanonicalPath().startsWith(\"/safe_dir/\")) { return f.getCanonicalPath(); }"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2002-0433",
+        "description": "List files in web server using \"*.ext\"",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0433"
+      },
+      {
+        "reference": "CVE-2003-0332",
+        "description": "Product modifies the first two letters of a filename extension after performing a security check, which allows remote attackers to bypass authentication via a filename with a .ats extension instead of a .hts extension.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-0332"
+      },
+      {
+        "reference": "CVE-2002-0802",
+        "description": "Database consumes an extra character when processing a character that cannot be converted, which could remove an escape character from the query and make the application subject to SQL injection attacks.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0802"
+      },
+      {
+        "reference": "CVE-2000-0191",
+        "description": "Overlaps \"fakechild/../realchild\"",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2000-0191"
+      },
+      {
+        "reference": "CVE-2004-2363",
+        "description": "Product checks URI for \"<\" and other literal characters, but does it before hex decoding the URI, so \"%3E\" and other sequences are allowed.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2004-2363"
+      },
+      {
+        "reference": "CVE-2002-0934",
+        "description": "Directory traversal vulnerability allows remote attackers to read or modify arbitrary files via invalid characters between two . (dot) characters, which are filtered and result in a \"..\" sequence.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2002-0934"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,118 @@
+ 0
+ 0.5
+ 1
+ 1.5
+ 2
+ 2.5
+ 3
+ 3.5
+ 4
+57K
+1M
+   1.1M
+1.6M
+ 1.9M
+5.6M
+Time to query bugs (minutes)
+The number of source files in a DB
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 4: Time to query 1,634 bugs to various sizes of DBs
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 0
+ 200
+ 400
+ 600
+ 800
+ 1000
+ 1200
+ 1400
+ 1600
+Time to query bugs (minutes)
+The number of queried bugs
+Figure 5: Time to query with various number of bugs against
+the entire DB
+Ruby, and PHP. The experiments suggest that the time to
+build a database linearly increases as the size of the source
+code increases. Once ReDeBug has built the initial database,
+incremental update is quickly done by adding/changing only
+the relevant parts of the database.
+The resulting database sizes and the number of projects
+and ﬁles in databases are described in Table III. As a
+reference point, Debian Lenny required 282GB to store
+1,155,594 ﬁles without compression, but only 6.0GB with
+compression in ReDeBug. The large compression factor is
+due to the sparseness of the Bloom ﬁlters.
+Figure 4 depicts the time to query 1,634 security-related
+patches (δ1 and δ2) to each database. As the size of a
+database (the number of ﬁles in a database) grew, the time to
+query bugs increased linearly. Though there was an overhead
+to recover compressed Bloom ﬁlters to perform the set
+membership test, the querying time was fast, e.g., 0.04
+second per bug against about 1 million source ﬁles in the
+case of Debian Lenny.
+Figure 5 shows the time it took to compare a varying
+number of bugs against the whole database including Σ1
+and Σ2. The query time has a very gentle upward slope.
+The results suggest querying even a large number of patches
+should take only a few minutes. For example, it took
+about 6 minutes 21 seconds to query 15 diffs, and this
+time increased only slightly to 7 minutes 46 seconds for
+1,634 diffs.
+Together these 3 graphs show that ReDeBug is highly
+scalable, and it can be applied to ﬁnd unpatched code copies
+in day-to-day development. The time it takes us to perform
+all operations increases linearly with the size of the database,
+and grows very slowly with the number of diffs.
+D. Security-Related Bugs
+1) {δ1 & δ2 } →Σ1: When security-related bugs are
+ﬁxed in the original projects, all the relevant code clones
+should also be corrected. In practice, unfortunately, code
+reuse among open source projects is usually ad-hoc, which
+makes it difﬁcult to update all relevant projects when the
+patch is released. An attacker may be able to easily identify
+the same known vulnerabilities (δ1 and δ2) in other projects
+(Σ1) that are not patched yet.
+We queried δ1 and δ2 to Σ1 to measure how many
+unpatched code clones are detected, which approximates
+how many (potentially) vulnerable projects an attacker may
+be able to spot when a patch becomes available. The total
+number of unpatched code clones in Σ1 for δ1 and δ2 was
+12,791 using the default parameters of n = 4 and c = 3.
+The number of matches to each dataset in Σ1 is shown in
+Figure 6. The old stable, but still supported, Debian Lenny
+and Ubuntu Maverick have 1,482 and 1,058 unpatched code
+clones, respectively.
+2) {δ1 & δ2 } →Σ2: We measured how many unpatched
+code clones are identiﬁed for δ1 and δ2 in Σ2 consisting of
+the latest versions of Debian Squeeze and Ubuntu Oneiric.
+This evaluation demonstrates roughly how responsive the
+new version of an OS is to previously released security-
+related patches. Σ2 still has 1,991 unpatched code clones for
+δ1; furthermore, 764 unpatched code clones are reported for
+δ2, which indicates that unpatched code clones are recurring
+in OS distributions.
+3) δ1 →Σ1 vs. δ1 →Σ2: We compared 1,838 unpatched
+code clones in Σ1 and 1,991 unpatched code clones in Σ2 for
+δ1; and we found that 1,379 unpatched code clones have per-
+sisted. Table IV shows the number of unpatched code clones
+identiﬁed from different years’ patches. It is interesting to
+note that security vulnerabilities that were patched over a
+decade ago (from 2001) still have 21 unpatched code clones
+present in Σ1. Even Σ2 still have 496 unpatched code clones
+from 2006 patches. This result demonstrates that unpatched
+code clones persist in modern distributions.
+55
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,20 @@
+Abstract
+The SZZ algorithm is the dominant technique for identifying bug-
+inducing commits and underpins many software engineering tasks,
+such as defect prediction and vulnerability analysis. Despite numer-
+ous variants, including recent LLM-based approaches, performance
+remains limited on developer-annotated datasets (e.g., recall of 0.552
+on the Linux kernel). A key limitation is the reliance ongit blame,
+which traces line-level changes within the same file, failing in com-
+mon scenarios such as ghost and cross-file cases—making nearly
+one-quarter of bug-inducing commits inherently untraceable. More-
+over, current approaches follow fixed pipelines that restrict iterative
+reasoning and exploration, unlike developers who investigate bugs
+through an interactive, multi-tool process.
+To address these challenges, we proposeAgentSZZ, an agent-
+based framework that leverages LLM-driven agents to explore
+repositories and identify bug-inducing commits. Unlike prior meth-
+ods,AgentSZZintegrates task-specific tools, domain knowledge,
+and a ReAct-style loop to enable adaptive and causal tracing of bugs.
+A structured compression module further improves efficiency by re-
+ducing redundant context while preserving key evidence. Extensive

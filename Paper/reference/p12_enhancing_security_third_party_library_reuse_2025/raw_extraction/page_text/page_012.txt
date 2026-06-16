@@ -1,0 +1,119 @@
+TABLE V: Vulnerability Detection Result on Ground Truth
+Scheme Item Reuse Type Total
+Custom Reuse Exact Reuse
+VULTURE
+Dtc-P 72 19 91
+Cfm-P 65 19 84
+Dtc-N 87 22 109
+Cfm-N 78 22 100
+V1SCAN
+Dtc-P 51 10 61
+Cfm-P 35 10 45
+Dtc-N 66 14 80
+Cfm-N 42 13 55
+Dtc: Vulnerabilities been detected.
+Cfm: Vulnerabilities been confirmed with manual check.
+P: Results on patched vulnerabilities.
+N: Results on non-patched vulnerabilities.
+including function name modification, statement modification,
+and operation modification.
+Scrutinize of results. The results are shown in Table V.
+We compared V ULTURE with V1SCAN. For custom reuse,
+VULTURE successfully identified 65 patched and 78 unpatched
+cases, with only four false negatives and 12 false positives.
+In contrast, V1SCAN identified 35 patched and 42 unpatched
+cases. For exact reuse, V ULTURE identified 19 patched and 22
+unpatched cases without any false negatives or false positives,
+whereas V1SCAN detected 10 patched and 13 unpatched
+cases with one false positive. Overall, V ULTURE achieved a
+95.8% F1 score, significantly outperforming V1SCAN, which
+achieved only a 66.7% F1 score.
+After manually being confirmed by three PhD students
+from computer science majors, we observed that V1SCAN
+produced a significant number of false negatives due to the
+limited comprehensiveness of its database. Additionally, it
+generated many false positives, which stemmed from inherent
+design flaws in its detection algorithm, as detailed in two
+motivational examples. V ULTURE reported 4 false negatives
+and 12 false positives in total. Out of these, 4 false negatives
+and 8 false positives were a result of the limitations inherent in
+chunk-based detection methods. Chunk-based method allows
+us to pinpoint modified code lines only within their respective
+control statements. If a modified line is not associated with any
+control statement, its precise location remains unidentifiable,
+which can result in inaccuracies. Additionally, the other 4
+false positives arose from the limitations of similarity-based
+detection. If the reused function is significantly modified, the
+Hash(i) and H(j) can’t be identified accurately (IV-B1), lead-
+ing V ULTURE to miss recognizing the actual reused function.
+Nevertheless, these issues are relatively infrequent in real-
+world scenarios.
+D. Reuse and Vulnerability Detection In the Wild
+To ensure the robustness of our evaluation, we tested how
+does VULTURE performs when facing real-world software. The
+target programs selected for this analysis are consistent with
+those listed in Table II. We then conducted a comprehensive
+analysis involving both TPL reuse detection and 1-day vulner-
+ability detection using V ULTURE .
+1) TPL reuse detection: In this experiment, we executed
+VULTURE to detect the reused TPLs in the target programs by
+TABLE VI: TPL Reuse Detection Result of V ULTURE
+Target DBiot DBkwd
+Dtc Cfm P Dtc Cfm P
+AliOS-Things 47 33 0.70 61 20 0.33
+LiteOS 18 12 0.66 19 4 0.21
+Tasmota 66 54 0.82 63 39 0.62
+TizenRT 44 34 0.77 51 20 0.39
+kamailio 7 2 0.29 10 2 0.20
+mbed-os 17 12 0.70 28 10 0.36
+openthread 4 2 0.50 4 1 0.25
+Sming 32 24 0.75 3 3 1.00
+TDengine 3 3 1.00 4 2 0.50
+zephyr 2 2 1.00 5 1 0.20
+Total 240 178 0.74 248 102 0.41
+Dtc: Reuses detected.
+Cfm: Reuses confirmed with manual check.
+utilizing DBiot and DBkwd, respectively.
+Table VI demonstrates the detection results. VULTURE cor-
+rectly detected 178 reused TPLs when using DB iot, achieving
+a precision of 74%; however its precision is only 41% when
+integrating DBkwd. Upon manually inspecting the failed cases,
+we found that 18 out of 62 were caused by the non-library
+projects in the DB iot. These projects, such as LuatOS, are
+not libraries themselves but are still reused by many other
+software, making them difficult to filter out manually. These
+non-library projects affect the specification of the database and
+cause V ULTURE to mistakenly identify them as the reused
+TPL instead of the actual parent libraries. Nine failed cases
+are caused by 9 TPLs which are filtered out by V ULTURE
+because these libraries are not prevalent on GitHub with a few
+stars (< 100 stars). Due to the preset thresholds, THhash and
+THsim, 29 cases failed as a result of overestimating similarity.
+Unfortunately, adjusting the thresholds could potentially result
+in additional failed or missed cases. The final six failed cases
+were due to the reuse of prevalent functions by many TPLs,
+which prevented V ULTURE from accurately identifying the
+actual TPL being reused. Such prevalent functions can be
+categorized into cryptographic functions (e.g., md5Update,
+parse_hex4), utility functions (e.g., hammingDistance),
+and common functions (e.g., strcpy).
+The disparity in the detection results between using DB iot
+and DB kwd arises because DB kwd contains many non-IoT-
+specific libraries. This lack of specificity results in incorrect
+identification of parent TPL reuse as child TPL reuse, leading
+to a high number of false positives. In contrast, DB iot, as a
+curated subset focused on IoT-related libraries, minimizes such
+misidentifications and achieves higher specificity. We did not
+incorporate VULTURE with DBcentris due to its lack of critical
+information (e.g., birth time, file path information) required by
+VULTURE .
+2) 1-day vulnerability detection: Here, we applied V UL-
+TURE , V1SCAN and SNYK to identify real-world 1-day vul-
+nerabilities. Table VII only highlights the top 5 target pro-
+grams with the highest number of detected vulnerabilities.
+The remaining 5 target programs were found to have no
+vulnerabilities according to the detection results.
+Table VII shows that V ULTURE is the most effective tool,
+identifying 175 vulnerabilities, and consistently outperforms
+SNYK and V1SCAN across all test targets. In comparison,
+12

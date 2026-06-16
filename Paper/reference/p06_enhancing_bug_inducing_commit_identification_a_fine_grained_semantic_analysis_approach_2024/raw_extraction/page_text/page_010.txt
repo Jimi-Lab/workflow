@@ -1,0 +1,148 @@
+3046 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+TABLE II
+THE PERFORMANCE COMPARISONS BETWEEN
+ALL METHODS FOR FINDING ALL
+BUG-INDUCING COMMITS
+Approach Precision Recall F1-score
+A-SZZ
+AB-SZZ
+AAG-SZZ
+AMA-SZZ
+AR-SZZ
+AL-SZZ
+0.07
+0.26
+0.28
+0.28
+0.39
+0.37
+0.64
+0.56
+0.52
+0.52
+0.38
+0.36
+0.13
+0.36
+0.36
+0.36
+0.37
+0.36
+SEM-SZZ * 0.45 0.43 0.44
+the precision and Ras the recall, the F1-score can be calculated
+as follows:
+F1= 2PR
+P +R (5)
+V. EXPERIMENT
+This section presents the experiment results of our research
+questions.
+A. Effectiveness of Our Met hod in Identifying Bug-Inducing
+Commits From Bug-Fixing Commits With Only Added Lines
+In this research question, we focus on two experimental
+settings: all bug-inducing commits and filtered bug-inducing
+commits. In the first setting, we concentrate on locating bug-
+inducing commits in DATASET-A. In the second setting, we
+focus on locating bug-inducing commits in DATASET-FA.
+In DATASET-A, there are 2,411 commits that involve no
+changes within functions, accounting for 21% of the total test
+cases. Thus, when handling test cases in DATASET-A, we first
+check whether the current commit contains added lines in func-
+tions. If it does, we use S
+EM-SZZ to produce the result. If it does
+not, we use the AR-SZZ algorithm. This approach gives us the
+experimental results shown in the row S
+EM-SZZ * in Table II.
+Table II presents the results of our approach and baselines
+for identifying all bug-inducing commits. Notably, the precision
+of some baselines, especially the A-SZZ algorithm, is relatively
+low, with a precision of less than 0.1. The best baseline AR-SZZ
+has a precision equal to 0.39, which is still lower than S
+EM-SZZ
+*. Thus, our approach improves precision by 22% compared to
+the best baseline AR-SZZ.
+As shown in Table II, A-SZZ performs the worst in F1-score
+due to a high number of false positives. Our proposed baselines
+outperform A-SZZ significantly. The best baselines AAG-SZZ
+and AMA-SZZ outperform A-SZZ by 200% in F1-score. This
+indicates the effectiveness of tracing back the neighboring un-
+modified lines of added lines. Furthermore, we observe that the
+AB-SZZ algorithm and its variants perform almost the same,
+resembling findings from prior research [20] where B-SZZ,
+AG-SZZ, MA-SZZ, L-SZZ and R-SZZ demonstrated similar
+performance. Notably, the idea of filtering out meta-changes
+appears to have no effect in this context. In TableII,S
+EM-SZZ *
+TABLE III
+THE PERFORMANCE COMPARISONS BETWEEN
+ALL METHODS FOR FINDING FILTERED
+BUG-INDUCING COMMITS
+Approach Precision Recall F1-score
+A-SZZ
+AB-SZZ
+AAG-SZZ
+AMA-SZZ
+AR-SZZ
+AL-SZZ
+0.11
+0.42
+0.44
+0.44
+0.58
+0.57
+0.96
+0.84
+0.79
+0.79
+0.56
+0.55
+0.20
+0.56
+0.57
+0.57
+0.57
+0.56
+SEM-SZZ 0.68 0.66 0.67
+also demonstrates the best balance between precision and recall,
+improving F1-score by 19% compared to the best baseline
+AR-SZZ.
+We then re-run all methods on DATASET-FA, and the results
+are documented in TableIII. TableIII demonstrates a significant
+improvement in the performance of all methods. However, some
+baselines continue to struggle with low precision. Notably, the
+precision of the A-SZZ algorithm is still quite low, with only a
+slight improvement from 0.07 to 0.11. After filtering out certain
+commits, the precisions of the AB-SZZ, AAG-SZZ and MA-
+SZZ algorithms remain below 0.50, despite an improvement of
+around 0.16. From the table, it’s evident that S
+EM-SZZ contin-
+ues to outperform all baselines in precision, outperforming the
+best baseline AR-SZZ by 17%.
+From Table III, we can also see that the unmodified lines,
+which can be traced back to find bug-inducing commits, mostly
+lie near the added lines. This is evident from the recall of the
+baselines, where they find most of the bug-inducing commits
+successfully. This corresponds to the introduction and the mo-
+tivation example, where we claim that most of the bug-inducing
+commits can be found by tracing back the unmodified lines near
+the added lines.
+Compared to all baselines, S
+EM-SZZ also achieves the best
+balance between precision and recall. This is evident in the
+F1-score, where S EM-SZZ achieves an F1-score of 0.67. It
+outperforms the best baselines by 18%, respectively. Therefore,
+we believe that S
+EM-SZZ is more effective in identifying bug-
+inducing commits which can be found by tracing back all lines
+within the function.
+RQ-1: SEM-SZZ is more precise in identifying bug-
+inducing commits compared to all baselines, increasing
+precision by 22%. Furthermore, SEM-SZZ achieves a no-
+table improvement of 19% in F1-score compared to the best
+baseline.
+B. Effectiveness of Our Met hod in Identifying Bug-Inducing
+Commits From Bug-Fixing Commits With Deleted Lines
+Table IV presents the results of S
+EM-SZZ and baselines on
+identifying bug-inducing commits from bug-fixing commits in
+DATASET-D. The results indicate that all baselines perform
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,60 @@
+Figure 5: Types of code modifications in VCCs.
+Appendix A Code modification types of VCCs
+We analyzed 415 VCCs discovered by MOVERY to better
+understand the types of code modifications. Figure 5 shows
+the analysis results; note that a VCC may contain multiple
+code modification types.
+It is worth noting that the variable names and variable types
+of the discovered VCCs are mostly different from disclosed
+vulnerable functions. We confirmed that most of these cases
+were caused by internal OSS modifications. Approaches using
+the abstraction method such as MOVERY , VUDDY , and MVP
+could address this type of code modification.
+Moreover, we confirmed that the cases, in which code lines
+of the disclosed vulnerable function were deleted or new code
+lines were added, accounted for more than 80% of the discov-
+ered VCCs. MOVERY , considering only the core lines of the
+vulnerable code, could respond to this code modification, but
+VUDDY , considering the syntax of the entire vulnerable func-
+tion, hardly discovered VCC to which this code modification
+was applied.
+All code modification types should be considered in VCC
+discovery. We confirmed thatMOVERY ’s extensible and min-
+imized signature generation made this possible while other
+existing approaches failed to handle some types of code mod-
+ifications (as demonstrated in Section 5.1).
+Out-of-bounds Read
+Out-of-bounds Write
+Improper Restriction of Operations 
+within the Bounds of a Memory Buffer
+Improper Input Validation
+Integer Underflow
+(a) Top 5 CWE distribution.
+ (b) CVSS distribution.
+Figure 6: CWE and CVSS distributions for the discovered VCCs
+by MOVERY .
+Appendix B Analysis for the discovered VCCs
+In our experiments, MOVERY discovered 415 VCCs for ten
+target software. We analyzed the vulnerability types ( i.e.,
+Common Weakness Enumeration, shortly CWE) and severity
+(i.e., Common Vulnerability Scoring System, shortly CVSS)
+for the discovered VCCs. Figure 6 depicts the analysis results.
+First, we confirmed that the 415 discovered VCCs belonged
+to 22 CWE groups; the distribution for the top five CWEs
+is shown in Figure 6a. The most frequently appeared type
+is “Out-of-bounds Read and Write” (53%); this vulnerabil-
+ity can lead to remote code execution and therefore requires
+extra attention. In addition, we confirmed that many vulnera-
+bilities related to memory buffer (11%) and input validation
+(7%) appeared; the top four CWEs groups belong to the most
+dangerous vulnerability types in 2021 [5].
+Next, we confirmed that most (84%) of the discovered
+VCCs had a medium severity, as shown in Figure 6b. Note
+that 15% of the propagated vulnerabilities had a high severity,
+which could pose a more critical threat to the entire software;
+it is noteworthy that the case study presented in Section 5.6 is
+a high-severity vulnerability. Especially high-risk vulnerabili-
+ties need to be discovered and patched more quickly, suggest-
+ing that there is in dire need of a precise VCC discovery tool,
+such as MOVERY .
+USENIX Association 31st USENIX Security Symposium    3053

@@ -1,0 +1,321 @@
+{
+  "cwe_id": "CWE-456",
+  "name": "Missing Initialization of a Variable",
+  "abstraction": "Variant",
+  "status": "Draft",
+  "description": "The product does not initialize critical variables, which causes the execution environment to use unexpected values.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-909",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Missing Initialization of Resource"
+      },
+      {
+        "cwe_id": "CWE-665",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Initialization"
+      },
+      {
+        "cwe_id": "CWE-665",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Initialization"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-89",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      },
+      {
+        "cwe_id": "CWE-120",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')"
+      },
+      {
+        "cwe_id": "CWE-98",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion')"
+      },
+      {
+        "cwe_id": "CWE-457",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Use of Uninitialized Variable"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Variant level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not initialize critical variables, which causes the execution environment to use unexpected values.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "initialization",
+      "environment",
+      "initialize",
+      "unexpected"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "initialization",
+      "environment",
+      "initialize",
+      "unexpected",
+      "execution",
+      "variables",
+      "critical",
+      "variable"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This function attempts to extract a pair of numbers from a user-supplied string.",
+        "snippet": "void parse_data(char *untrusted_input){ int m, n, error; error = sscanf(untrusted_input, \"%d:%d\", &m, &n); if ( EOF == error ){ die(\"Did not specify integer value. Die evil hacker!\\n\"); } /* proceed assuming n and m are..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "Here, an uninitialized field in a Java class is used in a seldom-called method, which would cause a NullPointerException to be thrown.",
+        "snippet": "private User user; public void someMethod() { // Do something interesting. ... // Throws NPE if user hasn't been properly initialized. String username = user.getName(); }"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code first authenticates a user, then allows a delete command if the user is an administrator.",
+        "snippet": "if (authenticate($username,$password) && setAdmin($username)){ $isAdmin = true; } /.../ if ($isAdmin){ deleteUser($userToDelete); }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java code the BankManager class uses the user variable of the class User to allow authorized users to perform bank manager tasks. The user...",
+        "snippet": "public class BankManager { // user allowed to perform bank manager tasks private User user = null; private boolean isUserAuthentic = false; // constructor for BankManager class public BankManager() { ... } // retrieve..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following Java code the BankManager class uses the user variable of the class User to allow authorized users to perform bank manager tasks. The user...",
+        "snippet": "public class BankManager { // user allowed to perform bank manager tasks private User user = null; private boolean isUserAuthentic = false; // constructor for BankManager class public BankManager(String username) { user..."
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "This example will leave test_string in an unknown condition when i is the same value as err_val, because test_string is not initialized (CWE-456). Depending on...",
+        "snippet": "char *test_string = \"Done at the beginning\"; if (i != err_val) { test_string = \"Hello World!\"; } printf(\"%s\", test_string);"
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "This example will leave test_string in an unknown condition when i is the same value as err_val, because test_string is not initialized (CWE-456). Depending on...",
+        "snippet": "char *test_string; if (i != err_val) { test_string = \"Hello World!\"; } else { test_string = \"Done on the other side!\"; } printf(\"%s\", test_string);"
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "Consider the following merchant server application as implemented in [REF-1475]. It receives card payment information (orderPgData instance in...",
+        "snippet": "File: OrderPgData.java ... private boolean isPaymentAmountTampered = true;"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2020-6078",
+        "description": "Chain: The return value of a function returning a pointer is not checked for success (CWE-252) resulting in the later use of an uninitialized variable (CWE-456) and a null pointer dereference (CWE-476)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-6078"
+      },
+      {
+        "reference": "CVE-2019-3836",
+        "description": "Chain: secure communications library does not initialize a local variable for a data structure (CWE-456), leading to access of an uninitialized pointer (CWE-824).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-3836"
+      },
+      {
+        "reference": "CVE-2018-14641",
+        "description": "Chain: C union member is not initialized (CWE-456), leading to access of invalid pointer (CWE-824)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2018-14641"
+      },
+      {
+        "reference": "CVE-2009-2692",
+        "description": "Chain: Use of an unimplemented network socket operation pointing to an uninitialized handler function (CWE-456) causes a crash because of a null pointer dereference (CWE-476)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2692"
+      },
+      {
+        "reference": "CVE-2020-20739",
+        "description": "A variable that has its value set in a conditional statement is sometimes used when the conditional fails, sometimes causing data leakage",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-20739"
+      },
+      {
+        "reference": "CVE-2005-2978",
+        "description": "Product uses uninitialized variables for size and index, leading to resultant buffer overflow.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-2978"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2237",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:002",
+    "block_type": "text",
+    "text": "Linux kernel does not record pull requests (PR). Consequently,\nour evaluation did not extend to the PR level.\nInternal validity. There may be some pitfalls in automati-\ncally collecting bug-inducing commits. After selecting commits\nwith “Fixes:”, 2,358 (3%) of the commits could not be matched\nto any bug-inducing commit. These commit IDs are stored in\na dedicated dataset. We manually label the commit ids in this\nabnormal dataset and divide them into two categories: partial\ncommit ID and not in the repository.\nPartial commit ID indicates commits where the text after the\nkeyword “Fixes:” is not recognized by the automated ﬁltering\ntechnique as a commit ID. The ﬁltering technique checks the\ncommit ID using the regular expression [0-9a-f]{7,40}, requir-\ning 7-40 characters. The total number of Partial commit ID\ncommits is 1,021 (1.3%). They include four causes: (i) the con-\ntent after Fixes is a link to a bug report; (e.g., Fixes: http://bugs.\ngentoo.org/show_bug.cgi?id=87182) (ii) the content after Fixes\ngives some description of the bug; (iii) the content after Fixes\nhas some format problems (e.g., Fixes: commit fda789fda); (iv)\nthe commit ID after Fixes: may be too short.\nNot in the repository indicates that the method can recognize\nthe commit ID in the commit message, however, the commit\nID does not exist in the list of commit IDs fetched from the\nmaster branch of the Linux kernel repository. The number of\ncommits in this situation is 1,337 (1.7%). It includes three\nprominent cases: (i) format problem: irregular formatting mak-\ning it impossible to search for the commit ID (e.g., fda798fda:,\n7598e8700e9a(drm/i915/gvt:; (ii) rebase problem: the commit\nis not in any branch of the repository, and may belong to a fork\noutside of the repository; (iii) branch problem: we only focus on\nthe master branch, while some commits may occur in another\nbranch.\nHowever, in total, anomalous commits only account for 3%\nof the total number of commits. We have made these abnormal\ncommits publicly available in a CSV ﬁle for further study. So,\nwe believe that the threat is minimal.\nTo minimize threats to internal validity from implementation\nerrors, we use the implementation of MA-SZZ from the replica-\ntion package of Rosa et al. [28] without making modiﬁcations.\nHowever, a deeper analysis found that the implementation of\nMA-SZZ by Rosa et al. [28] diverged from MA-SZZ’s orig-\ninal implementation [12]. The implementation of Rosa et al.\nincluded additional modiﬁcations for detecting the movement\nof code within ﬁles and from other ﬁles.\nAnother threat to internal validity is that some bug-ﬁxing\ncommits are also bug-inducing commits. In our analysis, we\nfound that there are 4,517 such common commits in our dataset,\nwhich represent both bug-ﬁxing and bug-inducing actions.\nThese common commits account for only 5.9% out of the total\n76,046 unique commits. To mitigate this threat, we have listed\nall these commits in a ﬁle named “common_hashes.txt” in the\nreplication package. This collection of cases where developers\nintroduce bugs while ﬁxing bugs may provide opportunities for\nfurther study.\nExternal validity. Considering that our study focuses on a\nsingle software project, primarily utilizing the C programming\nlanguage, our ﬁndings may not generalize to other projects",
+    "bbox": [
+      37.58,
+      63.79,
+      288.69,
+      744.41
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:003",
+    "block_type": "text",
+    "text": "or programming languages. However, the Linux kernel is a\nwell-structured software repository with a substantial code size\n(Linux v6.0 contains 23 MLOC). Therefore, it serves as a\nvaluable research object for evaluating the effectiveness of SZZ\nalgorithms.",
+    "bbox": [
+      300.6,
+      63.8,
+      551.66,
+      122.74
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:004",
+    "block_type": "text",
+    "text": "X. CONCLUSION AND FUTURE WORK",
+    "bbox": [
+      350.17,
+      131.78,
+      502.09,
+      142.91
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:005",
+    "block_type": "text",
+    "text": "SZZ is a vital algorithm for mining software repositories,\nand many studies rely on its results. Ensuring the precision and\nrecall of SZZ in real scenarios is thus crucial.\nIn our study, we collected a dataset of 76K bug-ﬁxing com-\nmits linked to bug-inducing commits in the Linux kernel. We\nevaluated six SZZ algorithms on this dataset, analyzed the ghost\ncommits issue, and examined its impact on SZZ. We proposed\nTC-SZZ, which can ﬁnd a bug-inducing commit for 17.7% of\nthe failure cases. Upon investigating the remaining failures, we\nfound that in 37.9% of the cases, the bug-inducing commit is not\nin the ﬁle history. ChatGPT demonstrates potential in assisting\nthe SZZ algorithm in identifying the associated bug-inducing\ncommits in these challenging cases.\nOur publicly available dataset of 76K bug-ﬁxing commits\nwith their bug-inducing commits provides a unique opportunity\nfor advancing SZZ algorithm research, including training Large\nLanguage Models (LLMs) for improved precision and recall.\nKey areas for future exploration include: (1) Enhancing SZZ\nAlgorithm Precision: Despite R-SZZ achieving 59% preci-\nsion, there is signiﬁcant potential for improvement. Future stud-\nies should explore patterns beyond non-semantic source code,\nmeta-changes, and refactoring changes to increase accuracy. (2)\nRefactoring Solutions Across Programming Languages:\nThe extension of refactoring solutions, typically focused on\nJava, to other programming languages like C in our Linux\ndataset, remains a challenge needing attention. (3) Addressing\nUndeﬁned Failures in Recall: Investigating the 23.08% of\npreviously undeﬁned failure cases, alongside ‘Ghost Commit’\nissues, is crucial for a more comprehensive understanding and\nimprovement of recall. (4) Impacts on Downstream Tasks:\nUtilizing our dataset to evaluate the effect of SZZ algorithms on\ndownstream tasks, such as Just-in-Time defect prediction, offers\na promising direction for future research. These directions not\nonly aim to reﬁne SZZ algorithms but also seek to understand\ntheir broader implications in software engineering research.",
+    "bbox": [
+      300.6,
+      149.72,
+      552.39,
+      567.32
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:006",
+    "block_type": "text",
+    "text": "DATA AVAILABILITY",
+    "bbox": [
+      383.8,
+      576.37,
+      468.46,
+      587.49
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:007",
+    "block_type": "text",
+    "text": "The dataset used in this paper, the TC-SZZ implementation,\nand the results of ChatGPT experiments are publicly available\nat https://doi.org/10.6084/m9.ﬁgshare.23889792.v2.",
+    "bbox": [
+      300.6,
+      594.3,
+      551.65,
+      629.33
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:008",
+    "block_type": "text",
+    "text": "ACKNOWLEDGMENT",
+    "bbox": [
+      385.57,
+      638.38,
+      466.7,
+      649.5
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:009",
+    "block_type": "text",
+    "text": "Any opinions, ﬁndings and conclusions or recommendations\nexpressed in this material are those of the author(s) and do not\nreﬂect the views of National Research Foundation, Singapore.",
+    "bbox": [
+      300.6,
+      656.32,
+      551.66,
+      691.34
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:010",
+    "block_type": "text",
+    "text": "REFERENCES",
+    "bbox": [
+      400.45,
+      700.4,
+      451.81,
+      711.52
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:011",
+    "block_type": "text",
+    "text": "[1] J. ´Sliwerski, T. Zimmermann, and A. Zeller, “When do changes induce\nﬁxes?” in Proc. Int. Workshop Mining Softw. Repositories, (MSR), 2005,\npp. 1–5.",
+    "bbox": [
+      304.59,
+      715.34,
+      551.68,
+      743.96
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 19,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:019:012",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

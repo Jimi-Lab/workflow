@@ -1,0 +1,275 @@
+{
+  "cwe_id": "CWE-327",
+  "name": "Use of a Broken or Risky Cryptographic Algorithm",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product uses a broken or risky cryptographic algorithm or protocol.",
+  "extended_description": "Cryptographic algorithms are the methods by which data is scrambled to prevent observation or influence by unauthorized actors. Insecure cryptography can be exploited to expose sensitive information, modify data in unexpected ways, spoof identities of other users or devices, or other impacts. It is very difficult to produce a secure algorithm, and even high-profile algorithms by accomplished cryptographic experts have been broken. Well-known techniques exist to break or weaken various kinds of cryptography. Accordingly, there are a small number of well-understood and heavily studied algorithms that should be used by most products. Using a non-standard or known-insecure algorithm is dangerous because a determined adversary may be able to break the algorithm and compromise whatever data has been protected. Since the state of cryptography advances so rapidly, it is common for an algorithm to be considered \"unsafe\" even if it was once thought to be strong. This can happen when new attacks are discovered, or if computing power increases so much that the cryptographic algorithm no longer provides the amount of protection that was originally thought. For a number of reasons, this weakness is even more challenging to manage with hardware deployment of cryptographic algorithms as opposed to software implementation. First, if a flaw is discovered with hardware-implemented cryptography, the flaw cannot be fixed in most cases without a recall of the product, because hardware is not easily replaceable like software. Second, because the hardware product is expected to work for years, the adversary's computing power will only increase over time.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-693",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Protection Mechanism Failure"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-311",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Missing Encryption of Sensitive Data"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific",
+      "Verilog",
+      "VHDL"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "ICS/OT"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses a broken or risky cryptographic algorithm or protocol.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "algorithm",
+      "cryptographic",
+      "cryptography",
+      "algorithms"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "algorithm",
+      "cryptographic",
+      "cryptography",
+      "algorithms",
+      "hardware",
+      "because",
+      "broken",
+      "even"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "These code examples use the Data Encryption Standard (DES).",
+        "snippet": "EVP_des_ecb();"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "These code examples use the Data Encryption Standard (DES).",
+        "snippet": "Cipher des=Cipher.getInstance(\"DES...\"); des.initEncrypt(key2);"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "These code examples use the Data Encryption Standard (DES).",
+        "snippet": "function encryptPassword($password){ $iv_size = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_ECB); $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND); $key = \"This is a password encryption key\"; $encryptedPassword =..."
+      },
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Suppose a chip manufacturer decides to implement a hashing scheme for verifying integrity property of certain bitstream, and it chooses to implement a SHA1...",
+        "snippet": "The manufacturer chooses a SHA1 hardware accelerator for to implement the scheme because it already has a working SHA1 Intellectual Property (IP) that the manufacturer had created and used earlier, so this reuse of IP..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "Suppose a chip manufacturer decides to implement a hashing scheme for verifying integrity property of certain bitstream, and it chooses to implement a SHA1...",
+        "snippet": "The manufacturer could have chosen a cryptographic solution that is recommended by the wide security community (including standard-setting bodies like NIST) and is not expected to be broken (or even better, weakened)..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-30273",
+        "description": "SCADA-based protocol supports a legacy encryption mode that uses Tiny Encryption Algorithm (TEA) in ECB mode, which leaks patterns in messages and cannot protect integrity",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30273"
+      },
+      {
+        "reference": "CVE-2022-30320",
+        "description": "Programmable Logic Controller (PLC) uses a protocol with a cryptographically insecure hashing algorithm for passwords.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-30320"
+      },
+      {
+        "reference": "CVE-2008-3775",
+        "description": "Product uses \"ROT-25\" to obfuscate the password in the registry.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-3775"
+      },
+      {
+        "reference": "CVE-2007-4150",
+        "description": "product only uses \"XOR\" to obfuscate sensitive data",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-4150"
+      },
+      {
+        "reference": "CVE-2007-5460",
+        "description": "product only uses \"XOR\" and a fixed key to obfuscate sensitive data",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-5460"
+      },
+      {
+        "reference": "CVE-2005-4860",
+        "description": "Product substitutes characters with other characters in a fixed way, and also leaves certain input characters unchanged.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2005-4860"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

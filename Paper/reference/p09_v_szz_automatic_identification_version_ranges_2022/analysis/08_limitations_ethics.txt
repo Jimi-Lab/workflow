@@ -1,0 +1,29 @@
+# 08 Limitations and Ethics Analysis
+
+Construct Validity:
+- The true inducing commit is inferred using a mental proxy for a perfect test based on CVE descriptions, fixing commits, commit messages, and vulnerable-code reasoning.
+- This can introduce annotation subjectivity, partly mitigated by two annotators, disagreement resolution, and boundary-version verification.
+
+Internal Validity:
+- Annotators are not original project developers, so they may misinterpret project-specific vulnerability semantics.
+- Manual checking reduces but does not eliminate this risk.
+
+External Validity:
+- The main study analyzes 172 vulnerabilities, similar to some prior manual SZZ studies but still limited.
+- Only C/C++ and Java are included.
+- The evaluation focuses on small fixing commits; large commits are discussed but not directly validated at the same depth.
+
+Method Limitations:
+- V-SZZ can fail when the true inducing commit is not the earliest descendant modification.
+- C/C++ line mapping based on textual similarity can produce semantic mismatches.
+- Java AST mapping can still miss line correspondences.
+- Vulnerabilities without usable deleted lines or without known fixing commits are outside the core workflow.
+
+Artifact Limitations:
+- Local source package contains the relevant static workflow but was not executed.
+- `setting.py` contains empty path placeholders, and reproduction likely requires external repositories, generated Git logs, and prepared data folders. [NEEDS ARTIFACT]
+- Runtime behavior and metric reproduction are not verified. [EXECUTION NOT REQUESTED]
+
+Ethics/Safety:
+- The method refines affected versions and can help avoid unnecessary upgrades, but false negatives are security-critical because they may cause vulnerable versions to be treated as safe.
+- Any downstream use should preserve conservative handling when evidence is incomplete.

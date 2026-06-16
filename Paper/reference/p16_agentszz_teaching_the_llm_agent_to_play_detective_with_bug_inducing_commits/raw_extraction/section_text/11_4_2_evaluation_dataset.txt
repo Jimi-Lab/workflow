@@ -1,0 +1,29 @@
+4.2 Evaluation Dataset
+To evaluateAgentSZZ, we use the same datasets as Tang et al. [36],
+including DS_LINUX, DS_GITHUB, and DS_APACHE. DS_LINUX
+contains 1,500 bug-fixing commits from the Linux kernel, sampled
+from the dataset of Lyu et al. [23]. DS_GITHUB contains 361 bug-
+fixing commits from 285 GitHub repositories covering C and Java
+projects [30]. During our evaluation (March 2026), we removed 6
+unavailable repositories, leaving 355 bug-fixing commits from 279
+repositories. DS_APACHE contains 241 bug-fixing commits from
+five Apache projects [42]. In total, we evaluateAgentSZZon 2,095
+bug-fixing commits with 2,271 bug-inducing commits.
+4.3 Baselines
+We select nine SZZ algorithms discussed in Section 2 as base-
+lines to compare withAgentSZZ: B-SZZ [ 33], AG-SZZ [18], MA-
+SZZ [10], R-SZZ [12], L-SZZ [12], RA-SZZ [24], Neural-SZZ [35],
+TC-SZZ [23], and LLM4SZZ [36], following prior studies [23, 36].
+Neural-SZZ and RA-SZZ are limited to Java projects, so we just com-
+pare in the datasets with Java projects. TG-SZZ [31] are excluded
+as they did not release their implementation.
+To ensure a fair comparison, we run LLM4SZZ using the same
+LLM asAgentSZZ(GPT-5-mini [ 26]), denoted as LLM4SZZ (5-
+mini) in our evaluation. We also include mini-swe-agent [ 47] as
+a baseline, as it represents an agent-based software engineering
+
+===== Page 007 =====
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+framework that supports multi-step reasoning and tool use, mak-
+ing it suitable for complex repository analysis tasks. Overall, we
+compareAgentSZZagainst eleven baselines.

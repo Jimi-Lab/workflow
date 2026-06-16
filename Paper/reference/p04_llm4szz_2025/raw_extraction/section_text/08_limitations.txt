@@ -1,0 +1,166 @@
+6 Discussion
+6.1 Failure Analysis
+In this section, we manually analyze the test cases where LLM4SZZ fails to identify their bug-
+inducing commits correctly. We randomly select 50 test cases from all failed test cases. After the
+analysis, we summarize the failed reasons as follows:
+Bug-inducing commits cannot be found even by tracing back all lines in the expanded
+context. As we mentioned above, LLM4SZZ provides LLMs with more context to help them locate
+buggy statements. If changes are within functions, we expand the context by providing LLMs with
+the full content of the function. Otherwise, we provide it with the three nearest code statements to
+the changed lines. However, there are still some bug-inducing commits that cannot be found even
+by tracing back all lines in the expanded context.
+In 27 test cases, LLM4SZZ fails to find bug-inducing commits due to this issue. In eight of these
+cases, the bug-fixing commits and their corresponding bug-inducing commits modify completely
+different files. In the remaining cases, the bug-fixing and bug-inducing commits modify the same
+files but different functions. Although expanding the context further might help find these bug-
+inducing commits, an excessively long context will undermine the overall performance ofLLM4SZZ,
+as mentioned earlier.
+Failing to locate buggy statements correctly. LLM4SZZ fails to find correct bug-inducing
+commits in 11 cases due to this issue. One main reason for this is that LLM4SZZ focuses only on
+modified lines in the context. Sometimes, it is the unmodified code statements in the context that
+lead to the bug. Although we provide more context to LLMs to avoid this issue, they still face
+challenges in accurately locating buggy statements.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 017 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:17
+Table 6. The performance comparisions between all methods in extended datasets
+Method DS_LINUX DS_GITHUBPrecision Recall F1-score Precision Recall F1-score
+B-SZZ 0.443 0.5920.507 0.416 0.6690.513
+AG-SZZ 0.480 0.532 0.505 0.480 0.581 0.526
+MA-SZZ 0.407 0.532 0.461 0.401 0.595 0.479
+R-SZZ 0.601 0.458 0.519 0.621 0.520 0.566
+L-SZZ 0.564 0.430 0.488 0.548 0.459 0.500
+LLM4SZZ0.642 0.579 0.609 0.646 0.604 0.624
+Failing to choose the correct bug-inducing commit among all candidates. The remaining
+12 test cases fail because LLM4SZZ does not identify the correct bug-inducing commit among
+all candidates. The main reason is that LLM4SZZ fails to determine whether a commit contains
+the bug. The bug-fixing commit 0𝑏136454741 in Figure 8 is a typical example. From the commit
+message, LLM4SZZ first locates two buggy statements, lines 2 and 4, resulting in two candi-
+date commits: 𝑒387𝑓7𝑑5𝑓𝑐𝑐 and 7907𝑓23𝑎𝑑𝑐1. Commit 𝑒387𝑓7𝑑5𝑓𝑐𝑐 introduces line 4 and re-
+places the former function unregister_netdevice_notifier_dev_netwith the current function
+unregister_netdevice_notifier_net. The LLM determines that although returning from the
+function unregister_netdevice_notifier_dev_net requires setting the notifier_cal field to
+null, this does not imply the same for the functionunregister_netdevice_notifier_netas they
+are different functions. Therefore, it determines that commit 𝑒387𝑓7𝑑5𝑓𝑐𝑐ˆ1 does not contain the
+bug, and LLM4SZZ incorrectly identifies 𝑒387𝑓7𝑑5𝑓𝑐𝑐 as the bug-inducing commit.
+6.2 Data Leakage
+Since all three datasets were collected before the release of LLMs like GPT-4o-mini [OpenAI
+2024], there is a potential issue that the performance improvement of LLM4SZZ may result from
+data leakage. To address this concern, we extend two of the datasets. To extend DS_GITHUB,
+we follow the same approach as the original paper [Rosa et al . 2021]. Specifically, we iterate
+through all commits in the dataset’s projects, identifying those whose commit messages contain
+keywords such as "fix" "bug" and "introduce". These commits are added to a candidate list. As
+GPT-4o-mini’s knowledge is limited to data available up to October 2023 [OpenAI 2024], we exclude
+all commits dated before this cutoff. We initially identify 186 candidate commits. Each commit
+is then manually reviewed to confirm its relevance to bug fixing and to ensure the existence of
+corresponding bug-inducing commits. After this filtering process, we obtain 148 verified bug-fixing
+commits and their associated bug-inducing commits. To extend the DS_LINUX dataset, we adopt
+the method used in the original study [Lyu et al . 2024]. Bug-fixing commits in Linux typically
+include the keyword "Fixes:" followed by the commit ID of the bug-inducing commit. Using a
+regular expression, we identify commits with this pattern. Commits dated before October 2023 are
+excluded, resulting in 9,913 bug-fixing commits. From these, we randomly sample 500 commits
+for the experiment, ensuring a 95% confidence level and a margin of error under 5%, the same
+as section 4.2. For DS_APACHE, extending the dataset is more challenging as it is based on bug
+reports that lack a fixed format for identifying bug-inducing commits. In the original study, all bug
+reports were manually analyzed, which required significant human effort. Given that our objective
+is to demonstrate that the performance improvement of LLM4SZZ is not due to data leakage, the
+extended datasets of DS_GITHUB and DS_LINUX are sufficient for this purpose. Therefore, we opt
+not to extend DS_APACHE.
+Table 6 presents the experimental results of LLM4SZZ and the baselines for identifying bug-
+inducing commits across the extended datasets. The best results are highlighted in bold. Among
+the baselines, the R-SZZ algorithm achieves the best performance in two datasets. In DS_LINUX,
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 018 =====
+ISSTA016:18 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+Table 7. Statistics related to the scalability of LLM4SZZ
+DATASET llm calls token numbers time
+DS_LINUX 9.8 14,489 30.43s
+DS_GITHUB 10.3 14,890 20.20s
+DS_APACHE 13.67 24,023 28.14s
+R-SZZ performs comparably to the B-SZZ and AG-SZZ algorithms, while in DS_GITHUB, it
+significantly outperforms all other baselines. From the table, we observe thatLLM4SZZ consistently
+outperforms all baselines. Specifically, in DS_LINUX, it improves precision by 6.8% and the F1-
+score by 17.3% compared to the best-performing baseline. Similarly, in DS_GITHUB, LLM4SZZ
+improves precision by 4.0% and the F1-score by 10.2%. These results demonstrate that LLM4SZZ’s
+performance improvements are not caused by data leakage.
+6.3 Scalability
+Table 7 presents statistics on the scalability of LLM4SZZ, including the average number of LLM
+calls, the average number of tokens consumed, and the average time required to process a bug-
+fixing commit. The average number of LLM calls and the average token consumption are primarily
+determined by the size of the bug-fixing commit. Bug-fixing commits in DS_APACHE are generally
+larger than those in DS_GITHUB and DS_LINUX, which results in higher LLM call frequencies and
+greater token consumption for DS_APACHE.
+Additionally, the table shows that LLM4SZZ requires approximately 30 seconds to handle a
+bug-fixing commit. This is longer than the processing time of some baselines, such as the B-SZZ
+algorithm, because these baselines rely on basic assumptions or simple heuristic rules. However,
+when compared to more complex techniques like RA-SZZ, which employs program analysis to
+detect refactorings, LLM4SZZ is significantly faster. Our experiment indicates that RA-SZZ takes
+an average of 78.4 seconds to process a single bug-fixing commit, nearly 2.6 times longer than
+LLM4SZZ.
+The total time cost of LLM4SZZ consists of two components: the time for LLM calls and the time
+required to retrieve relevant project information. For example, LLM4SZZ retrieves file contents
+from specific commits in the project, which contributes to the time cost. This explains why the
+average processing time for bug-fixing commits in DS_LINUX is longer than that in DS_GITHUB
+and DS_APACHE, even though DS_LINUX requires fewer LLM calls. The Linux project’s large size
+increases the time required for information retrieval, leading to higher overall processing times.
+Although this larger size results in increased time, the overal time remains acceptable, indicating
+that LLM4SZZ is feasible for large projects. We also investigate whether there are any extremely
+long bug-fixing commits that exceed the LLM’s token limit. Our results show that there is only one
+such commit in the Hadoop project, and it has minimal impact on overall performance.
+6.4 Bugs that LLMs Fail to Understand
+In this section, we analyze the test cases in which LLMs fail to understand the bug and fall back
+to rank-based identification. We randomly select 50 such test cases from the total of 797 failed
+cases and manually examine the characteristics of the bugs. Among these, 38 test cases are from
+DS_LINUX, 7 from DS_GITHUB, and 5 from DS_APACHE. We categorize the bugs into two types:
+those with an excessively large context and those requiring subtle changes to resolve.
+Bugs involving an excessively large context. LLM4SZZ performs context refinement before
+requiring the LLM to determine whether the commit contains a bug. However, even after refinement,
+the context can remain excessively large. In 32 of the analyzed test cases, the context ranges from
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.
+
+
+===== PAGE 019 =====
+LLM4SZZ: Enhancing SZZ Algorithm with Context-Enhanced Assessment on Large Language Models ISSTA016:19
+Table 8. The statistics of extra bug-inducing commits identified by LLM4SZZ
+Count DS_LINUX DS_GITHUB DS_APACHE
+only-additions 97 15 3
+with-deletions 25 12 6
+total 122 27 9
+330 to 1,887 lines of code. This overwhelming long context hinders the LLM’s ability to accurately
+detect the bug.
+Fixing the bug requires subtle changes. The remaining 18 failed test cases arise from the LLM’s
+difficulty in detecting subtle changes. For example, some bug-fixing commits only reorder code
+statements. In such cases, the LLM may incorrectly assume that both versions contain the same
+statements, misidentifying them as buggy. Similarly, bug fixes involving minimal changes, such as
+altering a single word in a long string, are also challenging for the LLM to detect.
+6.5 Can LLM4SZZ Find Extra Bug-inducing Commits?
+In this section, we examine whether LLM4SZZ can identify extra commits that all baselines cannot.
+Table 8 presents the statistics of the extra bug-inducing commits that baselines fail to find.LLM4SZZ
+identifies 109 extra bug-inducing commits in DS_LINUX, 31 in DS_GITHUB, and 10 in DS_APACHE,
+accounting for 7.8%, 7.4%, and 2.5% of the total bug-inducing commits, respectively.
+We classify these bug-fixing commits into two categories: those containing only added lines
+and those containing deleted lines. From the table, we observe that LLM4SZZ effectively identifies
+bug-inducing commits from those with only added lines. Additionally, techniques employed in
+LLM4SZZ, such as context expanding, facilitate the discovery of extra bug-inducing commits from
+bug-fixing commits with deleted lines. In DS_LINUX, the majority of extra bug-inducing commits
+are identified from bug-fixing commits with only added lines. Conversely, in DS_GITHUB, the
+number of extra bug-inducing commits found from bug-fixing commits with only added lines is
+nearly equal to those identified from bug-fixing commits with deleted lines.
+6.6 Threats to Validity
+Internal Validity. The LLMs may produce random outputs during the experiment. To minimize
+bias, we set the same parameters for all models. Additionally, we repeat the experiment three times
+and select the majority result as the final output. We also conduct our experiment on large-scale
+datasets to counteract the randomness. These datasets consist of two programming languages and
+a total of 2,104 test cases.
+External Validity. One potential limitation is that we implement and evaluate LLM4SZZ on only
+two programming languages, C and Java. However, the majority of bug-fixing commits in the
+three datasets are written in these two languages. Another concern is that DS_LINUX is created
+by randomly selecting test cases from the original dataset. To mitigate bias, we selected a total of
+1,500 test cases, achieving over a 95% confidence level with a confidence interval of 3. The third
+threat is the assumption that most bugs are fully fixed and introduced with a single commit. While
+this assumption holds for most test cases in the three datasets, it may not reflect all real-world
+scenarios. In the future, we plan to collect additional datasets to address this limitation.

@@ -1,0 +1,110 @@
+4.2 Classification and Explainability
+While in principle a wide range of methods are available
+for learning a classifier for the detection of vulnerability
+contributing commits, only few methods scale with larger
+amount of data while also providing explanations for their
+decisions. One technique satisfying both properties are lin-
+ear Support Vector Machines (SVM). This variant of classic
+SVMs does not apply the kernel trick for learning, but in-
+stead directly operates in the input space. As a result, the
+run-time complexity of a linear SVM scales linearly in the
+number of vectors and features.
+We implement our classifier for commits using the open-
+source tool LibLinear [17] that provides diﬀerent optimiza-
+tion algorithms for linear SVMs. Each of these algorithms
+seeks a hyperplane w that separates two given classes with
+maximum margin, in our case corresponding to unclassi-
+fied commits and vulnerability-contributing commits. As
+the learning is performed in the input space, we can use
+this hyperplane vector w for explaining the decisions of our
+classifier.
+By calculating the inner product between ϕ(x) and the
+vector w, we obtain a score which describes the distance from
+ϕ(x) to the hyperplane; that is, how likely the commit intro-
+duces a vulnerability, f(x) = ⟨ϕ(x),w⟩= ∑
+s∈S ws b(x,s).
+As this inner product is computed using a summation over
+each feature, we can simply test which features provide the
+biggest contribution to this distance and thus are causal for
+the decision.
+Finally, to calibrate free parameters of the linear SVM,
+namely the regularization parameter C and the class weight
+W, we perform a standard cross-validation on the training
+data. We then pick the best values corresponding to a reg-
+ularization cost C = 1 and a weight W = 100 for the class
+of suspicious commits.
+5. EV ALUATION
+We evaluate the eﬀectiveness of our approach in several
+diﬀerent ways. First, we use a temporal split between the
+training and test data to evaluate the predictiveness of the
+SVM. We picked 2011 as the split data to have the rela-
+tion of two-thirds to one-thirds training vs test data.5 Since
+we have the ground truth for the years 2011 to 2014 this
+method is the allows us to realistically and reliably test the
+eﬀectiveness of VCCFinder.
+Dataset
+Historical Test Total
+CVEs 469 249 718
+VCCs 421 219 640
+Unclassified commits 90,282 79,220 169,502
+Table 3: Distribution of commits, CVEs, and VCCs.
+5This is a standard approach to evaluate classifiers. The
+first dataset contains all commit data up until the 31st of
+December 2010. We use this dataset for the design and
+training of our classifier. The dataset can be considered the
+‘historical’ dataset. The second ‘testing’ dataset contains
+all commit data from 2011 to 2014 which is then used to
+evaluate our approach. This simulates VCCFinder being
+used in the beginning of 2011 having being trained on all
+existing data at the time and then trying to predict the
+unkown VCCs of the future (2011 to 2014).
+0.0 0.2 0.4 0.6 0.8 1.0
+Recall
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Precision
+combined
+code metrics
+code
+meta-data
+(a) Detection performance of VC-
+CFinder using diﬀerent feature sets.
+0.0 0.2 0.4 0.6 0.8 1.0
+Recall
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0Precision
+VCCFinder
+Flawfinder
+(b) Detection performance of our ap-
+proach and FlawFinder as precision-
+recall curve.
+Figure 1: Detection performance of VCCFinder.
+Second, we discuss the features learnt by the SVM as well
+as the true positives, i.e. vulnerabilities our classifier found
+in the test set. Third, we discuss the commits that are
+flagged by our classifier but lie outside the ground truth
+we have based on the CVEs. These could either be false
+positives or point to previously undetected vulnerabilities.
+Finally, we compare our approach to Flawfinder, an open-
+source static code analyzer.
+Comparing feature sets.
+We start with an evaluation of the impact of diﬀerent
+feature sets and their combination on the detection perfor-
+mance of our classifier. Figure 1(a) shows the precision-
+recall curves for these experiments. To this end, we train
+a classifier on code metric features and meta-information.
+As can be seen, the classifier that combines all the features
+(shown in blue) out-performs the classifiers which only oper-
+ate on a sub-set of the features, showing that combining the
+diﬀerent features is beneficial. Figure 1(b) shows the preci-
+sion recall curve of our VCCFinder compared to Flawfinder,
+which only operates on code metrics. The comparison with
+Flawfinder will be discussed in greater depth in section 5.3.
+433

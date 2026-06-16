@@ -1,0 +1,386 @@
+===== PAGE 019 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2237
+Linux kernel does not record pull requests (PR). Consequently,
+our evaluation did not extend to the PR level.
+Internal validity. There may be some pitfalls in automati-
+cally collecting bug-inducing commits. After selecting commits
+with “Fixes:”, 2,358 (3%) of the commits could not be matched
+to any bug-inducing commit. These commit IDs are stored in
+a dedicated dataset. We manually label the commit ids in this
+abnormal dataset and divide them into two categories: partial
+commit ID and not in the repository.
+Partial commit ID indicates commits where the text after the
+keyword “Fixes:” is not recognized by the automated ﬁltering
+technique as a commit ID. The ﬁltering technique checks the
+commit ID using the regular expression [0-9a-f]{7,40}, requir-
+ing 7-40 characters. The total number of Partial commit ID
+commits is 1,021 (1.3%). They include four causes: (i) the con-
+tent after Fixes is a link to a bug report; (e.g., Fixes: http://bugs.
+gentoo.org/show_bug.cgi?id=87182) (ii) the content after Fixes
+gives some description of the bug; (iii) the content after Fixes
+has some format problems (e.g., Fixes: commit fda789fda); (iv)
+the commit ID after Fixes: may be too short.
+Not in the repository indicates that the method can recognize
+the commit ID in the commit message, however, the commit
+ID does not exist in the list of commit IDs fetched from the
+master branch of the Linux kernel repository. The number of
+commits in this situation is 1,337 (1.7%). It includes three
+prominent cases: (i) format problem: irregular formatting mak-
+ing it impossible to search for the commit ID (e.g., fda798fda:,
+7598e8700e9a(drm/i915/gvt:; (ii) rebase problem: the commit
+is not in any branch of the repository, and may belong to a fork
+outside of the repository; (iii) branch problem: we only focus on
+the master branch, while some commits may occur in another
+branch.
+However, in total, anomalous commits only account for 3%
+of the total number of commits. We have made these abnormal
+commits publicly available in a CSV ﬁle for further study. So,
+we believe that the threat is minimal.
+To minimize threats to internal validity from implementation
+errors, we use the implementation of MA-SZZ from the replica-
+tion package of Rosa et al. [28] without making modiﬁcations.
+However, a deeper analysis found that the implementation of
+MA-SZZ by Rosa et al. [28] diverged from MA-SZZ’s orig-
+inal implementation [12]. The implementation of Rosa et al.
+included additional modiﬁcations for detecting the movement
+of code within ﬁles and from other ﬁles.
+Another threat to internal validity is that some bug-ﬁxing
+commits are also bug-inducing commits. In our analysis, we
+found that there are 4,517 such common commits in our dataset,
+which represent both bug-ﬁxing and bug-inducing actions.
+These common commits account for only 5.9% out of the total
+76,046 unique commits. To mitigate this threat, we have listed
+all these commits in a ﬁle named “common_hashes.txt” in the
+replication package. This collection of cases where developers
+introduce bugs while ﬁxing bugs may provide opportunities for
+further study.
+External validity. Considering that our study focuses on a
+single software project, primarily utilizing the C programming
+language, our ﬁndings may not generalize to other projects
+or programming languages. However, the Linux kernel is a
+well-structured software repository with a substantial code size
+(Linux v6.0 contains 23 MLOC). Therefore, it serves as a
+valuable research object for evaluating the effectiveness of SZZ
+algorithms.
+X. CONCLUSION AND FUTURE WORK
+SZZ is a vital algorithm for mining software repositories,
+and many studies rely on its results. Ensuring the precision and
+recall of SZZ in real scenarios is thus crucial.
+In our study, we collected a dataset of 76K bug-ﬁxing com-
+mits linked to bug-inducing commits in the Linux kernel. We
+evaluated six SZZ algorithms on this dataset, analyzed the ghost
+commits issue, and examined its impact on SZZ. We proposed
+TC-SZZ, which can ﬁnd a bug-inducing commit for 17.7% of
+the failure cases. Upon investigating the remaining failures, we
+found that in 37.9% of the cases, the bug-inducing commit is not
+in the ﬁle history. ChatGPT demonstrates potential in assisting
+the SZZ algorithm in identifying the associated bug-inducing
+commits in these challenging cases.
+Our publicly available dataset of 76K bug-ﬁxing commits
+with their bug-inducing commits provides a unique opportunity
+for advancing SZZ algorithm research, including training Large
+Language Models (LLMs) for improved precision and recall.
+Key areas for future exploration include: (1) Enhancing SZZ
+Algorithm Precision: Despite R-SZZ achieving 59% preci-
+sion, there is signiﬁcant potential for improvement. Future stud-
+ies should explore patterns beyond non-semantic source code,
+meta-changes, and refactoring changes to increase accuracy. (2)
+Refactoring Solutions Across Programming Languages:
+The extension of refactoring solutions, typically focused on
+Java, to other programming languages like C in our Linux
+dataset, remains a challenge needing attention. (3) Addressing
+Undeﬁned Failures in Recall: Investigating the 23.08% of
+previously undeﬁned failure cases, alongside ‘Ghost Commit’
+issues, is crucial for a more comprehensive understanding and
+improvement of recall. (4) Impacts on Downstream Tasks:
+Utilizing our dataset to evaluate the effect of SZZ algorithms on
+downstream tasks, such as Just-in-Time defect prediction, offers
+a promising direction for future research. These directions not
+only aim to reﬁne SZZ algorithms but also seek to understand
+their broader implications in software engineering research.
+DATA AVAILABILITY
+The dataset used in this paper, the TC-SZZ implementation,
+and the results of ChatGPT experiments are publicly available
+at https://doi.org/10.6084/m9.ﬁgshare.23889792.v2.
+ACKNOWLEDGMENT
+Any opinions, ﬁndings and conclusions or recommendations
+expressed in this material are those of the author(s) and do not
+reﬂect the views of National Research Foundation, Singapore.
+REFERENCES
+[1] J. ´Sliwerski, T. Zimmermann, and A. Zeller, “When do changes induce
+ﬁxes?” in Proc. Int. Workshop Mining Softw. Repositories, (MSR), 2005,
+pp. 1–5.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 020 =====
+2238
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+[2] S. Kim, T. Zimmermann, K. Pan, and E. James Jr, “Automatic identiﬁ-
+cation of bug-introducing changes,” in Proc. 21st IEEE/ACM Int. Conf.
+Automated Softw. Eng. (ASE’06), Piscataway, NJ, USA: IEEE Press,
+2006, pp. 81–90.
+[3] H. Hata, O. Mizuno, and T. Kikuno, “Bug prediction based on ﬁne-
+grained module histories,” in Proc. 34th Int. Conf. Softw. Eng. (ICSE),
+Piscataway, NJ, USA: IEEE Press, 2012, pp. 200–210.
+[4] M. Tan, L. Tan, S. Dara, and C. Mayeux, “Online defect prediction for
+imbalanced data,” in Proc. IEEE/ACM 37th IEEE Int. Conf. Softw. Eng.,
+vol. 2, Piscataway, NJ, USA: IEEE Press, 2015, pp. 99–108.
+[5] L. Pascarella, F. Palomba, and A. Bacchelli, “Fine-grained just-in-time
+defect prediction,” J. Syst. Softw., vol. 150, pp. 22–36, Apr. 2019.
+[6] M. Yan, X. Xia, Y. Fan, A. E. Hassan, D. Lo, and S. Li, “Just-in-time
+defect identiﬁcation and localization: A two-phase framework,” IEEE
+Trans. Softw. Eng., vol. 48, no. 1, pp. 82–101, Jan. 2022.
+[7] Y. Fan, X. Xia, D. A. Da Costa, D. Lo, A. E. Hassan, and S. Li, “The
+impact of mislabeled changes by SZZ on just-in-time defect prediction,”
+IEEE Trans. Softw. Eng., vol. 47, no. 8, pp. 1559–1586, Aug. 2021.
+[8] G. Bavota and B. Russo, “Four eyes are better than two: On the impact
+of code reviews on software quality,” in Proc. IEEE Int. Conf. Softw.
+Maintenance Evolution (ICSME), Piscataway, NJ, USA: IEEE Press,
+2015, pp. 81–90.
+[9] M. Tufano, G. Bavota, D. Poshyvanyk, M. Di Penta, R. Oliveto,
+and A. De Lucia, “An empirical study on developer-related factors
+characterizing ﬁx-inducing commits,” J. Softw.: Evol. Process, vol. 29,
+no. 1, 2017, Art. no. e1797.
+[10] H. Aman, S. Amasaki, T. Yokogawa, and M. Kawahara, “Empirical
+study of fault introduction focusing on the similarity among local
+variable names.” in Proc. 7th Int. Workshop Quantitative Approaches
+Softw. Qual. (QuASoQ), 2019, pp. 3–11.
+[11] B. Chen and Z. M. J. Jiang, “Extracting and studying the logging-code-
+issue-introducing changes in Java-based large-scale open source software
+systems,” Empirical Softw. Eng., vol. 24, no. 4, pp. 2285–2322, 2019.
+[12] D. A. Da Costa, S. McIntosh, W. Shang, U. Kulesza, R. Coelho, and
+A. E. Hassan, “A framework for evaluating the results of the SZZ
+approach for identifying bug-introducing changes,” IEEE Trans. Softw.
+Eng., vol. 43, no. 7, pp. 641–657, Jul 2017.
+[13] E. C. Neto, D. A. Da Costa, and U. Kulesza, “The impact of refactoring
+changes on the SZZ algorithm: An empirical study,” in Proc. IEEE 25th
+Int. Conf. Softw. Anal., Evol. Reeng. (SANER), Piscataway, NJ, USA:
+IEEE Press, 2018, pp. 380–390.
+[14] E. C. Neto, D. A. da Costa, and U. Kulesza, “Revisiting and improving
+SZZ implementations,” in Proc. ACM/IEEE Int. Symp. Empirical Softw.
+Eng. Meas. (ESEM), Piscataway, NJ, USA: IEEE Press, 2019, pp. 1–12.
+[15] C. Williams and J. Spacco, “SZZ revisited: Verifying when changes
+induce ﬁxes,” in Proc. Workshop Defects Large Softw. Syst., 2008,
+pp. 32–36.
+[16] S. Davies, M. Roper, and M. Wood, “Comparing text-based and
+dependence-based approaches for determining the origins of bugs,”
+J. Softw.: Evol. Process, vol. 26, no. 1, pp. 107–139, 2014.
+[17] C. Rezk, Y. Kamei, and S. Mcintosh, “The ghost commit problem when
+identifying ﬁx-inducing changes: An empirical study of apache projects,”
+IEEE Trans. Softw. Eng., vol. 48, no. 9, pp. 3297–3309, Sep. 2022.
+[18] K. Herzig and A. Zeller, “The impact of tangled code changes,” in
+Proc. 10th Work. Conf. Mining Softw. Repositories (MSR), Piscataway,
+NJ, USA: IEEE Press, 2013, pp. 121–130.
+[19] E. Sahal and A. Tosun, “Identifying bug-inducing changes for code
+additions,” in Proc. 12th ACM/IEEE Int. Symp. Empirical Softw. Eng.
+Meas., 2018, pp. 1–2.
+[20] S. Kim, E. J. Whitehead, and Y. Zhang, “Classifying software changes:
+Clean or buggy?” IEEE Trans. Softw. Eng., vol. 34, no. 2, pp. 181–196,
+Mar./Apr. 2008.
+[21] Z. Tóth, P. Gyimesi, and R. Ferenc, “A public bug database of GitHub
+projects and its application in bug prediction,” in Proc. Int. Conf.
+Comput. Sci. Appl., Cham, Switzerland: Springer, 2016, pp. 625–638.
+[22] M. Wen, R. Wu, and S.-C. Cheung, “Locus: Locating bugs from software
+changes,” in Proc. 31st IEEE/ACM Int. Conf. Automated Softw. Eng.
+(ASE), Piscataway, NJ, USA: IEEE Press, 2016, pp. 262–273.
+[23] S. Kim, T. Zimmermann, E. J. Whitehead Jr, and A. Zeller, “Predict-
+ing faults from cached history,” in Proc. 29th Int. Conf. Softw. Eng.
+(ICSE’07), Piscataway, NJ, USA: IEEE Press, 2007, pp. 489–498.
+[24] F. Rahman, D. Posnett, A. Hindle, E. Barr, and P. Devanbu, “BugCache
+for inspections: Hit or miss?” in Proc. 19th ACM SIGSOFT Symp. 13th
+Eur. Conf. Found. Softw. Eng., 2011, pp. 322–331.
+[25] J. Eyolfson, L. Tan, and P. Lam, “Correlations between bugginess
+and time-based commit characteristics,” Empirical Softw. Eng., vol. 19,
+no. 4, pp. 1009–1039, 2014.
+[26] M. L. Bernardi, G. Canfora, G. A. Di Lucca, M. Di Penta, and
+D. Distante, “The relation between developers’ communication and
+ﬁx-inducing changes: An empirical study,” J. Syst. Softw., vol. 140,
+pp. 111–125, Jun. 2018.
+[27] D. Izquierdo-Cortázar, G. Robles, and J. M. González-Barahona, “Do
+more experienced developers introduce fewer bugs?” in Proc. IFIP
+Int. Conf. Open Source Syst., Berlin, Heidelberg: Springer, 2012,
+pp. 268–273.
+[28] G. Rosa, L. Pascarella, S. Scalabrino, R. Tufano, G. Bavota, M. Lanza,
+and R. Oliveto, “Evaluating SZZ implementations through a developer-
+informed oracle,” in Proc. IEEE/ACM 43rd Int. Conf. Softw. Eng. (ICSE),
+Piscataway, NJ, USA: IEEE Press, 2021, pp. 436–447.
+[29] D. Silva and M. T. Valente, “RefDiff: Detecting refactorings in version
+histories,” in Proc. IEEE/ACM 14th Int. Conf. Mining Softw. Repositories
+(MSR), Piscataway, NJ, USA: IEEE Press, 2017, pp. 269–279.
+[30] N. Tsantalis, M. Mansouri, L. M. Eshkevari, D. Mazinanian, and
+D. Dig, “Accurate and efﬁcient refactoring detection in commit history,”
+in Proc. 40th Int. Conf. Softw. Eng., 2018, pp. 483–494.
+[31] Q. Zhong, L. Ding, J. Liu, B. Du, and D. Tao, “Can ChatGPT understand
+too? A comparative study on ChatGPT and ﬁne-tuned BERT,” 2023,
+arXiv:2302.10198.
+[32] J. White, S. Hays, Q. Fu, J. Spencer-Smith, and D. C. Schmidt,
+“ChatGPT prompt patterns for improving code quality, refactoring,
+requirements elicitation, and software design,” 2023, arXiv:2303.07839.
+[33] D. Spadini, M. Aniche, and A. Bacchelli, “PyDriller: Python framework
+for mining software repositories,” in Proc. 26th ACM Joint Meeting Eur.
+Softw. Eng. Conf. Symp. Found. Softw. Eng., 2018, pp. 908–911.
+[34] M. Borg, O. Svensson, K. Berg, and D. Hansson, “SZZ unleashed: An
+open implementation of the SZZ algorithm-featuring example usage in
+a study of just-in-time bug prediction for the Jenkins project,” in Proc.
+3rd ACM SIGSOFT Int. Workshop Mach. Learn. Techn. Softw. Qual.
+Eval., 2019, pp. 7–12.
+[35] V. Lenarduzzi, F. Palomba, D. Taibi, and D. A. Tamburri, “Open-
+SZZ: A free, open-source, web-accessible implementation of the SZZ
+algorithm,” in Proc. 28th Int. Conf. Program Comprehension, 2020,
+pp. 446–450.
+[36] S. Herbold, A. Trautsch, F. Trautsch, and B. Ledel, “Problems with
+SZZ and features: An empirical study of the state of practice of
+defect prediction data collection,” Empirical Softw. Eng., vol. 27, no. 2,
+pp. 1–49, 2022.
+[37] K. Herzig, S. Just, and A. Zeller, “It’s not a bug, it’s a feature: How
+misclassiﬁcation impacts bug prediction,” in Proc. 35th Int. Conf. Softw.
+Eng. (ICSE), Piscataway, NJ, USA: IEEE Press, 2013, pp. 392–401.
+[38] C. Bird, A. Bachmann, E. Aune, J. Duffy, A. Bernstein, V. Filkov,
+and P. Devanbu, “Fair and balanced? Bias in bug-ﬁx datasets,” in Proc.
+7th Joint Meeting Eur. Softw. Eng. Conf. ACM SIGSOFT Symp. Found.
+Softw. Eng., 2009, pp. 121–130.
+[39] T. H. Nguyen, B. Adams, and A. E. Hassan, “A case study of bias in
+bug-ﬁx datasets,” in Proc. 17th Work. Conf. Reverse Eng., Piscataway,
+NJ, USA: IEEE Press, 2010, pp. 259–268.
+[40] R. Wu, H. Zhang, S. Kim, and S.-C. Cheung, “ReLink: Recovering links
+between bugs and changes,” in Proc. 19th ACM SIGSOFT Symp. 13th
+Eur. Conf. Found. Softw. Eng., 2011, pp. 15–25.
+[41] S. McIntosh and Y. Kamei, “Are ﬁx-inducing changes a moving target?
+A longitudinal case study of just-in-time defect prediction,” in Proc.
+40th Int. Conf. Softw. Eng., 2018, pp. 560–560.
+[42] T. Zimmermann, S. Kim, A. Zeller, and E. J. Whitehead Jr, “Mining
+version archives for co-changed lines,” in Proc. Int. Workshop Mining
+Softw. Repositories, 2006, pp. 72–75.
+[43] C. C. Williams and J. W. Spacco, “Branching and merging in the
+repository,” in Proc. Int. Work. Conf. Mining Softw. Repositories, 2008,
+pp. 19–22.
+[44] J. Pace, “A tool which compares Java ﬁles based on content,” Jpace.
+Accessed: Jan. 15, 2024. [Online]. Available: http://www.incava.org/
+projects/java/diffj
+[45] G. Rodríguez-Pérez, G. Robles, and J. M. González-Barahona, “Repro-
+ducibility and credibility in empirical software engineering: A case study
+based on a systematic literature review of the use of the SZZ algorithm,”
+Inf. Softw. Technol., vol. 99, pp. 164–176, Jul. 2018.
+[46] F.
+Petrulio
+et
+al.,
+“SZZ
+in
+the
+time
+of
+pull
+requests,”
+2022,
+arXiv:2209.03311.
+[47] P. Bludau and A. Pretschner, “PR-SZZ: How pull requests can support
+the tracing of defects in software repositories,” in Proc. IEEE Int. Conf.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 021 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2239
+Softw. Anal., Evol. Reeng. (SANER), Piscataway, NJ, USA: IEEE Press,
+2022, pp. 1–12.
+[48] L. Bao, X. Xia, A. E. Hassan, and X. Yang, “V-SZZ: Automatic
+identiﬁcation of version ranges affected by CVE vulnerabilities,” in Proc.
+44th Int. Conf. Softw. Eng., 2022, pp. 2352–2364.
+[49] L. Erlikh, “Leveraging legacy system dollars for e-business,” IT Profes-
+sional, vol. 2, no. 3, pp. 17–23, 2000.
+[50] R. Minelli, A. Mocci, and M. Lanza, “I know what you did last summer-
+an investigation of how developers spend their time,” in Proc. IEEE 23rd
+Int. Conf. Program Comprehension, Piscataway, NJ, USA: IEEE Press,
+2015, pp. 25–35.
+[51] R. Baeza-Yates et al., Modern Information Retrieval, vol. 463. New
+York, NY, USA: ACM, 1999.
+[52] C. D. Manning, Introduction to Information Retrieval. Cambridge, UK:
+Cambridge University Press, 2008.
+[53] R. Oliveto, M. Gethers, D. Poshyvanyk, and A. De Lucia, “On the
+equivalence of information retrieval methods for automated traceability
+link recovery,” in Proc. IEEE 18th Int. Conf. Program Comprehension,
+Piscataway, NJ, USA: IEEE Press, 2010, pp. 68–71.
+[54] J. Cohen, Statistical Power Analysis for the Behavioral Sciences.
+Evanston, IL, USA: Routledge, 2013.
+[55] H. Hata, C. Treude, R. G. Kula, and T. Ishio, “9.6 million links in source
+code comments: Purpose, evolution, and decay,” in Proc. IEEE/ACM
+41st Int. Conf. Softw. Eng. (ICSE), Piscataway, NJ, USA: IEEE Press,
+2019, pp. 1211–1221.
+[56] J. E. Montandon, C. Politowski, L. L. Silva, M. T. Valente, F. Petrillo,
+and Y.-G. Guéhéneuc, “What skills do it companies look for in new
+developers? A study with stack overﬂow jobs,” Inf. Softw. Technol.,
+vol. 129, 2021, Art. no. 106429.
+[57] M. Aniche et al., “How modern news aggregators help development
+communities shape and share knowledge,” in Proc. 40th Int. Conf. Softw.
+Eng., 2018, pp. 499–510.
+[58] J. Wang, L. Li, and A. Zeller, “Restoring execution environments of
+Jupyter notebooks,” in Proc. IEEE/ACM 43rd Int. Conf. Softw. Eng.
+(ICSE), Piscataway, NJ, USA: IEEE Press, 2021, pp. 1622–1633.
+[59] Y. Wang, H. Le, A. D. Gotmare, N. D. Bui, J. Li, and S. C. Hoi,
+“CodeT5+: Open code large language models for code understanding
+and generation,” 2023, arXiv:2305.07922.
+[60] E. Nijkamp, H. Hayashi, C. Xiong, S. Savarese, and Y. Zhou, “Code-
+Gen2: Lessons for training LLMs on programming and natural lan-
+guages,” 2023, arXiv:2305.02309.
+[61] G. Rodriguez-Perez, M. Nagappan, and G. Robles, “Watch out for
+extrinsic bugs! A case study of their impact in just-in-time bug prediction
+models on the OpenStack project,” IEEE Trans. Softw. Eng., vol. 48,
+no. 4, pp. 1400–1416, Apr. 2022.
+Yunbo Lyu is a Ph.D. student and a Research Engi-
+neer with the School of Computing and Information
+Systems, Singapore Management University under
+the supervision of Prof. David Lo. His research
+interests include mining software repositories and
+library usage. His work has been published in high-
+quality software engineering conferences such as
+ICSE. For more information, see https://yunbolyu.
+github.io.
+Hong Jin Kang received the Ph.D. degree from Sin-
+gapore Management University. He is an Incoming
+Faculty Member with the University of Sydney. He
+is currently a Postdoctoral Fellow with the Univerity
+of California, Los Angeles. His research interest
+includes aims to improve developer productivity by
+leveraging human knowledge through methods such
+as active learning. For more information, see https://
+https//kanghj.github.io/.
+Ratnadira Widyasari is a Ph.D. candidate with
+the School of Computing and Information Systems,
+Singapore Management University, under the su-
+pervision of Prof. David Lo. Her research inter-
+ests include the topic of artiﬁcial intelligence and
+explainability for software engineering, speciﬁcally
+for software quality assurance. For more informa-
+tion, see https://ratnadiraw.github.io/.
+Julia Lawall received the Ph.D. degree from Indi-
+ana University, in 1994. She is a Researcher with
+Inria Paris, where she is the Head of the Whisper
+team. Her research interests include systems and
+software engineering. Since 2004, she has been de-
+signing and maintaining the program transformation
+tool Coccinelle, which has been extensively used on
+the Linux kernel.
+David Lo (Fellow, IEEE) is the OUB Chair Pro-
+fessor of Computer Science and the Director of
+the Center for Research in Intelligent Software
+Engineering (RISE) with Singapore Management
+University. Championing the area of AI for Software
+Engineering (AI4SE) since the mid-2000s, he has
+demonstrated how AI—encompassing data mining,
+machine learning, information retrieval, natural lan-
+guage processing, and search-based algorithms—
+can transform software engineering data into au-
+tomation and insights. His contributions have led
+to over 20 awards including two Test-of-Time Awards and ten ACM SIG-
+SOFT/IEEE TCSE Distinguished Paper Awards and gathered more than
+30k citations. He is an ACM Fellow, ASE Fellow, and National Research
+Foundation Investigator (Senior Fellow), he has also served as a PC Co-Chair
+for ASE’20, FSE’24, and ICSE’25. For more information, see http://www.
+mysmu.edu/faculty/davidlo/.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+[NEEDS CITATION VERIFICATION] Text-only references; no BibTeX verification.

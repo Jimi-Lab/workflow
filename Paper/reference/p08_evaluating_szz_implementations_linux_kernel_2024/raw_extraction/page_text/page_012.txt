@@ -1,0 +1,155 @@
+2230
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE VI
+RESULTS AFTER REMOVING THE GHOST COMMIT. PRECISION, RECALL,
+AND F-MEASURE CALCULATED FOR ALL SZZ ALGORITHMS. RMG,
+AMG ARE THE SHORT FOR REMOVE MAPPING GHOST AND
+ADD MAPPING GHOST
+Algorithm
+Filter RMG
+Filter AMG
+Filter RMG, AMG
+B-SZZ
+0.70
+0.58
+0.71
+AG-SZZ
+0.68
+0.56
+0.68
+L-SZZ
+0.52
+0.44
+0.53
+R-SZZ
+0.55
+0.46
+0.55
+MA-SZZ
+0.66
+0.55
+0.67
+SZZ@PYD
+0.67
+0.56
+0.67
+from the 1946 bug-inducing commits, 184 (9.46%) are Add
+Mapping Ghosts.
+To investigate the impact of ghost commits on SZZ algo-
+rithms, we remove the Remove and Add Mapping Ghost cases
+from KFC dataset. The experimental results for this modiﬁed
+dataset are presented in Table VI, which should be compared
+to the original results in Table II. “Filter RMG” refers to the re-
+moval of Remove Mapping Ghost bug-ﬁxing commits from our
+dataset. “Filter AMG” indicates the removal of Add Mapping
+Ghost bug-inducing commits from our dataset. “Filter RMG,
+AMG” signiﬁes the removal of both types of commits from
+our dataset. For example, when considering the B-SZZ algo-
+rithm, as shown in Table VI, only ﬁltering Add Mapping Ghost
+reduces the recall from 0.71 to 0.58 (↓22.4%), compared to
+ﬁltering both Remove and Add Mapping Ghost. While ﬁltering
+only Remove Mapping Ghost leads to a decrease in recall to 0.7
+(↓1.4%). These ﬁndings suggest that Remove Mapping Ghost
+has a more pronounced negative impact on the recall of SZZ al-
+gorithms. When compared to the results in Table II, the average
+recall for all SZZ algorithms in the KFC dataset improves by
+22.2% after the removal of Remove and Add Mapping Ghost.
+The precision of all SZZ algorithms remains unchanged due
+to the SZZ algorithms not producing any results for Remove
+Mapping Ghost cases and the relatively small proportion of Add
+Mapping Ghost cases.
+RQ2 Findings: Compared to Rezk’s study, the KFC
+dataset shows a signiﬁcant increase in Remove
+Mapping Ghosts (from 7.64% to 17.47%) and Add
+Mapping Ghosts (from 2.68% to 5.3%). Notably,
+Remove Mapping Ghosts negatively impact the
+recall of the SZZ algorithms (↓22.4%).
+C. RQ3: Other Failure Situations
+Given that B-SZZ exhibits the highest recall and identiﬁes
+the most unique bug-inducing commits among all the SZZ
+algorithms we evaluated in this paper, we further scrutinize
+all failure instances of B-SZZ to uncover additional failure
+scenarios.
+Table VII categorizes the B-SZZ algorithm results. “Success”
+indicates that B-SZZ identiﬁes all bug-inducing commits for
+a bug-ﬁxing commit; “Partial Success” implies at least one
+bug-inducing commit is identiﬁed but at least one is missed;
+TABLE VII
+CATEGORIZATION OF B-SZZ ALGORITHM RESULTS IN THE
+LINUX KERNEL
+Category
+Number
+Percentage
+Success
+43,846
+57.66%
+Partial Success
+1,002
+1.32%
+Mapping Ghost
+13,646
+17.94%
+Remove Mapping Ghost
+13,285
+17.47%
+Add Mapping Ghost
+361
+0.47%
+Failure without MG
+17,552
+23.08%
+Within-File Detection
+3,965
+5.21%
+Function-Log Detection
+4,994
+6.57%
+Line Change Detection
+3,115
+4.1%
+Cross-File Detection
+5,478
+7.2%
+“Mapping Ghost” signiﬁes that B-SZZ can not identify the
+bug-inducing commits due to the Mapping Ghost Problem.
+We eliminate bug-ﬁxing commits classiﬁed as Success, Partial
+Success, and Remove Mapping Ghost from the KFC dataset,
+then search for Add Mapping Ghost cases among the remaining
+bug-ﬁxing commits. If all bug-inducing commits for a speciﬁc
+bug-ﬁxing commit are Add Mapping Ghost, we consider that
+B-SZZ’s failure is due to Add Mapping Ghost.
+Out of 584 bug-ﬁxing commits where at least one of their
+bug-inducing commits is Add Mapping Ghost, 361 fail as a
+result of Add Mapping Ghost. Upon completing these ﬁlters, we
+obtain a dataset consisting of 17,552 bug-ﬁxing commits where
+B-SZZ fails, which we refer to as “Failures without MG.”
+With our algorithm, using TC-SZZ, we ﬁnd that out of the
+17,552 bug-ﬁxing commits in “Failure without MG,” 3,115
+(17.7%) of those commits contain 3,163 bug-inducing commits
+within the change history of some removed line. In contrast,
+git log -L only manages to track down 2,800. We refer to
+the failures that can be solved by TC-SZZ as Line Change
+Detections.
+For these 3,115 bug-ﬁxing commits, the average length of the
+change history is 3.76, with the longest change history having
+length 35. Additionally, 1,272 bug-inducing commits occupy
+the second-closest position in the change history (with a total
+length ≥2), signifying that these bug-inducing commits can
+be located by using git blame twice. Furthermore, 1,489 bug-
+inducing commits are located at the furthest point in the change
+history, indicating that the initial code is faulty. The remaining
+354 commits are in intermediate positions, i.e. descendant com-
+mits in Fig. 1.
+To determine if the differences in performance between TC-
+SZZ and the other variants of SZZ are signiﬁcant, we performed
+a statistical analysis on the KFC dataset, which comprises bug-
+ﬁxing commits in the Linux kernel from 2013 to 2022. We
+divide the dataset by year to reﬂect the yearly increase of
+new bug-ﬁxing commits. Given the low number of bug-ﬁxing
+commits in 2013 (152), we merged the data from 2013 and 2014
+into a single subset for analysis. Initially, we used the Shapiro-
+Wilk test to conﬁrm that the recall data for all algorithms follow
+a normal distribution. Subsequent t-tests were performed to
+compare the recall metric of TC-SZZ with other SZZ algo-
+rithms. As shown in Table VIII, there are signiﬁcant differences
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

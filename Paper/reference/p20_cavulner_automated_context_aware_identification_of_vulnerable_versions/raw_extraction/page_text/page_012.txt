@@ -1,0 +1,95 @@
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+12 Anon.
+Table 3. Comparison with baselines at the version level (GT: Ground Truth)
+Project GT V-SZZ VERJava
+TP FP FN Precision Recall F1-score TP FP FN Precision Recall F1-score
+jackson-databind 7,884 690 3,524 7,194 16.37% 8.75% 11.41% 5,834 3,096 2,050 65.33% 74.00% 69.39%
+liferay-portal 454 287 61 167 82.47% 63.22% 71.57% 206 675 248 23.38% 45.37% 30.86%
+jenkins 6,639 6,105 4 534 99.93% 91.96% 95.78% 4,189 2,132 2,450 66.27% 63.10% 64.65%
+struts 321 321 148 0 68.44% 100.00% 81.27% 242 131 79 64.88% 75.39% 69.74%
+tomcat 176 153 0 23 100.00% 86.93% 93.01% 148 514 28 22.36% 84.09% 35.32%
+spring-framework 155 132 9 23 93.62% 85.16% 89.19% 114 0 41 100.00% 73.55% 84.76%
+spring-security 35 35 9 0 79.55% 100.00% 88.61% 16 107 19 13.01% 45.71% 20.25%
+other 1,772 1,206 27 566 97.81% 68.06% 80.27% 1,205 133 567 90.06% 68.00% 77.49%
+Total 17,436 8,929 3,782 8,507 70.25% 51.21% 59.24% 11,954 6,788 5,482 63.78% 68.56% 66.08%
+Project GT LLM4SZZ CaVulner
+TP FP FN Precision Recall F1-score TP FP FN Precision Recall F1-score
+jackson-databind 7,884 198 518 7,686 27.65% 2.51% 4.60% 5,793 0 2,091 100.00% 73.48% 84.71%
+liferay-portal 454 212 24 242 89.83% 46.70% 61.45% 360 84 94 81.08% 79.30% 80.18%
+jenkins 6,639 6,055 181 584 97.10% 91.20% 94.06% 6,223 0 416 100.00% 93.73% 96.77%
+struts 321 280 106 41 72.54% 87.23% 79.21% 315 0 6 100.00% 98.13% 99.06%
+tomcat 176 176 275 0 39.02% 100.00% 56.14% 176 2 0 98.88% 100.00% 99.44%
+spring-framework 155 155 32 0 82.89% 100.00% 90.64% 151 0 4 100.00% 97.42% 98.69%
+spring-security 35 27 0 8 100.00% 77.14% 87.10% 35 0 0 100.00% 100.00% 100.00%
+other 1,772 1,127 14 645 98.77% 63.60% 77.38% 1,445 189 327 88.43% 81.55% 84.85%
+Total 17,436 8,230 1,150 9,206 87.74% 47.20% 61.38% 14,498 275 2,938 98.14% 83.15% 90.02%
+4.2 Evaluation Metrics
+We adopt accuracy, precision, recall, and F1-score as our evaluation metrics. The metrics are
+computed from two perspectives: the CVE level (accuracy) and the version level (precision, recall,
+and F1-score). Specifically, at the CVE level, an identification is labeled True only if the set of
+vulnerable versions exactly matches the ground truth. All other CVEs are labeled False. At the
+version level, each identified version is individually compared against the ground truth. A version
+present in the ground truth is counted as a TP; a version not present is counted as an FP; and a
+version that exists in the ground truth but is not identified is counted as an FN. The evaluation
+metrics are calculated as follows:
+Accuracy = |True|
+|True|+| False| (1)
+Precision = |TP|
+|TP|+| FP| (2)
+Recall = |TP|
+|TP|+| FN| (3)
+F1-score = 2 ·Precision ·Recall
+Precision +Recall (4)
+For example, consider a CVE whose ground truth includes versions [𝑣1, 𝑣2, 𝑣3, 𝑣4], while the
+approach identifies [𝑣3, 𝑣4, 𝑣5]. At the CVE level, this results in True = 0, False = 1, resulting in an
+accuracy of 0.00%. At the version level, TP = 2, FP = 1, FN = 2. Accordingly, the precision is 66.67%,
+the recall is 50.00%, and the F1-score is 57.14%.
+, Vol. 1, No. 1, Article . Publication date: January 2018.

@@ -1,0 +1,57 @@
+Opening Context:
+- Vulnerability Fixing Commit Analysis Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation.
+- VulPecker [70] extracts code patterns from VFC to detect similar vul- nerabilities in other software versions.
+Why the Problem Matters:
+- Vulnerability Fixing Commit Analysis Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation.
+- VulPecker [70] extracts code patterns from VFC to detect similar vul- nerabilities in other software versions.
+- SySeVR [71] uses a systematic approach to extract syntax- and semantic-based vul- nerability features from patches.
+- VulDeePecker [72] leverages deep learning t echniques to learn vulnerability patterns from code gadgets extracted from vulnerability ﬁxing commits.
+Concrete Pain Point:
+- Vulnerability Fixing Commit Analysis Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation.
+- VulDeePecker [72] leverages deep learning t echniques to learn vulnerability patterns from code gadgets extracted from vulnerability ﬁxing commits.
+- V ERCATION incorporates VFC analysis by leveraging LLMs to understand the context of code changes in ﬁxing com- mits, potentially capturing more nuanced vulnerability features.
+- Vulnerable Version Detection for OSS Several approaches have been proposed for vulnerable ver- sion identiﬁcation.
+- V-SZZ [17] uses the SZZ algorithm to back- track vfcs and identify vulnerability-introducing changes.
+Motivating Example:
+- Vulnerability Fixing Commit Analysis Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation.
+- VulDeePecker [72] leverages deep learning t echniques to learn vulnerability patterns from code gadgets extracted from vulnerability ﬁxing commits.
+- VCCFinder [73] uses machine learning techniques to identify vulnerability- contributing commits.
+- MLRefScanner [75] detects refactoring commits in Python projects by analyzing commit history and extracting features that represent refactoring activ- ities without altering code behavior.
+Prior Work Framing:
+- Most existing VFC analysis methods rely heavily on predeﬁned rules or patterns, which may not capture the full context of vulner- abilities.
+- V-SZZ [17] uses the SZZ algorithm to back- track vfcs and identify vulnerability-introducing changes.
+- Existing approaches often rely on predeﬁned patterns and syntactic-level analysis, leading to imprecision in vulner- ability characterization and code clone detection.
+- Existing code refactoring detection methods primarily focus on high-level changes like renaming and method/class moves.
+- Experimental results on our dataset of 122 CVEs across 12 popular open-source projects validate that V ERCATION surpasses existing techniques for vulnerable ver- sion identiﬁcation, demonstrating notable improvements in both precision and recall.
+Why Prior Work Is Insufficient:
+- Our approach, however, targets statement-level changes through ﬁne-grained AST expansion and normalization, including inline function expansion during AST generation.
+Technical Challenges:
+- SySeVR [71] uses a systematic approach to extract syntax- and semantic-based vul- nerability features from patches.
+- Most existing VFC analysis methods rely heavily on predeﬁned rules or patterns, which may not capture the full context of vulner- abilities.
+- V ERCATION incorporates VFC analysis by leveraging LLMs to understand the context of code changes in ﬁxing com- mits, potentially capturing more nuanced vulnerability features.
+- V ERCATION’s novelty lies not in individ- ual techniques but in the systematic integration of semantic analysis and methodological innovations in LLM application.
+Key Insight:
+- Our approach introduces two key innovations: leveraging LLMs to enhance the extraction of vulnerability-related state- ments and employing code clone detection based on expanded and normalized ASTs.
+- A CKNOWLEDGMENT We thank the anonymous reviewers for their insightful com- ments.
+- Furthermore, prior stud- ies [25], [26] found that vulner abilities can ofte n be localized to a few key lines, making ﬁle- and function-level vulnerability detection overly coarse-grained.
+- We propose V ERCATION (Vulnerable version identiﬁcation), a novel method to identify vulnerable versions of open-source C/C ++ software utilizing a symbiotic com- bination of static analysis, LLM, and code clone detection.
+System / Method Preview:
+- approach achieves an F1 score of 93.1%, outperforming current state-of-the-art methods.
+- More importantly, V ERCATION detected 202 incorrect vulnerable OSS versions in NVD reports.
+- Date of publication 19 August 2025; date of current version 13 February 2026.
+- Ting Zhang was with the School of Computing and Information Systems, Singapore Management University, Singapore 178903.
+- She is now with the Department of Software Systems and Cybersecurity, Monash University, Clayton, VIC 3800, Australia (e-m ail: ting.zhang@monash.edu).
+- Digital Object Identiﬁ er 10.1109/TSE.2025.3599581 Index Terms—Open-source software security, vulnerable ver- sion, large language model.
+Contribution List:
+- [NEEDS EVIDENCE] contribution list not cleanly extracted
+Claim-Evidence Structure:
+- The introduction connects vulnerability maintenance/SZZ/version-validation pain points to an automated method and empirical evaluation, but exact claim strength requires citation/table verification.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Paragraph Map:
+P1: Function: context/problem setup; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward method gap.
+P2: Function: prior-work gap; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward proposed approach.
+P3: Function: method preview/contributions; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward evaluation.
+Reusable Moves:
+- Start from vulnerability-management cost, identify why patch/commit/version evidence is noisy, then motivate an evidence-aware method.
+Risks for Our Paper:
+- Avoid importing their task definition if our target remains affected versions rather than bug-introducing commit identification. Mark unsupported transfer claims with [NEEDS EVIDENCE].

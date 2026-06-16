@@ -1,0 +1,186 @@
+2 Related work and background
+In this section, we place related work in context and define
+vulnerability lifetime in version control systems.
+2.1 Related work on vulnerability measure-
+ments
+There exists a considerable amount of work on measuring
+different aspects of software security. These range from gen-
+eral studies on bug characteristics [37], to studies on the vul-
+nerability discovery rate and its trends in various software
+projects [1, 8, 33]. Another strand of work focuses on vulnera-
+bility discovery models that try to capture the vulnerability
+discovery rate of specific software products after their release.
+Most of these models try to model the after-release discovery
+rate as a function of time [2–4, 15, 16], and others as a func-
+
+===== PAGE 003 =====
+tion of expended effort, either measured as the market share
+of a specific product [3], or the cumulative user months esti-
+mated to have elapsed since its release [40]. These reliability-
+inspired discovery models most often focus on a specific ver-
+sion of software (static codebase) and their accuracy against
+empirical data has been contested [1, 26, 27]. Specifically,
+empirical evidence [1, 33] suggest that there might be no de-
+creasing trend in the rate of vulnerability discoveries, or if
+there is, it may be attributed to a decrease in the detection
+effort, rather than the depletion of vulnerabilities. Therefore,
+the community has identified the need to measure different
+aspects of the security process.
+There are studies that measure the duration of different
+parts of the vulnerability lifecycle (see Figure 1). Frei [14],
+Krebs [17] and Shahzad et al. [36] measure characteristics
+of Phase 3 of the vulnerability lifecycle, namely how fast
+patches are developed and made available, and what the im-
+pact of delays is in terms of real-world exploits. Phase 4 of
+the lifecycle, namely how fast patches are applied to vulner-
+able systems, and how this relates to attacks in the wild, is
+studied by Nappa et al. [23]. Phase 2 of the lifecycle, namely
+how long vulnerabilities remain undetected since they have
+been discovered by attackers and used in zero-day attacks, is
+studied by Bilge et al. [5].
+The main topic of this paper, vulnerability lifetimes, i.e.
+the amount of time vulnerabilities remain in the code in the
+(upstream) repositories of non-static projects, has received at-
+tention, but limited progress has been made to date. A reason
+may be the difficulty of automatically assessing when a vul-
+nerability was introduced in a codebase. In a short LWN.net
+article, Corbet [11] presented the results of a small-scale study
+on 80 CVEs affecting the Linux kernel. This was followed by
+a blog post from Cook [10] on the amount of time 557 Linux
+kernel CVEs remained in the code. Both of these studies re-
+lied on manually curated data (either of the author or from the
+Ubuntu Security Team) and only touched the surface of the
+problem, being limited to providing one plot of the data. How-
+ever, the interest they raised, expressed in lengthy discussions
+in their respective forums, acted as a motivation for our work.
+The only study that investigates the issue of vulnerability life-
+times in a technical paper is, to the best of our knowledge,
+the recent work by Li and Paxson [18]. A small part of their
+insightful large-scale study on security patches in open source
+software is dedicated to assessing a lower bound for vulner-
+ability lifetimes. Using an approximation of the exact value
+rather than a lower-bound approach, our results regarding vul-
+nerability lifetimes differ by an order of magnitude compared
+to theirs. Also, due to more detailed per-project analysis, our
+conclusions do not support their hypothesis that vulnerability
+lifetimes and their types are correlated. In our study, we focus
+on how lifetimes differ between different projects and how
+they develop over the years, questions that generated inter-
+esting insights and have never been rigorously investigated
+before.
+2.2 Vulnerability lifetimes in version control
+systems
+A vulnerability’s code lifetime, or just lifetime for the rest of
+this paper, has been informally defined as the amount of time
+a vulnerability remains in the codebase. This is the time that
+elapses between a change in the codebase that introduced
+a weakness2, and the change in the codebase that fixed the
+weakness (which was discovered in the meantime). In a ver-
+sion control system, such as git, SVN, or mercurial, these
+changes are part of commits. These commits include meta-
+data about each change (e.g. commit timestamp, author) and
+the complete history of a repository can be tracked via a tree-
+like structure of commits (including branching and merging
+commits). A commit that contributed to the introduction of
+a weakness is known in literature [20, 31] as a Vulnerabil-
+ity Contributing Commit (VCC), and a commit that helped
+resolve the issue is referred to as a fixing commit. A vulner-
+ability may have multiple VCCs and fixing commits due to
+several reasons. Some examples follow:
+– a CVE may cover multiple programming errors. For ex-
+ample, CVE-2019-10207 describes a flaw in the bluetooth
+drivers of the Linux kernel. The fixing commit3 indicates that
+checks were missing in the bluetooth driver files of several
+manufacturers, pinpointing 5 responsible VCCs with commit
+dates spanning 8 years. Another example is CVE-2015-8550,
+which describes flaws in 2 linux kernel virtualization drivers
+(Xen blktap and Xen PVSCSI), introduced in 2013 and 2014
+respectively, and fixed with a patch spread among 7 commits
+all with the same commit date in 20154.
+– a vulnerability may be removed and then re-introduced. For
+example CVE-2017-18174 describes a double free in the
+Linux kernel that was introduced in 2015, removed without
+being designated as a security issue roughly a year later as
+part of a commit that “cleaned the error path”, re-introduced
+by a commit that provided new functionality 6 months later,
+and finally fixed again within a month of re-introduction5.
+– a fix may be extensive, requiring multiple commits. For
+example the fix of CVE-2017-9059 included considerable
+refactoring of the code and changes spanned 2 fixing commits
+2What constitutes a weakness is open to definition and often also to
+discussion among project contributors/developers. In the empirical part of
+this paper, we count vulnerabilities by their CVE identifier in the NVD,
+as often done in literature. We note that the CVE identifier is a level of
+abstraction higher than individual weaknesses, in the sense that multiple
+related weaknesses may be grouped together under a unique CVE identifier.
+However, for the sake of text simplicity, for the rest of the paper, we do no
+differentiate between the concepts (1 CVE-ID = 1 vulnerability).
+3https://github.com/torvalds/linux/commit/
+b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
+4more information at https://bugs.launchpad.net/ubuntu/
++source/linux/+bug/1530403.
+5more information at https://bugzilla.redhat.com/show_bug.
+cgi?id=1544482.
+
+===== PAGE 004 =====
+committed within a day6. Another Linux kernel vulnerability
+with CVE-2012-2119, this time a buffer overflow, had a patch
+spanning 5 short fixing commits modifying the same file, all
+committed on the same day7.
+Defining a lifetime metric comes down to explicitly defin-
+ing the start and end points of the time measurement.
+– Which of the potentially multiple VCCs/fixing commits
+should we consider as a start/end point? Considering the
+causes for multiple commits either introducing or fixing a vul-
+nerability, we decide to use the first of the VCCs as the start
+of the time measurement and the last of the fixing commits as
+the end. For cases like the first example concerning multiple
+sub-vulnerabilities described in one CVE, we therefore mea-
+sure the lifetime of the oldest one. For re-introduction cases,
+like the one in the second example, we measure the total life-
+time. In those cases, this whole period is most often a period
+of risk for systems running “stable” software versions (only
+applying critical patches), since the premature fix is often not
+designated as a security issue, and therefore not considered a
+critical patch.
+– Which timestamp to use? Most projects use a “main”
+branch of development (traditionally master in git) to track
+their code, and have a public mirror of this repository so that
+users can download the most recent versions of the code 8.
+Changes are then developed, discussed, and tested in private
+copies of the repository. When a change is ready to make it to
+the main branch, it is either (a) prepared as a (typically short)
+series of commits based on a recent reference commit and
+then merged into the main branch, or (b) directly committed to
+the main branch. For the purpose of measuring the lifetime of
+a vulnerability as a part of its window of exposure, we would
+want to measure the time between the VCC and the fix being
+widely available to users (including, e.g. maintainers of soft-
+ware distributions). Following this argumentation, we would
+use the time a VCC or a fixing commit was merged into the
+main branch as its timestamp, rather than its “commit times-
+tamp” (because the change may potentially be kept private
+until merging). This was indeed our first approach. However,
+from our empirical results we came to the conclusion that
+this adds unnecessary complexity to both the definition and
+the computation of the metric. The time between the commit
+and its merging into the main branch is usually very short
+(average of ∼20 days) in comparison to the lifetime of a vul-
+nerability (average in years). This is due to the fact that the
+usual practice after a fix is prepared and tested, is to download
+the most recent version of the code from the main branch
+of development and create a patch against this version. Fur-
+thermore, more complexity in the definition would have been
+6more information at https://www.spinics.net/lists/linux-nfs/
+msg63334.html.
+7more information at https://bugs.launchpad.net/ubuntu/
++source/linux/+bug/987566.
+8see https://git.kernel.org/pub/scm/linux/kernel/git/
+torvalds/linux.git for Linux.
+needed to account for fixes that were never merged into the
+main branch because the vulnerability they addressed only
+affected older versions of the software (and were therefore
+merged into e.g. a stable branch). Considering the above, we
+backtracked and decided to use the commit timestamp, which
+is readily available in the metadata of a commit in all three
+popular version control systems (git, SVN, mercurial).

@@ -1,0 +1,97 @@
+834
+835
+836
+837
+838
+839
+840
+841
+842
+843
+844
+845
+846
+847
+848
+849
+850
+851
+852
+853
+854
+855
+856
+857
+858
+859
+860
+861
+862
+863
+864
+865
+866
+867
+868
+869
+870
+871
+872
+873
+874
+875
+876
+877
+878
+879
+880
+881
+882
+18 Anon.
+(SZZ for short) that uses the diff command provided by Version Control Systems to identify lines
+of code modified by changes that fixed bugs. By tracing code history, the SZZ technique uses the
+annotate command in VCS to identify changes that introduced errors. Many researchers have
+improved SZZ to enhance the accuracy of identifying error-inducing commits. Kim et al. [ 24]
+proposed the AG-SZZ method, which uses annotation graphs to obtain more precise results,
+addressing the deficiency of non-semantic lines in the original SZZ algorithm. Costa et al. [ 14]
+introduced the MA-SZZ method, which excludes meta-changes from all candidate bug-inducing
+commits, i.e., commits that do not change the source code. To further reduce false positives, Neto et
+al. proposed two versions of RA-SZZ [32], based on RefDiff [38] and Refactoring Miner [44], which
+consider the impact of refactored lines of code in the original SZZ algorithm. Bao et al. [9] proposed
+the V-SZZ method, which leverages line mapping algorithms to identify the earliest commit that
+modified the vulnerable lines and then considers these commits to be the vulnerability-inducing
+commits. Rosa et al. [37] used an oracle to evaluate the performance of existing SZZ and its variants.
+Many works also identify vulnerable versions based on code similarity matching. ReDebug [21]
+uses a fast, syntax-based method that can scale to code bases the size of operating system distribu-
+tions written in many different languages. MVP [46] designed a novel slicing method based on patch
+code, extracting vulnerability and repair signatures from vulnerable functions and their patched
+counterparts. VUDDY [23] reduces the number of signature comparisons by utilizing function-level
+granularity and length filtering techniques, proposing a scalable method to detect vulnerable code
+clones. VCCFinder [34], based on data collected from code repositories, trained an SVM classifier
+to tag suspicious commits. Similarly, VulPecker [28], based on a collected database of vulnerability
+patches and instances of vulnerable code, as well as an automatic selection of code similarity
+algorithms effective for specific vulnerabilities, solved the problem of source code vulnerability
+detection. VulDeePecker [49] improved the accuracy of VulPecker through deep learning. All these
+efforts target the C/C++ ecosystem, while VERJava [42] targets the Java ecosystem, which employs
+a two-stage approach to systematically assess vulnerable versions.
+The emergence of LLMs has brought new solutions for security research. For example, Li et
+al. introduce IRIS [ 27], a neuro-symbolic approach combining LLMs with static analysis. The
+LLM infers taint-flow specifications for a project and guides vulnerability detection. Fakih et al.
+present LLM4CVE [18], an iterative pipeline that uses LLMs to automatically generate patches for
+vulnerable functions. In terms of identifying vulnerable versions, Tang et al. propose LLM4SZZ [43]
+to enhance the classic SZZ algorithm by using an LLM to identify bug-inducing commits. However,
+vulnerabilities differ from bugs. Without vulnerability specific context and accurate tracing of
+inducing commits, LLM4SZZ falls short on vulnerable version identification. Our approach is
+specifically designed to address this issue.
+7 Conclusion
+In this paper, we presented CaVulner, a novel approach for the precise identification of vulnerable
+versions in Java open source projects.CaVulner integrates multiple sources of information, including
+method level change patterns, CVE and CWE metadata, and patch diffs, with the semantic reasoning
+power of large language models. It localizes vulnerable code blocks, traces the commits that
+introduced those vulnerabilities and derives an accurate set of affected version tags by deduplicating
+hunk hashes and normalizing version labels. Our evaluation on 176 real-world CVEs from 43 projects
+covering 8,730 versions demonstrates that CaVulner outperforms state-of-the-art approaches,
+including V-SZZ, VERJava, and LLM4SZZ in accuracy, precision, recall, and F1-score. While this
+study focuses on the Java ecosystem, we will adapt CaVulner to additional language ecosystems
+such as C, C++, and Python in future work.
+, Vol. 1, No. 1, Article . Publication date: January 2018.

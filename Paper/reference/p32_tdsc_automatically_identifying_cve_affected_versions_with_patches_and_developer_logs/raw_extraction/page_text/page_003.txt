@@ -1,0 +1,49 @@
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 907
+Fig. 1. Examples of vulnerability and change reporting systems.
+trustworthy, but only security patches or only developer logs are
+not enough to decide if a software version is affected by a CVE
+(incomplete).
+Security Patch. Patches are a set of code changes to soft-
+ware or operating systems (OS). They aim to solve security
+vulnerabilities in programs or products. Software vendors may
+release updates to ﬁx performance vulnerabilities, or to provide
+enhanced security features[31]. A CVE-ID may correspond to
+a single patch or multiple patches, and we call each vulnerable
+code block in a patch as a diff hunk. A diff hunk is identiﬁed by
+one @@ statement in the patch (see Fig.1(b)), and it corresponds
+to a source code block waiting to be patched. For ease of
+explanation, we deﬁne all the lines without preﬁx in a diff hunk
+as an oth, and all the ‘-’ lines assub. A diff hunk consists of
+four parts: the vulnerable function (including its parameters),
+Fig. 2. Examples of exact and partial matching.
+oth (excluding the comments), the ‘-’ line(s) and the ‘+’ line(s).
+Among them, the ‘-’ line and the ‘+’ line represent the lines of
+source code that need to be deleted and added, respectively, and
+oth is used tolocate the ‘-’ line and the ‘+’ line. For example, the
+diff hunk in Fig.1(b) represents that the io _ add_buffers from the
+/fs/io _ uring.c ﬁle is a vulnerable function, and this vulnerability
+is patched by deleting the ‘-’ line from the vulnerable source
+code and adding the ‘+’ line. The patch-based vulnerability
+detection [19], [20], [32] relies on a context-based patch method,
+which extracts the lines from the diff hunks of the patches for
+identiﬁcation of vulnerable source code.
+There are two types of methods for matching a diff hunk with
+the source code. Theexact matchmethod means that the string
+consisting of ‘-’ line(s) andoth speciﬁed by the diff hunk must
+exactly match the source code, and the code sequence is also the
+same, as shown in Fig.2(a). We can see that the oth lines include
+six positioning start and end statements. The two ’+’ lines do not
+appear in the source code, which means this code is unpatched.
+Note that for a diff hunk consisting of only ‘+’ lines andoth,t h e
+exact match means the corresponding ‘+’ lines andoth exactly
+match the source code which has been patched, because ‘+’ lines
+are new code, which does not exist in the unpatched source code
+at the corresponding locations.
+The second method is calledpartial match, which matches
+the source code that does not have all ‘-’ lines andoth in the
+diff hunk, as shown in Fig.2(b). We can see that the oth lines
+include lines 4-6 and 14-18 in the patch ﬁle, which match the
+correspondent lines in the source code, but line 15 in the patch
+does not match line 10 in the source code. There is no partial
+match for the diff hunk consisting of only ‘+’ lines andoth,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

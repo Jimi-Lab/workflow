@@ -1,0 +1,268 @@
+{
+  "cwe_id": "CWE-116",
+  "name": "Improper Encoding or Escaping of Output",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product prepares a structured message for communication with another component, but encoding or escaping of the data is either missing or done incorrectly. As a result, the intended structure of the message is not preserved.",
+  "extended_description": "Improper encoding or escaping can allow attackers to change the commands that are sent to another component, inserting malicious commands instead. Most products follow a certain protocol that uses structured messages for communication between components, such as queries or commands. These structured messages can contain raw data interspersed with metadata or control information. For example, \"GET /index.html HTTP/1.1\" is a structured message containing a command (\"GET\") with a single argument (\"/index.html\") and metadata about which protocol version is being used (\"HTTP/1.1\"). If an application uses attacker-supplied inputs to construct a structured message without properly encoding or escaping, then the attacker could insert special characters that will cause the data to be interpreted as control information or metadata. Consequently, the component that receives the output will perform the wrong operations, or otherwise interpret the data incorrectly.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-707",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-74",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "AI/ML",
+      "Database Server",
+      "Web Server"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product prepares a structured message for communication with another component, but encoding or escaping of the data is either missing or done incorrectly. As a result, the intended structure of the message is not...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "structured",
+      "encoding",
+      "escaping",
+      "message"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "structured",
+      "encoding",
+      "escaping",
+      "message",
+      "component",
+      "commands",
+      "metadata",
+      "communication"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "JSP",
+        "nature": "Bad",
+        "summary": "This code displays an email address that was submitted as part of a form.",
+        "snippet": "<% String email = request.getParameter(\"email\"); %> ... Email Address: <%= email %>"
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "Consider a chat application in which a front-end web application communicates with a back-end server. The back-end is legacy code that does not perform...",
+        "snippet": "$inputString = readLineFromFileHandle($serverFH); # generate an array of strings separated by the \"|\" character. @commands = split(/\\|/, $inputString); foreach $cmd (@commands) { # separate the operator from its..."
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "Consider a chat application in which a front-end web application communicates with a back-end server. The back-end is legacy code that does not perform...",
+        "snippet": "$inputString = GetUntrustedArgument(\"command\"); ($cmd, $argstr) = split(/\\s+/, $inputString, 2); # removes extra whitespace and also changes CRLF's to spaces $argstr =~ s/\\s+/ /gs; $argstr = UrlEncode($argstr); if..."
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "This example takes user input, passes it through an encoding scheme, then lists the contents of the user's home directory based on the user name.",
+        "snippet": "sub GetUntrustedInput { return($ARGV[0]); } sub encode { my($str) = @_; $str =~ s/\\&/\\&amp;/gs; $str =~ s/\\\"/\\&quot;/gs; $str =~ s/\\'/\\&apos;/gs; $str =~ s/\\</\\&lt;/gs; $str =~ s/\\>/\\&gt;/gs; return($str); } sub doit {..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2021-41232",
+        "description": "Chain: authentication routine in Go-based agile development product does not escape user name (CWE-116), allowing LDAP injection (CWE-90)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-41232"
+      },
+      {
+        "reference": "CVE-2008-4636",
+        "description": "OS command injection in backup software using shell metacharacters in a filename; correct behavior would require that this filename could not be changed.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-4636"
+      },
+      {
+        "reference": "CVE-2008-0769",
+        "description": "Web application does not set the charset when sending a page to a browser, allowing for XSS exploitation when a browser chooses an unexpected encoding.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-0769"
+      },
+      {
+        "reference": "CVE-2008-0005",
+        "description": "Program does not set the charset when sending a page to a browser, allowing for XSS exploitation when a browser chooses an unexpected encoding.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-0005"
+      },
+      {
+        "reference": "CVE-2008-5573",
+        "description": "SQL injection via password parameter; a strong password might contain \"&\"",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-5573"
+      },
+      {
+        "reference": "CVE-2008-3773",
+        "description": "Cross-site scripting in chat application via a message subject, which normally might contain \"&\" and other XSS-related characters.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-3773"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

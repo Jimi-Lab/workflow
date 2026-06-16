@@ -1,0 +1,13 @@
+System Overview: VULTURE consists of TPLFILTER database construction, TPL reuse identification, version-based analysis, and chunk-based analysis.
+Pipeline Stages: TPL selection; component segment construction; vulnerability segment construction; candidate library detection; identification optimization; version-based analysis; chunk-based analysis.
+Core Algorithm: source layout suggests hashing/TLSH for reuse/version detection, libclang-based chunk extraction, path/diff analysis, LLM-assisted patch collection, and false-positive elimination.
+Data Structures: componentDB, funcDate, initialSigs, metaInfos, verIDX, CommitBenckmark, VulnerabilityBenckmark.xlsx, iotList.txt, patchcollector outputs, TPLReuseDetector result files.
+Model / Agent Components: LLM/OpenAI/LangChain components appear in patchcollector for CVE/commit analysis by static import and README.
+Design Choices: platform-specific filtering reduces irrelevant TPLs; version-based analysis handles exact reuse; chunk-based analysis handles custom reuse and patch state.
+Why Each Choice Is Needed: exact matching alone misses custom reuse; chunk evidence preserves fine-grained semantic patch information.
+Failure Handling: source has subprocess/API/parser dependencies; runtime failures were not exercised. [EXECUTION NOT REQUESTED]
+Complexity / Cost Discussion: paper has time-cost evaluation; exact numbers require table repair. [NEEDS TABLE REPAIR]
+Pseudocode or Algorithm Blocks: [NEEDS ALGORITHM REPAIR]
+Static Reproducibility Signals: README, requirements, setup script, source modules, benchmark files, and local database-like artifacts are visible.
+Agent Evidence Anchors: raw_extraction/section_text/05_method.txt; raw_extraction/source_static_inventory.txt.
+Writing Pattern: method section can be decomposed by database construction, reuse detection, and vulnerability detection.

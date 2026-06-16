@@ -1,0 +1,18 @@
+4.2 Evaluation Metrics
+We adopt accuracy, precision, recall, and F1-score as our evaluation metrics. The metrics are
+computed from two perspectives: the CVE level (accuracy) and the version level (precision, recall,
+and F1-score). Specifically, at the CVE level, an identification is labeled True only if the set of
+vulnerable versions exactly matches the ground truth. All other CVEs are labeled False. At the
+version level, each identified version is individually compared against the ground truth. A version
+present in the ground truth is counted as a TP; a version not present is counted as an FP; and a
+version that exists in the ground truth but is not identified is counted as an FN. The evaluation
+metrics are calculated as follows:
+Accuracy = |True|
+|True|+| False| (1)
+Precision = |TP|
+|TP|+| FP| (2)
+Recall = |TP|
+|TP|+| FN| (3)
+F1-score = 2 ·Precision ·Recall
+Precision +Recall (4)
+For example, consider a CVE whose ground truth includes versions [𝑣1, 𝑣2, 𝑣3, 𝑣4], while the

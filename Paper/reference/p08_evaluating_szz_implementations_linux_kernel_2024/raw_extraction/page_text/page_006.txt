@@ -1,0 +1,139 @@
+2224
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+TABLE I
+DATASETS PREVIOUSLY USED FOR EVALUATING THE SZZ ALGORITHM.
+B-SZZ IS INDICATED AS //, AS THE AUTHOR DID NOT USE A DATASET
+FOR EVALUATION. ‘‘RE.’’ MEANS THE DATASET IS ANNOTATED BY
+RESEARCHERS. ‘‘DEV.’’ MEANS THE DATASET IS ANNOTATED
+BY DEVELOPERS
+Approach / Dataset
+#Dataset type
+#Projects
+#Bug Fixes
+B-SZZ [1]
+//
+//
+//
+AG-SZZ [2]
+Manually (re.)
+2
+301
+DJ-SZZ [15]
+Manually (re.)
+1
+25
+L-SZZ & R-SZZ [16]
+Manually (re.)
+3
+174
+MA-SZZ [12]
+Auto metrics
+10
+2,637
+RA-SZZ [13]
+Manually (re.)
+10
+365
+RA-SZZ∗[14]
+Manually (re.)
+10
+365
+Rosa’s Dataset [28]
+Auto (dev.)
+1,625
+1,930
+of the defect prediction model relies heavily on the quality of
+the dataset labeled by the SZZ algorithm [7]. A lot of mislabeled
+commits in the dataset will seriously affect the model prediction
+results, which highlights the importance of the accuracy of the
+SZZ algorithm.
+The SZZ algorithm is also used to analyze factors related
+to software quality [9], [10], [11], [25], [26], [27]. A study
+by Eyolfson et al. [25] discusses the correlation between the
+time-based factors of a commit (such as the commit’s time of
+day, day of the week, and commit frequency) and the commit’s
+bugginess. Izquierdo-Cortázar et al. [27] and Tufano et al. [9]
+explore the correlation between the developer’s experience and
+the tendency to induce defects.
+SZZ has also been used to identify bug-inducing commits
+at the pull request level in studies by Petrulio et al. [46] and
+Bludau et al. [47]. Furthermore, SZZ has been employed to
+determine the correct version information about vulnerable soft-
+ware within the National Vulnerability Database [48]. Given the
+importance and widespread use of SZZ, we aim to evaluate its
+performance in our study.
+III. CONSTRUCTING A DATASET OF BUG-INDUCING COMMITS
+INFORMED BY DEVELOPERS
+Evaluating the accuracy of the SZZ algorithm and its vari-
+ants requires a dataset of bug-ﬁxing commits accompanied in
+each case by the set of commits that introduced the ﬁxed bug.
+´sliwerski, Zimmermann, and Zeller [1] proposed experiments
+based on ECLIPSE and MOZILLA in which bug-ﬁxing com-
+mits were chosen based on their references to a bug tracker;
+no evaluation was made of the accuracy of the corresponding
+collected bug-inducing commits. Subsequent SZZ variants were
+mostly evaluated using small, manually-validated datasets, as
+shown in Table I.
+A. The Dataset of Rosa et al.
+In 2021, Rosa et al. [28] proposed a new methodology to
+build a dataset for evaluating SZZ variants based on the obser-
+vation that the log messages of some commits both contain a
+statement that the commit is ﬁxing a bug and explicitly identify
+the commit that introduced the bug that is being ﬁxed. For
+example, they have found the message “THRIFT-4513: ﬁx bug
+in comparator introduced by e58f75d” in the commit a8a97bd
+in the project apache/thrift.5 The presence of such messages
+raises the possibility of creating a large-scale dataset fully auto-
+matically, relying on the expertise of project developers to map
+bug-ﬁxing commits to the corresponding set of bug-introducing
+commits. Nevertheless, they did not identify a standardized
+means of providing bug-ﬁxing and bug-introducing commit in-
+formation neither across projects nor within projects. Thus, they
+proposed to mine such information in commit logs using natural
+language processing (NLP) techniques, followed by manual
+veriﬁcation. Using their approach, they created a dataset of
+1,930 bug-ﬁxing commits from 1,625 software projects written
+in a variety of programming languages. Using the resulting
+dataset, they compare the precision, recall, and F-measure of
+nine SZZ variants, and study the impact of dropping reported
+bug-inducing commits that postdate the associated entry in the
+bug tracker.
+While the NLP-based approach of Rosa et al. [28] made
+it possible to obtain a large dataset, exploiting developer
+knowledge, researchers have identiﬁed some weaknesses in
+their results. The dataset remains small, containing 1,930 bug-
+ﬁxing commits from 19,603,736 commits collected on GitHub,
+amounting to 0.001% of the total commits collected. While not
+all commits on GitHub are ﬁxes or introduce bugs, previous
+studies [49], [50] have highlighted that 55% to 95% of the
+total cost of software development is devoted to maintenance.
+Therefore, it is likely that the 1,930 commits collected in the
+dataset is a vast underestimation of the actual number of bug
+ﬁxes. And as there are on average only 1.2 commits per project,
+the collected commits may not be representative of the full
+scope of issues that arise in each project’s development.
+B. A Dataset Extracted From the Development History of the
+Linux kernel
+The Linux kernel was ﬁrst released in 1991 and has grown to
+23 MLOC as of the release of Linux v6.0 in October 2022. The
+Linux kernel has been developed using git since April 2005.
+Prior to October 2013, Linux kernel developers sporadically
+included in their commit log messages comments beginning
+with Fixes: followed by a reference to Bugzilla or some other
+URL. Starting with the commit 629c66a22c216 from security
+researcher Kees Cook on October 24, 2013, the Linux kernel
+developer community has mostly settled on a strict format
+for bug-ﬁx information. This format consists of one or more
+lines starting with the keyword Fixes:, each followed by the
+commit id of the bug-introducing commit, followed by the
+ﬁrst line of the commit log message of the bug-introducing
+commit in parentheses. This format is encouraged by the Linux
+kernel documentation7 and by the Linux kernel “linting” tool
+checkpatch.8
+5https://github.com/apache/thrift/commit/a8a97bde9eeada5ce0571ea1650b1
+8f3ebc50e42
+6https://github.com/torvalds/linux/commit/629c66a22c21b692b6e58b9c1d8
+fa56a60ccb52d
+7https://www.kernel.org/doc/html/v4.9/kernel-documentation.html
+8https://docs.kernel.org/dev-tools/checkpatch.html
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

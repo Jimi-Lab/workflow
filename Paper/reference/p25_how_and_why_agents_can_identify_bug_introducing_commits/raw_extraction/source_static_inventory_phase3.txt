@@ -1,0 +1,700 @@
+Paper ID: p25_how_and_why_agents_can_identify_bug_introducing_commits
+Artifact Source: https://github.com/niklasrisse/agents-for-szz
+Snapshot Root: E:\AI\Agent\workflow\Paper\reference\p25_how_and_why_agents_can_identify_bug_introducing_commits\raw_extraction\artifact_static_snapshot\selected_repo
+Analysis Mode: downloaded static snapshot only
+Execution: [EXECUTION NOT REQUESTED]
+
+Files observed: 205
+Python files: 38
+Shell scripts: 13
+Data/result JSON/CSV files: 125
+
+Primary Static Entrypoints:
+- src/simple_szz_agent.py
+- src/szz_agent_stage_01.py
+- src/szz_agent_stage_02.py
+- src/prompts.py
+- src/evaluation_utils.py
+- experiments/*/generate_table.py and generate_figure.py
+- experiments/*/results/*.json pre-computed outputs
+
+Top Imports:
+- pathlib: 36
+- json: 33
+- argparse: 26
+- sys: 23
+- os: 20
+- evaluation_utils: 19
+- typing: 15
+- datetime: 12
+- logging: 10
+- time: 10
+- subprocess: 9
+- utils: 8
+- math: 6
+- re: 6
+- random: 5
+- shutil: 4
+- szz.ma_szz: 4
+- collections: 3
+- dataclasses: 3
+- dotenv: 3
+- prompts: 3
+- textwrap: 1
+- analyze_grep_calls: 1
+- statistics: 1
+- numpy: 1
+- scipy: 1
+- szz.ag_szz: 1
+- szz.b_szz: 1
+- git: 1
+- szz.l_szz: 1
+
+Functions / Classes Signals:
+- function main: 33
+- function parse_args: 17
+- function fmt: 8
+- function generate_tikz_body: 7
+- function write_inputable: 7
+- function write_standalone: 7
+- function load_and_evaluate: 6
+- function get_commit_message: 6
+- function find_latest_results_file: 6
+- function load_data: 6
+- function find_latest_file: 5
+- function git_cmd: 5
+- function get_commit_diff: 5
+- function is_commit_match: 4
+- function get_unique_repos: 4
+- function repo_exists: 4
+- function clone_repo: 4
+- function ensure_repos_exist: 4
+- function fit_log_linear: 3
+- function build_agent_command: 3
+- function verify_agent_cli: 3
+- function get_repo_path: 3
+- function setup_logging: 3
+- function prepare_candidate_selection_directory: 3
+- function replace_if_contains_prefix: 3
+- function replace_word_if_contains_short_prefix: 3
+- function load_results: 2
+- function print_summary: 2
+- function get_files_from_commit: 2
+- function get_file_history_with_paths: 2
+- function build_file_rename_timeline: 2
+- function get_file_path_at_timestamp: 2
+- function build_file_path_mapping: 2
+- function find_all_bic_positions: 2
+- function redact_bic_from_message: 2
+- function parse_candidate_selection_result: 2
+- function build_combined_results: 2
+- function to_dict: 2
+- function load_stage_01: 1
+- function load_stage_02: 1
+- class CommitInfo: 3
+- class FileHistoryEntry: 2
+- class TurnStats: 1
+- class CallStats: 1
+- class EntryResult: 1
+- class SZZResult: 1
+- class LLMSelectionResult: 1
+- class FullResult: 1
+- class SearchStep: 1
+- class BICSearchResult: 1
+- class BICFinderEntryResult: 1
+
+Key File Snippets:
+
+## README.md
+# How and Why Agents Can Identify Bug-Introducing Commits
+
+Code and Data for the paper "How and Why Agents Can Identify Bug-Introducing Commits" (Currently Under Review).
+
+## Citation
+
+If you use this work, please cite:
+
+```bibtex
+@misc{risse2026simpleszzagent,
+      title={How and Why Agents Can Identify Bug-Introducing Commits},
+      author={Niklas Risse and Marcel Böhme},
+      year={2026},
+      eprint={2603.29378},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE},
+      url={https://arxiv.org/abs/2603.29378},
+}
+```
+
+## Repository Structure
+
+```
+├── README.md
+├── requirements.txt              # Python dependencies
+├── .env.template                 # API key template
+├── clone_repos.sh                # Script to clone all 153 required repositories
+├── generate_all_tables_and_figures.sh  # Regenerate all tables/figures (no API calls)
+├── src/                          # Source code
+│   ├── simple_szz_agent.py       # Simple-SZZ-Agent implementation
+│   ├── szz_agent_stage_01.py     # SZZ-Agent Stage 1 (candidate identification)
+│   ├── szz_agent_stage_02.py     # SZZ-Agent Stage 2 (candidate selection)
+│   ├── prompts.py                # LLM prompt templates
+│   ├── evaluation_utils.py       # Evaluation metric computation
+│   ├── statistical_comparison.py # Statistical significance tests
+│   ├── collect_DS_LINUX-26.py    # Data collection script
+│   └── baselines/                # Baseline implementations
+│       ├── baseline_bszz.py      # B-SZZ (Basic SZZ)
+│       ├── baseline_agszz.py     # AG-SZZ
+│       ├── baseline_lszz.py      # L-SZZ
+│       ├── baseline_rszz.py      # R-SZZ
+│       ├── baseline_maszz.py     # MA-SZZ
+│       ├── baseline_raszz.py     # RA-SZZ
+│       ├── baseline_vszz.py      # V-SZZ
+│       ├── baseline_llm4szz.py   # LLM4SZZ
+│       ├── pyszz_v2/             # PySZZ library
+│       ├── llm4szz/              # LLM4SZZ library
+│       └── vszz/                 # V-SZZ library
+├── data/                         # Raw datasets
+│   ├── DS_GITHUB.json
+│   ├── DS_LINUX.json
+│   └── DS_LINUX-26.json
+├── sampled_datasets/             # Sampled datasets used in experiments
+│   ├── DS_LINUX_100_42.json
+│   ├── DS_LINUX_200_42.json
+│   ├─
+
+## requirements.txt
+anthropic==0.75.0
+openai==2.16.0
+python-dotenv==1.2.1
+GitPython==3.1.46
+PyDriller==1.15.2
+scipy==1.17.0
+numpy==2.4.1
+matplotlib
+networkx==3.6.1
+dateparser==1.2.2
+regex==2026.1.15
+
+# pyszz_v2 baselines (B-SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ, RA-SZZ)
+PyYAML
+options
+beautifulsoup4
+lxml
+packaging
+
+# V-SZZ baseline
+python-Levenshtein
+lizard
+unidiff
+tqdm
+
+# LLM4SZZ baseline
+tree-sitter==0.21.3
+tiktoken
+
+
+## src/simple_szz_agent.py
+#!/usr/bin/env python3
+"""
+Simple SZZ Agent: Directly select the bug-introducing commit from file history candidates.
+
+This script combines and simplifies szz_agent_stage_01.py and szz_agent_stage_02.py:
+1. Determines files touched by the fix commit
+2. Builds candidate commit set from file histories (as in stage 02)
+3. Directly presents ALL candidates to the LLM for selection (no binary search)
+
+Usage:
+    python simple_szz_agent.py                              # Full run with default dataset
+    python simple_szz_agent.py --limit 10                   # Process only 10 entries
+    python simple_szz_agent.py -d sampled_datasets/DS_GITHUB-j.json  # Use different dataset
+"""
+
+import argparse
+import json
+import logging
+import os
+import random
+import re
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
+
+from dotenv import load_dotenv
+
+from prompts import create_candidate_selection_instructions
+
+# Load environment variables
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+REPOS_DIR = PROJECT_ROOT / "repos"
+DEFAULT_DATASET = PROJECT_ROOT / "sampled_datasets/DS_LINUX-26_100_42.json"
+TEMP_DIR = PROJECT_ROOT / "temp_analysis"
+RESULTS_DIR = PROJECT_ROOT / "results"
+LOGS_DIR = PROJECT_ROOT / "logs"
+AGENT_LOGS_DIR = PROJECT_ROOT / "agent_logs"
+RANDOM_SEED = 42
+GIT_TIMEOUT = 300  # seconds
+CLAUDE_TIMEOUT = 600  # 10 min per invocation
+OPENHANDS_TIMEOUT = 1800  # 30 min per invocation
+MAX_RETRIES = 1
+RETRY_DELAY = 60  # seconds
+
+# OpenRouter model aliases and settings
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL_MAP = {
+    "kimi-k2.5": "moonshotai/kimi-k2.5",
+    "minimax-m2.5": "minimax/minimax-m2.5",
+    "glm-5": "z-ai/glm-5",
+    "deepseek-v3.2": "deepseek/deepseek-v3.2",
+    "moonshotai/kimi-k2.5": "moonshotai/kimi-k2.5",
+    "minimax/minimax-m2.5": "minimax/minimax-m2.5",
+    "qwen3.
+
+## src/szz_agent_stage_01.py
+#!/usr/bin/env python3
+"""SZZ algorithm with LLM-based candidate selection.
+
+This script:
+1. Runs SZZ to find ALL candidate bug-inducing commits (via git blame)
+2. Tracks whether ground truth BIC is in the candidate set
+3. Optionally uses Claude Code to select the most likely BIC from candidates
+4. Claude can also decide that none of the candidates are the BIC
+5. Evaluates the results against ground truth
+
+Usage:
+    python szz_agent_stage_01.py                              # Full run with default sample
+    python szz_agent_stage_01.py --limit 10                   # Process only 10 samples (for testing)
+    python szz_agent_stage_01.py -s other_sample.json         # Use a different sample file
+    python szz_agent_stage_01.py -s sampled_datasets/DS_GITHUB-j.json  # Use DS_GITHUB-j dataset
+"""
+
+import argparse
+import json
+import logging
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
+
+from dotenv import load_dotenv
+
+from prompts import create_stage01_candidate_selection_instructions
+
+# Load environment variables
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+REPOS_DIR = PROJECT_ROOT / "repos"
+DEFAULT_SAMPLE_FILE = PROJECT_ROOT / "sampled_datasets/DS_LINUX-26_100_42.json"
+RESULTS_DIR = PROJECT_ROOT / "results"
+LOGS_DIR = PROJECT_ROOT / "logs"
+AGENT_LOGS_DIR = PROJECT_ROOT / "agent_logs"
+TEMP_DIR = PROJECT_ROOT / "temp_analysis"
+
+# Git settings
+GIT_TIMEOUT = 300  # seconds
+
+
+# =============================================================================
+# REPOSITORY MANAGEMENT
+# =============================================================================
+def get_unique_repos(sample_data: List[Dict]) -> Set[str]:
+    """Extract unique repository names from sample data."""
+    return {entry["repo_name"] for entry in sample_data}
+
+
+def repo_exists(repo_name: str, repos_dir: Path)
+
+## src/szz_agent_stage_02.py
+#!/usr/bin/env python3
+"""
+Claude Code BIC Finder with Hybrid Binary Search + Candidate Selection.
+
+Finds the bug-introducing commit (BIC) using a hybrid approach:
+1. Binary search to narrow down candidates (minimizing API calls)
+2. When ≤9 candidates remain, switch to direct candidate selection
+
+This combines the efficiency of binary search with the accuracy of
+presenting multiple candidates for direct comparison.
+
+Designed to work as a second-stage method after szz_agent_stage_01.py:
+- Processes entries where SZZ found no candidates OR szz_agent_stage_01 abstained
+- Combines predictions from both stages for final evaluation
+
+Usage:
+    python szz_agent_stage_02.py                                  # Full run with default dataset
+    python szz_agent_stage_02.py --limit 10                       # Process only 10 entries
+    python szz_agent_stage_02.py -d sampled_datasets/DS_GITHUB-j.json  # Use DS_GITHUB-j dataset
+"""
+
+import argparse
+import json
+import logging
+import os
+import random
+import re
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
+
+from dotenv import load_dotenv
+
+from prompts import create_binary_search_instructions, create_candidate_selection_instructions
+
+# Load environment variables
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+REPOS_DIR = PROJECT_ROOT / "repos"
+DEFAULT_DATASET = PROJECT_ROOT / "sampled_datasets/linux_200_42_stage_1.json"
+TEMP_DIR = PROJECT_ROOT / "temp_analysis"
+RESULTS_DIR = PROJECT_ROOT / "results"
+LOGS_DIR = PROJECT_ROOT / "logs"
+AGENT_LOGS_DIR = PROJECT_ROOT / "agent_logs"
+RANDOM_SEED = 44
+CLAUDE_TIMEOUT = 600  # 10 min per invocation
+OPENHANDS_TIMEOUT = 1800  # 30 min per invocation (local models are slower)
+GIT_TIMEOUT = 300  # seconds, for large repos like linux-kernel
+
+# Hybrid approach configuration
+CANDIDATE_SELECTION_THRESHOLD = 33  # Switch to candid
+
+## src/prompts.py
+"""
+Prompt-building functions for all SZZ agent scripts.
+
+This module centralizes the LLM instruction generation used by:
+- simple_szz_agent.py
+- szz_agent_stage_01.py
+- szz_agent_stage_02.py
+"""
+
+
+# =============================================================================
+# SIMPLE SZZ AGENT / SZZ AGENT STAGE 02 (shared prompt)
+# =============================================================================
+def create_candidate_selection_instructions(
+    num_candidates: int,
+    without_fc_message: bool = False,
+    without_fc_diff: bool = False
+) -> str:
+    """Create the instructions file for candidate selection task.
+
+    Used by simple_szz_agent.py and szz_agent_stage_02.py (hybrid candidate selection).
+    """
+
+    files_provided = "## Files Provided\n"
+
+    if not without_fc_message:
+        files_provided += """
+### fix_commit_message.txt
+The commit message from the fix commit, which describes what bug was fixed.
+"""
+
+    if not without_fc_diff:
+        files_provided += """
+### fix_commit_diff.txt
+The diff (patch) of the fix commit, showing exactly what code changes were made to fix the bug.
+This is crucial for understanding the precise nature of the fix.
+"""
+
+    files_provided += f"""
+### candidates/
+Contains {num_candidates} candidate commit diffs, named `candidate_01.diff` through `candidate_{num_candidates:02d}.diff`.
+These are ordered chronologically (oldest to newest).
+
+**IMPORTANT**: The candidate file names are neutral (candidate_01, candidate_02, etc.) and do NOT reveal any information about which commit introduced the bug. You must analyze the actual code changes to make your determination.
+"""
+
+    if not without_fc_message and not without_fc_diff:
+        understand_bug = "1. **Understand the bug**: Read `fix_commit_message.txt` and carefully analyze `fix_commit_diff.txt` to understand:"
+    elif not without_fc_message:
+        understand_bug = "1. **Understand the bug**: Read `fix_commit_message.txt` to understand:"
+    elif not without_fc_diff:
+        understand_bug = "1. **Understand the bug**: Carefully analyze `fix_commit_diff.txt` to understand:"
+    else:
+        understand_bug = "1. **Understand the bug**: Analyze the candidate 
+
+## src/evaluation_utils.py
+"""Shared evaluation utilities for all baseline scripts.
+
+This module implements the macro-averaged recall, precision, and F1 metrics
+as described in SZZ evaluation literature:
+
+    recall = (1/N) * Σ (|correct_ci ∩ identified_ci| / |correct_ci|)
+    precision = (1/N) * Σ (|correct_ci ∩ identified_ci| / |identified_ci|)
+    F1 = 2 * (recall × precision) / (recall + precision)
+
+Where:
+    - correct_ci = ground truth bug-inducing commits for fix commit ci
+    - identified_ci = predicted bug-inducing commits for fix commit ci
+    - N = total number of bug-fixing commits with ground truth
+"""
+
+from typing import Dict, List, Set
+
+
+def is_commit_match(commit_hash: str, ground_truth: Set[str]) -> bool:
+    """Check if a commit matches any ground truth using prefix matching."""
+    for gt in ground_truth:
+        if commit_hash.startswith(gt) or gt.startswith(commit_hash):
+            return True
+    return False
+
+
+def count_matching_commits(predicted_bics: List[str], gt_bics: Set[str]) -> int:
+    """Count how many predicted commits match ground truth."""
+    matches = 0
+    matched_gt = set()  # Track which GT commits have been matched
+    for pred in predicted_bics:
+        for gt in gt_bics:
+            if gt not in matched_gt and (pred.startswith(gt) or gt.startswith(pred)):
+                matches += 1
+                matched_gt.add(gt)
+                break
+    return matches
+
+
+def evaluate_results(results: List[Dict]) -> Dict:
+    """Evaluate results using macro-averaged metrics.
+
+    For each bug-fixing commit ci:
+        - recall_ci = |correct ∩ identified| / |correct|
+        - precision_ci = |correct ∩ identified| / |identified|
+
+    Final metrics are averaged across all N commits:
+        - recall = (1/N) * Σ recall_ci
+        - precision = (1/N) * Σ precision_ci
+        - F1 = 2 * (recall × precision) / (recall + precision)
+    """
+    recall_sum = 0.0
+    precision_sum = 0.0
+    n_entries = 0
+
+    entries_with_predictions = 0
+    total_correct_matches = 0
+
+    for entry in results:
+        gt_bics = set(entry.get("ground_truth_bics", []))
+        predicted_bics = entry.get("predicted_bics", [])
+
+        # Skip entries without ground truth
+        if not g
+
+## src/statistical_comparison.py
+#!/usr/bin/env python3
+"""Statistical comparison of BIC prediction methods using Wilcoxon signed-rank test.
+
+Compares the main method (szz_agent_stage_02) against all other baselines
+in a results directory, using F1 score as the metric.
+
+Usage:
+    python statistical_comparison.py DS_LINUX
+    python statistical_comparison.py DS_GITHUB-j
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+
+import numpy as np
+from scipy import stats
+
+from evaluation_utils import evaluate_results
+
+
+def load_results(filepath: Path) -> Tuple[List[Dict], Dict]:
+    """Load results from a JSON file.
+
+    Returns:
+        - List of result entries
+        - Metadata dict
+    """
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+
+    if isinstance(data, dict) and "results" in data:
+        metadata = data.get("metadata", {})
+        return data["results"], metadata
+    else:
+        return data, {}
+
+
+def calculate_entry_f1(entry: Dict) -> Optional[float]:
+    """Calculate F1 for a single entry."""
+    gt_bics = set(entry.get("ground_truth_bics", []))
+    predicted_bics = entry.get("predicted_bics", [])
+
+    if not gt_bics:
+        return None
+
+    from evaluation_utils import count_matching_commits
+    num_matches = count_matching_commits(predicted_bics, gt_bics)
+
+    recall = num_matches / len(gt_bics)
+
+    if len(predicted_bics) > 0:
+        precision = num_matches / len(predicted_bics)
+    else:
+        precision = 0.0
+
+    if precision + recall > 0:
+        f1 = 2 * precision * recall / (precision + recall)
+    else:
+        f1 = 0.0
+
+    return f1
+
+
+def align_results(results_a: List[Dict], results_b: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+    """Align results by entry ID to ensure paired comparison."""
+    lookup_a = {e.get("id"): e for e in results_a}
+    lookup_b = {e.get("id"): e for e in results_b}
+
+    common_ids = sorted(set(lookup_a.keys()) & set(lookup_b.keys()))
+
+    aligned_a = [lookup_a[id_] for id_ in common_ids]
+    aligned_b = [lookup_b[id_] for id_ in common_ids]
+
+    return aligned_a, aligned_b
+
+
+def extract_f1_pairs(
+    results_a: List[Dict],
+    results_b: List[Dict]
+) -> Tuple[np.
+
+## generate_all_tables_and_figures.sh
+#!/bin/bash
+# Generate all tables and figures from pre-computed results.
+# No API calls required.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
+PASSED=0
+FAILED=0
+
+run() {
+    local name="$1"
+    local script="$2"
+    echo -n "[$name] "
+    if python "$script" > /dev/null 2>&1; then
+        echo "OK"
+        PASSED=$((PASSED + 1))
+    else
+        echo "FAILED"
+        FAILED=$((FAILED + 1))
+    fi
+}
+
+echo "========================================"
+echo "Generating all tables and figures"
+echo "========================================"
+echo
+
+run "RQ1  Table 1 (Effectiveness)"          experiments/rq1_effectiveness/generate_table.py
+run "RQ2a Table 2 (Data Leakage)"           experiments/rq2a_data_leakage/generate_table.py
+run "RQ2b Table 3 (LLM Backbone)"           experiments/rq2b_llm_backbone/generate_table.py
+run "RQ2c Table 4 (Context Ablation)"       experiments/rq2c_context_ablation/generate_table.py
+run "RQ2d Table 5 (Stage Analysis)"         experiments/rq2d_stage_analysis/generate_table.py
+run "RQ2e Table 6 (Threshold)"             experiments/rq2e_threshold/generate_table.py
+run "RQ3  Table 7 (Agent Comparison)"       experiments/rq3_simple_agent/generate_table.py
+run "RQ4a Figures 3-5 (Behavior Analysis)"  experiments/rq4a_behavior_analysis/generate_figures.py
+run "RQ4b Figure 6 (Error Analysis)"        experiments/rq4b_error_analysis/generate_figure.py
+run "RQ4c Table 8 (Models & Agents)"        experiments/rq4c_models_agents/generate_table.py
+
+echo
+echo "========================================"
+echo "Done: $PASSED passed, $FAILED failed"
+echo "========================================"
+
+if [ "$FAILED" -gt 0 ]; then
+    exit 1
+fi
+
+
+## clone_repos.sh
+#!/bin/bash
+# Clone all repositories required for running experiments.
+#
+# Repositories come from two datasets:
+#   - DS_LINUX: Linux kernel (repos/linux-kernel/)
+#   - DS_GITHUB: Various GitHub projects (repos/<owner>/<repo>/)
+#
+# Usage:
+#   bash clone_repos.sh          # Clone all repositories
+#   bash clone_repos.sh --dry-run  # Show what would be cloned without cloning
+#
+# Note: This requires ~50+ GB of disk space and significant time for large repos
+#       (especially linux, qemu, cpython, mesa).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPOS_DIR="$SCRIPT_DIR/repos"
+DRY_RUN=false
+
+if [ "${1:-}" = "--dry-run" ]; then
+    DRY_RUN=true
+fi
+
+# Each line: <local_path>|<git_url>
+# Local path is relative to repos/
+REPOS=(
+    # DS_LINUX dataset (Linux kernel)
+    "linux-kernel|https://github.com/torvalds/linux.git"
+
+    # DS_GITHUB dataset — owner/repo structure
+    "abarisain/dmix|https://github.com/abarisain/dmix.git"
+    "adamretter/exist|https://github.com/adamretter/exist.git"
+    "analogdevicesinc/linux|https://github.com/analogdevicesinc/linux.git"
+    "andrewphorn/ClassiCube-Client|https://github.com/andrewphorn/ClassiCube-Client.git"
+    "apache/bookkeeper|https://github.com/apache/bookkeeper.git"
+    "AsherBond/qemu|https://github.com/AsherBond/qemu.git"
+    "aviaryan/PopularMovies|https://github.com/aviaryan/PopularMovies.git"
+    "benpicco/RIOT|https://github.com/benpicco/RIOT.git"
+    "BenzoRoms/packages_providers_TelephonyProvider|https://github.com/BenzoRoms/packages_providers_TelephonyProvider.git"
+    "Bioconductor/Rsamtools|https://github.com/Bioconductor/Rsamtools.git"
+    "bminor/mesa-mesa|https://gitlab.freedesktop.org/mesa/mesa.git"
+    "bvanassche/net-snmp|https://github.com/bvanassche/net-snmp.git"
+    "CCI/cci|https://github.com/CCI/cci.git"
+    "Chairshot215/android_kernel_lge_hammerhead-starship|https://github.com/Chairshot215/android_kernel_lge_hammerhead-starship.git"
+    "christ66/git-plugin|https://github.com/christ66/git-plugin.git"
+    "ClangBuiltLinux/linux|https://github.com/ClangBuiltLinux/linux.git"
+    "clebertsuconic/activemq-artemis|https://github.com/clebertsuconic/activemq-artemis.git"
+    "cmassiot/u
+
+Static Consistency Notes:
+- README states scripts/data are included for reproducing tables/figures, while full agent experiments require API keys, large repository clones, and high cost.
+- This audit confirms source, prompts, datasets, sampled datasets, experiment generators, and pre-computed result files are present in the downloaded snapshot.
+- No experiment script, data-generation script, baseline, model, package installation, or table generator was executed. [EXECUTION NOT_REQUESTED]

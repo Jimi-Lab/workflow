@@ -1,0 +1,99 @@
+3050 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 15. A failing example of the BUGNNINGS approach.
+the commit message, the bug occurs because the bug-inducing
+commit introduces the dma variable but does not set the burst
+size. In S EM-SZZ, the data flow of the lpss variable is com-
+pared, which correctly locates line 4, highlighted in yellow.
+Conversely, BUGNNINGS incorrectly locates the place where
+lpssis defined, which is line 1.
+In fact, BUGNNINGS often tends to locate line numbers far
+from the added lines based on PDGs. As mentioned earlier,
+most bug-inducing commits can be found by tracing back the
+lines near the added lines. This is the one main reason for its
+poor performance. Another reason is its analysis of control flow
+dependence. For instance, a newly addedifstatement can have
+the control flow dependent relationship with many lines in the
+program, often including many irrelevant lines.
+E. Threats to Validity
+Internal Validity.Threats to internal validity refer to causality,
+bias, and errors in the experiment. One potential threat is that we
+do not compile the entire source code of the program. Instead,
+we utilize the tree-sitter parser to implement fuzzy parsing[45],
+allowing us to analyze only part of the program. However,
+fuzzy parsing may not accurately reflect the behavior of the
+program, especially when the program contains many macros.
+This could potentially lead to errors when creating datasets
+and undermine the effectiveness of S
+EM-SZZ in comparison.
+Our implementation of BUGNNINGS faces the same issue,
+as we build program dependence graphs directly from abstract
+syntax trees. Another threat is the analysis of failure cases in
+the discussion. We only randomly selected a subset of failure
+cases for analysis which could also result in bias.
+External Validity. Threats to external validity refer to the
+applicability of our approach to other scenarios. One potential
+threat is that we only implemented and evaluated our approach
+on the projects in the C programming language. This limitation
+arises due to the lack of ghost commits in other programming
+languages. This r aises concerns about the portability of our
+approach to other programming languages. To enhance gen-
+eralization, we evaluate our approach on a larger dataset than
+those used in previous studies. Another threat is that, in our
+dataset, each bug-fixing commit typically corresponds to only
+one bug-inducing commit, which may not reflect real-world
+scenarios. In the future, we plan to extend our approach to
+more programming languages and collect additional datasets to
+address these issues.
+Construct Validity. Threats to construct validity refer to the
+accuracy of the measures used to represent the concepts in
+the study. Our approach might not perfectly encapsulate the
+complexities of real-world software development. For example,
+S
+EM-SZZ cannot handle test cases without changed lines in
+functions. Therefore, it is not applicable to the entire dataset.
+To mitigate this threat, we power a baseline with S
+EM-SZZ
+and apply it on the whole dataset when evaluating S EM-SZZ’s
+effectiveness.
+Conclusion Validity. Threats to conclusion validity refers to
+the accuracy of the conclusions drawn from the data. In our
+study, we draw conclusions based on a dataset from the Linux
+kernel, which may not fully represent other software develop-
+ment scenarios. Although we have analyzed the dataset and
+found that it includes both small and large commits, similar to
+those found in other developm ent contexts, there may still be
+limitations in generalizing our findings. To address this, we plan
+to extend our approach to include other programming languages
+and projects in the future.
+VII. R
+ELATED WORK
+SZZ algorithm Evaluation. The SZZ algorithm and its vari-
+ants have been the foundation in numerous software engineer-
+ing studies, leading to extensive evaluations by researchers
+[33], [34]. Initially, evaluations often involved manual an-
+notation, where researchers like Davies et al. [33] manually
+annotated 174 bugs across three repositories. However, manual
+annotation is time-consuming and may not always yield accu-
+rate results, as annotators may lack an in-depth understanding
+of the projects. Recognizing these challenges, many researchers
+have proposed developer-informed oracles as an alternative.
+For instance, Wen et al. [36] collected bug-inducing commits
+based on bug reports, while Rosa et al. [35] relied on commit
+messages for identification. Despite these advancements, one
+persistent issue has been the limited size of available datasets.
+Most existing datasets are relatively small, capturing only a
+fraction of the bug-inducing commits present in real-world
+projects. To address this limitation, Lyu et al. [20] collect a
+large dataset based on commit messages from the Linux kernel.
+This dataset, being considerably larger in scale, provides a more
+comprehensive view of bug-inducing commits in a real-world
+context.
+SZZ algorithm Application. The original SZZ algorithm and
+its variants are widely used by researchers in various empirical
+studies within software engineering. These algorithms have
+been applied to investigate developer collaboration [46], code
+reviews [47], [48], technical debt [49], software vulnerability
+[17] and software quality [50]. For instance, Palomba et al.
+[51] employed the SZZ algorithm to explore the correlation
+between smelly code and code that introduces faults. Similarly,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,247 @@
+{
+  "cwe_id": "CWE-454",
+  "name": "External Initialization of Trusted Variables or Data Stores",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product initializes critical internal variables or data stores using inputs that can be modified by untrusted actors.",
+  "extended_description": "A product system should be reluctant to trust variables that have been initialized outside of its trust boundary, especially if they are initialized by users. The variables may have been initialized incorrectly. If an attacker can initialize the variable, then they can influence what the vulnerable system will do.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1419",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Initialization of Resource"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-456",
+        "nature": "CanAlsoBe",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Missing Initialization of a Variable"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "PHP",
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product initializes critical internal variables or data stores using inputs that can be modified by untrusted actors.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "variables",
+      "initialized",
+      "stores",
+      "system"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "variables",
+      "initialized",
+      "stores",
+      "system",
+      "trust",
+      "been",
+      "they",
+      "initialization"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the Java example below, a system property controls the debug level of the application.",
+        "snippet": "int debugLevel = Integer.getInteger(\"com.domain.application.debugLevel\").intValue();"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code checks the HTTP POST request for a debug switch, and enables a debug mode if the switch is set.",
+        "snippet": "$debugEnabled = false; if ($_POST[\"debug\"] == \"true\"){ $debugEnabled = true; } /.../ function login($username, $password){ if($debugEnabled){ echo 'Debug Activated'; phpinfo(); $isAdmin = True; return True; } }"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-43468",
+        "description": "WordPress module sets internal variables based on external inputs, allowing false reporting of the number of views",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-43468"
+      },
+      {
+        "reference": "CVE-2000-0959",
+        "description": "Does not clear dangerous environment variables, enabling symlink attack.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2000-0959"
+      },
+      {
+        "reference": "CVE-2001-0033",
+        "description": "Specify alternate configuration directory in environment variable, enabling untrusted path.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0033"
+      },
+      {
+        "reference": "CVE-2001-0872",
+        "description": "Dangerous environment variable not cleansed.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0872"
+      },
+      {
+        "reference": "CVE-2001-0084",
+        "description": "Specify arbitrary modules using environment variable.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2001-0084"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

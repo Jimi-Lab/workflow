@@ -1,0 +1,146 @@
+classified commits. This finding confirms the intuition that
+security bugs are not commonly introduced by code edits or
+refactoring, but that new code is a more likely entry points
+for vulnerabilities. To the best of our knowledge this fact
+has not been used to ease the workload of code reviewers.
+3.4.4 Text-Based Features
+One of the central tenets of our work is that combining
+code metrics with GitHub metadata can help with the de-
+tection of VCCs. While both the code and the metadata
+features detailed above are “hard” numerical features, there
+are also a number “soft” features contained in GitHub that
+can be helpful. These text-based features, like the commit
+message, cannot be evaluated using statistical tests as above,
+but will be integrated into the machine-learning algorithm
+using a generalized bag-of-words model as we will discuss in
+Section 4.1.
+4. LEARNING-BASED DETECTION
+The diﬀerent features presented in the previous sections
+provide information for analyzing the search for suspicious
+commits and the discovery of potential vulnerabilities. As
+the large number of these features renders the manual con-
+struction of detection rules diﬃcult, we apply techniques
+from the area of machine-learning to automatically analyze
+the commits and rank them so code-reviewers can prioritise
+their work. The construction of a learning-based classifier,
+however, poses several challenges that need to be addressed
+to make our approach useful in practice:
+1. Generality: Our features comprise information that
+range from numerical code metrics to structured meta-
+data, such as words in commit messages and keywords
+in code. Consequently, we strive for a classifier that is
+capable of jointly analyzing these heterogeneous fea-
+tures and inferring a combined detection model.
+2. Scalability: To analyze large code repositories with
+thousands of source files and commits, we require a
+very eﬃcient learning method which is able to operate
+on the large amount of available features in reasonable
+time.
+3. Explainability: To help an analyst in practice, it is ben-
+eficial if the classifier can give a human-comprehensible
+explanation as to why the commit was flagged, instead
+of requiring an analyst to blindly trust a black-box de-
+cision.
+We address these challenges by combining two concepts
+from the domains of machine-learning and information re-
+trieval. In particular, we first create a joint representation
+for the heterogeneous features using a generalized bag-of-
+words model and then apply a linear Support Vector Ma-
+chine (SVM)-a learning method that can be extended to
+provide explanations for its decisions and which is also eﬃ-
+cient enough to cope with the large number of features which
+need to be analysed.
+4.1 Generalized Bag-of-Words Models
+Bag-of-word models have been initially designed for anal-
+ysis of text documents [30, 29]. In order to combine both
+code metric based numerical features with GitHub meta-
+data features, we generalize these models by considering a
+generic set of tokens S for our analysis. This set can contain
+textual words from commit messages as well as keywords,
+identifiers and other tokens from the code of a commit. In
+particular, we obtain these tokens by splitting the commit
+message and its code using spaces and newlines. Further-
+more, we ignore certain tokens, such as author names and
+email addresses, since they might bias the generality of our
+classifier and could compromise privacy.
+Formally, we define the mapping ϕ from a commit to a
+vector space as
+ϕ: X −→R|S|, ϕ : x↦−→
+(
+b(x,s)
+)
+s∈S,
+where X is the set of all commits and x∈X an individual
+commit to be embedded in the vector space. The auxiliary
+function b(x,s) returns a binary flag for the presence of a
+token s in x and is given by
+b(x,s) =
+{
+1 if token s is contained in x
+0 otherwise .
+To also incorporate numerical features like the author con-
+tribution into this model, we additionally convert all nu-
+merical features into strings. This enables us to add all
+arbitrary numbers to S and thereby treat both kinds of fea-
+tures equally. However, when using a string representation
+for numerical features we have to ensure that similar values
+are still identified as being similar. This is obviously not
+the case for a naive mapping, as “1.01” and “0.99” represent
+totally diﬀerent strings.
+We tackle this problem by mapping all numerical features
+to a discrete grid of bins prior to the vector space embed-
+ding. This quantization ensures that similar values fall into
+the same bins. We choose diﬀerent bin sizes depending on
+the type of the feature. If the numerical values are rather
+evenly distributed, we apply a uniform grid, whereas for
+features with skewed distribution we a apply a logarithmic
+partitioning. For the latter, we apply the logarithmic func-
+tion to its values and cut oﬀ all digits after the first decimal
+place.
+To better understand this generalized bag-of-words model,
+let us consider a fictitious commit x, where a patch has been
+written by a user who did not contribute to a project before.
+The committed patch is written in C and contains a call
+to an API function which is associated with a buﬀer write
+operation. The corresponding vector representation of the
+commit x looks as follows
+ϕ(x) ↦→
+
+
+
+
+
+
+
+···
+1
+0
+···
+1
+0
+···
+
+
+
+
+
+
+
+···
+AUTHOR_CONTRIBUTION:0.0
+AUTHOR_CONTRIBUTION:10.0
+···
+buf_write_func();
+some_other_func();
+···
+The two tokens indicative of the commit are reflected by
+non-zero dimensions, while all unrelated tokens are associ-
+ated with zero dimensions. Note that the resulting vector
+space is high-dimensional and may contain several thousands
+of dimensions. For a concrete commit x, however, the vast
+majority of these dimensions are zero and thus the vector
+ϕ(x) can be stored in a sparse data structure. We make use
+of the open-source tool Sally [27] for this purpose, which
+implements diﬀerent strategies for extracting and storing
+sparse feature vectors.
+432

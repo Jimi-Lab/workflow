@@ -1,0 +1,128 @@
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+2.1
+SZZ algorithms
+The original SZZ and its variants have been widely used in many
+previous studies to identify bug-inducing commits based on bug-
+fixing commits [2, 3, 5, 14, 25, 62]. SZZ algorithms assume that
+the lines of code that are modified by the bug-fixing commits are
+the same as or evolved from the lines of code that are modified
+by the bug-inducing commits [57]. In our study, we will use the
+following SZZ algorithms to investigate whether they can identify
+VICs for vulnerabilities, which is the same as a prior study [16].
+In this paper, the implementation of these SZZ algorithms used is
+from the replication package of the study of Rosa et al. [45].
+The original SZZ approach (B-SZZ) was proposed by Sliwerski
+et al. [51]. First, B-SZZ identifies bug-fixing changes in issue track-
+ing systems based on the description of bug reports and commit
+messages. Then, it leverages the diff command provided by the
+version control systems (VCS) to identify the lines of code modified
+by the bug-fixing changes. Finally, B-SZZ traces back through the
+code history to identify the changes that introduce one or more of
+the buggy lines by using the annotate command in the VCS.
+AG-SZZ was proposed by Kim et al. [27] since they observed that B-
+SZZ might consider non-semantic lines, including blank/comment
+lines and those involving format modifications (e.g., modifications
+to the code indentation) to be buggy lines. Kim et al. achieved a more
+precise result by using the annotation graph that provides more
+comprehensive information about line moves and modifications
+within a file than the annotate command.
+MA-SZZ was proposed by Da Costa et al. [11] because they noticed
+that AG-SZZ flags meta-changes as potential bug-inducing changes
+due to the limitation of the annotation graph. Meta-changes are the
+commits that do not change source code, including branch changes
+(i.e., changes copying code from one branch to a new branch),
+merge changes (i.e., changes applying code modifications from one
+branch to another), and property changes (i.e., changes impacting
+file properties)
+RA-SZZ was proposed by Neto et al. [35] since they observed that
+prior SZZ algorithms identify incorrect bug-inducing changes due
+to the impact of refactoring lines. Refactoring lines refer to those
+involving refactoring modifications (e.g., modification to a function
+name). There are two versions of RA-SZZ implemented by Neto
+et al. [35, 36], which are based on RefDiff [50] and Refactoring
+Miner [54], respectively. In our study, we select the RA-SZZ based
+on Refactoring Miner because it is more effective [36]. But RA-SZZ
+can only work on Java projects since the two refactoring-detection
+tools are only for Java code.
+2.2
+Motivating Examples
+Nguyen et al. demonstrated that the versions affected by a CVE
+vulnerability might be spurious and could be refined by its fixing
+commits and inducing commits [38]. Figure 1 depicts a motivating
+example from CVE-2018-6621. According to its change history,
+we find that the version information in the CVE description was
+changed from ‘3.4.1’ to ‘3.2’. This indicates that sometimes it is
+difficult for developers to determine the correct vulnerable versions.
+We apply the original SZZ approach to identify the inducing commit
+based on the fixing commit of this vulnerability. We assume that if
+CVE-2018-6621
+The decode_frame function in libavcodec/utvideodec.c in FFmpeg through 3.2 
+allows remote attackers to cause a denial of service (out of array read) via a 
+crafted AVI file.
+Project: FFmpeg
+Change from 3.4.1 to 3.2
+Fixing Commit: 118e1b
+Previous Commit: 3ecc59
+if (slice_end < 0 || slice_end < slice_start ||
+-
+bytestream2_get_bytes_left(&gb) < slice_end) {
++     bytestream2_get_bytes_left(&gb) < slice_end + 1024LL) 
++ if (slice_end < 0 || slice_end < slice_start ||
++     bytestream2_get_bytes_left(&gb) < slice_end) {
+from 3.1 to 3.2.10, 
+3.3.x before 3.3.8, 
+3.4.x before 3.4.2
+Version tags
+Vulnerable Version Tags
+Non-Vulnerable Version Tags
+n3.1.x (1≤x≤11)
+n3.1, n3.1.1, …, n3.1.11
+n3.2.x (1≤x≤15)
+n3.2, n3.2.1, …, n3.2.10
+n3.2-dev
+n3.2.11, n3.2.12, …, n3.2.15
+n3.3.x (1≤x≤9)
+n3.3, n3.3.1, …, n3.3.7
+n3.3-dev
+n3.3.8, n3.3.9
+n3.4.x (1≤x≤8)
+n3.4, n3.4.1, n3.4-dev
+n3.4.2, n3.4.3, …, n3.4.8
+Figure 1: The first motivating example from CVE-2018-6621
+a version contains the vulnerable code, this version is vulnerable;
+otherwise, the version is not vulnerable. Thus, the versions between
+the inducing commit and the fixing commit are vulnerable. Since
+a version in a git repository is usually assigned to a tag, we first
+identify the tags of vulnerable versions (see Figure 1). Then, we
+find that the vulnerable versions can be summarized into ‘from 3.1
+to 3.2.10, 3.3.x before 3.3.8, and 3.4.x before 3.4.2’, which is different
+from the version information in the CVE description. Additionally,
+we find that several development versions (e.g., 3.2-dev) are also
+vulnerable.
+However, the current SZZ algorithms cannot identify the true
+inducing commits for some vulnerabilities. Figure 2 present another
+motivating example from CVE-2015-1830. For the fixing commit
+of this vulnerability, the SZZ algorithms identify the commit that
+last modified the vulnerable line as the inducing commit (called
+‘Previous Commit’ in Figure 2). But if we use this previous commit
+to infer the versions affected by this vulnerability, no vulnerable
+version would be detected. Nevertheless, this vulnerability still
+exists in the version with respect to the previous commit based
+on the CVE description and the fixing commit. Thus, we continue
+to identify the commits that modified the vulnerable line (called
+‘Descendants Commits’). As the change in the first descendants
+commit is just a format change, we regard the second descendants
+commit as the true inducing commit in which the vulnerable line of
+code was firstly added4. This vulnerability can be considered to be
+foundational [39] since it was present in an initial version. Based
+on this inducing commit, we infer the vulnerable versions are ‘5.x
+before 5.11.2’, which is consistent with the version information in
+the CVE description.
+4This CVE is a directory traversal vulnerability, also known as the ../ (dot dot
+slash) attack. The exploit information in a reference mentions that the vulnerability
+can be exploited via a traversal path ’/fileserver/../admin/’. The added API ’FileSys-
+tem.getDefault().getPath(String).normalize()’ in the fixing commit removes redundant
+elements in a path including any “.” or “directory/..” occurrences.
+2354
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. 

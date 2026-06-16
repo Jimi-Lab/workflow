@@ -1,0 +1,102 @@
+// Original buggy code
+char buf[8];
+strcpy(buf, input);
+// Possible patch 1
+char buf[8];
+- strcpy(buf, input);
++ strncpy(buf, input, 8);
+// Possible patch 2
+char buf[8];
++ if(strlen(input) < 8)
+strcpy(buf, input);
+Figure 1: Buggy code example and two possible patches
+the code into high-level representations like parse trees and
+control ﬂow graphs. They then employ advanced fuzzy
+matching algorithms on the abstractions to ﬁnd additional
+code clones that we may miss. On the other hand, they
+may report more false code clones, which require signiﬁcant
+human effort to inspect all the reported cases. Furthermore,
+it is known to be very hard to implement good parsers [7].
+Overall, the main difference is by employing simpler
+techniques that is language agnostic, we can focus on ef-
+ﬁcient data structures and algorithms and ultimately scale to
+much larger code bases written in many different languages.
+Our techniques may miss some clones, but minimize false
+clone detection rate. This is important for at least two
+reasons. First, by checking all code in a distribution quickly
+we can make basic guarantees that at least syntactically
+similar unpatched code clones do not exist. Second, we
+can conservatively estimate the amount of code cloning in
+existing large code bases. The more advanced algorithms in
+the above work have not demonstrated they can make either
+claim.
+B. Unpatched Code Clone Detection
+At a high level, there are two approaches to ﬁnd unpatched
+code clones in OS distributions: (1) ﬁrst ﬁnd all code clones
+among the source and then check if a patch applies to copies,
+or (2) check for clones of only the patched code. Previous
+work has focused on techniques for ﬁnding all clones such
+as in (1). This makes sense when doing bug ﬁnding on
+whole code bases is cheaper to do on unique code snippets.
+ReDeBug takes approach (2) because we only want to ﬁnd
+clones of the original unpatched buggy code.
+ReDeBug looks for unpatched code clones where patches
+are in UNIX uniﬁed diff format. Uniﬁed diffs are pop-
+ular among open source kernel developers, OS distribution
+maintainers, and are well-integrated into popular revision
+control systems like Subversion [12].
+A uniﬁed diff patch consists of a sequence of diff hunks.
+Each hunk contains the changed ﬁlename, and a sequence of
+additions and deletions. Added source code lines are preﬁxed
+by a “+” symbol, and deletions are preﬁxed by a “-” symbol.
+Line changes are represented as deleting the original line and
+adding back the changed lines.
+The original buggy code includes all code deleted by
+the patch. However, simply looking for the lines that were
+changed (by being deleted) is insufﬁcient: we must also
+consider the surrounding context of the patch.
+Consider the buggy code and two possible patch scenarios
+shown in Figure 1. Patch 1 signiﬁes that strcpy is buggy
+by deleting the line of code. The code is replaced with the
+safe strncpy version. We can go looking for the deleted
+line of code, and ﬂag it as buggy everywhere we see it.
+However, patch 2 simply adds a check. Looking for the
+missing check is not straightforward since we cannot directly
+look for missing lines of code. Our approach is to look for
+copies of the surrounding context tokens, c, for each changed
+line and report clones of the context.
+The overall steps used by ReDeBug to detect buggy code
+clones, shown in Figure 2, are:
+• Step 1: Pre-process the source. A user obtains all
+source ﬁles used in their distribution. For Debian, this is
+done using the apt tool. ReDeBug then automatically:
+1) Performs normalization and tokenization as de-
+scribed in the core system in § II-A.
+2) Moves an n-length window over the token stream.
+For each window, the resulting n-tokens are
+hashed into a Bloom ﬁlter.
+3) Stores the Bloom ﬁlter for each source ﬁle in
+a raw data format. ReDeBug compresses Bloom
+ﬁlters before storing to disk to save space and to
+reduce the amount of disk access at query time.
+While initially the above steps would be performed over
+the entire distribution, day-to-day use would only run
+the steps on modiﬁed ﬁles, e.g., as part of a revision
+control check-in. In our experiments and implemen-
+tation, we also concatenate per-ﬁle Bloom ﬁlters for
+a project into a single bitmap before saving to disk.
+This is purely an optimization; loading the single large
+Bloom ﬁlter is much quicker than loading a bunch of
+small Bloom ﬁlters on our machines.
+• Step 2: Check for unpatched code copies. A user
+obtains a uniﬁed diff software patch. ReDeBug then
+automatically:
+1) Extracts the original code snippet and the c tokens
+of context information from the pre-patch source.
+The mechanics for the code snippet are simple:
+we extract lines preﬁxed by a “-” symbol in the
+patch (lines preﬁxed with a “+” symbol are added
+and thus not present in the original buggy code). If
+context information is given in the patch, we use
+51
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

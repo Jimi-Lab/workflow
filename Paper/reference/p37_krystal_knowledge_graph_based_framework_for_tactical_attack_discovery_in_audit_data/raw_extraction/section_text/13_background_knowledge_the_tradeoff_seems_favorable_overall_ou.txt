@@ -1,0 +1,96 @@
+background knowledge the tradeoff seems favorable. Overall, our 
+framework achieved a performance of 1.2 s per attack on average 
+in the scenario graph construction via list:forward-chaining . The 
+highest performance has been achieved in scenario 2 and 3 ( Cadets 
+dataset with FreeBSD) with 0.79 s. Note that we excluded time for 
+backward-chaining for root cause identiﬁcation as it is basically a 
+select query over the provenance graph (without constructing a 
+new graph) and therefore the run times are relatively fast. The run 
+time for scenario graph generation through graph querying is even 
+faster, i.e., less than 0.5 s for all scenarios. This indicates that our 
+RDF-based provenance graph data model scales well with respect 
+to graph size and query complexity when it comes to graph-query 
+based attack construction. 
+Propagation-Based Alert Detection Performance In the follow- 
+ing, we measure the effectiveness of our approach in detecting 
+alerts based on alerting policies over the tagged provenance graph. 
+We leverage alert policies such as Change Permission, File Execution, 
+File Corruption , or Data Leak from ( Hossain et al., 2020 ). In addi- 
+tion, we created a custom alert Reconn that detects connections 
+from external IPs to processes that access sensitive ﬁles. Table 6 
+summarizes the detected alerts for all scenarios. Overall, our ap- 
+proach detected all high-level attack activities in the ground truth 
+and achieved similar detection performance as the evaluation in 
+Hossain et al. (2020) (cf. Table 3 ). 
+13 
+
+===== Page 013 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Table 6 
+Provenance-based alert detection. 
+Scenario ID Total Events (M) Reconn Change Perm File Exec File Corrupt Data Leak 
+1,2 7.8 65 1152 15 115 3 
+3 12.9 4 1274 1 1040 3 
+4 23.4 3 9 2 618 3 
+5 19.3 22 448 0 288 10 
+Table 7 
+Detected alerts by Sigma rules. 
+Scenario ID Dataset ID Total Events (M) Correctly Identiﬁed Alert Incorrectly Identiﬁed Alert 
+1,2 CD I 7.8 34 0 
+3 CD II 12.9 41 0 
+4 TH 23.4 19 0 
+5 FD 19.3 1162 261 
+Signature-Based Alert Detection Performance In this evalu- 
+ation, we used the Sigma rules incorporated into our KRYSTAL 
+framework to detect attacks based on IoCs from logs. As discussed 
+in Section 6.2 , we automatically translated Sigma rules into ex- 
+ecutable SPARQL queries and run them against the provenance 
+graph. To this end, we translated most of the existing Sigma rules 
+for Linux logs (33 rules) and Windows logs (160 rules). At the time 
+of writing 42 , there are no speciﬁc Sigma rules for dtrace FreeBSD, 
+however, dtrace FreeBSD logs have a similar structure to auditd 
+Linux logs in the evaluated DARPA dataset, hence, we could also 
+use them to detect attacks in FreeBSD logs. 
+Table 7 shows the number of triggered alerts based on Sigma 
+rules from all ﬁve scenarios within our KRYSTAL framework. For 
+scenarios with Linux and FreeBSD as log sources, the translated 
+Sigma rules detected similar alerts as propagation-based alert de- 
+tection without any incorrectly identiﬁed alerts. It includes alerts 
+for system owner or user discovery 43 , ﬁle or folder permissions 
+change 44 , privilege escalation preparation 45 , program executions in 
+suspicious folders 46 , etc . Furthermore, Sigma rules detected more 
+speciﬁc alerts which have been missed by propagation-based ap- 
+proaches , such as bash_proﬁle modiﬁcation 47 (as part of the persis- 
+tence phase), and data compressed 48 (as part of the data-exﬁltration 
+phase). 
+For Windows, we identiﬁed more alerts on Scenario 5 (Five Di- 
+rection) with a total of 1162 alerts (with 261 incorrect alerts that 
+could not be linked to actual attack activities in the scenario). 
+Relevant alerts include, e.g., Suspicious Service Path Modiﬁcation 49 , 
+Suspicious XOR Encoded PowerShell Command Line 50 , Rar with Pass- 
+word or Compression Level 51 , Change Default File Association 52 , LSASS 
+Memory Dumping 53 , and Capture a Network Trace with netsh.exe . 54 
+Integrated and Enriched Cross-Technique Graphs 
+Our experiments showed that the knowledge graph founda- 
+tion enables the integration of results from various detection tech- 
+niques and their linking to additional knowledge and gives the 
+analyst a rich view for comprehensive, multi-paradigmatic threat 
+analysis. 
+42 last access 04/05/2021 
+43 http://bit.ly/sigmaDiscovery 
+44 http://bit.ly/sigmaFolderPermission 
+45 http://bit.ly/sigmaPrivilegeEscalation 
+46 http://bit.ly/sigmaProgramExecution 
+47 http://bit.ly/sigmaBashProﬁleModiﬁcation 
+48 http://bit.ly/sigmaDataCompressed 
+49 http://bit.ly/SigmaWinSuspService 
+50 http://bit.ly/SigmaWinPowerShellXOR 
+51 http://bit.ly/SigmaWinRarFlags 
+52 http://bit.ly/SigmaWinChangeFileAssoc 
+53 http://bit.ly/SigmaWinLSASSDump 
+54 http://bit.ly/SigmaWinNetSHPacket 
+The scenario attack graph in Fig. 11 , for instance, shows an en- 
+riched attack graph constructed through a combination of tech- 
+niques summarized in Table 8 , which compares KRYSTAL to other 
+state of the art approaches and highlights the integrative aspect 
+of the framework. The identiﬁed attack steps are linked to rich

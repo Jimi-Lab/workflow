@@ -1,0 +1,22 @@
+lines 4-7).
+Fig. 5. A program state example.
+Fig. 5 illustrates the program’s state for the previously col-
+lected execution path in the motivation example. Upon encoun-
+tering the statement at line 3, we extract the variablesworkand
+tmp from the statement. Consequently, we add line number 3
+to their data flow, as depicted in the figure. Additionally, upon
+reaching line 6, we easily identify it as an if statement related
+to path constraint. Since our path executes from block c to d,
+and it does not satisfy the condition, we negate the condition
+and store it in the path constraint, as shown in Fig. 5.
+C. State Comparison
+After collecting the states, our subsequent step involves com-
+paring the states of the execution paths from the current version
+with those from the previous version. This comparison enables
+us to identify discrepancies in their states, ultimately helping us
+determine the unmodified statements contributing to the bug.
+For each execution path in the current version, our objective
+is to discover how the added lines affect the path, making its
+state different from the previous version. To enable the com-
+parison, the first step involves identifying the corresponding
+execution path in the previou

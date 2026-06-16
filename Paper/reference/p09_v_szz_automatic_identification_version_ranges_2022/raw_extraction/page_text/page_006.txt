@@ -1,0 +1,157 @@
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+L. Bao et al.
+Table 1: The statistics of the vulnerabilities and the corresponding fixing commits in two dataset.
+Language
+Project
+#Vul
+#VFC
+#ZERO
+#SMALL
+(NO_CVE_ID)
+#LARGE
+C/C++ [30]
+FFmpeg
+908
+908
+234
+583 (435)
+91
+ImageMagick
+756
+748
+207
+423 (262)
+118
+linux-kernel
+1,716
+1,841
+461
+887 (1)
+493
+OpenSSL
+132
+126
+30
+53 (0)
+43
+php-src
+426
+414
+98
+223 (42)
+93
+Total
+3,938
+4,037
+1,030
+2,169 (740)
+838
+Java [43]
+apache/tomcat
+69
+98
+16
+32 (0)
+50
+apache/struts
+44
+76
+6
+39 (0)
+21
+apache/tomcat701
+35
+59
+n.a.
+n.a.
+n.a.
+jenkinsci/jenkins
+34
+43
+7
+27 (0)
+9
+spring-projects/
+spring-framework
+24
+43
+4
+17 (1)
+32
+...(more 199 projects)
+Total
+624
+1,282
+172
+387 (9)
+557
+1 Since the repository of Apache Tomcat70 has been removed on GitHub, we cannot get the number of deleted lines
+in VFCs and set the values to n.a..
+(#ZERO), larger than zero and less than or equal to five deleted lines
+(#SMALL), and large than five deleted lines (#LARGE), respectively.
+The dataset with C/C++ projects is collected by Liu et al. [30].
+There are five popular C/C++ projects, i.e., FFmpeg (a multimedia
+framework), ImageMagick (a representative raster/vector image file
+processing software suite), OpenSSL (an implementation of secure
+communication protocols), PHP-SRC (the official interpreter for
+PHP language), and Linux kernel (one of the most widely used
+operating systems). They collect a large number of vulnerabilities
+with fixing commits by utilizing automated crawlers and spending
+months of manual effort. There are 3,938 vulnerabilities with 4,037
+fixing commits in this dataset.
+The dataset with Java projects is collected by Ponta et al. [43].
+They construct this dataset by collecting publicly disclosed vulner-
+abilities affecting more than 200 Java open source projects used in
+SAP products or internal tools, including Apache Tomcat and Struts,
+Jenkins (an automation server facilitating continuous integration
+and continuous delivery), and Spring framework. In total, there are
+624 vulnerabilities with 1,282 fixing commits in this dataset.
+We have many popular projects with two programming lan-
+guages that span a wide range of functionalities based on the above
+two datasets. Thus, we believe that various types of vulnerabilities
+and the corresponding fixing commits have been covered.
+4.2
+Manual Annotation for
+Vulnerability-Inducing Commits
+To annotate inducing commits for vulnerabilities, we follow the
+model proposed by Rodríguez-Pérez et al. [44], which is designed
+to identify how bugs are introduced in software components. Given
+a bug-fixing commit, Rodríguez-Pérez et al. check the previous
+commits and the descendants commits of each line in the bug-
+fixing commit until identifying the first-failing change. They check
+whether a bug is present in a certain snapshot using a “perfect test”.
+Since there is no such a perfect test in practice, they use a mentally
+designed test as a proxy of the perfect test based on bug reports,
+comments, and discussions from developers.
+We use a similar approach to annotate the inducing commits for
+vulnerabilities. Following Rodríguez-Pérez et al.’s idea of “perfect
+test”, we leverage the related information of a vulnerability (e.g.,
+the CVE description, fixing commits, and commit messages) to
+determine whether it exists on a snapshot (referred to as a commit
+on a software system). To help annotators go further back and
+quickly check previous commits and descendants commits, we
+develop a web application that integrates the git blame tool. For
+each modified line in a vulnerability fixing commit, we first identify
+its previous commit to check whether the vulnerability exists in the
+snapshot, then go further back recursively to analyze descendants
+commits.
+Thus, we might get multiple inducing commits when there are
+more than one modified line of code. However, according to the
+model of Rodríguez-Pérez et al. [44], there is just one change that
+introduced a vulnerability. Thus, we consider the earliest one in the
+annotated inducing commits as the true inducing commits because
+we assume all the modified lines of code in the fixing commits
+are vulnerable and the earliest inducing commits that contain the
+vulnerable lines of code are more likely to be vulnerable.
+To show the annotation process, we can refer to the second
+motivating example (as shown in Figure 2). We also find that only
+four vulnerabilities (see Table 2) are introduced by the previous
+commits but not the descendants commits. For example, CVE-2018-
+14884 in Fig 5 is not foundational. For example, the commit message
+of the fixing commit for CVE-2018-14884 in Figure 5 mentions that
+‘The sizeof()s for Content-Length and Transfer-Encoding were missing
+the trailing ":"’. So, we think this vulnerability is introduced by the
+previous commit because the sizeof function in the vulnerable line
+of code is firstly added in the previous commit.
+2357
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. 

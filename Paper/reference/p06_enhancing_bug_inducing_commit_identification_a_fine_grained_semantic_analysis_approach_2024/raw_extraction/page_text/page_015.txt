@@ -1,0 +1,133 @@
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3051
+Bavota et al. [47] delved into the impact of the code review
+process on the likelihood of introducing a bug. Furthermore, the
+SZZ algorithm has also been used to determine the correct ver-
+sions affected by a vulnerability in the National Vulnerability
+Database [17]. Another broad application of the SZZ algorithm
+is in just-in-time defect detection [52], where researchers aim
+to determine whether a commit introduces a defect. Datasets
+[37], [53], [54] used for just-in-time defect detection are often
+collected using the SZZ algorithm. Based on these datasets,
+many researchers have proposed models and evaluated their
+effectiveness. For instance, Kamei et al. [52] utilized the B-
+SZZ algorithm to identify bug-inducing commits and collected
+a large dataset for their study. Similarly, Fan et al. [37] investi-
+gated the impacts of different variants of the SZZ algorithm on
+defect detection.
+Factors leading to buggy commits. Researchers have ex-
+tensively explored the characteristics of bug-inducing commits,
+with a particular emphasis on the factors contributing to their
+production [2], [4], [6], [55], [56]. For instance, ´Sliwerski et al.
+[6] analyzed the time factor and discovered that commits made
+on Fridays are more prone to introducing bugs. Other studies
+have delved into the developer factor, including developers’
+coding habits and experience. Eyolfson et al. [55] found that
+developers who commit code daily are less likely to introduce
+bugs, while Bernardi et al. [56] discovered that developers who
+communicate frequently with their colleagues tend to produce
+fewer bugs. Additionally, Rahman et al. [4] identified that de-
+velopers with experience in the target file are less likely to
+introduce buggy commits.
+VIII. C
+ONCLUSION AND FUTURE WORK
+In this study, we observe that the majority of bug-inducing
+commits for bug-fixing commits with only added lines can be
+effectively located by tracing back the nearby lines of the un-
+modified lines. To further enhance precision, we introduce our
+approach, S
+EM-SZZ. Our approach leverages data flow analysis
+and control flow analysis to compare the states between the
+two versions of the program, identifying their difference and
+generating the statements contributing to the bug. Subsequently,
+we trace back the buggy statements to identify candidate com-
+mits. Finally, we employ line similarity comparison to pinpoint
+the commit that initially introduced all the buggy statements,
+marking it as the bug-inducing commit. The result shows that
+our proposed method significantly improves the precision and
+F1-score of the baselines in all scenarios, regardless of whether
+the bug-fixing commit contains deleted lines. In the future, we
+plan to extend our work to other programming languages and
+collect more high-quality datasets. Additionally, current meth-
+ods overlook commit messages when locating bug-inducing
+commits. We intend to leverage large language models to in-
+terpret commit messages and code changes, using this informa-
+tion to filter out irrelevant lines detected by baselines such as
+A-SZZ. Furthermore, our current approach relies on line sim-
+ilarity to identify buggy commits. We aim to replace this with
+large language models. We hope this can maintain the high
+recall of A-SZZ while gaining SEM-SZZ’s high precision.
+D
+ATA AVAILABILITY
+The replication package, which includes the source code,
+datasets, and prediction results, can be found at https://figshare.
+com/s/a25207be10150e2f0177.
+REFERENCES
+[1] S. Kim, E. J. Whitehead, and Y . Zha ng, “Classifying software changes:
+Clean or buggy?” IEEE Trans. Softw. Eng., vol. 34, no. 2, pp. 181-196,
+Mar./Apr. 2008.
+[2] G. Bavota, B. De Carluccio, A. D e Lucia, M. Di Penta, R. Oliveto, and
+O. Strollo, “When does a refactoring induce bugs? An empirical study,”
+in Proc. IEEE 12th Int. Work. Conf. Source Code Anal. Manipulation ,
+Piscataway, NJ, USA: IEEE Press, 2012, pp. 104-113.
+[3] S. Kim and E. J. Whitehead Jr, “How long did it take to fix bugs?” in
+Proc. Int. Workshop Mining Softw. Repositories , 2006, pp. 173-174.
+[4] F. Rahman and P. Devanbu, “Owner ship, experience and defects: A fine-
+grained study of authorship,” in Proc. 33rd Int. Conf. Softw. Eng., 2011,
+pp. 491-500.
+[5] G. Canfora, M. Ceccarelli, L. Cerulo, and M. Di Penta, “How long does
+a bug survive? An empirical study,” in Proc. 18th Work. Conf. Reverse
+Eng., Piscataway, NJ, USA: IEEE Press, 2011, pp. 191-200.
+[6] J. ´Sliwerski, T. Zimmermann, and A. Zeller, “When do changes induce
+fixes?” ACM Sigsoft Softw. Eng. Motes , vol. 30, no. 4, pp. 1-5, 2005.
+[7] S. Kim, T. Zimmermann, K. Pan, and E. J. Jr. Whitehead, “Automatic
+identification of bug-introducing changes,” in Proc. 21st IEEE/ACM Int.
+Conf. Automated Softw. Eng. (ASE’), Piscataway, NJ, USA: IEEE Press,
+2006, pp. 81-90.
+[8] D. A. Da Costa, S. McIntosh, W. Shang, U. Kulesza, R. Coelho, and
+A. E. Hassan, “A framework for evaluating the results of the SZZ
+approach for identifying bug-introducing changes,” IEEE Trans. Softw.
+Eng., vol. 43, no. 7, pp. 641-657, Jul. 2017.
+[9] E. C. Neto, D. A. Da Costa, and U. Kulesza, “The impact of refactoring
+changes on the SZZ algorithm: An empirical study,” in Proc. IEEE 25th
+Int. Conf. Softw. Anal., Evol. Reeng. (SANER), Piscataway, NJ, USA:
+IEEE Press, 2018, pp. 380-390.
+[10] M. Tan, L. Tan, S. Dara, and C. Mayeux, “Online defect prediction for
+imbalanced data,” in Proc. IEEE/ACM 37th IEEE Int. Conf. Softw. Eng.,
+vol. 2, Piscataway, NJ, USA: IEEE Pre ss, 2015, pp. 99-108.
+[11] L. Pascarella, F. Palomba, and A. B acchelli, “Fine-grained just-in-time
+defect prediction,” J. Syst. Softw., vol. 150, pp. 22-36, Dec. 2018.
+[12] H. Hata, O. Mizuno, and T. Kikuno, “Bug prediction based on fine-
+grained module histories,” in Proc. 34th Int. Conf. Softw. Eng. (ICSE),
+Piscataway, NJ, USA: IEEE Press, 2012, pp. 200-210.
+[13] R.-M. Karampatsis and C. Sutt on, “How often do single-statement bugs
+occur? The ManySStuBs4J dataset,” in Proc. 17th Int. Conf. Mining
+Softw. Repositories, 2020, pp. 573-577.
+[14] G. An and S. Yoo, “Reducing the search space of bug inducing commits
+using failure coverage,” in Proc. 29th ACM Joint Meeting Eur. Softw.
+Eng. Conf. Symp. Found. Softw. Eng. , 2021, pp. 1459-1462.
+[15] M. Tufano, G. Bavota, D. Poshyvanyk, M. Di Penta, R. Oliveto,
+and A. De Lucia, “An empirical study on developer-related factors
+characterizing fix-inducing commits,” J. Softw.: Evol. Process , vol. 29,
+no. 1, 2017, Art. no. e1797.
+[16] B. Chen and Z. M. Jiang, “Extracting and studying the logging-code-
+issue-introducing changes in Java-based large-scale open source software
+systems,” Empirical Softw. Eng., vol. 24, pp. 2285-2322, Mar. 2019.
+[17] L. Bao, X. Xia, A. E. Hassan, and X . Yang, “V-szz: automatic identifi-
+cation of version ranges affected by cve vulnerabilities,” in
+Proc. 44th
+Int. Conf. Softw. Eng. , 2022, pp. 2352-2364.
+[18] L. Tang, L. Bao, X. Xia, and Z. Huang, “Neural szz algorithm,” in Proc.
+38th IEEE/ACM Int. Conf. Automated Softw. Eng. (ASE),Piscataway, NJ,
+USA: IEEE Press, 2023, pp. 1024-1035.
+[19] C. Rezk, Y . Kamei, and S. Mcintosh, “The ghost commit problem when
+identifying fix-inducing changes: An empirical study of apache projects,”
+IEEE Trans. Softw. Eng. , vol. 48, no. 9, pp. 3297-3309, Sep. 2022.
+[20] Y . Lyu, H. J. Kang, R. Widyasari, J. Lawall, and D. Lo, “Evaluating
+SZZ implementations: An empirical study on the linux kernel,” 2023,
+arXiv:2308.05060.
+[21] E. Sahal and A. Tosun, “Identif ying bug-inducin g changes for code
+additions,” in Proc. 12th ACM/IEEE Int. Symp. Empirical Softw. Eng.
+Meas., 2018, pp. 1-2.
+[22] “The commit of the motivation exa mple,” [Online]. Available: Accessed:
+Mar. 15, 2024. https://github.com/torvalds/linux/commit/e9838bd5116
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

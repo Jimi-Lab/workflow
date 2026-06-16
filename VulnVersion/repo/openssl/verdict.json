@@ -1,0 +1,32 @@
+{
+  "tag": "OpenSSL-engine-0_9_6",
+  "line": "engine-0.9.6",
+  "verdict": "NOT_AFFECTED",
+  "run_status": "OK",
+  "confidence": 1.0,
+  "matched_predicates": [],
+  "failed_predicates": [
+    "vuln_anchor_exists"
+  ],
+  "triggered_guards": [
+    "function_not_present_in_tag_snapshot"
+  ],
+  "evidence_snippets": [
+    {
+      "ref": "OpenSSL-engine-0_9_6:crypto/x509v3/v3_genn.c",
+      "source": "git_show",
+      "snippet": "File exists but contains NO GENERAL_NAME_cmp function"
+    },
+    {
+      "ref": "OpenSSL-engine-0_9_6:crypto/x509v3/v3_genn.c",
+      "source": "git_show",
+      "snippet": "GENERAL_NAME union has ASN1_TYPE *other for GEN_EDIPARTY; no ediPartyName member"
+    },
+    {
+      "ref": "OpenSSL-engine-0_9_6:crypto/x509v3/v3_genn.c",
+      "source": "git_grep",
+      "snippet": "git grep -rn GENERAL_NAME_cmp OpenSSL-engine-0_9_6: zero matches across all .c/.h files"
+    }
+  ],
+  "reasoning_summary": "GENERAL_NAME_cmp (the function containing the NULL ptr deref via edipartyname comparison) does not exist in OpenSSL-engine-0_9_6. The fix commit f960d812 modifies GENERAL_NAME_cmp, GENERAL_NAME_set0_value, and GENERAL_NAME_get0_value plus adds edipartyname_cmp, but in this tag none of these functions are present. The file v3_genn.c exists but is an older version lacking these functions entirely. The struct union uses ASN1_TYPE *other for GEN_EDIPARTY with no separate ediPartyName member. The vulnerability root cause cannot manifest because the anchor function is absent."
+}

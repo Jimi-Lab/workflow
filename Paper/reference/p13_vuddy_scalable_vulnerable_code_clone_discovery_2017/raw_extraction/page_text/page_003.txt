@@ -1,0 +1,116 @@
+• Type-2: Renamed clones.These are syntactically identi-
+cal clones except for the modiﬁcation of types, identiﬁers,
+comments, and whitespace. VUDDY covers Type-1 and
+Type-2 clones.
+• Type-3: Restructured clones.Further structural mod-
+iﬁcation (e.g., deletion, insertion, or rearrangement of
+statements) is applied to renamed clones to produce
+restructured clones.
+• Type-4: Semantic clones.These are clones that could be
+syntactically different, but convey the same functionality.
+For the purpose of making VUDDY optimized for detecting
+security-related clones, we devotedly designed VUDDY to be
+able to detect Type-1 and Type-2 clones, which is the right
+scope that retains the context while allowing minor changes
+that frequently occur after code cloning. In the following
+sections, we explain why two former types of clones properly
+handle the security-aware context, and how approaches for
+detecting Type-3 and Type-4 clones sacriﬁce accuracy, and
+lead to increased false positive rate.
+We also specify a granularity unit which refers to the scale
+of a code fragment, which is referenced throughout this study.
+• Token: This is the minimum unit the compiler can
+understand. For example, in the statementi n ti=0 ;
+ﬁve tokens exist:int, i, =, 0, and ;.
+• Line: This represents a sequence of tokens delimited by
+a new-line character.
+• Function: This is a collection of consecutive lines that
+perform a speciﬁc task. A standard C or C++ function
+consists of a header and body. A header includes a return
+type, function name, and parameters, and a body includes
+a sequence of lines that determine the behavior of the
+function.
+• File: This contains a set of functions. A ﬁle may in fact
+contain no functions. However, most source ﬁles usually
+contain multiple functions.
+• Program: This is a collection of ﬁles.
+In summary, a program is a collection of ﬁles that contain
+functions, and a function is a collection of lines that are
+composed of tokens. Code cloning can occur with any of
+the listed granularity units. VUDDY take a function as its
+processing granularity.
+B. Related work
+Rataan et al. reviewed an extensive amount of research on
+code clone detection, and reported more than 70 techniques
+published in 11 journals and 37 conferences and workshops
+[23]. In this section we review some of the representative
+techniques which can be grouped into ﬁve categories based
+on the clone granularity level: set of tokens, set of lines, set
+of functions, ﬁles, or a hybrid of others. The selection of the
+granularity level greatly affects the ensuing clone detection
+process, and contributes greatly to scalability and accuracy.
+1) T oken-level granularity: Techniques that adopt token-
+level granularity lexically analyze a program in order to
+transform it into a sequence, or bag, of tokens. The token
+sequences are then compared for similarity comparison. The
+best-known of these are CCFinder [15] and CP-Miner [24].
+In CCFinder, the similarity of the sequence of lexical com-
+ponents, i.e., tokens, is measured by a sufﬁx-tree algorithm,
+which is computationally expensive and consumes a large
+amount of memory.
+CP-Miner parses a program and compares the resulting
+token sequences using the “frequent subsequence mining”
+algorithm known as CloSpan [25]. Due to CloSpan’s heuristics
+for improved efﬁciency, CP-Miner can scale to the size of
+moderately large code bases such as the Linux kernel, by con-
+suming less memory space. However, the mining complexity
+of CP-Miner is stillO(n2) in the worst case wheren is the
+number of LoC, and their experiment showed that CP-Miner
+requires a similar amount of execution time as CCFinder.
+Aside from scalability issues, the two aforementioned tech-
+niques generate a high false positive rate caused by their
+aggressive abstraction, and ﬁltering heuristics. Although the
+developers of CP-Miner claim that CP-Miner detects 17 to 52
+percent more clones than CCFinder, Jang et al. [18] revealed
+that the false positive rate for reported code clones was 90 %
+for CP-Miner. This implies that this design does not guarantee
+sufﬁcient reliability to be useful for vulnerability detection.
+2) Line-level granularity: ReDeBug [18] takes a set of
+lines as its processing unit. It slides a window of n (4,
+by default) lines through the source code and applies three
+different hash functions to each window. The code clones
+between ﬁles are detected by means of membership checking
+in a bloom ﬁlter, which stores the hash values of each window.
+Although the line-based window sliding technique enables
+ReDeBug to detect some of the Type-3 clones, ReDeBug
+cannot detect Type-2 clones in which variables are renamed or
+data types are changed. Consequently, ReDeBug misses many
+vulnerable clones with slight modiﬁcations. Moreover, the use
+of a line-level granularity leads to a limited information of the
+context, and it eventually introduces many false positive cases.
+In terms of performance, this approach adequately scales to
+30 K SourceForge projects (922 MLoC), but it required 23.3
+hours to process ﬁles and build a hash database.
+3) Function-level granularity: SourcererCC [19] attempts
+to detect Type-3 clones by using the bag-of-tokens tech-
+nique. It parses all of the functions, and creates an index
+consisting of the bag-of-tokens of each function. Then, it
+infers the similarity of functions by applying an Overlap
+function which is computed as the number of tokens shared
+by two functions. If the similarity between the two functions
+exceeds a predetermined threshold, they are deemed as a clone
+pair. They reduced the number of similarity computations, by
+using ﬁltering heuristics that assign more weight to frequent
+tokens in the bag to achieve large-scale clone detection. In
+their experiment, SourcererCC detected code clones from 100
+MLoC in approximately 37 hours, whereas it required 78
+hours for CCFinder to execute for the same code base, despite
+CCFinder detecting fewer clones than SourcererCC. However,
+as a tradeoff for detecting Type-3 clones, their applicability
+for vulnerability detection is badly damaged. In many cases,
+vulnerabilities are suppressed by inserting a single if statement.
+However, SourcererCC cannot distinguish between patched
+(i.e., an if statement inserted) and unpatched (i.e., without an
+if statement, and thus vulnerable) code fragments.
+597
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

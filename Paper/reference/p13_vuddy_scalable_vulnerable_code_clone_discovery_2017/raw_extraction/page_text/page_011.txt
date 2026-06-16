@@ -1,0 +1,113 @@
+TABLE IV: Comparison of VUDDY and ReDeBug, targeting
+Android ﬁrmware (14.86 MLoC, 349 K functions).
+VUDDY ReDeBug
+Time to complete 1 7m3s 2 8m1 5s
+# initial reports 206 2,090
+# multiple counts 0 1,845
+# unique clones 206 245
+# false positives 0 43
+# end result 206 202
+# unique ﬁndings 25 21
+# common ﬁndings 181
+1
+10
+100
+1000
+10000
+VUDDY ReDeBug
+Time (in sec, log scaled)
+Preprocessing
+Clone detection
+1023
+676
+1.04
+1019
+Fig. 7: Time required for preprocessing and clone detection.
+A. Speed
+The result of comparison is summarized in Table IV. In
+terms of speed, VUDDY is faster than ReDeBug. When
+querying 9,770 CVE patches targeting Android ﬁrmware (14.9
+MLoC, using kernel version 3.18.14), VUDDY required 17
+minutes and 3 seconds. Meanwhile, ReDeBug using the same
+default parameters (n =4 , c =3 , where n is the number
+of lines per window, andc is the amount of context) used by
+Jang et al. [18] in their experiment, required 28 minutes and 15
+seconds for clone detection. In fact, VUDDY required 1,023
+seconds for preprocessing and for the ﬁngerprint generation
+procedure, and the actual clone detection required only 1.04
+seconds, as illustrated in Fig. 7. Note that once the prepro-
+cessing is complete, VUDDY does not need to regenerate the
+ﬁngerprint dictionary for every clone detection. Thus, we can
+argue that VUDDY detects vulnerable code clones at a speed
+more than twice faster than ReDeBug, in practice.
+B. False positive
+VUDDY overwhelms ReDeBug with decisive margin, with
+respect to accuracy. No false positive was reported by VUDDY .
+However, we conducted a manual inspection for 12 hours
+with 2,090 code clones reported by ReDeBug to ﬁnd that
+1,845 (88.3 %) of these code clones were duplicates, because
+ReDeBug counts the number of CVE patches rather than the
+number of unpatched spots in the target code. After removing
+duplication, the number of clones reduced to 245. Then, we
+were able to ﬁnd 43 (17.6 %) false positives among the 245
+unique code clones through a further inspection. The false
+positive cases were attributed to two causes: ReDeBug is
+language agnostic, and there is a technical limitation in their
+approach.
+The language agnostic nature of ReDeBug causes the
+technique to ﬁnd code clones of trivial patches (i.e., hardly
+related to vulnerability), such as patches that modify macro
+statements, structs, and header inclusion or exclusion. For
+example, the patch for CVE-2013-0231 adds header inclusion
+statements to the beginning ofpciback_ops.cin the xen
+driver of Linux kernel. The patch for CVE-2015-5257 adds an
+initialization statement of a struct member variable. Although
+ReDeBug found and reported that these patches are not applied
+in the Android smartphone, these unpatched code cannot be
+vulnerabilities. On the other hand our mechanism targets only
+the functions, and therefore refrains from reporting such trivial
+code clones.
+ReDeBug also has a technical limitation that contributes
+to the false positives. When ReDeBug processes the patches,
+it excludes the lines preﬁxed by a “+” symbol to obtain
+the original buggy code snippet, and then removes curly
+braces, redundant whitespaces and comments from the snippet.
+When searching for the snippet in the target source code,
+the lack of context leads to false positives. For example,
+ReDeBug reported a benign function inxenbus.cas an
+unpatched vulnerability, where the patch actually adds a line of
+comment to the original source code without making any sig-
+niﬁcant changes to other lines of code. Even worse, ReDeBug
+erroneously detected the nr_recvmsgfunction shown in
+Listing 4, although the corresponding patch in Listing 5 is
+already applied. In this case, the sequence of lines 3, 6, 8,
+and 9 in the patch exactly matches lines 3, 4, 6, and 7 of
+the function in Listing 4 after preprocessing. This example
+reveals the limitation of a line-level granularity, responsible
+for causing false positives.
+Listing 4: nrrecvmsg function in Android ﬁrmware which
+is erroneously reported as vulnerable by ReDeBug.
+1 sax->sax25_family = AF_NETROM;
+2 skb_copy_from_linear_data_offset(skb, 7, sax->
+sax25_call.ax25_call,
+3 AX25_ADDR_LEN);
+4 msg->msg_namelen =sizeof(*sax);
+5 }
+6 skb_free_datagram(sk, skb);
+7 release_sock(sk);
+Listing 5: Patch for CVE-2013-7266.
+1 sax->sax25_family = AF_NETROM;
+2 skb_copy_from_linear_data_offset(skb, 7, sax->
+sax25_call.ax25_call,
+3 AX25_ADDR_LEN);
+4 + msg->msg_namelen =sizeof(*sax);
+5 }
+6 - msg->msg_namelen =sizeof(*sax);
+7 -
+8 skb_free_datagram(sk, skb);
+9 release_sock(sk);
+C. False negative
+Table IV shows the number of unique ﬁndings of VUDDY
+and ReDeBug, which represent the false negatives of each
+605
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

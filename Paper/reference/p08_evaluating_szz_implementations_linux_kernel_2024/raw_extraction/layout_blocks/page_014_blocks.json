@@ -1,0 +1,272 @@
+[
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:001",
+    "block_type": "text",
+    "text": "2232\nIEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024",
+    "bbox": [
+      42.35,
+      32.52,
+      556.42,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:002",
+    "block_type": "text",
+    "text": "Considering that GPT-4 currently has a cap of 25 messages\nevery 3 hours and the manual process involved, we selected\na sample of 375 failure cases18 (with a 95% conﬁdence level\nand 5% margin of error, following previous work [55], [56],\n[57], [58]) from the total of 14,437 identiﬁed failure cases.\nWe exclude the “Line Change Detection” category because\nTC-SZZ was able to identify all bug-inducing commits in this\ngroup. To simplify, we do not use TC-SZZ in this section, as\nour ground truth in Section VI-C only uses git log -L.\nIn Section VI-C, we classiﬁed the 14,437 failure cases into\nthree categories: Function-Log Detection, Within-File Detec-\ntion, and Cross-File Detection. This section introduces an\nadditional category, Function-Blame Detection, which is a\nsubset of Function-Log Detection. The differentiation lies in\nthe method used for identifying the bug-inducing commit. In\nthe case of Function-Log Detection, the git log -L command\nis employed. This command helps in tracing the evolution of\nspeciﬁc parts of a ﬁle, revealing the historical changes that led\nto the current state. For Function-Blame Detection, we utilize\nthe git blame command only once. This command allows us to\npinpoint the last change made to those lines. There are a total of\n3,200 Function-Blame Detection cases and 4,994 Function-Log\nDetection cases. For instance, consider the commit 06bbf75.19",
+    "bbox": [
+      42.34,
+      63.79,
+      293.46,
+      337.93
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:003",
+    "block_type": "text",
+    "text": "This commit involves a single deleted line within the function\n“process_response_list”. By applying git blame to all the lines\nof this function, we can identify the commit that initially intro-\nduced the bug. Although git log -L can also be used for this\npurpose by showing the evolution of the function over time, git\nblame speciﬁcally returns only the most recent changes.\nIn our sample of 375 cases, we found that 8.5% (32 out of\n375) are Function-Log Detections (excluding Function-Blame\nDetection cases), and 25.1% (94 out of 375) are Function-\nBlame Detections. Moreover, 30.9% (116 out of 375) of the\ncases are Within-File Detections, while 35.5% (133 out of\n375) of the cases are the Cross-File Detections.",
+    "bbox": [
+      42.35,
+      338.76,
+      293.4,
+      481.38
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:004",
+    "block_type": "text",
+    "text": "A. Pipeline of ChatGPT Experiment",
+    "bbox": [
+      42.35,
+      501.88,
+      191.42,
+      512.84
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:005",
+    "block_type": "text",
+    "text": "Fig. 5 shows the pipeline of the ChatGPT experiment.\nThe pipeline has three steps: (A) Cross-File Detection, (B)\nWithin-File Detection (C) Function-Log (Function-Blame) De-\ntection. The prompts used in the different steps are shown\nin Table IX.\nFor the Function-Log Detection cases, we use the Prompt C\nin the Table IX to query ChatGPT. Speciﬁcally, for the 〈Commit\nMessage〉in the table, we use the commit log subject and body\nof the bug-ﬁxing commit. For 〈Code of the Function〉, we use\nthe code of all changed functions as input for ChatGPT. Subse-\nquently, we execute git log -L on the line(s) of code suggested\nby ChatGPT to trace the bug-inducing commits. Similarly, for\nthe Function-Blame Detection cases, we apply the git blame\ncommand to the line(s) of code that ChatGPT indicates to",
+    "bbox": [
+      42.35,
+      518.67,
+      293.41,
+      685.21
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:006",
+    "block_type": "text",
+    "text": "18This sample size was determined to be statistically representative using\na popular sample size calculator (https://www.surveymonkey.com/mp/sample-\nsize-calculator/) with a conﬁdence level of 95% and a 5% margin of error.\n19https://github.com/torvalds/linux/commit/06bbf753476dab23eb262cb5fba\nb6d6d277a0ba3",
+    "bbox": [
+      42.35,
+      697.29,
+      293.42,
+      743.96
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:007",
+    "block_type": "text",
+    "text": "Fig. 5.\nThe Pipeline of the ChatGPT Experiment.",
+    "bbox": [
+      305.35,
+      337.64,
+      474.86,
+      346.53
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:008",
+    "block_type": "text",
+    "text": "TABLE IX\nPROMPT FOR GPT-4 IN DIFFERENT SITUATIONS",
+    "bbox": [
+      353.59,
+      375.81,
+      508.18,
+      393.68
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:009",
+    "block_type": "text",
+    "text": "Situations\nTemplate",
+    "bbox": [
+      333.02,
+      402.41,
+      422.57,
+      411.6
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:010",
+    "block_type": "text",
+    "text": "Prompt A:\nCross-File\nDetection",
+    "bbox": [
+      331.6,
+      420.75,
+      368.54,
+      447.86
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:011",
+    "block_type": "text",
+    "text": "〈Commit Message〉\nBased on the above commit message of a\nbug-ﬁxing commit, which ﬁle in the Linux\nkernel could be causing this bug-ﬁxing\ncommit?",
+    "bbox": [
+      390.98,
+      411.75,
+      531.78,
+      456.83
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:012",
+    "block_type": "text",
+    "text": "Prompt B:\nWithin-File\nDetection",
+    "bbox": [
+      331.63,
+      470.45,
+      368.51,
+      497.58
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:013",
+    "block_type": "text",
+    "text": "〈Commit Message〉\nBased on the above commit message of a\nbug-ﬁxing commit and function names in\nﬁle 〈ﬁle_name〉, which function or functions\ncould be causing this bug-ﬁxing commit?\n〈Function Name List〉",
+    "bbox": [
+      390.98,
+      456.98,
+      537.49,
+      511.84
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:014",
+    "block_type": "text",
+    "text": "Prompt C:\nFunction-Log\n(Function-Blame)\nDetection",
+    "bbox": [
+      321.51,
+      520.17,
+      378.62,
+      556.26
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:015",
+    "block_type": "text",
+    "text": "〈Commit Message〉\nBased on the above commit message of a\nbug-ﬁxing commit, please identify the line\nor lines of code in the following code that\ncould be causing this bug-ﬁxing commit:\n〈Code of the Function〉",
+    "bbox": [
+      390.98,
+      511.18,
+      530.75,
+      566.04
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:016",
+    "block_type": "text",
+    "text": "identify the bug-inducing commits. To ensure fairness in the\nexperiment, we remove all portions of the commit message that\ndirectly reference a bug-inducing commit.\nFigs. 6 and 7 show an example where ChatGPT successfully\naids in identifying a bug-inducing commit from a Function-\nBlame Detection case.20 Initially, we query ChatGPT using the\nprompt depicted in Fig. 6. Subsequently, the line(s) of code\nreturned by ChatGPT (shown in Fig. 7) are subjected to the git\nblame command to get the bug-inducing commits.",
+    "bbox": [
+      305.35,
+      595.86,
+      556.41,
+      702.62
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:017",
+    "block_type": "text",
+    "text": "20https://github.com/torvalds/linux/commit/761e205b559be52852d85e0db4a\n034c9f57965f9",
+    "bbox": [
+      305.35,
+      725.08,
+      558.66,
+      743.96
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 14,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:014:018",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

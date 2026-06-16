@@ -1,0 +1,43 @@
+Opening Context:
+- [NEEDS EVIDENCE] introduction boundary uncertain
+Why the Problem Matters:
+- [NEEDS EVIDENCE]
+Concrete Pain Point:
+- Those sources may include repos- itories that curate vulnerabilities, weaknesses, attack pattern related data in different formats with varying degrees of detail.
+- The resulting knowledge graph contains hundreds of thousands of interconnected entities and edges, enabling multi-hop analysis in various directions (e.g., from attack techniques to vulnerabilities, from vulnerabilities to attack techniques).
+- W e demonstrate the usefulness of the knowledge graph for comprehensive weakness analysis, linking adversary groups to exploited vulnerabilities, and graph-based inference tasks that include variable-length path traversal and link discov- ery .
+- Each of these resources is indispensable in its own domain, yet their siloed formats, differing schemas, and inconsistent cross-references present signiﬁcant hurdles for analysts who need an integrated and holistic view that interconnects vulnerabilities, weaknesses, attack patterns, and adversarial behaviors.
+- As a result, organizations are left with incomplete or outdated views of how newly published vulnerabilities may be exploited, which weaknesses cause recurring attacks, or how defensive mea- sures align with adversary techniques.
+Motivating Example:
+- [NEEDS EVIDENCE] motivating example not reliably isolated
+Prior Work Framing:
+- [NEEDS EVIDENCE]
+Why Prior Work Is Insufficient:
+- [NEEDS EVIDENCE]
+Technical Challenges:
+- [NEEDS EVIDENCE]
+Key Insight:
+- Graph Querying and Multi-Hop Traversal One of the key advantages of representing cyber threat intelligence as a knowledge graph is the ability to perform multi-hop traversal across heterogeneous entities.
+- These insights enable analysts to anticipate potential threat paths before they are explicitly reported in advisories, supporting proactive defense.
+- Using automated graph traversals, we observe that not all 25 CWEs yield direct mappings to A TT&CK techniques.
+- This breadth shows that Scattered Spider leverages multiple ﬁle-system and access-control weaknesses to gain insight into system conﬁgurations and stored assets.
+System / Method Preview:
+- method for rating the severity of software vulnerabilities), exploitability and impact scores, and extracted CPE ( Common Platform Enumeration ) criteria, which specify the affected hardware, operating systems, or software products.
+- CWE (MITRE) : The CWE extraction process gathers identiﬁers and metadata (ID, name, abstraction level, structural type, and status), rich text ﬁelds (description, extended descrip- tion, background), and a wide range of structured or nested elements, including alternative terms, applicable platforms, modes of introduction (describing when and how the weakness can be introduced during development), likelihood of exploit, weakness ordinalities (sequence in which weaknesses might occur), common consequences, detection methods, potential mitigations etc.
+- A TT&CK (Enterprise/Mobile/ICS STIX) : Across all supported A TT&CK domains, the pipeline collects common properties such as ID, external ID, object type, name, description, external references, timestamps/versioning, and domains.
+- Depending on the object type, additional ﬁelds may include platforms (target operating systems or environments), aliases (alternative names), detection guidance etc.
+- Relationships created: In our system, STIX-deﬁned relationship objects are materialized as graph edges by leveraging the relationship_type, source_ref, and target_ref ﬁelds, or, when APOC is unavailable, through a fallback naming scheme of the form sourceType_to_targetType.
+- As shown in T able I, the largest node set in the constructed knowledge graph comes from the CVE dataset, with 307,142 vulnerability entries.
+Contribution List:
+- [NEEDS EVIDENCE] contribution list not cleanly extracted
+Claim-Evidence Structure:
+- The introduction connects vulnerability maintenance/SZZ/version-validation pain points to an automated method and empirical evaluation, but exact claim strength requires citation/table verification.
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Paragraph Map:
+P1: Function: context/problem setup; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward method gap.
+P2: Function: prior-work gap; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward proposed approach.
+P3: Function: method preview/contributions; Main Claim: see extracted introduction; Evidence Type: paper text; Transition: toward evaluation.
+Reusable Moves:
+- Start from vulnerability-management cost, identify why patch/commit/version evidence is noisy, then motivate an evidence-aware method.
+Risks for Our Paper:
+- Avoid importing their task definition if our target remains affected versions rather than bug-introducing commit identification. Mark unsupported transfer claims with [NEEDS EVIDENCE].

@@ -1,0 +1,105 @@
+quential, and cross-domain associations among nodes such as
+courses of action, intrusion sets, tools, tactics, and campaigns,
+the graph enables uniﬁed and in-depth analysis of the complex
+landscape of cybersecurity threats and defenses.
+C. Graph Querying and Multi-Hop Traversal
+One of the key advantages of representing cyber threat
+intelligence as a knowledge graph is the ability to perform
+multi-hop traversal across heterogeneous entities. Unlike tradi-
+tional tabular or siloed repositories, the graph structure allows
+analysts to traverse explicit paths that connect vulnerabilities
+(CVEs) to weaknesses (CWEs), to adversarial attack patterns
+(CAPEC), and ultimately to real-world adversary techniques
+in A TT&CK. These traversals not only provide the interme-
+diate steps involved in analyzing a threat, but also enhance
+individual data points (e.g., a CVE) by connecting them to a
+broader threat context—such as severity , affected platforms,
+available mitigations, and associated adversarial techniques.
+For instance, consider a forward traversal that begins with
+the vulnerability CVE-2016-6225, which affects Percona Xtra-
+Backup and stems from improper handling of the initial-
+ization vector (IV) in its xbcrypt encryption utility . This
+ﬂaw , which allows chosen-plaintext attacks against encrypted
+backup ﬁles, is associated with the weakness CWE-326 (In-
+adequate Encryption Strength). This weakness connects to
+the attack pattern CAPEC-112 (Brute Force), which in turn
+maps to the A TT&CK technique T1110 (Brute Force). This
+traversal illustrates how a speciﬁc cryptographic vulnerability
+can be situated within a broader chain of adversarial behavior,
+revealing plausible exploitation methods and aligning low-
+level technical ﬂaws with high-level attacker tactics. The
+corresponding Cypher query for the forward path is shown
+in Fig. 3 (left), and its graphical representation in Fig. 4.
+Conversely , a reverse traversal starting from the A TT&CK
+technique T1110 (Brute Force) uncovers associated upstream
+weaknesses and vulnerabilities that could facilitate brute-
+force exploitation. Speciﬁcally , the knowledge graph links this
+technique to the attack pattern CAPEC-112, which maps to
+multiple underlying weaknesses: CWE-326 (Inadequate En-
+cryption Strength), CWE-330 (Use of Insufﬁciently Random
+V alues), and CWE-521 (W eak Password Requirements). These
+weaknesses are in turn linked to various CVEs, enabling
+defenders to identify and prioritize vulnerable systems likely
+to be targeted using brute-force methods. The Cypher query
+for this reverse traversal is shown in Fig. 3 (right), and the
+corresponding path visualization is provided in Fig. 5.
+T ogether, these forward and reverse queries and their corre-
+sponding visualizations demonstrate the bidirectional multi-
+hop traversal capabilities of knowledge graphs—supporting
+both top-down and bottom-up threat analysis across the cyber
+kill chain.
+D. T opology-Based Link Scoring in Cybersecurity Knowledge
+Graphs
+One of the most valuable analytical capabilities of our inte-
+grated cybersecurity knowledge graph is the ability to compute
+MATCH path =
+(c:cve {id:
+"CVE-2016-6225"})
+-[:related_cwe]->
+(w:cwe)
+-[:related_capec]->
+(p:capec)
+-[:related_attack]->
+(a:attack_pattern)
+RETURN a.external_id AS
+attack_id, path
+ORDER BY a.external_id
+LIMIT 100;
+MATCH path =
+(a:attack_pattern
+{external_id: "T1110"})
+<-[:related_attack]-
+(p:capec)
+<-[:related_capec]-
+(w:cwe)
+<-[:related_cwe]-
+(c:cve)
+RETURN c.id AS
+cve_id, path
+ORDER BY c.id
+LIMIT 100;
+Fig. 3. Cypher queries for traversing the knowledge graph. Left: forward
+traversal from CVE →CWE→CAPEC→A TT&CK. Right: reverse traversal
+from A TT&CK back to CVE.
+Fig. 4. Path visualization for CVE (”CVE-2016-6225”) to A TT&CK.
+Fig. 5. Path visualization for A TT&CK (“T1110”) to CVEs.
+topology-based link scores . Here, only the graph’s structural
+properties (topology) are leveraged to quantify how strongly
+two entities are related, without requiring external features.
+For example, such scoring allows analysts to identify plausible
+connections between entities in a graph, such as CVE ↔CWE,
+CWE↔CAPEC, or CAPEC ↔A TT&CK techniques.
+The Neo4j Graph Data Science (GDS) library provides
+several well-established structural similarity algorithms [19].
+W e highlight two representative measures below (with Cypher
+examples shown in Fig. 6):
+• Adamic–Adar (AA): Assigns higher weight to shared
+neighbors that are themselves rare:
+AA(u, v) =
+∑
+w∈Γ(u)∩Γ(v)
+1
+log |Γ(w)|.
+• Common Neighbors (CN): Simply counts the number of
+shared neighbors:
+CN (u, v) = |Γ(u) ∩ Γ(v)|.

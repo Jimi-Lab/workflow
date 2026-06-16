@@ -1,0 +1,377 @@
+[
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:001",
+    "block_type": "text",
+    "text": "V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities\nICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA\n",
+    "bbox": [
+      53.57500076293945,
+      61.11920166015625,
+      558.20361328125,
+      69.21601867675781
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:002",
+    "block_type": "text",
+    "text": "+ Document<T> doc = ATOM_ENGINE.getparser().parse(is);\n",
+    "bbox": [
+      93.48112487792969,
+      101.12286376953125,
+      245.07852172851562,
+      106.89664459228516
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:003",
+    "block_type": "text",
+    "text": "+ XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);\n",
+    "bbox": [
+      97.09730529785156,
+      169.15155029296875,
+      269.2651062011719,
+      174.9253387451172
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:004",
+    "block_type": "text",
+    "text": "Fixing Commit: 9beb2d\n",
+    "bbox": [
+      89.55339813232422,
+      157.48379516601562,
+      159.99351501464844,
+      164.44017028808594
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:005",
+    "block_type": "text",
+    "text": "Previous Commit: 7d30ae\n",
+    "bbox": [
+      90.00959014892578,
+      120.5487060546875,
+      167.40420532226562,
+      127.50507354736328
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:006",
+    "block_type": "text",
+    "text": "Descendants Commit: 42d310 \n",
+    "bbox": [
+      90.09860229492188,
+      82.85697937011719,
+      182.3739776611328,
+      89.81334686279297
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:007",
+    "block_type": "text",
+    "text": "- Document<T> doc = parser.parse(is)\n",
+    "bbox": [
+      96.93597412109375,
+      177.4576416015625,
+      194.56491088867188,
+      183.23143005371094
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:008",
+    "block_type": "text",
+    "text": "+ Document<T> doc = prser.parse(reader)\n",
+    "bbox": [
+      95.62857818603516,
+      184.8680419921875,
+      203.80056762695312,
+      190.64183044433594
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:009",
+    "block_type": "text",
+    "text": "+ Document<T> doc = parser.parse(is)\n- Document<T> doc = ATOM_ENGINE.getparser().parse(is);\n",
+    "bbox": [
+      95.10562133789062,
+      131.88265991210938,
+      245.89083862304688,
+      145.62872314453125
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:010",
+    "block_type": "text",
+    "text": "Figure 6: An example of a failing line mapping.\n",
+    "bbox": [
+      78.20999908447266,
+      194.75845336914062,
+      269.6251220703125,
+      206.7908172607422
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:011",
+    "block_type": "text",
+    "text": "However, V-SZZ still failed to identify inducing commits for a\nsmall number of vulnerabilities. One reason is that a few vulnera-\nbilities’ true inducing commits are not in the earliest descendants\ncommits, e.g., CVE-2018-14884 in Figure 5. Another reason is that\nthe mapping algorithms in our proposed approach fail to identify\nthe modified lines. For C/C++ projects, the line mapping algorithm\nbased on string similarity does not consider the semantic of the\nsource code. For example, in CVE-2016-2549 from linux-kernel,\nthe modified line hrtimer_cancel(&stime->hrt); in the previ-\nous commit is wrongly mapped to a deleted line with the same\ncontent in another function. For Java projects, the mapping algo-\nrithms based on AST [17] also failed in some cases. Figure 6 presents\nan example from CVE-2016-8739 in the project Apache/CXF. We\nfind that a vulnerable line in the fixing commit cannot be mapped\nin the previous commit so that our approach cannot identify the\ndescendants commit, which is the true inducing commit.\nCompared to the previous SZZ algorithms, V-SZZ can detect\nmore true inducing commits for the vulnerabilities and outper-\nform them in terms of F1-score.\n",
+    "bbox": [
+      53.79800033569336,
+      219.3972625732422,
+      295.5556640625,
+      430.7802734375
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:012",
+    "block_type": "text",
+    "text": "5.2.2\nRQ2. Table 5 and 6 present the results of SZZ algorithms\non refining vulnerable versions affected by the vulnerabilities in\nC/C++ and Java projects, respectively. We also count the number\nof cases in which the vulnerable versions are correctly inferred\nbased on the inducing commits detected by an SZZ algorithm, de-\nnoted as #Correct in the two tables. We find that the number of\nvulnerabilities with correct vulnerable versions detected by SZZ\nalgorithms increases comparing to the number of vulnerabilities\nwith true inducing commits. This is because the inducing commits\nwrongly detected by SZZ algorithms might belong to the same\nversion of the true inducing commit. As shown in the table, our\napproach based on V-SZZ has a much higher recall than the other\nSZZ algorithms. This indicates that our approach has fewer false\nnegatives (i.e., a version is identified as not vulnerable, but it is\nvulnerable). Compared to false positives (i.e., a version is identified\nas vulnerable, but it is not vulnerable), false negatives might result\nin more potential security risk. Because a conservative action is\nto upgrade the newest version without the vulnerability for false\npositives, while if a version is considered not vulnerable, no action\nmight be taken. On the other hand, our approach based on V-SZZ\nhas similar precisions to the other SZZ algorithms. Overall, in terms\nof F1-score, our approach based on V-SZZ achieves the best perfor-\nmance on the vulnerabilities from both C/C++ and Java projects\n(0.928 and 0.952, respectively). Furthermore, to measure whether\n",
+    "bbox": [
+      53.46699905395508,
+      445.20623779296875,
+      295.55206298828125,
+      709.6512451171875
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:013",
+    "block_type": "text",
+    "text": "Table 5: The results of SZZ algorithms on identifying vulner-\nable versions in C/C++ projects.\n",
+    "bbox": [
+      317.65899658203125,
+      82.26547241210938,
+      559.794921875,
+      105.25682830810547
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:014",
+    "block_type": "text",
+    "text": "#Correct\nAvgRecall\nAvgPrecision\nAvgF1\n",
+    "bbox": [
+      373.9989929199219,
+      109.88627624511719,
+      543.743408203125,
+      122.27728271484375
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:015",
+    "block_type": "text",
+    "text": "B-SZZ\n69\n0.789\n0.960\n0.866\nAG-SZZ\n73\n0.821\n0.950\n0.881\nMA-SZZ\n71\n0.829\n0.930\n0.877\n",
+    "bbox": [
+      332.40301513671875,
+      125.35923767089844,
+      543.7523193359375,
+      159.668212890625
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:016",
+    "block_type": "text",
+    "text": "V-SZZ\n87\n0.930\n0.927\n0.928\n",
+    "bbox": [
+      332.40301513671875,
+      162.75022888183594,
+      543.7527465820312,
+      175.77781677246094
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:017",
+    "block_type": "text",
+    "text": "Table 6: The results of SZZ algorithms on identifying vulner-\nable versions in Java projects.\n",
+    "bbox": [
+      317.65899658203125,
+      195.43948364257812,
+      559.794921875,
+      218.4308319091797
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:018",
+    "block_type": "text",
+    "text": "#Correct\nAvgRecall\nAvgPrecision\nAvgF1\n",
+    "bbox": [
+      372.8789978027344,
+      223.0592498779297,
+      542.6234130859375,
+      235.45025634765625
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:019",
+    "block_type": "text",
+    "text": "B-SZZ\n53\n0.875\n0.948\n0.910\nAG-SZZ\n55\n0.871\n0.957\n0.912\nMA-SZZ\n54\n0.894\n0.934\n0.914\nRA-SZZ\n30\n0.640\n0.672\n0.656\n",
+    "bbox": [
+      331.2829895019531,
+      238.5322723388672,
+      542.6206665039062,
+      283.80023193359375
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:020",
+    "block_type": "text",
+    "text": "V-SZZ\n59\n0.941\n0.963\n0.952\n",
+    "bbox": [
+      331.2829895019531,
+      286.8822326660156,
+      542.6239624023438,
+      299.90985107421875
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:021",
+    "block_type": "text",
+    "text": "the improvement of our approach based on V-SZZ over the previ-\nous SZZ algorithms is statistically significant, we apply Wilcoxon\nsigned-rank test [58] at 95% significance level on F1-scores. We\nfind that the p-values are smaller than 0.05, which indicates the\nimprovement is statistically significant at the confidence level of\n95%.\nIn terms of F1-score, our approach based on V-SZZ can effec-\ntively refine version ranges affected by CVE vulnerabilities and\nachieve higher performance than those based on the previous\nSZZ algorithms.\n",
+    "bbox": [
+      317.9549865722656,
+      317.51824951171875,
+      559.7091674804688,
+      428.2582702636719
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:022",
+    "block_type": "text",
+    "text": "6\nDISCUSSION\n6.1\nThe Impact of Duplicated Changes\n",
+    "bbox": [
+      317.9549865722656,
+      447.71826171875,
+      513.9680786132812,
+      478.0491638183594
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:023",
+    "block_type": "text",
+    "text": "The second step of our approach is to detect commits that have the\nduplicated changes of the fixing commits and inducing commits.\nThe novelty contribution of this step is minor, but it has a significant\nimpact on the results of our approach. We find that the patches for\napproximately half of the vulnerabilities we annotated in the study\nare copied among different fixing commits (i.e., 48/100 and 37/72\nfor the C/C++ and Java dataset, respectively). Similarly, we also\nfind that 8 and 11 vulnerabilities whose inducing commits we an-\nnotated are duplicated in the other commits for the C/C++ and Java\ndataset, respectively. To verify the impact of duplicated changes, we\napply our approach without detecting duplicated changes on our\nannotated dataset. We find that the detected vulnerable versions of\nall vulnerabilities are different from those considering duplicated\nchanges. If missing commits with duplicated changes in the fixing\ncommits, the number of false positives increases. If missing com-\nmits with duplicated changes in the inducing commits, the number\nof false negatives increases. For example, the vulnerability-fixing\ncommit in the first motivating example (see Figure 1) has three\ncherry-picked commits. If we do not consider these three cherry-\npicked commits, some non-vulnerable versions (e.g. versions above\n3.2.10, 3.3.7, and 3.4.2) are detected as vulnerable. Therefore, we\n",
+    "bbox": [
+      317.6860046386719,
+      478.0822448730469,
+      559.7105712890625,
+      710.1443481445312
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:024",
+    "block_type": "text",
+    "text": "2360\n",
+    "bbox": [
+      298.0,
+      746.8159790039062,
+      314.0,
+      755.7440185546875
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "p09_v_szz_automatic_identification_version_ranges_2022:block:009:025",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

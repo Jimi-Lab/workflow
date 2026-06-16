@@ -1,0 +1,238 @@
+{
+  "cwe_id": "CWE-1221",
+  "name": "Incorrect Register Defaults or Module Parameters",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "Hardware description language code incorrectly defines register defaults or hardware Intellectual Property (IP) parameters to insecure values.",
+  "extended_description": "Integrated circuits and hardware IP software programmable controls and settings are commonly stored in register circuits. These register contents have to be initialized at hardware reset to defined default values that are hard coded in the hardware description language (HDL) code of the hardware unit. Hardware descriptive languages also support definition of parameter variables, which can be defined in code during instantiation of the hardware IP module. Such parameters are generally used to configure a specific instance of a hardware IP in the design. The system security settings of a hardware design can be affected by incorrectly defined default values or IP parameters. The hardware IP would be in an insecure state at power reset, and this can be exposed or exploited by untrusted software running on the system. Both register defaults and parameters are hardcoded values, which cannot be changed using software or firmware patches but must be changed in hardware silicon. Thus, such security issues are considerably more difficult to address later in the lifecycle. Hardware designs can have a large number of such parameters and register defaults settings, and it is important to have design tool support to check these settings in an automated way and be able to identify which settings are security sensitive.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-1419",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Initialization of Resource"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Verilog",
+      "VHDL"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "Hardware description language code incorrectly defines register defaults or hardware Intellectual Property (IP) parameters to insecure values.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "hardware",
+      "parameters",
+      "register",
+      "are"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "hardware",
+      "parameters",
+      "register",
+      "are",
+      "settings",
+      "defaults",
+      "values",
+      "defined"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "Consider example design module system verilog code shown below. The register_example module is an example parameterized module that defines two parameters,...",
+        "snippet": "// Parameterized Register module example // Secure_mode : REGISTER_DEFAULT[0] : When set to 1 register is read only and not writable// module register_example #( parameter REGISTER_WIDTH = 8, // Parameter defines width..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The example code is taken from the fuse memory inside the buggy OpenPiton SoC of HACK@DAC'21 [REF-1356]. Fuse memory can be used to store key hashes, password...",
+        "snippet": "parameter MEM_SIZE = 100; localparam JTAG_OFFSET = 81; const logic [MEM_SIZE-1:0][31:0] mem = { // JTAG expected hamc hash 32'h49ac13af, 32'h1276f1b8, 32'h6703193a, 32'h65eb531b, 32'h3025ccca, 32'h3e8861f4,..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Bad",
+        "summary": "The following example code is excerpted from the Access Control module, acct_wrapper, in the Hack@DAC'21 buggy OpenPiton System-on-Chip (SoC). Within this...",
+        "snippet": "module acct_wrapper #( ... always @(posedge clk_i) begin if(~(rst_ni && ~rst_6)) begin for (j=0; j < AcCt_MEM_SIZE; j=j+1) begin acct_mem[j] <= 32'hffffffff; end end ..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "Consider example design module system verilog code shown below. The register_example module is an example parameterized module that defines two parameters,...",
+        "snippet": "register_example #( .REGISTER_WIDTH (32), .REGISTER_DEFAULT (1225) // Correct default value set, to enable Secure_mode ) Secure_Device_ID_example ( .Data_in (Data_in), .Data_out (Secure_reg), .Clk (Clk), .resetn..."
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The example code is taken from the fuse memory inside the buggy OpenPiton SoC of HACK@DAC'21 [REF-1356]. Fuse memory can be used to store key hashes, password...",
+        "snippet": "parameter MEM_SIZE = 100; localparam JTAG_OFFSET = 100;"
+      },
+      {
+        "language": "Verilog",
+        "nature": "Good",
+        "summary": "The following example code is excerpted from the Access Control module, acct_wrapper, in the Hack@DAC'21 buggy OpenPiton System-on-Chip (SoC). Within this...",
+        "snippet": "module acct_wrapper #( ... always @(posedge clk_i) begin if(~(rst_ni && ~rst_6)) begin for (j=0; j < AcCt_MEM_SIZE; j=j+1) begin acct_mem[j] <= 32'h00000000; end end ..."
+      }
+    ],
+    "observed_examples": []
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

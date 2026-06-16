@@ -1,0 +1,17 @@
+Paper ID: p11_vccfinder_finding_potential_vulnerabilities_in_open_source_projects_to_assist_code_audits_2015
+Title: VCCFinder: Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder：Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+Input: GitHub C/C++ project histories, CVE references/fixing commits, commit diffs, code metrics, and repository metadata as stated in the paper. The local source root does not include the full database. [NEEDS ARTIFACT]
+Output: ranked suspicious commits or VCC candidates for manual audit; local adapted script 2_gen_vuln_version.py also computes vulnerable-version tags from selected VCCs, but that is source-layer evidence and not the core paper claim.
+Objects / Entities: CVEs, fixing commits, VCCs, unclassified commits, features, SVM model, precision/recall curves, Flawfinder baseline.
+Formal Definitions: Precision/recall and feature mappings are described in paper text; formulas/layout are not repaired. [NEEDS FORMULA REPAIR]
+Objective: Reduce manual audit effort by finding likely vulnerability-contributing commits with lower false-positive burden.
+Constraints: Limited to labeled CVEs/projects and C/C++ feature extraction; language transfer requires retraining per paper limitations.
+Evaluation Target: temporal split over historical/test data and comparison to Flawfinder.
+Boundary Conditions: Unknown vulnerabilities in the database make true positives lower-bound and false positives upper-bound, per limitations.
+What Is Not Solved: Does not guarantee that flagged commits reveal the underlying vulnerability; still requires expert audit.
+Reusable Formalization Pattern: Treat vulnerability search as a ranking/prioritization problem with explicit label noise and lower/upper-bound caveats.

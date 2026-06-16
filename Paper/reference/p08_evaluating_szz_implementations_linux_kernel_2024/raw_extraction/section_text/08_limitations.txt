@@ -1,0 +1,222 @@
+===== PAGE 018 =====
+2236
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+(2) Partial Bug-ﬁxing: This case occurs when a bug-ﬁxing
+commit rectiﬁes a previous, incorrect bug-ﬁx attempt, and
+the bug-inducing commit, as labeled by the developer, is the
+one that the initial, ﬂawed bug-ﬁx was attempting to correct.
+The SZZ algorithm identiﬁes the recent, incorrect ﬁx as the
+bug-inducing commit. For example, the bug-ﬁxing commit
+c0702a426 addressed a bug originally introduced by commit
+297ccce. Prior to this, commit 829969927 attempted to ﬁx the
+bug originating from commit 297ccce but failed, leading to the
+necessity of bug-ﬁxing commit c0702a4.
+(3) Affected by Other Changes: In some cases, code that
+was previously correct becomes problematic due to subsequent
+changes. These subsequent changes are then considered the
+bug-inducing commits. However, the SZZ algorithm might in-
+correctly identify the commit that originally wrote the code as
+the bug-inducing commit. For instance, the bug-ﬁxing commit
+9b7becf128 addresses a bug induced by a previous commit.
+The actual bug-inducing commit, 219fb0c, modiﬁed a function
+but failed to update the relevant failure message. While the
+change code made in commit 9b7becf1 was appropriate at the
+time, it became ﬂawed when commit 219fb0c did not make
+the necessary update. However, the SZZ algorithm incorrectly
+identiﬁes the commit that initially introduced the changed code
+as the bug-inducing one.
+(4) Developer Error: Even developers are not infallible and
+can sometimes incorrectly label commits. For example, in the
+bug-ﬁxing commit e04e7a7,29 the developer identiﬁed commit
+8195b13 as the bug-inducing commit. However, these two com-
+mits address different aspects of deadlock issues in hv_netvsc.
+The bug-ﬁxing commit e04e7a7 resolves a deadlock caused
+by a race condition between two functions and their locking
+mechanisms. In contrast, the commit labeled by the developer as
+bug-inducing, 8195b13, deals with a deadlock resulting channel
+offer messages in the same queue. Moreover, after our review,
+the commit 7bf7bb3,30 identiﬁed by the SZZ algorithm as the
+bug-inducing one, is considered correct. The rationale is that
+in commit 7bf7bb3, rtnl_lock() was added at an inappropriate
+location, leading to a deadlock. This can be understood from the
+code comments in the bug-ﬁxing commit, as shown in Fig, 10.
+This revision emphasizes the role of rtnl_lock() in preventing
+the deadlock and clariﬁes why the SZZ algorithm’s identiﬁ-
+cation of the bug-inducing commit is considered accurate in
+this context.
+IX. THREATS TO VALIDITY
+Construct validity. Our dataset, collected from the Linux
+kernel serves as an excellent study subject. As outlined in Sec-
+tion III, we employed an automated approach to collect the data.
+26https://github.com/torvalds/linux/commit/c0702a4bd41829f05638ec2dab7
+0f6bb8d8010ce
+27https://github.com/torvalds/linux/commit/829969956f97e880dd01086be47
+747226e48a3f0
+28https://github.com/torvalds/linux/commit/9b7becf103e2689d7f005895130
+ccf89a153fef1
+29https://github.com/torvalds/linux/commit/e04e7a7bbd4bbabef4e1a58367e
+5fc9b2edc3b10
+30https://github.com/torvalds/linux/commit/7bf7bb37f16a80465ee3bd7c6c9
+66f96f5a075a6
+Fig. 10.
+Example of Failure Reason: Developer Error.
+By following the ofﬁcial Linux documentation for identifying
+bug-ﬁxing commits, we ensured 100% accuracy in our collected
+data. A few bug-ﬁxing commits may have been missed due
+to formatting errors, but this small percentage should have no
+impact on our results. We used a minimum number (the commit
+ID must have at least 7 characters) when searching for bug-
+inducing commits to minimize instances where a partial commit
+ID matches multiple bug-inducing commits.
+As Linux Kernel does not have an issue tracker, e.g., Bugzilla
+or JIRA, it is challenging to ensure that all bugs are consid-
+ered. Furthermore, the Linux documentation does not enforce
+the inclusion of bug-inducing commits when submitting bug-
+ﬁxing commits, as the guideline suggests “If the patch ﬁxes
+a bug, cite the commit which introduced the bug if possible
+(and please provide both the commit ID and the title when
+citing commits).” Therefore, it is possible that some bug-ﬁxing
+commits may not be linked to their corresponding bug-inducing
+commits, depending on the developer’s discretion. Additionally,
+our dataset does not include extrinsic bugs as described by
+Rodriguez et al. [61], which are bug ﬁxes not directly traceable
+to changes within the repository. As a result, our research does
+not claim to document every single bug-ﬁxing commit from the
+past decade. Instead, our objective is to collate as many bug-
+ﬁxing commits as possible, each with a veriﬁed origin, to offer
+a thorough and accurate overview.
+Another threat to construct validity of our dataset is that
+around 96% of bug-ﬁxing commits are linked to a single bug-
+inducing commit. This raises questions about the complexity
+of bugs. The majority of bug-ﬁxing commits linked to a single
+bug-inducing commit may be indicative of developers con-
+forming to speciﬁc guidelines within the Linux kernel project,
+potentially introducing a bias into the dataset. Our comparison
+with prior research by Rosa et al. [28] revealed a similar trend:
+out of 1,115 bug-ﬁxing commits, 1,113 were associated with
+just one bug-inducing commit. Given these ﬁndings, it becomes
+challenging to deﬁnitively assert whether the reality of bug
+genesis is more accurately reﬂected in bug-ﬁxing commits with
+a single or multiple bug-inducing commits. Therefore, we leave
+this as an open question, acknowledging the need for further
+discussion and exploration in this area.
+In our study, we conducted the evaluation of SZZ implemen-
+tations solely at the commit level, aligning with the methodol-
+ogy used by Rosa et al. [28]. It is important to note that the
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 019 =====
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2237
+Linux kernel does not record pull requests (PR). Consequently,
+our evaluation did not extend to the PR level.
+Internal validity. There may be some pitfalls in automati-
+cally collecting bug-inducing commits. After selecting commits
+with “Fixes:”, 2,358 (3%) of the commits could not be matched
+to any bug-inducing commit. These commit IDs are stored in
+a dedicated dataset. We manually label the commit ids in this
+abnormal dataset and divide them into two categories: partial
+commit ID and not in the repository.
+Partial commit ID indicates commits where the text after the
+keyword “Fixes:” is not recognized by the automated ﬁltering
+technique as a commit ID. The ﬁltering technique checks the
+commit ID using the regular expression [0-9a-f]{7,40}, requir-
+ing 7-40 characters. The total number of Partial commit ID
+commits is 1,021 (1.3%). They include four causes: (i) the con-
+tent after Fixes is a link to a bug report; (e.g., Fixes: http://bugs.
+gentoo.org/show_bug.cgi?id=87182) (ii) the content after Fixes
+gives some description of the bug; (iii) the content after Fixes
+has some format problems (e.g., Fixes: commit fda789fda); (iv)
+the commit ID after Fixes: may be too short.
+Not in the repository indicates that the method can recognize
+the commit ID in the commit message, however, the commit
+ID does not exist in the list of commit IDs fetched from the
+master branch of the Linux kernel repository. The number of
+commits in this situation is 1,337 (1.7%). It includes three
+prominent cases: (i) format problem: irregular formatting mak-
+ing it impossible to search for the commit ID (e.g., fda798fda:,
+7598e8700e9a(drm/i915/gvt:; (ii) rebase problem: the commit
+is not in any branch of the repository, and may belong to a fork
+outside of the repository; (iii) branch problem: we only focus on
+the master branch, while some commits may occur in another
+branch.
+However, in total, anomalous commits only account for 3%
+of the total number of commits. We have made these abnormal
+commits publicly available in a CSV ﬁle for further study. So,
+we believe that the threat is minimal.
+To minimize threats to internal validity from implementation
+errors, we use the implementation of MA-SZZ from the replica-
+tion package of Rosa et al. [28] without making modiﬁcations.
+However, a deeper analysis found that the implementation of
+MA-SZZ by Rosa et al. [28] diverged from MA-SZZ’s orig-
+inal implementation [12]. The implementation of Rosa et al.
+included additional modiﬁcations for detecting the movement
+of code within ﬁles and from other ﬁles.
+Another threat to internal validity is that some bug-ﬁxing
+commits are also bug-inducing commits. In our analysis, we
+found that there are 4,517 such common commits in our dataset,
+which represent both bug-ﬁxing and bug-inducing actions.
+These common commits account for only 5.9% out of the total
+76,046 unique commits. To mitigate this threat, we have listed
+all these commits in a ﬁle named “common_hashes.txt” in the
+replication package. This collection of cases where developers
+introduce bugs while ﬁxing bugs may provide opportunities for
+further study.
+External validity. Considering that our study focuses on a
+single software project, primarily utilizing the C programming
+language, our ﬁndings may not generalize to other projects
+or programming languages. However, the Linux kernel is a
+well-structured software repository with a substantial code size
+(Linux v6.0 contains 23 MLOC). Therefore, it serves as a
+valuable research object for evaluating the effectiveness of SZZ
+algorithms.
+X. CONCLUSION AND FUTURE WORK
+SZZ is a vital algorithm for mining software repositories,
+and many studies rely on its results. Ensuring the precision and
+recall of SZZ in real scenarios is thus crucial.
+In our study, we collected a dataset of 76K bug-ﬁxing com-
+mits linked to bug-inducing commits in the Linux kernel. We
+evaluated six SZZ algorithms on this dataset, analyzed the ghost
+commits issue, and examined its impact on SZZ. We proposed
+TC-SZZ, which can ﬁnd a bug-inducing commit for 17.7% of
+the failure cases. Upon investigating the remaining failures, we
+found that in 37.9% of the cases, the bug-inducing commit is not
+in the ﬁle history. ChatGPT demonstrates potential in assisting
+the SZZ algorithm in identifying the associated bug-inducing
+commits in these challenging cases.
+Our publicly available dataset of 76K bug-ﬁxing commits
+with their bug-inducing commits provides a unique opportunity
+for advancing SZZ algorithm research, including training Large
+Language Models (LLMs) for improved precision and recall.
+Key areas for future exploration include: (1) Enhancing SZZ
+Algorithm Precision: Despite R-SZZ achieving 59% preci-
+sion, there is signiﬁcant potential for improvement. Future stud-
+ies should explore patterns beyond non-semantic source code,
+meta-changes, and refactoring changes to increase accuracy. (2)
+Refactoring Solutions Across Programming Languages:
+The extension of refactoring solutions, typically focused on
+Java, to other programming languages like C in our Linux
+dataset, remains a challenge needing attention. (3) Addressing
+Undeﬁned Failures in Recall: Investigating the 23.08% of
+previously undeﬁned failure cases, alongside ‘Ghost Commit’
+issues, is crucial for a more comprehensive understanding and
+improvement of recall. (4) Impacts on Downstream Tasks:
+Utilizing our dataset to evaluate the effect of SZZ algorithms on
+downstream tasks, such as Just-in-Time defect prediction, offers
+a promising direction for future research. These directions not
+only aim to reﬁne SZZ algorithms but also seek to understand
+their broader implications in software engineering research.
+DATA AVAILABILITY
+The dataset used in this paper, the TC-SZZ implementation,
+and the results of ChatGPT experiments are publicly available
+at https://doi.org/10.6084/m9.ﬁgshare.23889792.v2.
+ACKNOWLEDGMENT
+Any opinions, ﬁndings and conclusions or recommendations
+expressed in this material are those of the author(s) and do not
+reﬂect the views of National Research Foundation, Singapore.
+REFERENCES
+[1] J. ´Sliwerski, T. Zimmermann, and A. Zeller, “When do changes induce
+ﬁxes?” in Proc. Int. Workshop Mining Softw. Repositories, (MSR), 2005,
+pp. 1–5.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

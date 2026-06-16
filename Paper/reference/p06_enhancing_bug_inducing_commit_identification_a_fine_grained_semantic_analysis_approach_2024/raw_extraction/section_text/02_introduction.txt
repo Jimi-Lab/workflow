@@ -1,0 +1,213 @@
+I. I NTRODUCTION
+M
+ODERN software development evolves through a series
+of commits. When developers make commits, they save
+changes made to a set of files within a repository. Each commit
+Received 7 April 2024; revised 18 September 2024; accepted 22 Septem-
+ber 2024. Date of publication 9 October 2024; date of current version
+14 November 2024. This research was supported in part by the National Key
+Research and Development Program of China under Grant 2021YFB2701102,
+in part by the National Science Foundation of China under Grant 62372398,
+Grant 62302447, Grant 62202419, Grant 72342025, and Grant U20A20173,
+in part by the Fundamental Research Funds for the Central Universities
+under Grant 226-2022-00064, and in part by Zhejiang Provincial Natural
+Science Foundation of China under G rant LY24F020008. Recommended for
+acceptance by C. Treude (Corresponding author: Lingfeng Bao.)
+Lingxiao Tang and Lingfeng Bao are with the State Key Laboratory
+of Blockchain and Data Security , Zhejiang University, Hangzhou 310007,
+China, and also with Hangzhou High-Tech Zone (Binjiang) Blockchain
+and Data Security Research Ins titute, Hangzhou 310052, China (e-mail:
+12421037@zju.edu.cn; lingfengbao@zju.edu.cn).
+Chao Ni is with the State Key Laboratory of Blockchain and Data Security,
+Zhejiang University, Hangzhou 310007, Chin a (e-mail: chaoni@zju.edu.cn).
+Qiao Huang is with the School of Co mputer Science and Technology,
+Zhejiang Gongshang University, Hangzhou 310018, China (e-mail: qiao-
+huang@zjgsu.edu.cn).
+Digital Object Identifi er 10.1109/TSE.2024.3468296
+captures the state of the repository as a snapshot at a specific
+moment. To facilitate the management of commits, version con-
+trol systems such as Git have been developed. Among various
+types of commits, bug-inducing commits [1] hold particular
+significance, as they provide essential insights into the origins
+and evolution of bugs. Consequently, researchers have devoted
+additional attention to them. Prior studies have been conducted
+to understand the characteristics of bug-inducing commits [2],
+[3], [4], [5] and introduced numerous techniques to identify
+them [6], [7], [8], [9]. Building upon these identified bug-
+inducing commits, researchers have also proposed methods for
+Just-in-Time defect detection[9], [10], [11], [12] and automatic
+program repair [13], [14]. They have also worked on analyzing
+factors for software quality [15], [16], and pinpointing affected
+software versions of a vulnerability [17].
+Currently, the primary approaches for identifying bug-
+inducing commits are the original SZZ algorithm [6] and its
+variants. The original SZZ algorithm was introduced by Sliwer-
+ski, Zimmermann, and Zeller in 2005 [6]. They assume that the
+deleted lines in the bug-fixing commit introduce the bug. Thus,
+the algorithm operates by tracing back the deleted lines within
+bug-fixing commits. This tracing process aims to identify the
+commits that last modified those deleted lines. These identified
+commits are then marked as bug-inducing commits. Although
+the original SZZ algorithm has achieved great success, it suffers
+from low precision because bug-fixing commits may contain
+noise (e.g., blank lines, comments, and meta-changes) that is
+unrelated to bug fixes. To address this issue, numerous variants
+have been introduced[7], [8], [9]. Typically, these variants make
+use of static methods to filter out noise in bug-fixing commits.
+Additionally, deep learning methods have also been explored to
+further improve precision [18].
+However, previous research shows that the abovementioned
+methods fail to address the challenge posed by bug-fixing com-
+mits with only added lines [19]. When it happens, tools like git
+blame or annotate cannot identify deleted lines to link them
+with bug-inducing commits. Recent research has highlighted
+the prevalence of these kinds of commits in datasets, which
+significantly impacts the recall of SZZ algorithms. For instance,
+a dataset collected by Rezk et al. [19], containing 12 Apache
+projects, revealed that the highest percentage of such instances
+reached 11.72%. Further investigations, such as the study con-
+ducted by Lyu et al. [20], have demonstrated even higher oc-
+currences of bug-fixing commits only containing added lines.
+Lyu et al.’s dataset reported that 17.46% of bug-fixing commits
+0098-5589 © 2024 IEEE. Personal use is permitted, but repub lication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 002 =====
+
+3038 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+are solely comprised of added lines, indicating that these kinds
+of commits are more prevalent than previous findings.
+Despite the prevalence of such commits and their negative
+impact on SZZ algorithms, few methods have been proposed to
+mitigate this issue, let alone evaluating them with a developer-
+informed oracle. To the best of our knowledge, the A-SZZ
+algorithm, proposed by Sahal et al. [21], is the main method
+intended to address this challenge. This algorithm operates by
+first identifying added lines, then locating the block encompass-
+ing these additions, and finally tracing back all lines within
+the block. However, our experimental results reveal that this
+algorithm suffers from significantly low precision, rendering
+it impractical for real-world use. Researchers [19] have pro-
+posed enhancements to the A-SZZ algorithm. However, these
+improvements are constrained to specific scenarios, such as
+method override, logging operations, and class expansions, lim-
+iting their applicability. Furthermore, they have not been eval-
+uated under a developer-informed oracle and their evaluation
+lacks reliability.
+In this paper, we present a novel approach called S
+EM-SZZ to
+tackle this issue. We conducted a study to e xplore the position
+of unmodified lines that could be traced back to identify bug-
+inducing commits. The results of this study revealed that in
+most cases if a bug-inducing commit could be found by tracing
+back unmodified lines within a function, it could typically be
+identified by tracing back only the two unmodified lines near-
+est the added lines, rather than tracing back the entire block
+encapsulating the added lines.
+Building upon these findings, we further refined our ap-
+proach by incorporating techniques from previous studies [7],
+[8] to filter out noise in the unmodified lines, such as blank
+lines, comments, and meta-changes. Despite these refinements
+that resulted in significantly higher precision compared to the
+A-SZZ algorithm, they still suffered from low precision.
+To further enhance precision, we conduct a more fine-grained
+analysis. We begin by performing static program slicing to
+extract program parts relevant to the bug. Then, we collect
+and compare the states of the two versions of the program.
+One version is the most recent commit previous to the bug-
+fixing commit, while the other is the bug-fixing commit itself.
+This process incorporates data flow analysis and control flow
+analysis. Based on this analysis, we aim to identify which set of
+statements in the previous version contributed to the bug. Sub-
+sequently, when locating the bug-inducing commit, we traced
+back from the bug-fixing commit to identify the earliest commit
+that contains all these buggy statements, designating it as the
+bug-inducing commit.
+Compared to previous methods, S
+EM-SZZ has two advan-
+tages. Firstly, it improves precision by more fine-grained analy-
+sis. Secondly, our method can be applied to all scenarios. Note
+that we can also adopt our approach to bug-fixing commits with
+deleted lines since the core idea of our approach is to compare
+the states of the two versions of the program and identify the
+statements contributing to the bug. Thus, based on the core idea,
+we can apply S
+EM-SZZ in all scenarios, regardless of whether
+they contain deleted lines.
+To evaluate our approach, we utilize the dataset proposed by
+Lyu et al. [20]. Among all available datasets, we select this one
+for two primary reasons. Firstly, the dataset is annotated by
+the project’s developers, ensuring its accuracy and reliability.
+Secondly, it contains the largest number of bug-fixing commits
+with only added lines compared to other datasets. This dataset,
+built on the Linux kernel, contains over ten thousand bug-fixing
+commits without deleted lines. Thus, it is much more reli-
+able than previous datasets, which are manually annotated and
+small-scale. We assess our approach by attempting to address
+the following questions:
+RQ1: How effective is our approach in identifying bug-
+inducing commits from bug-fixing commits with only
+added lines?
+In this research question (RQ), we first compare S
+EM-SZZ
+with our proposed baselines and A-SZZ across all bug-fixing
+commits with only added lines. We also notice that some bug-
+inducing commits cannot be found even by tracing back all lines
+in the function and some bug-fixing commits do not contain
+changed lines within functions. All methods mentioned above
+cannot identify the first type of bug-inducing commits and
+S
+EM-SZZ is not designed to handle the second type of bug-
+fix commits. Thus, we remove these redundant test cases and
+then evaluate all methods. The results demonstrate that our pro-
+posed baselines significantly outperform A-SZZ, and S
+EM-SZZ
+surpasses all baselines significantly, with an improvement from
+17% to 19% in F1-score.
+RQ2: How effective is SEM-SZZ in identifying bug-inducing
+commits from bug-fixing commits with deleted lines?
+In this research question (RQ), we compare our method
+with baselines to identify bug-inducing commits from bug-
+fixing commits with deleted lines. Our goal is to determine
+whether S
+EM-SZZ can effectively handle bug-fixing commits
+with deleted lines. The result demonstrates that S EM-SZZ en-
+hances precision by 7% and F1-score by 7%, respectively.
+RQ3: How effective are the key components of SEM-SZZ?
+In this research question (RQ), we conduct an ablation exper-
+iment to verify the effectiveness of each key component. The
+result shows that each key design, including data flow compar-
+ison, path constraint comparison, the method to locate the bug-
+inducing commit and the line similarity threshold, contributes
+to the overall performance.
+RQ4: How effective is S
+EM-SZZ in terms of time cost?
+An approach that consumes too much time is impractical for
+deployment in real-world scenarios. In this RQ, we want to
+investigate the time efficiency of our approach. The result shows
+that our approach takes approximately 1.95 seconds to handle a
+fixing commit from scratch, which can be deployed in practice.
+In summary, our contributions can be summarized as follows:
+• We provide a new insight on how to find bug-inducing
+commits based on bug-fixing commits with only added
+lines. Our study reveals that most bug-inducing commits
+can be identified by tracing back nearby unmodified lines
+of the added lines.
+• We introduce a novel approach for pointing out statements
+contributing to the bug from bug-fixing commits, which
+compares the program’s state between two versions. This
+approach can be applied to all scenarios, regardless of
+whether the bug-fixing commit contains added lines.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== PAGE 003 =====
+
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3039
+Fig. 1. A motivation example.
+• We introduce a new method for locating bug-inducing
+commits by identifying the earliest commit that introduces
+all these buggy statements and designating it as the bug-
+inducing commit.
+• Our experimental results demonstrate that S EM-SZZ out-
+performs all other baselines in all scenarios.

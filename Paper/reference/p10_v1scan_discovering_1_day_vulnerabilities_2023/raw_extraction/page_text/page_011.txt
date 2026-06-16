@@ -1,0 +1,253 @@
+Table 6: Accuracy comparison between the improved version-
+based approach of V1SCAN and CENTRIS.
+Target
+program
+V1SCAN (version-based)
+CENTRIS
+#TP
+#FP
+#FN
+#TP
+#FP
+#FN
+Turicreate
+23
+0
+3
+22
+24
+4
+ReactOS
+20
+0
+1
+5
+47
+16
+TizenRT
+7
+0
+0
+7
+33
+0
+Aseprite
+3
+0
+4
+7
+24
+0
+FreeBSD
+10
+0
+2
+7
+19
+5
+MongoDB
+6
+0
+0
+6
+9
+0
+MAME
+1
+0
+1
+2
+23
+0
+Filament
+3
+0
+0
+3
+10
+0
+Godot
+4
+0
+2
+2
+8
+4
+ArangoDB
+1
+0
+0
+1
+10
+0
+Total
+78
+0
+13
+62
+207
+29
+more, V1SCAN failed to detect OSS vulnerabilities when the
+reuse relationship was unclear. For example, vulnerable codes
+that were inherited from the Linux Kernel existed in FreeBSD.
+V1SCAN failed to identify the reuse relationship between the
+Linux Kernel and FreeBSD, resulting in three FNs.
+5.2
+Effectiveness of V1SCAN
+Next, we evaluate the effectiveness of V1SCAN compared to
+existing version- and code-based approaches. In the experi-
+ments, CENTRIS [36] and VUDDY [14] were leveraged for
+the version- and code-based approaches, respectively.
+Methodology. We first evaluated how the improved version-
+and code-based approaches of V1SCAN enhance vulnerabil-
+ity detection accuracy over the baselines individually (i.e.,
+CENTRIS and VUDDY). Thereafter, we assessed the effec-
+tiveness of V1SCAN by comparing its vulnerability detection
+results with the combined results (union) of CENTRIS and
+VUDDY. We used the vulnerability dataset (4,612 CVE vul-
+nerabilities) collected in Section 4.3, and used the same target
+programs (Table 4) and metrics introduced in Section 5.1. As
+in the previous experiment, TPs and FPs were established
+through manual analysis. Finally, when comparing two ap-
+proaches here, if a vulnerability detected by one approach
+goes undetected by the other approach, it is considered a false
+negative of the latter. Therefore, in subsequent experiments,
+FNs are may differ from that introduced in Section 5.1.
+Effectiveness of the improved version-based approach.
+The improved version-based approach of V1SCAN was sub-
+stantially better accurate than CENTRIS (see Table 6). It dis-
+covered 78 vulnerabilities in ten target programs without
+producing any false alarms by using reuse code classification.
+V1SCAN reported 13 FNs that occurred when a vulnerability
+contained in the less frequent version of the OSS (not a preva-
+lent version) was reused in the target program, or because it
+was accidentally filtered out during the filtering process. Note
+that some of these FNs can be overcome with the improved
+code-based approach of V1SCAN.
+Table 7: Accuracy comparison between the improved code-based
+approach of V1SCAN and VUDDY.
+Target
+program
+V1SCAN (code-based)
+VUDDY
+#TP
+#FP
+#FN
+#TP
+#FP
+#FN
+Turicreate
+13
+1
+0
+9
+9
+4
+ReactOS
+21
+1
+0
+13
+8
+8
+TizenRT
+7
+0
+0
+5
+5
+2
+Aseprite
+8
+0
+0
+3
+0
+5
+FreeBSD
+12
+2
+0
+10
+0
+2
+MongoDB
+10
+0
+0
+3
+3
+7
+MAME
+7
+2
+0
+1
+0
+6
+Filament
+13
+0
+0
+4
+3
+9
+Godot
+1
+0
+0
+1
+0
+0
+ArangoDB
+4
+0
+0
+0
+2
+4
+Total
+96
+6
+0
+49
+30
+47
+CENTRIS discovered only 62 CVE vulnerabilities while
+producing 207 false alarms (i.e., a precision of 23%). When
+CENTRIS fails to predict the correct component versions, it
+would fail to detect vulnerabilities contained in the reused
+components (FNs). Additionally, it produced many FPs when
+(1) the version prediction failed (103 FPs), and (2) a compo-
+nent was reused with code modifications (97 FPs). In the latter
+case, 81 vulnerabilities were not reused in the target program
+and 16 vulnerabilities were repaired by backporting security
+patches. The remaining seven FPs occurred because the CPE
+provided an incorrect OSS version in that a version without a
+vulnerable function was referred to as vulnerable [8,35].
+Effectiveness of the improved code-based approach. The
+improved code-based approach used by V1SCAN detected
+twice as many TPs as VUDDY (see Table 7).
+It is noteworthy that V1SCAN covered all vulnerabilities de-
+tected by VUDDY. Specifically, V1SCAN could detect seven
+CVE vulnerabilities that existed outside of functions by us-
+ing the vulnerable code classification technique. Moreover,
+V1SCAN could discover modified vulnerable codes by com-
+posing a signature with core code lines related to vulnerabil-
+ities. V1SCAN produced six FPs owing to the similar code
+logic in OSS components, as explained in Section 5.1.
+In contrast, VUDDY reported 47 FNs (a 51% TP detec-
+tion rate). It failed to detect most vulnerabilities when the
+propagated vulnerable code underwent syntax changes. In
+addition, VUDDY could not detect vulnerabilities that exist
+outside of functions (e.g., macro vulnerabilities) because it
+only considered function units.
+Furthermore, VUDDY produced 30 FPs, mainly because of
+the abstraction method (see Section 2.4). When the security
+patch changes only the abstraction targets (e.g., parameters
+and local variable names), VUDDY cannot differentiate be-
+tween vulnerable and patched functions, resulting in an FP
+being reported. Finally, if the code of the function to which the
+security patch is applied is extremely short and general (e.g.,
+a single line return statement), VUDDY mistakenly detects
+lines of code that are similar but safe as being vulnerable.

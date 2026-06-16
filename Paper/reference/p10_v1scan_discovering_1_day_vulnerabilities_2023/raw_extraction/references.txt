@@ -1,0 +1,337 @@
+===== PAGE 013 =====
+quired. We reported two vulnerabilities to the LibGDX team
+in March 2022. They confirmed our report and immediately
+applied the security patches to their codebase.
+V1SCAN also detected vulnerabilities in other software,
+including OpenMVG, FreeBSD, and Disque. We reported
+the vulnerabilities to the respective development teams; the
+FreeBSD team responded that they would fix the vulnerability
+in the subsequent versions. Patch requests are currently pend-
+ing for the four cases, despite our multiple reports. Nonethe-
+less, we observed that V1SCAN could be effectively used for
+vulnerability detection in real-world software programs.
+Limitations. V1SCAN makes several assumptions that limit
+its application.
+First, V1SCAN can be applied only when the source code
+of the target program is available.
+Second, although V1SCAN outperformed the existing ap-
+proaches, it may fail to detect several vulnerabilities. A typical
+example other than those introduced in Section 5.1 is the vul-
+nerability in which CPE is incorrectly provided and, at the
+same time, reused with significant code changes. To address
+this problem, we can devise a CPE verification technique
+(e.g., [6,8,35]) or apply a more relaxed code-based approach.
+However, the former is beyond the scope of this paper, and par-
+ticular caution is needed, as the latter may produce more FPs.
+Additionally, while V1SCAN can handle the syntax diversity
+of vulnerable codes, it may not detect propagated vulnerable
+functions that do not contain the code lines deleted in the
+patch. This is a result of our decision to avoid potential FPs
+(Section 5.1), but it may result in the reporting of several FNs.
+Third, V1SCAN may not be able to filter code vulnerabil-
+ities resolved by security patches applied by the developers
+themselves. To solve this problem, we are considering apply-
+ing semantic analysis to vulnerable and patched codes.
+Finally, the accuracy of V1SCAN can be affected by the
+performance of external tools. For example, CENTRIS can
+incorrectly identify components, causing V1SCAN to produce
+FPs. In addition, FPs and FNs may be generated owing to the
+selected function parser and LSH algorithm (see Section 5.1).
+If this becomes an issue, V1SCAN can be plugged into other
+tools to enhance the vulnerability discovery accuracy.
+7
+Related work
+Software composition analysis. Several approaches have
+attempted to detect third-party OSS components reused in
+target programs (e.g., [2, 9, 17, 20, 28, 36, 40, 41]); some of
+these can be used to detect vulnerabilities. Woo et al. [36] pre-
+sented CENTRIS to identify the modified OSS components in
+a target program. It significantly reduces false alarms in com-
+ponent identification by considering only the unique parts of
+the OSS through code segmentation. Duan et al. [9] proposed
+OSSPolice to identify 1-day vulnerabilities from the third-
+party libraries of an Android application. It utilizes constant
+features to extract library versions, and determines whether
+vulnerable versions were used in the target application. Zhan
+et al. [40] proposed ATVHunter to precisely detect versions of
+third-party libraries using the control flow graph of the appli-
+cation. Based on the identified versions, they verified whether
+the target application contained known vulnerabilities.
+However, their goal was to precisely identify the compo-
+nents, and they did not fully consider OSS modifications for
+vulnerability detection. Therefore, they may produce many
+false alarms in our problem situations (see Section 5.1).
+Vulnerable code detection. Several approaches have at-
+tempted to discover vulnerable code in target programs (e.g.,
+[3, 12, 14, 34, 37]). Jang et al. [12] proposed ReDeBug, a
+token-level vulnerable code clone detection approach that
+uses a sliding window technique. Kim et al. [14] presented
+VUDDY, a function-level vulnerable code clone detection ap-
+proach that can scalably detect 1-day vulnerabilities. Bowman
+et al. [3] proposed VGRAPH, a code property graph based
+vulnerable code detection approach that is robust to code
+modification. Xiao et al. [37] presented MVP, a recurring
+vulnerability detection approach, which can discover vulner-
+able code that recurs with different syntax. Woo et al. [34]
+proposed MOVERY, an approach that can precisely detect
+modified vulnerable code clones.
+Although their goals are similar to ours, they did not con-
+sider vulnerable code whose code has changed significantly
+owing to the modified OSS reuse, which led to the production
+of false negatives when applied to our target problem. Also,
+they cannot counteract vulnerabilities that exist outside of the
+selected granularity (see Section 5.1 and Section 6). Other
+approaches have attempted to detect vulnerabilities based on
+learning algorithms (e.g., [18,19]). These approaches can be
+applied to discover general vulnerable code; however, they
+are not applicable for detecting 1-day vulnerabilities.
+Code clone detection. Many approaches attempted to detect
+code clones (e.g., [4,13,24–27,31]). However, as verified in
+the previous studies (e.g., [14,37]), they generate numerous
+false alarms when applied to detect vulnerable code. Hence,
+they cannot be directly applied to solving our target issue.
+8
+Conclusion
+Detecting known security vulnerabilities in third-party OSS
+components is the first step toward achieving secure software.
+In this regard, we presented V1SCAN, which is a precise ap-
+proach for detecting 1-day vulnerabilities from modified OSS
+components in a target program. V1SCAN significantly out-
+performed existing approaches in terms of 1-day vulnerability
+discovery accuracy by consolidating version- and code-based
+approaches, along with the reused code classification and
+vulnerable code classification techniques. Equipped with the
+vulnerability detection results of V1SCAN, developers can
+mitigate the potential risks imposed by modified third-party
+OSS reuse, rendering a safer software ecosystem.
+
+
+===== PAGE 014 =====
+Acknowledgment
+We appreciate the anonymous shepherd and reviewers for
+their valuable comments to improve the paper. This work
+was supported by Institute of Information & Communications
+Technology Planning & Evaluation (IITP) grant funded by
+the Korea government Ministry of Science and ICT (MSIT)
+(No.2022-0-00277, Development of SBOM Technologies for
+Securing Software Supply Chains, No.2022-0-01198, Con-
+vergence Security Core Talent Training Business, and IITP-
+2023-2020-0-01819, ICT Creative Consilience program).
+Availability
+The source code and datasets of V1SCAN is publicly avail-
+able at GitHub: https://github.com/wooseunghoon/
+V1SCAN-public.
+References
+[1] Mansour Ahmadi, Reza Mirzazade Farkhani, Ryan
+Williams, and Long Lu. Finding Bugs Using Your Own
+Code: Detecting Functionally-similar yet Inconsistent
+Code. In 30th USENIX Security Symposium (USENIX
+Security 21), pages 2025–2040, 2021.
+[2] Michael Backes, Sven Bugiel, and Erik Derr. Reliable
+Third-Party Library Detection in Android and its Se-
+curity Applications. In Proceedings of the 23rd ACM
+SIGSAC Conference on Computer and Communications
+Security (CCS), pages 356–367, 2016.
+[3] Benjamin Bowman and H Howie Huang. VGRAPH:
+A Robust Vulnerable Code Clone Detection System
+Using Code Property Triplets. In Proceedings of the
+5th IEEE European Symposium on Security and Privacy
+(EuroS&P), pages 53–69, 2020.
+[4] Lutz Büch and Artur Andrzejak. Learning-Based Re-
+cursive Aggregation of Abstract Syntax Trees for Code
+Clone Detection. In Proceedings of the IEEE 26th In-
+ternational Conference on Software Analysis, Evolution
+and Reengineering (SANER), pages 95–104, 2019.
+[5] Ctags. Universal Ctags, 2023. https://github.com/
+universal-ctags/ctags.
+[6] Jiarun Dai, Yuan Zhang, Hailong Xu, Haiming Lyu,
+Zicheng Wu, Xinyu Xing, and Min Yang. Facilitating
+Vulnerability Assessment through PoC Migration. In
+Proceedings of the 2021 ACM SIGSAC Conference on
+Computer and Communications Security, pages 3300–
+3317, 2021.
+[7] Alexandre Decan and Tom Mens.
+What Do Pack-
+age Dependencies Tell Us About Semantic Version-
+ing? IEEE Transactions on Software Engineering (TSE),
+47(6):1226–1240, 2019.
+[8] Ying Dong, Wenbo Guo, Yueqi Chen, Xinyu Xing,
+Yuqing Zhang, and Gang Wang. Towards the detec-
+tion of inconsistencies in public security vulnerability
+reports. In Proceedings of the 28th USENIX Security
+Symposium (Security), pages 869–885, 2019.
+[9] Ruian Duan, Ashish Bijlani, Meng Xu, Taesoo Kim, and
+Wenke Lee. Identifying Open-Source License Violation
+and 1-day Security Risk at Large Scale. In Proceed-
+ings of the 24th ACM SIGSAC Conference on Computer
+and Communications Security (CCS), pages 2169–2185,
+2017.
+[10] GitHub. The world’s leading software development
+platform, 2023. https://github.com/.
+[11] Hyunji Hong, Seunghoon Woo, Eunjin Choi, Jihyun
+Choi, and Heejo Lee. xVDB: A High-Coverage Ap-
+proach for Constructing a Vulnerability Database. IEEE
+Access, 10:85050–85063, 2022.
+[12] Jiyong Jang, Abeer Agrawal, and David Brumley. Re-
+DeBug: Finding Unpatched Code Clones in Entire OS
+Distributions. In Proceedings of the 33rd IEEE Sympo-
+sium on Security and Privacy (SP), pages 48–62, 2012.
+[13] Lingxiao Jiang, Ghassan Misherghi, Zhendong Su, and
+Stephane Glondu. DECKARD: Scalable and Accurate
+Tree-based Detection of Code Clones. In Proceedings
+of the 29th International Conference on Software Engi-
+neering (ICSE), pages 96–105, 2007.
+[14] Seulbae Kim, Seunghoon Woo, Heejo Lee, and Hakjoo
+Oh.
+VUDDY: A Scalable Approach for Vulnerable
+Code Clone Discovery.
+In Proceedings of the 38th
+IEEE Symposium on Security and Privacy (SP), pages
+595–614, 2017.
+[15] Seongkyeong Kwon, Seunghoon Woo, Gangmo Seong,
+and Heejo Lee. OCTOPOCS: Automatic Verification
+of Propagated Vulnerable Code Using Reformed Proofs
+of Concept. In 2021 51st Annual IEEE/IFIP Interna-
+tional Conference on Dependable Systems and Networks
+(DSN), pages 174–185, 2021.
+[16] Frank Li and Vern Paxson. A Large-Scale Empirical
+Study of Security Patches. In Proceedings of the 24th
+ACM SIGSAC Conference on Computer and Communi-
+cations Security (CCS), pages 2201–2215, 2017.
+[17] Menghao Li, Wei Wang, Pei Wang, Shuai Wang, Ding-
+hao Wu, Jian Liu, Rui Xue, and Wei Huo. LibD: Scal-
+able and Precise Third-party Library Detection in An-
+droid Markets. In Proceedings of the 39th International
+
+
+===== PAGE 015 =====
+Conference on Software Engineering (ICSE), pages 335–
+346. IEEE, 2017.
+[18] Zhen Li, Deqing Zou, Shouhuai Xu, Hai Jin, Hanchao
+Qi, and Jie Hu. VulPecker: An Automated Vulnerability
+Detection System Based on Code Similarity Analysis.
+In Proceedings of the 32nd Annual Conference on Com-
+puter Security Applications (ACSAC), pages 201–213,
+2016.
+[19] Zhen Li, Deqing Zou, Shouhuai Xu, Xinyu Ou, Hai Jin,
+Sujuan Wang, Zhijun Deng, and Yuyi Zhong. VulDeeP-
+ecker: A Deep Learning-Based System for Vulnerability
+Detection. In Proceedings of the 25th Annual Network
+and Distributed System Security Symposium (NDSS),
+2018.
+[20] Ziang Ma, Haoyu Wang, Yao Guo, and Xiangqun Chen.
+LibRadar: Fast and Accurate Detection of Third-party
+Libraries in Android Apps.
+In Proceedings of the
+38th International Conference on Software Engineer-
+ing: Companion (ICSE-Companion), pages 653–656,
+2016.
+[21] NVD. Common Platform and Enumeration (CPE), 2023.
+https://nvd.nist.gov/products/cpe.
+[22] NVD. National Vulnerability Database, 2023. https:
+//nvd.nist.gov/.
+[23] Jonathan Oliver, Chun Cheng, and Yanggui Chen.
+TLSH–a locality sensitive hash. In Proceedings of the
+2013 Fourth Cybercrime and Trustworthy Computing
+Workshop, pages 7–13, 2013.
+[24] Chaiyong Ragkhitwetsagul and Jens Krinke. Siamese:
+Scalable and Incremental Code Clone Search via Mul-
+tiple Code Representations. Empirical Software Engi-
+neering, pages 2236–2284, 2019.
+[25] Chanchal K Roy and James R Cordy. NICAD: Accu-
+rate Detection of Near-Miss Intentional Clones Using
+Flexible Pretty-Printing and Code Normalization. In
+Proceedings of the 16th IEEE International Conference
+on Program Comprehension (ICPC), pages 172–181,
+2008.
+[26] Hitesh Sajnani, Vaibhav Saini, Jeffrey Svajlenko, Chan-
+chal K Roy, and Cristina V Lopes. SourcererCC: Scaling
+Code Clone Detection to Big-Code. In Proceedings of
+the 38th International Conference on Software Engi-
+neering (ICSE), pages 1157–1168, 2016.
+[27] Yuichi Semura, Norihiro Yoshida, Eunjong Choi, and
+Katsuro Inoue. CCFinderSW: Clone Detection Tool
+with Flexible Multilingual Tokenization. In Proceedings
+of the 24th Asia-Pacific Software Engineering Confer-
+ence (APSEC), pages 654–659, 2017.
+[28] Wei Tang, Du Chen, and Ping Luo.
+BCFinder: A
+Lightweight and Platform-independent Tool to Find
+Third-party Components in Binaries. In Proceedings of
+the 25th Asia-Pacific Software Engineering Conference
+(APSEC), pages 288–297. IEEE, 2018.
+[29] National Telecommunications and Information Admin-
+istration.
+NTIA Software Component Transparency
+with SBOM (Software Bill of Materials), 2023. https:
+//www.ntia.doc.gov/SoftwareTransparency.
+[30] TLSH.
+Trend Micro Locality Sensitive Hash, 2023.
+https://github.com/trendmicro/tlsh.
+[31] Pengcheng Wang, Jeffrey Svajlenko, Yanzhao Wu, Yun
+Xu, and Chanchal K Roy. CCAligner: A Token Based
+Large-Gap Clone Detector.
+In Proceedings of the
+40th International Conference on Software Engineering
+(ICSE), pages 1066–1077, 2018.
+[32] Wikipedia.
+Jaccard similarity, 2023.
+https://en.
+wikipedia.org/wiki/Jaccard_index.
+[33] Wikipedia.
+Locality-sensitive
+hashing, 2023.
+https://en.wikipedia.org/wiki/Locality-
+sensitive_hashing.
+[34] Seunghoon Woo, Hyunji Hong, Eunjin Choi, and Heejo
+Lee. MOVERY: A Precise Approach for Modified Vul-
+nerable Code Clone Discovery from Modified Open-
+Source Software Components. In Proceedings of the
+31st USENIX Security Symposium (Security), pages
+3037–3053, 2022.
+[35] Seunghoon Woo, Dongwook Lee, Sunghan Park, Heejo
+Lee, and Sven Dietrich.
+V0Finder: Discovering the
+Correct Origin of Publicly Reported Software Vulner-
+abilities. In Proceedings of the 30th USENIX Security
+Symposium (Security), pages 3041–3058, 2021.
+[36] Seunghoon Woo, Sunghan Park, Seulbae Kim, Heejo
+Lee, and Hakjoo Oh. CENTRIS: A Precise and Scalable
+Approach for Identifying Modified Open-Source Soft-
+ware Reuse. In Proceedings of the IEEE/ACM 43rd In-
+ternational Conference on Software Engineering (ICSE),
+pages 860–872, 2021.
+[37] Yang Xiao, Bihuan Chen, Chendong Yu, Zhengzi Xu,
+Zimu Yuan, Feng Li, Binghong Liu, Yang Liu, Wei Huo,
+Wei Zou, and Wenchang Shi. MVP: Detecting Vulnera-
+bilities using Patch-Enhanced Vulnerability Signatures.
+In Proceedings of the 29th USENIX Security Symposium
+(Security), pages 1165–1182, 2020.
+[38] Yifei Xu, Zhengzi Xu, Bihuan Chen, Fu Song, Yang
+Liu, and Ting Liu. Patch Based Vulnerability Matching
+for Binary Programs. In Proceedings of the 29th ACM
+SIGSOFT International Symposium on Software Testing
+and Analysis (ISSTA), pages 376–387, 2020.
+
+
+===== PAGE 016 =====
+[39] Fabian Yamaguchi, Nico Golde, Daniel Arp, and Konrad
+Rieck. Modeling and Discovering Vulnerabilities with
+Code Property Graphs. In Proceedings of the 35th IEEE
+Symposium on Security and Privacy (SP), pages 590–
+604. IEEE, 2014.
+[40] Xian Zhan, Lingling Fan, Sen Chen, Feng Wu, Tian-
+ming Liu, Xiapu Luo, and Yang Liu. ATVHunter: Re-
+liable Version Detection of Third-Party Libraries for
+Vulnerability Identification in Android Applications. In
+Proceedings of the 43rd International Conference on
+Software Engineering (ICSE), pages 1695–1707. IEEE,
+2021.
+[41] Xian Zhan, Tianming Liu, Lingling Fan, Li Li, Sen Chen,
+Xiapu Luo, and Yang Liu. Research on Third-Party Li-
+braries in Android Apps: A Taxonomy and Systematic
+Literature Review. IEEE Transactions on Software En-
+gineering, 2021.
+
+
+[NEEDS CITATION VERIFICATION] Text-only references; no BibTeX verification.

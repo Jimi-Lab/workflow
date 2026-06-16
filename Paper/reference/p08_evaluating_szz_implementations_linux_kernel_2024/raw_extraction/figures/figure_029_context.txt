@@ -1,0 +1,32 @@
+Page: 18
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+2236
+IEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024
+(2) Partial Bug-ﬁxing: This case occurs when a bug-ﬁxing
+commit rectiﬁes a previous, incorrect bug-ﬁx attempt, and
+the bug-inducing commit, as labeled by the developer, is the
+one that the initial, ﬂawed bug-ﬁx was attempting to correct.
+The SZZ algorithm identiﬁes the recent, incorrect ﬁx as the
+bug-inducing commit. For example, the bug-ﬁxing commit
+c0702a426 addressed a bug originally introduced by commit
+297ccce. Prior to this, commit 829969927 attempted to ﬁx the
+bug originating from commit 297ccce but failed, leading to the
+necessity of bug-ﬁxing commit c0702a4.
+(3) Affected by Other Changes: In some cases, code that
+was previously correct becomes problematic due to subsequent
+changes. These subsequent changes are then considered the
+bug-inducing commits. However, the SZZ algorithm might in-
+correctly identify the commit that originally wrote the code as
+the bug-inducing commit. For instance, the bug-ﬁxing commit
+9b7becf128 addresses a bug induced by a previous commit.
+The actual bug-inducing commit, 219fb0c, modiﬁed a function
+but failed to update the relevant failure message. While the
+change code made in commit 9b7becf1 was appropriate at the
+time, it became ﬂawed when commit 219fb0c did not make
+the necessary update. However, the SZZ algorithm incorrectly
+identiﬁes the commit that initially introduced the changed code
+as the bug-inducing one.
+(4) Developer Error: Even developers are not infallible and
+can sometimes incorrectly label commits. For example, in the
+bug-ﬁxing commit e04e7a7,2

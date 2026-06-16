@@ -1,0 +1,24 @@
+Experiment Design Analysis
+
+Datasets:
+- D1: NEXUS Attack-Pattern Dataset, built from structured CVE-CWE-CAPEC-TTP relationships and enhanced data.
+- D2: 10k-Minimal-Overlap dataset for broader evaluation.
+- D3: 3.3k-Fully-Unseen dataset.
+- D4: MITRE-APT/threat-report dataset.
+- D5: SMET CVE-to-TTP dataset.
+
+Metrics and baselines:
+- Micro/macro Precision, Recall, F1.
+- TTP coverage, TPR, FPR, FNR.
+- Baselines include supervised CVEMap-style expansion, unsupervised SMET/Ladder/AttacKG-style approaches, and generative Llama/GPT-4o-mini prompting.
+- Model comparison spans BERT-Base, BERT-Large, RoBERTa-Base, RoBERTa-Large, SecureBERT, and SecureBERT-Plus.
+
+Transferable experiment pattern for VulnVersion:
+- Use dataset variants to test generalization: in-domain CVEs, minimal-overlap projects, fully unseen projects, and case-study/security-report inputs.
+- Report both accuracy metrics and coverage. For affected-version identification, pair precision/recall/F1 with version/tag coverage and unknown/abstain rate.
+- Compare structured-only, LLM-only, and hybrid graph+agent variants.
+- Include feedback/adaptation experiments separately from base prediction to show whether agent memory helps without inventing results. [NEEDS EXPERIMENT]
+
+Gaps:
+- Table I and Table II values are extractable in text but need table repair for citation-ready numeric tables. [NEEDS TABLE REPAIR]
+- No code/dataset artifact found locally. [NEEDS ARTIFACT]

@@ -1,0 +1,18 @@
+System Overview: LLM4SZZ combines SZZ-style history tracing with LLM-guided assessment of buggy statements, patch context, and candidate commits.
+Pipeline Stages:
+1. Preparation of bug-fixing commit context.
+2. Determine whether to use rank-based identification or context-enhanced identification.
+3. Rank/select buggy statements or candidate commits using LLM judgment.
+4. Trace/identify bug-inducing commits.
+5. Evaluate predictions against datasets and baselines.
+Core Algorithm: The paper describes rank-based and context-enhanced identification; exact prompt/algorithm formatting needs repair. [NEEDS PROMPT REPAIR]
+Data Structures: Local static code shows patch parsing classes, CFG/control-flow utilities, tree-sitter parsing, SZZ core classes, and version-range helper scripts.
+Model / Agent Components: LLM calls are paper-level method components; local runtime/API behavior was not executed. [EXECUTION NOT REQUESTED]
+Design Choices: Use different strategies for deleted-line and non-deleted-line cases; enrich context instead of relying only on static local hunks.
+Why Each Choice Is Needed: Deleted-line cases can use buggy statement ranking, while non-deleted-line or large-context cases need candidate-context assessment.
+Failure Handling: Discussion section covers failures from wrong candidate selection and LLM misunderstanding; exact counts require table repair.
+Complexity / Cost Discussion: [NEEDS EVIDENCE] Extracted discussion mentions scalability, but exact cost claims need verification.
+Pseudocode or Algorithm Blocks: Not cleanly extracted. [NEEDS ALGORITHM REPAIR]
+Static Reproducibility Signals: visible scripts include gen_results_for_dels_llm.py, gen_results_for_no_dels_llm.py, core/vszz.py, CFG.py, util.py, parse_patch.py, 3_gen_vuln_version.py, version_range_evidence.py.
+Agent Evidence Anchors: raw_extraction/section_text/04_method.txt; raw_extraction/source_static_inventory.txt
+Writing Pattern: Present a branch-specific pipeline when a task has structurally different input cases.

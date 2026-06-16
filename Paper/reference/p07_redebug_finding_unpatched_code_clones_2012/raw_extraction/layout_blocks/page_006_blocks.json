@@ -1,0 +1,227 @@
+[
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:001",
+    "block_type": "text",
+    "text": "A standard approach for comparing all N ﬁles requires that\nwe compare ﬁle 1 to ﬁle 2 through N, ﬁle 2 to ﬁle 3 through\nN, and so on with a total of N(N−1)\n",
+    "bbox": [
+      55.885799407958984,
+      69.97142028808594,
+      296.4541931152344,
+      105.78540802001953
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:002",
+    "block_type": "text",
+    "text": "2\ncomparisons.\nIn order to make pairwise comparisons cheap, we need\nto implement the Jaccard SIMILARITY set-wise similarity\ncomparisons efﬁciently. Most standard libraries implement\nthe Jaccard index directly as a set operation on set data con-\ntainer classes, e.g., as done in SimMetrics [4]. The problem\nis that set data structures are L1/L2 cache inefﬁcient.\nReDeBug uses bitvectors in order to speed up pair-wise\ncomparisons. The idea is that the bitvector operation well-\napproximates a true Jaccard based upon the original sets.\nHowever, the Bloom ﬁlters we described above are designed\nfor set membership, not calculating the Jaccard. Jang et al.\nnoticed that as the number of hash functions used in a Bloom\nﬁlter grows, so does the error in the approximation [22]. The\nsolution is to use a single hash function when creating the\nbitvectors for SIMILARITY, not multiple hash functions. A\nsingle hash function approach is called feature hashing. Jang\net al. [22] show that feature hashing well approximates the\ntrue Jaccard in both theory and practice (e.g., within 99.99%\nof the true value with proper parameter selection); we adopt\ntheir technique in ReDeBug. A side beneﬁt is that a single\nhash is faster than multiple hashes used in typical Bloom\nﬁlter operations.\nReDeBug encodes all elements in a bitvector using fea-\nture hashing. ReDeBug then calculates the distance using\nSIMILARITYbv instead of Equation 2,\n",
+    "bbox": [
+      55.88039016723633,
+      93.90373229980469,
+      296.4738464355469,
+      403.1593933105469
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:003",
+    "block_type": "text",
+    "text": "SIMILARITYbv(va, vb) = S(va ∧vb)\n",
+    "bbox": [
+      102.40689849853516,
+      407.4540710449219,
+      248.9888916015625,
+      426.04705810546875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:004",
+    "block_type": "text",
+    "text": "S(va ∨vb)\n",
+    "bbox": [
+      205.45700073242188,
+      420.89227294921875,
+      248.9888916015625,
+      439.484375
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:005",
+    "block_type": "text",
+    "text": "where vi is the bitvector representation of the feature set for\nﬁle i and S(·) counts the number of set bits.\nThe complete system for computing similarity for OS-\ndistributions becomes:\n1) Obtain all source code. For Debian and Ubuntu, this\nis done with apt. For SourceForge, we crawled all\nSubversion, CVS and Git directories.\n2) For each ﬁle, normalize and tokenize as described in\n§ II-A.\n3) For each n-length token sequence i, compute h(i) = d\nand set the d’th bit in the respective ﬁle bitvector m.\n4) Compute SIMILARITYbv between each pair of bitvec-\ntors.\nThe result is a pairwise similarity measurement between\nﬁles. In a development environment we would only return\nthose with a similarity greater than θ.\nSimilarity at different granularities: The source ﬁle level\nprovides a relatively coarse granularity of measurement\nbetween code bases. ReDeBug can extract functions from\nﬁles, and compute similarity based upon functions using\nthe same algorithm. ReDeBug can also calculate the total\nfraction of unique n-tokens. The total fraction of n-tokens\n",
+    "bbox": [
+      55.86932373046875,
+      435.27252197265625,
+      296.4662780761719,
+      699.6553344726562
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:006",
+    "block_type": "text",
+    "text": "suggests the number of unique code fragments found. In our\nevaluation, we measure both for our data sets (§ III-H).\n",
+    "bbox": [
+      314.2608337402344,
+      69.97587585449219,
+      554.8390502929688,
+      100.39458465576172
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:007",
+    "block_type": "text",
+    "text": "D. Similarity vs. Bug Finding\n",
+    "bbox": [
+      314.2509765625,
+      100.30583190917969,
+      435.4031982421875,
+      112.08273315429688
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:008",
+    "block_type": "text",
+    "text": "The algorithm for ﬁnding bugs is similar to that for\nsimilarity detection, with a few exceptions. First, we pre-\nprocess the source to build a database. Patches are queried\nagainst the database while every pair of ﬁles is compared\nwhen computing similarity. The advantage of this is that the\ntime to build a database and to query bugs increases only\nlinearly as we have more ﬁles and patches. The time for\nsimilarity detection quadratically goes up with more ﬁles\ndue to N 2 comparisons.\nThe second difference is that we use Bloom ﬁlters for un-\npatched code clone detection, while we used feature hashing\nfor similarity detection. We originally wanted a system that\nused a single algorithm. While conceptually more elegant,\nsuch a design wasn’t optimal in either scenario. For example,\nif we had based our similarity metric on Bloom ﬁlters with\nmultiple hash functions, we would have a larger error rate\nthan with feature hashing due to extra collisions from the\nextra hash functions. If we had used feature hashing instead\nof Bloom ﬁlters, we would again have lower accuracy when\nperforming set membership tests. While this may seem like a\nsubtle difference, previous theoretical and empirical analysis\nalso back up the difference between feature hashing and\nBloom ﬁlters [22, 29].\nLuckily, the internals of implementing both feature hash-\ning and Bloom ﬁlters is almost identical. In one case we use\na single hash function and have a distance metric interface,\nand in the other we use multiple hash functions and export\na set membership interface.\n",
+    "bbox": [
+      314.2509765625,
+      115.24888610839844,
+      554.8632202148438,
+      446.69866943359375
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:009",
+    "block_type": "text",
+    "text": "III. IMPLEMENTATION & EVALUATION\n",
+    "bbox": [
+      352.8804016113281,
+      453.2975158691406,
+      516.2515869140625,
+      465.1925354003906
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:010",
+    "block_type": "text",
+    "text": "A. Implementation\n",
+    "bbox": [
+      314.2757873535156,
+      468.24053955078125,
+      389.6125183105469,
+      480.0174255371094
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:011",
+    "block_type": "text",
+    "text": "ReDeBug is implemented in about 1000 lines of C\ncode and 250 lines of Python. Normalization is mod-\nularized within the Python code. We use the QuickLZ\nlibrary [3] to perform compression/decompression while\nsetting QLZ_COMPRESSION_LEVEL to 3 for faster decom-\npression speed.\n",
+    "bbox": [
+      314.2757873535156,
+      483.18359375,
+      554.854248046875,
+      554.2493896484375
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:012",
+    "block_type": "text",
+    "text": "B. Unpatched Code Clone Detection Experimental Setup\n",
+    "bbox": [
+      314.28564453125,
+      560.85791015625,
+      545.8981323242188,
+      572.6348266601562
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:013",
+    "block_type": "text",
+    "text": "System Environment: We performed all experiments to\nﬁnd unpatched code clones (both building and querying the\ndatabase) on a desktop machine running Linux 2.6.38 (3.4\nGHz Intel Core i7 CPU, 8GB memory, 256 GB SSD drive).\nWe utilized 8 threads to build a DB and to query bugs.\nDataset: We collected our source code dataset twice: early\nin 2011 and late in 2011. We ﬁrst collected our Early 2011\nDataset (Σ1) in January/March 2011: all source packages for\nDebian 5.0 Lenny and Ubuntu 10.10 Maverick, as well as\nall public SourceForge C/C++ projects using version control\nsystems such as Subversion, CVS and Git, and the Linux\n",
+    "bbox": [
+      314.2778015136719,
+      575.4458618164062,
+      554.8639526367188,
+      706.0388793945312
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:014",
+    "block_type": "text",
+    "text": "53\n",
+    "bbox": [
+      302.0,
+      739.87109375,
+      310.0,
+      748.73046875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 6,
+    "block_id": "p07_redebug_finding_unpatched_code_clones_2012:block:006:015",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. \n",
+    "bbox": [
+      32.2965087890625,
+      762.5669555664062,
+      579.7036743164062,
+      772.1849975585938
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

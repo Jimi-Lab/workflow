@@ -1,0 +1,112 @@
+2) It is guaranteed that even in the worst case,n is small
+because of the length classiﬁcation. For example, the
+ﬁngerprint dictionary of Linux kernel 4.7.6 (stable kernel
+released on Sep. 30, 23K ﬁles with over 15.4 MLoC)
+only contains 5,245 integer keys, and among the hash sets
+associated to the keys, the largest set has 1,019 elements.
+The average number of elements of the hash sets is 67.85,
+the median is 5, and the mode (the value that occurs most
+often) is 1. This implies that most of the hash set will
+have only one element.
+The efﬁciency of VUDDY in terms of discovering code
+clones from large programs is further evaluated in section VII.
+V. APPLICA TION:V ULNERABILITY DETECTION
+In this section we describe the application of VUDDY to
+detect vulnerabilities from small to massive real-world pro-
+grams. To obtain vulnerable functions from reliable software
+projects when establishing a vulnerability database, we lever-
+aged the Git repositories of well-known and authoritative open
+source projects: Google Android, Codeaurora Android Project,
+Google Chromium Project, FreeBSD, Linux Kernel, Ubuntu-
+Trusty, Apache HTTPD, and OpenSSL. Then, by using the
+general clone detection procedure explained in section IV,
+VUDDY searches for the code clones of vulnerable functions
+from a target program.
+A. Establishing a vulnerability database
+The process of collecting vulnerable code and establishing
+a vulnerability database is fully automated. The process of
+reconstructing vulnerable functions out of Git commit logs
+consists of the following steps:
+1) git clone repository.This is to download speciﬁed
+Git repository into a local directory.
+2) git log --grep=‘CVE-20’for each repository.
+This searches the commits regarding Common Vulner-
+ability and Exposures (CVEs) [34]. This works for any
+general keywords, such as vulnerability types, or vulner-
+ability names. If it is required to collect certain types of
+bugs, such as buffer overﬂow, the keyword for grep would
+be “buffer overﬂow.” Well-known vulnerability names,
+such as Heartbleed, can also be queried.
+3) git showthe searched commits.This shows the full
+commit log that contains a description of the vulnerability
+related to CVE, as well as a security patch information
+in uniﬁed diff format. Diffs have a dedicated line for
+recording ﬁle metadata, in which reference IDs to old
+and new ﬁles addressed by the patch are written.
+4) Filter irrelevant commits.The steps listed could fetch
+commits that are inappropriate for vulnerability detection.
+For example, some commits have the keyword “CVE-
+20” in their message, which is actually “Revert the patch
+for CVE-20XX-XXXX.” Merging commits or updating
+commits which usually put all the messages of associated
+commits together are another problem, particularly if one
+of the commits happens to be a CVE patch. In such cases,
+our automated approach would end up retrieving a benign
+function. Thus, commits which revert, merge, or update
+are discarded in this step.
+5) git show the old ﬁle ID. This shows the old, un-
+patched version of the ﬁle. We then retrieve the vulnerable
+function from the ﬁle.
+Listing 1 is the patch for CVE-2013-4312, found in the
+Codeaurora Android repository. This patch adds lines 9 and 10
+to ensure that the per-user amount of pages allocated in pipes
+is limited so that the system can be protected against memory
+abuse. The ﬁle metadata in line 2 indicate the references to
+the old ﬁle (d2cbeff) and the new ﬁle (19078bd), and line
+5 conveys information about the line numbers of the affected
+portion in the ﬁle.
+We could retrieve the old function, namely the vulnerable
+version of the function, by querying “git show d2cbeff”
+to the cloned Git object, obtaining the old ﬁle, and parsing
+the relevant function. Listing 2 is the retrieved vulnerable
+function, which includes both the vulnerable part, and the
+context around it.
+Listing 1: Patch for CVE-2013-4312.
+1 diff --git a/fs/pipe.c b/fs/pipe.c
+2 index d2cbeff..19078bd 100644
+3 --- a/fs/pipe.c
+4 +++ b/fs/pipe.c
+5 @@ -607,6 +642,8 @@void free_pipe_info(struct
+pipe_inode_info*pipe)
+6 {
+7 int i;
+8 + account_pipe_buffers(pipe, pipe->buffers, 0);
+9 + free_uid(pipe->user);10
+for (i = 0; i < pipe->buffers; i++) {11
+struct pipe_buffer*buf = pipe->bufs + i;12
+if (buf->ops)
+Listing 2: Snippet of the vulnerable function retrieved from
+the patch for CVE-2013-4312.
+1 void free_pipe_info(struct pipe_inode_info*pipe)
+2 {
+3 int i;
+4 for (i = 0; i < pipe->buffers; i++) {
+5 struct pipe_buffer*buf = pipe->bufs + i;
+6 if (buf->ops)
+Applying the same method to 9,770 vulnerability patches,
+we collected 5,664 vulnerable functions that address 1,764
+unique CVEs. These vulnerable functions have well-known
+vulnerabilities such as buffer overﬂow, integer overﬂow, input
+validation error, permission-related vulnerabilities, and others.
+The shortest vulnerable function consists of 51 characters after
+abstraction and normalization. Single-lined functions (e.g., a
+guard function which returns by calling another function) are
+excluded from the database, since these functions frequently
+cause false positives when our abstraction is applied.
+B. Vulnerability detection
+The application of VUDDY for vulnerability detection does
+not require any supplementary procedure. VUDDY processes
+the functions in the vulnerability database in the same way as
+it does with a normal program, then discovers vulnerability
+601
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

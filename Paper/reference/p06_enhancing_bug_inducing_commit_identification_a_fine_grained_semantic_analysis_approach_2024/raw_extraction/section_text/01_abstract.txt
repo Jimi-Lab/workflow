@@ -1,0 +1,27 @@
+Abstract—The SZZ algorithm and its variants have been
+extensively utilized for identifying bug-inducing commits based
+on bug-fixing commits. However, these algorithms face challenges
+when there are no deletion lines in the bug-fixing commit.
+Previous studies have attempted to address this issue by tracing
+back all lines in the block that encapsulates the added lines.
+However, this method is too coarse-grained and suffers from
+low precision. To address this issue, we propose a novel method
+in this paper called S
+EM-SZZ, which is based on fine-grained
+semantic analysis. Initially, w e observe that a significant number
+of bug-inducing commits can be identified by tracing back
+the unmodified lines near added lines, resulting in improved
+precision and F1-score. Building on this observation, we conduct
+a more fine-grained semantic analysis. We begin by performing
+program slicing to extract the program part near the added
+lines. Subsequently, we compare the program’s states between
+the previous version and the current version, focusing on data
+flow and control flow differences based on the extracted program
+part. Finally, we extract statements contributing to the bug
+based on these differences and utilize them to locate bug-
+inducing commits. We also extend our approach to fit the scenario
+where the bug-fixing commits contain deleted lines. Experimental
+results demonstrate that S
+EM-SZZ outperforms the state-of-the-
+art methods in identifying bug-inducing commits, regardless of
+whether the bug-fixing commit contains deleted lines.

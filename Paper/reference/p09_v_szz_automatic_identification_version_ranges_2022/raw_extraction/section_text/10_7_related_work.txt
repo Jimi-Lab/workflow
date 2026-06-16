@@ -1,0 +1,74 @@
+# 7
+RELATED WORK
+
+In this section, we first present some related work on vulnerabil-
+ities analysis, then review the studies about the evaluation and
+application of SZZ algorithms.
+7.1
+Vulnerabilities Analysis
+There are many studies that analyze different aspects of vulnerabil-
+ities [8, 24, 29, 30, 34, 39, 48]. Ozment et al. studied the evolution of
+vulnerabilities in the OpenBSD operating system, and found that
+remedying half of the known vulnerabilities cost average 2.6 years
+for a release [39]. Shahzad et al. conducted an exploratory study
+of vulnerabilities life cycles and found that the vendors have been
+becoming more agile in patching the vulnerabilities and the access
+complexity of vulnerabilities has been increasing [48]. Nappa et al.
+investigated the patch deployment process in ten client applications,
+and analyzed when security updates were available to clients and
+how quickly clients patched [34]. Huang et al. analyzed 131 patches
+from five open-source project, and showed that there exist cases
+where patch development was lengthy and error-prone [24]. Li and
+Paxson conducted a large scale empirical study with more than 3,000
+CVE entries and the related fixing commits [29]. They analyzed the
+duration of the impact of vulnerabilities, the reliability of the fix, and
+the difference with non-security fixes. Camilo et al. conducted an in-
+depth analysis of the Chromium project to examine the relationship
+between bugs and vulnerabilities [8]. They demonstrated that bugs
+and vulnerabilities are empirically dissimilar groups, prompting us
+to investigate the inducing commits for vulnerabilities. Liu et al.
+2361
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:19:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 011 =====
+V-SZZ: Automatic Identification of Version Ranges Affected by CVE Vulnerabilities
+ICSE ’22, May 21–29, 2022, Pittsburgh, PA, USA
+analyzed the vulnerability distribution based on a large vulnerabil-
+ity dataset, consisting of all known vulnerabilities associated with
+five representative open source projects [30].
+Many researchers also have investigated how to characterize
+and predict vulnerable code based on different attributes, such as
+code [22, 37, 41, 46, 49], commit [32, 33], and human factors [33, 49].
+For example, Shin and Williams used code complexity metrics to pre-
+dict vulnerable files and found that the defect prediction model and
+the vulnerability prediction model achieve similar performance [49];
+Scandariato et al. predicted vulnerable software components by
+applying text mining on source code [46].
+7.2
+SZZ Evaluation and Application
+To evaluate SZZ and its variants, some previous studies rely on
+manual analysis of a small sample of SZZ results [12, 27, 51, 59].
+But manual analysis by researchers is of high cost and might iden-
+tify bug introducing commits incorrectly. To build a more accurate
+ground truth, the “developer-informed” information can be lever-
+aged. For example, Rosa et al. identify bug introducing commits by
+associating the commit id in the commit messages [45]; Wen et al.
+collect the bug introducing commits in the bug reports [57]. How-
+ever, it is difficult to build such dataset that contain enough pairs of
+fixing commits and introducing commits for vulnerabilities. There-
+fore, we follow the approach of odríguez-Pérez et al. [44], based on
+the perfect test idea, to build a dataset linking vulnerabilities fixing
+commits and introducing commits.
+SZZ algorithms have been used in many software engineering
+researches. For example, in many defect prediction studies [9, 10,
+21, 26, 31, 52, 53, 60–62], an important research topic in software
+engineering, researchers use SZZ algorithms to identify the bug-
+inducing commits and build a dataset to evaluate their proposed
+defect prediction models. Some researchers use SZZ algorithms to
+conduct different kinds of empirical studies, such as code review [4,
+28], code smells [40], developer activities [6, 7], technical debt [56],
+etc. In our study, we evaluate the effectiveness of SZZ algorithms
+on identifying inducing commits for vulnerabilities and proposed
+an approach based on an improved SZZ algorithm to refine the
+software versions affected by CVE vulnerabilities.

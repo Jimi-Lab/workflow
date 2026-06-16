@@ -1,0 +1,114 @@
+code diff Diffvp. Subsequently, V ULTURE analyzes the Diffvp
+to determine if the modified items in Diffvp are functions
+or global declarations (e.g., global variables, structures, and
+macros). For functions, V ULTURE extracts and records the
+entire function of both the vulnerable and patched code as
+the vulnerable and patched functions, respectively; while for
+global declarations, V ULTURE records them as the vulnera-
+ble and patched global declarations. Then, within the target
+program, leveraging ctags, V ULTURE specifically labels each
+code snippet as either a function or a global declaration and
+compares them with vulnerable/patched functions/declarations,
+respectively.
+As a result, V ULTURE distinguishes TPL reuses in the
+target program into four groups and processes each group with
+function-level granularity, ensuring that unused functions in the
+TPLs do not affect the detection accuracy:
+G1: No vulnerable reuse. It indicates a target program
+reuses the vulnerable version of a TPL without involving any
+vulnerable functions or vulnerable global declaration.
+• Analysis: When all the target code snippets are exactly
+equal to the patched function or the patched global
+declaration, V ULTURE regards the target program as G1.
+The target programs in this group are considered secure.
+G2: Vulnerable global declaration reuse. It represents that
+a target program only reuses vulnerable global declarations.
+• Analysis: When any of the global declarations in a target
+code snippet exactly equals to that of the vulnerable
+global declarations, V ULTURE regards the target program
+as G2.
+• Confirmation: VULTURE employs line matching to iden-
+tify the vulnerable declarations. If a global declaration
+that is deleted from the vulnerable TPL continues to
+appear in the target code snippet, V ULTURE considers
+that a vulnerability is identified. Furthermore, when a
+global declaration added to the patched TPL does not
+appear in the target code snippet, V ULTURE considers
+the target program as vulnerable. A 1-day vulnerability is
+then identified.
+G3: Exact vulnerable reuse : It represents that a target pro-
+gram exactly reuses the vulnerable function of a TPL without
+providing any patches.
+• Analysis: VULTURE labels the target program as G3 if
+any target functions are equal to the vulnerable functions.
+• Confirmation: VULTURE utilizes TLSH to compute the
+hash values of the vulnerable function and the target
+function snippet. If any function in the target program
+shares the same hash value as the vulnerable function,
+VULTURE considers it unpatched and classified to G3. A
+1-day vulnerability is then identified.
+G4: Custom reuse: It represents that a target program reuses
+the vulnerable or patched functions with custom modifications.
+• Analysis: VULTURE labels the target program as G4
+if any target functions are similar to the vulnerable or
+patched functions. If the similarity score for any pair of
+functions exceeds THsim, V ULTURE classifies the target
+program as G4.
+• Confirmation: VULTURE uses TLSH to compare the hash
+values of each function in the target program with those
+of the vulnerable function. Since it involves custom reuse,
+it is uncertain whether the target program is secure; thus,
+VULTURE confirms the vulnerable custom reuses via a
+chunk-based analysis.
+2) Chunk-based analysis: To preserve the semantic and
+syntactic information that is overlooked by function [28] and
+line matching [46], static analysis has traditionally been used,
+but it comes with significant challenges. First, static analy-
+sis requires compilable code, which is problematic because
+patches are often provided as isolated snippets that cannot
+be compiled directly. Second, static analysis demands an
+extensive environment setup for compilation, which is both
+time-consuming and resource-intensive.
+To resolve the issues brought by the traditional static
+analysis, V ULTURE utilizes chunk-based code analysis to
+examine custom reused functions, striking a balance between
+efficiency and accuracy in semantic information extraction
+without the reliance on compilation. For these customized
+functions, V ULTURE verifies whether these custom modifica-
+tions provide the same security functionality as those in the
+official patches released by TPL contributors. Specifically, for
+chunk-based analysis, a chunk represents a group of modified
+lines focused on a specific functionality. In a given function,
+the lines within the same chunk are either governed by the
+same control structures (e.g., if-else, while, for) or
+operate on the same set of variables. A chunk preserves both
+the semantic meaning and contextual relationships embedded
+within the patch code, ensuring an accurate assessment of
+custom adaptations.
+Taking as input the information of CVE ID, vulnerable
+code snippets, patched code snippets, Diffvp, and target code
+snippets, V ULTURE proceeds with the following steps:
+Chunk construction. When reusing TPLs, the target program
+might alter the format of the reused code. Thus, VULTURE first
+standardizes all code snippets, including target code snippets,
+vulnerable code, and the patched code. According to the LLVM
+coding standard2, VULTURE removes unnecessary entities such
+as leading spaces, comments, and constant strings.
+After normalization, V ULTURE separately initiates code
+diff among the target, vulnerable, and patched code snippets.
+The comparison correspondingly yields three code diff (i.e.,
+Diffvt, Diffpt, and Diffvp), where Diffvt is the code diff between
+the target and vulnerable code snippets, Diffpt is the code diff
+between the target and patched code snippets, and Diffvp is the
+code diff between the vulnerable and patched code snippets.
+Each line in the above code diff is treated as an individual
+chunk. We manually predefined 40 regular expressions, cov-
+ering all types of statements (e.g., call expressions, binary
+operations). Using these regular expressions, V ULTURE then
+extracts the variables and operations involved in each chunk.
+It further adopts a disjoint-set union algorithm to identify the
+data-dependent chunks when 1) the chunks are part of the
+same control block without any nested control structures, or 2)
+chunks share the same variable. Eventually, all related chunks
+2LLVM Coding Standard: https://llvm.org/docs/CodingStandards.html
+8

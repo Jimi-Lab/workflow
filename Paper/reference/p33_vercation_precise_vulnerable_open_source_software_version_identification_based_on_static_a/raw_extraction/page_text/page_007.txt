@@ -1,0 +1,90 @@
+382 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+Fig. 4. Overview of code clone detection process in VERCATION.
+of code that preserves well-deﬁned components of statements,
+explicit statement order and the execution logic [47].
+Method Expansion. Due to code refactoring often outlining
+code into a new method, as shown in Listing 2, the codes
+in Lines 7-8 are outlined into methods FFMIN. The standard
+AST comparison treats the if -condition (Lines 7-8) as com-
+pletely different from the FFMIN function call, resulting in
+a false vulnerability identiﬁcati on. Therefore, we utilize the
+inline technique to expand the method during AST generation to
+gather more code behavior within the statements. This involves
+obtaining the method deﬁnitio n at the callsite and expanding
+the method body inline, resulting in a more comprehensive code
+representation. We get the AST for the target ﬁle using Clang
+without performing actual compilation. Furthermore, through
+recursive retrieval of line numbers for sub-ASTs, we can locate
+the sub-AST corresponding to S
+v.
+AST Normalization. To address structural variations arising
+from different developer coding styles, it is essential to nor-
+malize the AST. This process m itigates incons istencies and
+reduces analytical noise by standardizing code representations.
+AST normalization involves conditional struct ure normaliza-
+tion, loop structure normalization, and relational operation
+normalization.
+• Conditional structure can be implemented by if-
+else and switch-case. We normalize the structure
+of switch-case: switch(expression){case
+value1: statement1; break; case
+value2: statement2; break; default
+statement3;} into a if-else structure: if(exp
+== value1) statement1; else if(exp ==
+value2) statement2; else statement3.
+• Loop structure can be represented as while, do-while
+and for structures, we normalize all the loop structure
+to while [48].T h e for structure is for(initialize;
+condition; increment) {statements;},w e
+transform it into while structure: initialize; while
+(condition) {statements; increment}.
+• Relational operation include commutative and noncom-
+mutative operation. Commutative relational operation (i.e.,
++, !=, &&) refers to the operation where commutate the
+operands does not change the operation semantics. We
+normalize the two operands (left and right child nodes)
+of the operation (parent nodes) by alphabetical order. For
+example, we transform b+a (b is the left child node) to
+a+b(a is the left child node). Noncommutative relational
+operation (i.e., >, <=) will change the operation semantic
+when commutating the operands, we normalize them by
+predeﬁned rules. For example, we transformb<a to a>b
+(normalize operation < to >).
+AST Similarity. Ultimately, we utilize an in-order traversal
+to ascertain whether the commit introduces S by comparing
+the AST similarity of S
+i and S′
+i. First, we perform an in-order
+traversal of the ASTs for Si and S′
+i, converting the results
+into sequences Sqi and S′qi. Then, we calculate the edit dis-
+tance between the two sequences as their AST-based similarity
+Similarity
+B(Sqi,S′qi). We set a similarity threshold ϑ2, and
+if SimilarityB(Sqi,S′qi)≥ϑ2, Si and S′
+i are considered to
+be AST-based similar. If SimilarityB(Sqi,S′qi)<ϑ2,i ti n -
+dicates that there is no statement similar to Si in the pre-
+modiﬁcation commit. During this process, we classify a commit
+as a refactoring commit when it exhibits low edit-distance sim-
+ilarity (SimilarityA(Si,S′
+i)<ϑ1) but high AST-based similar-
+ity (SimilarityB(Sqi,S′qi)≥ϑ2). This indicates that while the
+code structure has been signiﬁcantly modiﬁed, the underlying
+functionality remains unchanged.
+3) Statement Weight Allocation: Not all statements identi-
+ﬁed by an LLM contribute equally to vulnerability in triggering
+the exploit. To address this, we propose a weight allocation
+strategy that prioritizes vulnerable statements based on their in-
+vocation of known sensitive functions. The core premise is that
+the presence of speciﬁc, high-risk functions within a statement
+is a strong indicator of its criticality. We followed a systematic
+process to identify and categorize these sensitive functions.
+Starting with a comprehensive review of previous studies [49],
+[50], we collected existing sensitive function enumerations.
+We then conducted a preliminary study of common C/C ++
+vulnerabilities to identify the mo st frequent vulnerability cat-
+egories, such as buffer overﬂow, integer overﬂow, and use-
+after-free, and examined the functions commonly involved in
+known vulnerabilities for each type. This process involved three
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

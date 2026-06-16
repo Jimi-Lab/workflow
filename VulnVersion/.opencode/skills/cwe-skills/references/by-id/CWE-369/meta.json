@@ -1,0 +1,272 @@
+{
+  "cwe_id": "CWE-369",
+  "name": "Divide By Zero",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "The product divides a value by zero.",
+  "extended_description": "This weakness typically occurs when an unexpected value is provided to the product, or if an error occurs that is not properly detected. It frequently occurs in calculations involving physical dimensions such as size, length, width, and height.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      },
+      {
+        "cwe_id": "CWE-682",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Incorrect Calculation"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product divides a value by zero.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "occurs",
+      "zero",
+      "calculations",
+      "dimensions"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "occurs",
+      "zero",
+      "calculations",
+      "dimensions",
+      "frequently",
+      "unexpected",
+      "involving",
+      "typically"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following Java example contains a function to compute an average but does not validate that the input value used as the denominator is not zero. This will...",
+        "snippet": "public int computeAverageResponseTime (int totalTime, int numRequests) { return totalTime / numRequests; }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following C/C++ example contains a function that divides two numeric values without verifying that the input value used as the denominator is not zero....",
+        "snippet": "double divide(double x, double y){ return x/y; }"
+      },
+      {
+        "language": "C#",
+        "nature": "Bad",
+        "summary": "The following C# example contains a function that divides two numeric values without verifying that the input value used as the denominator is not zero. This...",
+        "snippet": "int Division(int x, int y){ return (x / y); }"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "The following Java example contains a function to compute an average but does not validate that the input value used as the denominator is not zero. This will...",
+        "snippet": "public int computeAverageResponseTime (int totalTime, int numRequests) throws ArithmeticException { if (numRequests == 0) { System.out.println(\"Division by zero attempted!\"); throw ArithmeticException; } return..."
+      },
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following C/C++ example contains a function that divides two numeric values without verifying that the input value used as the denominator is not zero....",
+        "snippet": "const int DivideByZero = 10; double divide(double x, double y){ if ( 0 == y ){ throw DivideByZero; } return x/y; } ... try{ divide(10, 0); } catch( int i ){ if(i==DivideByZero) { cerr<<\"Divide by zero error\"; } }"
+      },
+      {
+        "language": "C#",
+        "nature": "Good",
+        "summary": "The following C# example contains a function that divides two numeric values without verifying that the input value used as the denominator is not zero. This...",
+        "snippet": "int SafeDivision(int x, int y){ try{ return (x / y); } catch (System.DivideByZeroException dbz){ System.Console.WriteLine(\"Division by zero attempted!\"); return 0; } }"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2007-3268",
+        "description": "Invalid size value leads to divide by zero.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-3268"
+      },
+      {
+        "reference": "CVE-2007-2723",
+        "description": "\"Empty\" content triggers divide by zero.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-2723"
+      },
+      {
+        "reference": "CVE-2007-2237",
+        "description": "Height value of 0 triggers divide by zero.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-2237"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

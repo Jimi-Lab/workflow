@@ -1,0 +1,38 @@
+# 05 Method Analysis
+
+System Overview:
+- The pipeline takes a vulnerability with fixing commits as input.
+- Stage 1 identifies inducing commits using V-SZZ.
+- Stage 2 detects duplicated fixing/inducing changes across branches.
+- Stage 3 infers affected version tags from fixing and inducing commits.
+
+V-SZZ Core:
+- For each modified line in a fixing commit, V-SZZ first uses git blame to locate the previous commit.
+- It filters non-semantic lines, including blank/comment/format-only lines.
+- It maps the modified line to an earlier version and repeats blame to walk further backward.
+- Stopping conditions include line becoming new/inserted, file first addition, or repository initial commit.
+- The earliest relevant commit is considered the vulnerability-inducing commit for that line.
+
+Line Mapping:
+- For Java, the paper uses AST mapping based on Fan et al.'s implementation.
+- For C/C++, it uses string similarity and line locality; the paper states an edit-distance based threshold of 0.75.
+- Local source evidence: `my_szz.py` includes `compute_line_ratio`, `map_modified_line_java`, and `map_modified_line`, and records `previous_commits` while walking backward.
+
+Duplicated Change Detection:
+- The paper detects cherry-picked commits via commit messages when possible.
+- It also uses hash-based hunk matching to detect copied commits without explicit cherry-pick metadata.
+- Local source evidence: `identify_duplicated_patch.py` hashes normalized patch hunks and builds commit-patch / patch-commit maps.
+
+Affected-Version Detection:
+- The method identifies version-tagged commits reachable from inducing commits and version-tagged commits reachable from fixing commits.
+- The vulnerable version set is the difference between inducing-reachable tags and fixing-reachable tags.
+- Local source evidence: `extract_tag.py` computes `ic_sons_tag - fc_sons_tag` in `generate_vulnerable_versions`.
+
+Failure Handling:
+- Mapping failures can prevent V-SZZ from reaching true descendant/earlier commits.
+- For C/C++, string matching can map to semantically unrelated identical lines.
+- For Java, AST mapping can still fail in specific line evolution cases.
+
+Agent Notes:
+- The method is strongest as an affected-version baseline and conceptual contrast for agent/verifier pipelines.
+- It is not a general vulnerability discovery method; it assumes known CVEs and fixing commits.

@@ -1,0 +1,84 @@
+Fig. 12. Mappings for intrusion set G1015 to CVEs. Blue nodes represent
+groups, green nodes represent CWEs, and violet represents CVEs.
+Fig. 13. Mappings for intrusion set G1017 to CVEs. Blue nodes represent
+groups, green nodes represent CWEs, and violet represents CVEs.
+than 300 victims across healthcare, education, legal, insur-
+ance, technology , and manufacturing. Unlike MedusaLocker or
+Medusa mobile malware, Medusa is a distinct ransomware-as-
+a-service (RaaS) operation, with afﬁliates frequently purchas-
+ing access from initial access brokers (IABs).
+The advisory highlights common TTPs for initial ac-
+cess, including phishing campaigns [T1566] and exploita-
+tion of unpatched software vulnerabilities [T1190]. Specif-
+ically , Medusa afﬁliates leveraged the ScreenConnect vul-
+nerability CVE-2024-1709 (CWE-288: Authentication By-
+pass) and the Fortinet EMS SQL injection vulnerability
+CVE-2023-48788 (CWE-89: SQL Injection). These exam-
+ples illustrate how Medusa combines social engineering with
+the exploitation of critical software ﬂaws.
+When we mapped the advisory’s A TT&CK techniques into
+our knowledge graph, their connections to CWEs and CVEs
+did not immediately retrieve the speciﬁc CVEs listed in the
+advisory using direct traversals (T echnique → CAPEC →
+CWE → CVE). However, by enabling two-hop hierarchical
+expansions across CAPEC and CWE relations, the graph
+MATCH (a:attack_pattern)
+WHERE a.external_id IN [
+"T1110.001","T1110.003","T1566", "T1133","T1190","T1665"
+]
+// CAPECs (base + expansion)
+MATCH (capec0:capec)-[:related_attack]->(a)
+OPTIONAL MATCH (capec0)-[:capec_precedence|
+capec_child*1..2]-(capecX:capec)
+WITH [c IN (collect(DISTINCT capec0) + collect(DISTINCT
+capecX)) WHERE c IS NOT NULL] AS capecs
+UNWIND capecs AS capec
+WITH DISTINCT capec
+// Base CWEs
+MATCH (capec)-[:related_capec]-(cwe0:cwe)
+// CWE expansion
+OPTIONAL MATCH (cwe0)-[:cwe_precedence|
+cwe_child*1..2]-(cweX:cwe)
+WITH [w IN (collect(DISTINCT cwe0) + collect(DISTINCT
+cweX)) WHERE w IS NOT NULL] AS cwes
+UNWIND cwes AS cwe
+WITH DISTINCT cwe
+// To CVEs
+MATCH (cve:cve)-[:related_cwe]-(cwe)
+RETURN DISTINCT cve.id AS cve_id
+ORDER BY cve_id;
+Fig. 14. Cypher Query to traverse from A TT&CK techniques to CVEs via
+CAPECs and CWEs.
+successfully revealed all of the reported CVEs while also
+identifying further related vulnerabilities.
+T ogether, these case studies demonstrate how the knowledge
+graph can operationalize CISA advisories by systematically
+bridging A TT&CK techniques to underlying CWEs and CVEs.
+By incorporating hierarchical expansions, the framework not
+only recovers explicitly listed vulnerabilities but also uncovers
+a broader set of latent CVEs, providing defenders with a more
+comprehensive view of potential exploitation surfaces.
+E. T opology-Based Discovery of Missing Links
+T opology-based similarity measures can be applied to the
+cybersecurity knowledge graph to identify plausible but un-
+observed relationships between entities. For example, while
+some CWE and CAPEC nodes are not explicitly linked, their
+structural context within the graph may suggest a strong latent
+association. Using Cypher queries, we can systematically
+enumerate candidate CWE–CAPEC pairs within a bounded
+hop distance and rank them by metrics such as Common
+Neighbors, Adamic–Adar, and Preferential Attachment. This
+allows analysts to focus on the most promising high-scoring
+pairs, highlighting potential links that warrant examination.
+W e illustrate this approach through two case studies. In both,
+the CWE and CAPEC nodes are not directly connected , yet
+their similarity scores from the Neo4j Graph Data Science
+(GDS) library indicate likely relationships.
+Case Study 3 (CWE-308 and CAPEC-151) These nodes
+share 14 common neighbors and have an Adamic–Adar score
+of 5.41, indicating strong and distinctive structural overlap.
+Semantically , CWE-308 (Use of Single-Factor Authentication)
+and CAPEC-151 (Identity Spooﬁng) are closely related, as
+weak authentication mechanisms inherently enable spooﬁng-
+based attacks. The structural and semantic evidence together
+highlight the plausibility of a missing edge.

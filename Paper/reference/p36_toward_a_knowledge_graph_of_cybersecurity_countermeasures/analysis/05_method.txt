@@ -1,0 +1,42 @@
+Method / Ontology Design Analysis
+
+Method Overview:
+- The paper combines three information-organization approaches: conceptual framework, domain knowledge model, and knowledge graph.
+- It builds D3FEND bottom-up from technical sources, especially patents, while refining higher-level abstractions as semantic patterns emerge.
+
+Data Source Method:
+- The patent corpus is used because patents contain engineering-level claims, citations, official categories, and novelty assertions.
+- Existing MITRE knowledge bases and ATT&CK are analyzed and mapped into D3FEND.
+- Additional sources include academic papers, technical specifications, and product technical documentation.
+
+Countermeasure Analysis Process:
+- The paper reports early attempts with unsupervised topic modeling and text summarization, then states these were insufficient for semantic representation.
+- The adopted approach is manual/curated analysis to identify abstract defensive techniques and digital artifacts, with future automation as the roadmap.
+- This is a strong research pattern: start with human-grounded curation to define ontology quality before automating extraction.
+
+D3FEND Model:
+- D3FEND includes the knowledge graph, user interface, and knowledge model.
+- Defensive tactics are high-level maneuvers, while techniques are methods for implementing those maneuvers.
+- D3FEND technique naming is treated as a high-dimensional optimization problem: maximize information, minimize confusion, and prefer computer science / computer engineering semantics where relevant.
+- Example technique: process code segment verification, used to demonstrate semantic specificity and evidence grounding.
+
+Digital Artifact Ontology:
+- The DAO defines concepts needed to classify and represent digital objects relevant to cybersecurity analysis.
+- A digital object becomes a digital artifact when a cyber actor interacts with it.
+- Digital artifacts establish conceptual scope: if an item cannot exist in computer or network infrastructure, it is outside the ontology.
+- Compound artifacts are supported through hierarchical/compositional representation.
+
+Attack-Defense Mapping:
+- Offensive and defensive techniques are associated with digital artifacts through typed relations.
+- The key inference pattern is artifact-mediated: accurately model offense-artifact and defense-artifact relations, then infer offense-defense relationships through the shared artifact layer.
+- This is directly useful for VulnVersion graph design: affectedness can be modeled through root cause, patch, target code, build artifact, version/tag, and vulnerability-condition nodes rather than direct untyped pairwise labels.
+
+Static Source Evidence:
+- README identifies src/ontology/d3fend-protege.ttl as the editable ontology source and make all as the build workflow.
+- d3fend-protege.ttl is a large OWL/RDF Turtle ontology with thousands of classes/properties and subclass assertions.
+- Makefile uses ROBOT, Jena, SPARQL queries, Blazegraph endpoints, and dist/test targets.
+- src/queries contains report and quality-check queries such as missing labels, duplicate labels, missing definitions, inconsistent IRIs, missing ATT&CK IDs, and restriction conversion.
+- update scripts support ATT&CK, CAPEC, SPARTA, ATLAS, CCI, NIST, and CWE-related mapping workflows.
+
+Execution Boundary:
+- The build workflow, SPARQL reports, ontology validation, and reasoner paths were not executed. [EXECUTION NOT REQUESTED]

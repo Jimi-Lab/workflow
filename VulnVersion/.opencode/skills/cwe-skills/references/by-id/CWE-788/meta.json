@@ -1,0 +1,269 @@
+{
+  "cwe_id": "CWE-788",
+  "name": "Access of Memory Location After End of Buffer",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product reads or writes to a buffer using an index or pointer that references a memory location after the end of the buffer.",
+  "extended_description": "This typically occurs when a pointer or its index is incremented to a position after the buffer; or when pointer arithmetic results in a position after the buffer.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      },
+      {
+        "cwe_id": "CWE-119",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Restriction of Operations within the Bounds of a Memory Buffer"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "The CWE entry might be misused when lower-level CWE entries might be available. It also overlaps existing CWE entries and might be deprecated in the future."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product reads or writes to a buffer using an index or pointer that references a memory location after the end of the buffer.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "location",
+      "position",
+      "end",
+      "incremented"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "location",
+      "position",
+      "end",
+      "incremented",
+      "arithmetic",
+      "references",
+      "typically",
+      "results"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example takes an IP address from a user, verifies that it is well formed and then looks up the hostname and copies it into a buffer.",
+        "snippet": "void host_lookup(char *user_supplied_addr){ struct hostent *hp; in_addr_t *addr; char hostname[64]; in_addr_t inet_addr(const char *cp); /*routine that ensures user_supplied_addr is in the right format for conversion */..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following example, it is possible to request that memcpy move a much larger segment of memory than assumed:",
+        "snippet": "int returnChunkSize(void *) { /* if chunk info is valid, return the size of usable memory, * else, return -1 to indicate an error */ ... } int main() { ... memcpy(destBuf, srcBuf, (returnChunkSize(destBuf)-1)); ... }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example applies an encoding procedure to an input string and stores it into a buffer.",
+        "snippet": "char * copy_input(char *user_supplied_string){ int i, dst_index; char *dst_buf = (char*)malloc(4*sizeof(char) * MAX_SIZE); if ( MAX_SIZE <= strlen(user_supplied_string) ){ die(\"user string too long, die evil hacker!\");..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following C/C++ example the method processMessageFromSocket() will get a message from a socket, placed into a buffer, and will parse the contents of the...",
+        "snippet": "int processMessageFromSocket(int socket) { int success; char buffer[BUFFER_SIZE]; char message[MESSAGE_SIZE]; // get message from socket and store into buffer //Ignoring possibliity that buffer > BUFFER_SIZE if..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2009-2550",
+        "description": "Classic stack-based buffer overflow in media player using a long entry in a playlist",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2550"
+      },
+      {
+        "reference": "CVE-2009-2403",
+        "description": "Heap-based buffer overflow in media player using a long entry in a playlist",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2403"
+      },
+      {
+        "reference": "CVE-2009-0689",
+        "description": "large precision value in a format string triggers overflow",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0689"
+      },
+      {
+        "reference": "CVE-2009-0558",
+        "description": "attacker-controlled array index leads to code execution",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0558"
+      },
+      {
+        "reference": "CVE-2008-4113",
+        "description": "OS kernel trusts userland-supplied length value, allowing reading of sensitive information",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-4113"
+      },
+      {
+        "reference": "CVE-2007-4268",
+        "description": "Chain: integer signedness error (CWE-195) passes signed comparison, leading to heap overflow (CWE-122)",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-4268"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

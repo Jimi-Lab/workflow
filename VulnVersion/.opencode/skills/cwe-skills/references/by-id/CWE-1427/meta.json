@@ -1,0 +1,256 @@
+{
+  "cwe_id": "CWE-1427",
+  "name": "Improper Neutralization of Input Used for LLM Prompting",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product uses externally-provided data to build prompts provided to large language models (LLMs), but the way these prompts are constructed causes the LLM to fail to distinguish between user-supplied inputs and developer provided system directives.",
+  "extended_description": "When prompts are constructed using externally controllable data, it is often possible to cause an LLM to ignore the original guidance provided by its creators (known as the \"system prompt\") by inserting malicious instructions in plain human language or using bypasses such as special characters or tags. Because LLMs are designed to treat all instructions as legitimate, there is often no way for the model to differentiate between what prompt language is malicious when it performs inference and returns data. Many LLM systems incorporate data from other adjacent products or external data sources like Wikipedia using API calls and retrieval augmented generation (RAG). Any external sources in use that may contain untrusted data should also be considered potentially malicious.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-77",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Neutralization of Special Elements used in a Command ('Command Injection')"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "AI/ML"
+    ],
+    "architectures": [
+      "Not Architecture-Specific"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation",
+    "System Configuration",
+    "Integration",
+    "Bundling"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses externally-provided data to build prompts provided to large language models (LLMs), but the way these prompts are constructed causes the LLM to fail to distinguish between user-supplied inputs and...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation",
+      "System Configuration",
+      "Integration",
+      "Bundling"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "llm",
+      "malicious",
+      "prompts",
+      "are"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "llm",
+      "malicious",
+      "prompts",
+      "are",
+      "instructions",
+      "constructed",
+      "external",
+      "between"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "Consider a \"CWE Differentiator\" application that uses an an LLM generative AI based \"chatbot\" to explain the difference between two weaknesses. As input, it...",
+        "snippet": "prompt = \"Explain the difference between {} and {}\".format(arg1, arg2) result = invokeChatbot(prompt) resultHTML = encodeForHTML(result) print resultHTML"
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "Consider this code for an LLM agent that tells a joke based on user-supplied content. It uses LangChain to interact with OpenAI.",
+        "snippet": "from langchain.agents import AgentExecutor, create_tool_calling_agent, tool from langchain_openai import ChatOpenAI from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder from langchain_core.messages..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "Consider a \"CWE Differentiator\" application that uses an an LLM generative AI based \"chatbot\" to explain the difference between two weaknesses. As input, it...",
+        "snippet": "cweRegex = re.compile(\"^CWE-\\d+$\") match1 = cweRegex.search(arg1) match2 = cweRegex.search(arg2) if match1 is None or match2 is None: # throw exception, generate error, etc. prompt = \"Explain the difference between {}..."
+      },
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "Consider this code for an LLM agent that tells a joke based on user-supplied content. It uses LangChain to interact with OpenAI.",
+        "snippet": "system_prompt = \"\"\" You are a witty and helpful LLM agent, ready to sprinkle humor into your responses like confetti at a birthday party. Aim to make users smile while providing clear and useful information, balancing..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2023-32786",
+        "description": "Chain: LLM integration framework has prompt injection (CWE-1427) that allows an attacker to force the service to retrieve data from an arbitrary URL, essentially providing SSRF (CWE-918) and potentially injecting...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2023-32786"
+      },
+      {
+        "reference": "CVE-2024-5184",
+        "description": "ML-based email analysis product uses an API service that allows a malicious user to inject a direct prompt and take over the service logic, forcing it to leak the standard hard-coded system prompts and/or execute...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-5184"
+      },
+      {
+        "reference": "CVE-2024-5565",
+        "description": "Chain: library for generating SQL via LLMs using RAG uses a prompt function to present the user with visualized results, allowing altering of the prompt using prompt injection (CWE-1427) to run arbitrary Python code...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-5565"
+      },
+      {
+        "reference": "CVE-2024-48746",
+        "description": "AI-based integration with business intel dashboard allows prompt injection through its natural language component, allowing execution of arbitrary code",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-48746"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

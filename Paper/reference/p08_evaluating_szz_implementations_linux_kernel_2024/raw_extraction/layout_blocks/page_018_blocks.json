@@ -1,0 +1,122 @@
+[
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:001",
+    "block_type": "text",
+    "text": "2236\nIEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024",
+    "bbox": [
+      42.35,
+      32.52,
+      556.42,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:002",
+    "block_type": "text",
+    "text": "(2) Partial Bug-ﬁxing: This case occurs when a bug-ﬁxing\ncommit rectiﬁes a previous, incorrect bug-ﬁx attempt, and\nthe bug-inducing commit, as labeled by the developer, is the\none that the initial, ﬂawed bug-ﬁx was attempting to correct.\nThe SZZ algorithm identiﬁes the recent, incorrect ﬁx as the\nbug-inducing commit. For example, the bug-ﬁxing commit\nc0702a426 addressed a bug originally introduced by commit\n297ccce. Prior to this, commit 829969927 attempted to ﬁx the\nbug originating from commit 297ccce but failed, leading to the\nnecessity of bug-ﬁxing commit c0702a4.\n(3) Affected by Other Changes: In some cases, code that\nwas previously correct becomes problematic due to subsequent\nchanges. These subsequent changes are then considered the\nbug-inducing commits. However, the SZZ algorithm might in-\ncorrectly identify the commit that originally wrote the code as\nthe bug-inducing commit. For instance, the bug-ﬁxing commit\n9b7becf128 addresses a bug induced by a previous commit.\nThe actual bug-inducing commit, 219fb0c, modiﬁed a function\nbut failed to update the relevant failure message. While the\nchange code made in commit 9b7becf1 was appropriate at the\ntime, it became ﬂawed when commit 219fb0c did not make\nthe necessary update. However, the SZZ algorithm incorrectly\nidentiﬁes the commit that initially introduced the changed code\nas the bug-inducing one.\n(4) Developer Error: Even developers are not infallible and\ncan sometimes incorrectly label commits. For example, in the\nbug-ﬁxing commit e04e7a7,29 the developer identiﬁed commit\n8195b13 as the bug-inducing commit. However, these two com-\nmits address different aspects of deadlock issues in hv_netvsc.\nThe bug-ﬁxing commit e04e7a7 resolves a deadlock caused\nby a race condition between two functions and their locking\nmechanisms. In contrast, the commit labeled by the developer as\nbug-inducing, 8195b13, deals with a deadlock resulting channel\noffer messages in the same queue. Moreover, after our review,\nthe commit 7bf7bb3,30 identiﬁed by the SZZ algorithm as the\nbug-inducing one, is considered correct. The rationale is that\nin commit 7bf7bb3, rtnl_lock() was added at an inappropriate\nlocation, leading to a deadlock. This can be understood from the\ncode comments in the bug-ﬁxing commit, as shown in Fig, 10.\nThis revision emphasizes the role of rtnl_lock() in preventing\nthe deadlock and clariﬁes why the SZZ algorithm’s identiﬁ-\ncation of the bug-inducing commit is considered accurate in\nthis context.",
+    "bbox": [
+      42.34,
+      63.42,
+      293.41,
+      577.03
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:003",
+    "block_type": "text",
+    "text": "IX. THREATS TO VALIDITY",
+    "bbox": [
+      112.28,
+      588.16,
+      223.45,
+      599.28
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:004",
+    "block_type": "text",
+    "text": "Construct validity. Our dataset, collected from the Linux\nkernel serves as an excellent study subject. As outlined in Sec-\ntion III, we employed an automated approach to collect the data.",
+    "bbox": [
+      42.35,
+      605.87,
+      293.39,
+      641.13
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:005",
+    "block_type": "text",
+    "text": "26https://github.com/torvalds/linux/commit/c0702a4bd41829f05638ec2dab7\n0f6bb8d8010ce\n27https://github.com/torvalds/linux/commit/829969956f97e880dd01086be47\n747226e48a3f0\n28https://github.com/torvalds/linux/commit/9b7becf103e2689d7f005895130\nccf89a153fef1\n29https://github.com/torvalds/linux/commit/e04e7a7bbd4bbabef4e1a58367e\n5fc9b2edc3b10\n30https://github.com/torvalds/linux/commit/7bf7bb37f16a80465ee3bd7c6c9\n66f96f5a075a6",
+    "bbox": [
+      42.34,
+      649.77,
+      295.23,
+      743.96
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:006",
+    "block_type": "text",
+    "text": "Fig. 10.\nExample of Failure Reason: Developer Error.",
+    "bbox": [
+      305.35,
+      187.64,
+      489.01,
+      196.53
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:007",
+    "block_type": "text",
+    "text": "By following the ofﬁcial Linux documentation for identifying\nbug-ﬁxing commits, we ensured 100% accuracy in our collected\ndata. A few bug-ﬁxing commits may have been missed due\nto formatting errors, but this small percentage should have no\nimpact on our results. We used a minimum number (the commit\nID must have at least 7 characters) when searching for bug-\ninducing commits to minimize instances where a partial commit\nID matches multiple bug-inducing commits.\nAs Linux Kernel does not have an issue tracker, e.g., Bugzilla\nor JIRA, it is challenging to ensure that all bugs are consid-\nered. Furthermore, the Linux documentation does not enforce\nthe inclusion of bug-inducing commits when submitting bug-\nﬁxing commits, as the guideline suggests “If the patch ﬁxes\na bug, cite the commit which introduced the bug if possible\n(and please provide both the commit ID and the title when\nciting commits).” Therefore, it is possible that some bug-ﬁxing\ncommits may not be linked to their corresponding bug-inducing\ncommits, depending on the developer’s discretion. Additionally,\nour dataset does not include extrinsic bugs as described by\nRodriguez et al. [61], which are bug ﬁxes not directly traceable\nto changes within the repository. As a result, our research does\nnot claim to document every single bug-ﬁxing commit from the\npast decade. Instead, our objective is to collate as many bug-\nﬁxing commits as possible, each with a veriﬁed origin, to offer\na thorough and accurate overview.\nAnother threat to construct validity of our dataset is that\naround 96% of bug-ﬁxing commits are linked to a single bug-\ninducing commit. This raises questions about the complexity\nof bugs. The majority of bug-ﬁxing commits linked to a single\nbug-inducing commit may be indicative of developers con-\nforming to speciﬁc guidelines within the Linux kernel project,\npotentially introducing a bias into the dataset. Our comparison\nwith prior research by Rosa et al. [28] revealed a similar trend:\nout of 1,115 bug-ﬁxing commits, 1,113 were associated with\njust one bug-inducing commit. Given these ﬁndings, it becomes\nchallenging to deﬁnitively assert whether the reality of bug\ngenesis is more accurately reﬂected in bug-ﬁxing commits with\na single or multiple bug-inducing commits. Therefore, we leave\nthis as an open question, acknowledging the need for further\ndiscussion and exploration in this area.\nIn our study, we conducted the evaluation of SZZ implemen-\ntations solely at the commit level, aligning with the methodol-\nogy used by Rosa et al. [28]. It is important to note that the",
+    "bbox": [
+      305.35,
+      231.16,
+      556.42,
+      744.4
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 18,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:018:008",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

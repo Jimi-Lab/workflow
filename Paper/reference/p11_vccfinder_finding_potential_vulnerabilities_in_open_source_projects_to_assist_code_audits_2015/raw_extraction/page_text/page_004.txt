@@ -1,0 +1,119 @@
+between competing approaches. We focus on 66 C and
+C++ projects using the version control system Git (see ap-
+pendix A for the list). These 66 projects contain 170,860
+commits and 718 vulnerabilities reported by CVEs.
+3.1 Vulnerability-contributing Commits
+In order to analyze the common features of commits that
+introduce vulnerabilities, we first needed to find out which
+commits actually introduced vulnerabilities. To the best
+of our knowledge, no large-scale database exists that maps
+vulnerabilities as reported by CVEs to commits. Meneely
+et al. and Shin et al. [25, 23, 24] manually created such
+mappings for the Mozilla Firefox Browser, Apache HTTP
+server and parts of the RHEL Linux kernel. We contacted
+the authors to inquire whether they would share this data,
+since we could have used that as a baseline for our larger
+analysis. Unfortunately, this was not possible at the time,
+although the data might be released in the future. To create
+a freely available database for ourselves and the research
+community, we set out to create a method to automatically
+map CVEs to vulnerability-contributing commits. 1
+Since at this point we are only interested in CVEs relating
+to projects hosted on Github, we utilized two data sources
+as starting points for our mapping. As a first source, we
+selected all CVEs containing a link to a commit of one of the
+66 projects fixing a vulnerability as part of the “proof”. As a
+second source for fixing commits, we created a crawler that
+searches commit messages of the 66 projects for mentions of
+CVE IDs. To check the accuracy of our mapping we took a
+random sample of 10 % and manually checked the mapping
+and found no incorrectly mapped CVEs. This gave us a
+list of 718 CVEs. This list is potentially not complete since
+there might be CVEs that do not link to the fixing commit
+and which are also not mentioned in the commit messages.
+However, this does not represent a problem for our approach
+since 718 is a large enough sample to train our classifier.
+We then developed and tested a heuristic to proceed from
+these fixing commits to the vulnerability-contributing com-
+mits (VCCs). Recall that we are operating on Git commits,
+which means that we have access to the whole history of a
+given project. One (appropriately named) Git subcommand
+is git blame, which, given a file, for each line names the
+commit that last changed the line. The heuristic for finding
+the commit that introduced a vulnerability given a commit
+that fixed it is as follows:
+1. Ignore changes in documentation such as release notes
+or change logs.
+2. For each deletion, blame the line that was deleted.
+Rationale: If the fix needed to change the line, that
+often means that it was part of the vulnerability. Note
+that Git diﬀs only know of added and deleted lines. If
+a line was changed, it shows up as a deletion and an
+addition in the diﬀ.
+1We have anonymously uploaded the database
+to https://www.dropbox.com/s/x1shbyw0nmd2x45/
+vcc-database.dump?dl=0 so the reviewers can access
+the raw data during the review process. We will release the
+data to the community together with the paper. The file
+was created using pg_dump and can be read into a database
+using pg_restore. The dump file will create the three
+tables cves, commits and repositories in the schema export.
+3. For every continuous block of code inserted in the fix-
+ing commit, blame the lines before and after the block
+Rationale: Security fixes are often done by adding ex-
+tra checks, often right before an access or after a func-
+tion call.
+4. Finally, mark the commit vulnerable that was blamed
+most in the steps above. If two commits were blamed
+for the same amount of lines, blame both.
+Our heuristic maps the 718 CVEs of our dataset to 640
+VCCs. The reason we have fewer VCCs than CVEs is that
+a single commit can induce multiple CVEs. To estimate the
+accuracy of our heuristic, we took a 15 % random sample
+of all VCCs flagged by our heuristic (i.e. 96 VCCs) and
+manually checked them. We found only three cases (i.e.
+3.1 %) where our heuristic blamed a wrong commit for the
+vulnerability. All three of the mis-mappings occurred in
+very large commits. For example, one commit of libtiﬀ 2
+that fixes CVE-2010-1411 also upgrades libtool to version
+2.2.8. The method we propose for VCCFinder is capable of
+dealing with noisy datasets, so for the purpose of this work,
+an error rate of 3.1 % is acceptable. However, improving our
+blame heuristics further is an interesting avenue for future
+research.
+Apart from the 640 VCCs, we have a large set of 169,502
+unclassified commits. We name these commits unclassified,
+since, while no CVE points to them, they might still contain
+unknown vulnerabilities.
+At this point we now have a large dataset mapping CVEs
+to vulnerability-contributing commits. Our goal now is to
+extract features from these VCCs in order to detect further
+potential VCCs in the large number of unclassified commits.
+3.2 Features
+First we extracted a list of characteristics that we hypoth-
+esized could distinguish commits. One of our central hy-
+potheses is that combining code metrics with GitHub meta-
+data features is beneficial for finding VCCs. First, we test
+each feature separately using statistical analysis, e.g. for
+each feature we measured whether the distribution of this
+feature within the class of vulnerable commits was statisti-
+cally diﬀerent from the distribution within all unclassified
+commits.
+Here is a list of hypotheses concerning metadata we started
+with:
+•New committers are more likely to introduce security
+bugs than frequent contributors.
+•It is good to “commit early and often” according to
+the Git Best Practices 3. Therefore, longer commits
+may be more suspicious than shorter ones.
+•Code that has been iterated over frequently, possibly
+by many diﬀerent authors, is more suspicious than
+code that doesn’t change often. Meneely and Williams
+[23] already analyzed these code churn features in their
+work. We integrate and combine these features below.
+Table 1 shows a list of all features along with a statistical
+evaluation (cf. Section 3.4) of all numerical features except
+2https://GitHub.com/vadz/libtiﬀ/commit/31040a39
+3http://sethrobertson.GitHub.io/GitBestPractices/
+#commit
+429

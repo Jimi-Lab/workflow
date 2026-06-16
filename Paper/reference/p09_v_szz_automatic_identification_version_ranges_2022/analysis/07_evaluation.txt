@@ -1,0 +1,29 @@
+# 07 Evaluation Analysis
+
+Main Results: Manual Annotation
+- Table 2 reports 172 vulnerabilities, 188 fixing commits, 92 fixing commits with descendant commits, and 99 CVEs whose affected-version information is inconsistent with manually verified affected versions. [NEEDS TABLE REPAIR]
+- The paper argues most vulnerabilities with descendant commits are introduced by descendant/earlier commits rather than previous commits, except four cases.
+
+RQ1: Vulnerability-Inducing Commit Identification
+- C/C++: V-SZZ identifies true inducing commits for 86/100 vulnerabilities and reports recall 0.851, precision 0.649, F1 0.736. [NEEDS TABLE REPAIR]
+- Java: V-SZZ identifies true inducing commits for 59/72 vulnerabilities and reports recall 0.836, precision 0.505, F1 0.630. [NEEDS TABLE REPAIR]
+- The paper states V-SZZ improves F1 over the best baseline by 19.3 percent for C/C++ and 3.6 percent for Java.
+
+RQ2: Affected-Version Refinement
+- C/C++: V-SZZ reports 87 correct cases, average recall 0.930, average precision 0.927, average F1 0.928. [NEEDS TABLE REPAIR]
+- Java: V-SZZ reports 59 correct cases, average recall 0.941, average precision 0.963, average F1 0.952. [NEEDS TABLE REPAIR]
+- The paper emphasizes recall because false negatives in affected-version analysis can leave vulnerable versions unremediated.
+
+Ablation/Discussion Evidence:
+- Duplicate-change handling is important: the paper reports duplicated fixing patches in 48/100 C/C++ cases and 37/72 Java cases; duplicated inducing commits in 8 C/C++ and 11 Java vulnerabilities. [NEEDS TABLE REPAIR]
+- Without duplicated-change detection, detected affected versions differ for all annotated vulnerabilities according to the discussion section.
+
+Error Analysis:
+- Some vulnerabilities are not introduced by earliest descendant commits, e.g., CVE-2018-14884.
+- C/C++ string similarity can mis-map identical-looking lines in different semantic contexts.
+- Java AST mapping can fail to map vulnerable lines in some cases.
+
+Validity:
+- Ground truth depends on mentally constructed "perfect tests" from CVE and commit evidence.
+- Dataset size/language coverage limits external validity.
+- The local artifact was not run, so reported metrics are paper-reported only. [EXECUTION NOT REQUESTED]

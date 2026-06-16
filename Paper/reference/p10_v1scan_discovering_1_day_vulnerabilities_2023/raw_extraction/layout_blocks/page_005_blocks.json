@@ -1,0 +1,467 @@
+[
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:001",
+    "block_type": "text",
+    "text": "Prevalent version identification. We then need to identify\nthe version of each reused component. However, precise iden-\ntification of the version to which reused modified OSS com-\nponents belong is challenging (see Section 2.3). Therefore,\nV1SCAN is designed such that it is not critically affected by\nthe correctness of the identified versions.\nOur approach is to first roughly detect vulnerabilities and\nthen refine the results. In particular, we define the prevalent\nversion of the OSS component as the version to which the\nfunctions contained in the reused OSS codebase most closely\ncorrespond. To identify the prevalent version, V1SCAN first\ncompares all functions in the target program with those in\nevery version of the OSS component. V1SCAN extracts the\nOSS functions that are exactly included in the target program,\nand then verifies the versions to which each extracted function\nbelongs. The most frequently identified version is designated\nthe prevalent version of the OSS component.",
+    "bbox": [
+      53.86,
+      72.4,
+      295.78,
+      276.04
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:002",
+    "block_type": "text",
+    "text": "Reused code classification. Next, V1SCAN classifies func-\ntions reused in OSS components based on the reused code\nclassification defined in Section 2.2. Because we consider\nthe function unit in the version-based approach, V1SCAN\nclassifies reused OSS functions based on code modifications.\nWhen an OSS is reused in the target program, the functions\nin the original OSS can be in one of three states: (1) exactly\nreused, (2) changed, or (3) unused. Subsequently, V1SCAN\nexamines the state of all the functions included in the preva-\nlent version of the OSS component. We consider the function\nrelationships defined in Section 3.1.",
+    "bbox": [
+      54.0,
+      279.64,
+      295.86,
+      411.55
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:003",
+    "block_type": "text",
+    "text": "• Exactly reused functions. If a function in the prevalent\nversion is identical to a certain function in the target\nprogram, it is considered reused in the target program.",
+    "bbox": [
+      63.96,
+      416.98,
+      294.12,
+      453.26
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:004",
+    "block_type": "text",
+    "text": "• Changed functions. If a function f ′ that exists in the\ntarget program is similar to function f in the prevalent\nversion, f is considered a changed function.",
+    "bbox": [
+      63.96,
+      455.91,
+      294.12,
+      495.44
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:005",
+    "block_type": "text",
+    "text": "• Unused functions. Among all functions in the prevalent\nversion, those that did not belong to the exactly reused\nor changed were included in the unused group.",
+    "bbox": [
+      63.96,
+      501.36,
+      294.12,
+      537.63
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:006",
+    "block_type": "text",
+    "text": "The changed functions were further classified according\nto the version to which they belonged. To this end, V1SCAN\ncompares f ′ with all functions in every version of the OSS.\nIf f ′ belongs to any other version of the OSS and is not the\nprevalent version, f ′ is stored in the group under the name of\nthe associated version. In contrast, if f ′ does not belong to\nany version of the OSS, it is stored in the “none” group. OSS\nfunctions that do not belong to the prevalent version but are\ncontained in the target program, as detected in the prevalent\nversion identification, are also included in the changed group\nwith their respective version names.",
+    "bbox": [
+      53.64,
+      543.42,
+      295.87,
+      674.98
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:007",
+    "block_type": "text",
+    "text": "Figure 3 depicts the procedure to classify reused code com-\npared with OSS identification in existing version-based ap-\nproaches. V1SCAN stores the hash value of each function\nobtained by applying the LSH algorithm (see Section 3.1).",
+    "bbox": [
+      54.0,
+      674.93,
+      295.77,
+      722.8
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:008",
+    "block_type": "text",
+    "text": "OSS name,",
+    "bbox": [
+      378.91,
+      94.47,
+      407.15,
+      101.04
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:009",
+    "block_type": "text",
+    "text": "version",
+    "bbox": [
+      383.6,
+      101.0,
+      400.76,
+      107.58
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:010",
+    "block_type": "text",
+    "text": "Target program",
+    "bbox": [
+      434.04,
+      78.41,
+      471.02,
+      84.99
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:011",
+    "block_type": "text",
+    "text": "OSS",
+    "bbox": [
+      456.66,
+      88.11,
+      466.52,
+      94.69
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:012",
+    "block_type": "text",
+    "text": "OSS name = {",
+    "bbox": [
+      479.62,
+      72.95,
+      514.5,
+      79.52
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:013",
+    "block_type": "text",
+    "text": "exactly reused : [ f1 ,  f2 ,  … ],",
+    "bbox": [
+      481.33,
+      79.38,
+      557.41,
+      86.01
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:014",
+    "block_type": "text",
+    "text": "changed\n: {",
+    "bbox": [
+      488.7,
+      86.02,
+      524.1,
+      92.6
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:015",
+    "block_type": "text",
+    "text": "version i\n: [ f3′,  … ], …",
+    "bbox": [
+      494.95,
+      92.45,
+      555.18,
+      99.08
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:016",
+    "block_type": "text",
+    "text": "none \n: [ f5′,  … ]},",
+    "bbox": [
+      498.36,
+      98.99,
+      551.41,
+      105.61
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:017",
+    "block_type": "text",
+    "text": "unused\n: [ f6 ,  … ]",
+    "bbox": [
+      489.28,
+      105.52,
+      544.13,
+      112.15
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:018",
+    "block_type": "text",
+    "text": "}",
+    "bbox": [
+      479.62,
+      112.17,
+      482.24,
+      118.74
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:019",
+    "block_type": "text",
+    "text": "(a) OSS identification in existing",
+    "bbox": [
+      322.66,
+      120.59,
+      421.3,
+      127.9
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:020",
+    "block_type": "text",
+    "text": "version-based approaches\n(b) Reused code classification in V1SCAN",
+    "bbox": [
+      332.17,
+      124.32,
+      554.76,
+      135.16
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:021",
+    "block_type": "text",
+    "text": "Target program",
+    "bbox": [
+      332.09,
+      78.41,
+      369.07,
+      84.99
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:022",
+    "block_type": "text",
+    "text": "OSS",
+    "bbox": [
+      354.69,
+      88.11,
+      364.56,
+      94.69
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:023",
+    "block_type": "text",
+    "text": "fi: a function in the prevalent version\nf ′\ni : a function in the target program similar to fi.",
+    "bbox": [
+      362.82,
+      141.37,
+      515.65,
+      163.94
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:024",
+    "block_type": "text",
+    "text": "Figure 3: Illustration of the differences between reused code\nclassification and OSS identification in existing approaches.",
+    "bbox": [
+      317.88,
+      167.96,
+      558.0,
+      190.59
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:025",
+    "block_type": "text",
+    "text": "3.2.2\nImproved code-based approach",
+    "bbox": [
+      317.88,
+      206.23,
+      481.71,
+      219.2
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:026",
+    "block_type": "text",
+    "text": "Vulnerable code classification. To increase the vulnerability\ndetection scope, V1SCAN classifies the code locations where\nvulnerabilities exist, and then takes an effective vulnerability\ndetection approach for each location. We considered the fol-\nlowing four code locations (see Section 2.2): 1 function, 2\nstructure, 3 macro, and 4 (global and class) variable.",
+    "bbox": [
+      317.52,
+      223.91,
+      559.65,
+      296.05
+    ],
+    "reading_order": 26,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:027",
+    "block_type": "text",
+    "text": "Code extraction. Subsequently, V1SCAN extracts the code\nlines belonging to the location in the target program. In fact,\nextracting functions, structures, macros, and variables from\nthe target program can easily be performed using an exist-\ning C/C++ parser (e.g., [5]). For more accurate vulnerability\ndetection, V1SCAN further classifies the four locations into\ntwo groups based on the syntactic similarity: (functions and\nstructures) and (macros and variables). Functions and struc-\ntures have in common that multiple code lines are enclosed in\ncurly braces, while macros and variables generally consist of\nonly one or two code lines. V1SCAN extracts (1) LSH hash\nvalues (see Section 3.1) and (2) source code lines from all\nfunctions and structures in every C/C++ source file in the tar-\nget program. We consider both hash values and lines of code\nto reduce false positives in vulnerability discovery (details\nare introduced in Section 3.3.2). For macros and variables,\nV1SCAN extracts only the corresponding source code lines.",
+    "bbox": [
+      317.63,
+      299.65,
+      559.65,
+      503.29
+    ],
+    "reading_order": 27,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:028",
+    "block_type": "text",
+    "text": "3.3\nDetection phase (P2)",
+    "bbox": [
+      317.88,
+      517.33,
+      449.7,
+      532.88
+    ],
+    "reading_order": 28,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:029",
+    "block_type": "text",
+    "text": "V1SCAN detects propagated vulnerabilities in the target pro-\ngram, using improved version- and code-based approaches.",
+    "bbox": [
+      317.74,
+      538.28,
+      559.66,
+      562.24
+    ],
+    "reading_order": 29,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:030",
+    "block_type": "text",
+    "text": "3.3.1\nImproved version-based approach",
+    "bbox": [
+      317.88,
+      573.2,
+      493.23,
+      586.17
+    ],
+    "reading_order": 30,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 5,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:005:031",
+    "block_type": "text",
+    "text": "Vulnerability detection. V1SCAN detects vulnerabilities in\nthe target program by using the prevalent version. We used\nCPE [21] to construct a CPE database that maps the CVEs\nto the affected OSS versions (see Section 4.3). By leveraging\nthe CPE database, V1SCAN identifies the CVE vulnerabilities\nincluded in the prevalent version of the OSS component. For\nexample, the CPE of the Heartbleed vulnerability (CVE-2014-\n0160) specifies that the vulnerability exists in OpenSSL 1.0.1\nto 1.0.1f. If OpenSSL is reused in the target program and\nits prevalent version is between 1.0.1 and 1.0.1f, V1SCAN\ndetermines that this vulnerability exists in the target program.",
+    "bbox": [
+      317.52,
+      590.88,
+      559.75,
+      722.8
+    ],
+    "reading_order": 31,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

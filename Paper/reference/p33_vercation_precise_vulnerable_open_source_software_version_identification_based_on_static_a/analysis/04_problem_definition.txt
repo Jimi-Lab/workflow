@@ -1,0 +1,35 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- Additionally, the PoC input may not be universal across all vulnerable versions [7].
+- The best LLM DeepSeek-V3 in our evaluation, whose API pricing is $0.30 per million t okens for input and $1.10 per million tokens for output.
+- This cost includes: input tokens for CVE descriptions, dangerous ﬂows, and few-shot examples, output tokens for logic explanation, and vulnerable statements.
+Objective:
+- Vulnerability Fixing Commit Analysis Several studies have focused on analyzing vulnerability ﬁx- ing commit (VFC) to extract vulnerability features, which can be used for various purposes such as vulnerability detection, classiﬁcation, and affected version identiﬁcation.
+- VulDeePecker [72] leverages deep learning t echniques to learn vulnerability patterns from code gadgets extracted from vulnerability ﬁxing commits.
+- V ERCATION incorporates VFC analysis by leveraging LLMs to understand the context of code changes in ﬁxing com- mits, potentially capturing more nuanced vulnerability features.
+- Vulnerable Version Detection for OSS Several approaches have been proposed for vulnerable ver- sion identiﬁcation.
+Constraints:
+- However, the NVD often encompasses all versions before the reportedvulnerability or designates only the versions mentioned in the report as vulnerable.
+- For instance, CVE-2018- 5785 reported only version v2.3.0 as vulnerable in CPE[2].Y e t , upon manual validation, it was uncovered that versions v2.1.1 to v2.3.0 are all susceptible tothe vulnerability.
+- However, executing a PoC for each software version is a time-intensive process that requires meticulous environment setup.
+- Personal use is permitted, but republication/redistribution requires IEEE permission.
+- Existing methods typi- cally extract vulnerabilityfeatures using static analysis in which vulnerability patterns are pre- deﬁned by human experts: some consider data and control dependencies from the patched code [12], [13]; some consider using hashes of entire functions [16]; and some consider only the patch code [14], [17].
+Evaluation Target:
+- evaluation, encompassing 12 commonly used OSS projects, 122 Common Vulnerabilities and Exposures (CVEs), and a total of 1,211 OSS versions.
+- This dataset comprised every patch released through Git with respect to those 122 CVEs.
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool.
+- More importantly, during the evaluation, we found 202 version errors in the NVD reports.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- Most existing VFC analysis methods rely heavily on predeﬁned rules or patterns, which may not capture the full context of vulner- abilities.
+- C ONCLUSION AND FUTURE WORK This paper proposed V ERCATION, an approach designed for vulnerable version identiﬁcation of open-source C/C ++ soft- ware.
+- In the future, we plan to empirically validate V ERCATION on a broader set of languages (Java, Python, JavaScript, and PHP) to conﬁrm its effectiveness.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

@@ -1,0 +1,49 @@
+ISSTA016:16 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+1 if (i == MLX5_MAX_PORTS) {
+2 -  if (ldev->nb.notifier_call)
+3 +  if (ldev->nb.notifier_call) {
+4   unregister_netdevice_notifier_net(&init_net, &ldev->nb);
+5 +   ldev->nb.notifier_call = NULL;
+6 +  }
+Fixing Commit: 0b136454741 in linux
+After returning from unregister_netdevice_notifier_dev_net(), set the notifier_call field to NULL so successive call to 
+mlx5_lag_add() will function as expected.
+1 files changed, 3 addition(+) and 1 deletion(-)
+drivers/net/ethernet/mellanox/mlx5/core/lag.c
+Fig. 8. An example where LLM4SZZ fails to choose the correct bug-inducing commit among candidates.
+Compared to gpt4o-mini, llama3-70b performs better in DS_LINUX, worse in DS_GITHUB,
+and similarly in DS_APACHE. In DS_LINUX, llama3-70b outperforms gpt-4o-mini in precision
+and F1-score. To understand the performance differences, we investigate the test cases where the
+two models produced different results. We find that llama3-70b tends to be conservative when
+locating buggy statements and produces an empty result if it is uncertain. For instance, llama3-70b
+produces results for 1,334 test cases in DS_LINUX, while gpt-4o-mini produces results for 1,373
+test cases. In DS_LINUX, gpt-4o-mini and llama3-70b identified almost the same number of true
+bug-inducing commits, resulting in higher precision for llama3-70b. In DS_GITHUB, many bug-
+inducing commits can only be found by tracing back unmodified code statements, while llama3-70b
+tends to conservatively identify deleted lines as buggy statements. Therefore, in DS_GITHUB,
+gpt-4o-mini outperforms llama3-70b in both precision and recall.
+RQ-3: The core ideas of LLM4SZZ can be applied to other large language models and better LLMs
+can enhance the performance of LLM4SZZ.
+6 Discussion
+6.1 Failure Analysis
+In this section, we manually analyze the test cases where LLM4SZZ fails to identify their bug-
+inducing commits correctly. We randomly select 50 test cases from all failed test cases. After the
+analysis, we summarize the failed reasons as follows:
+Bug-inducing commits cannot be found even by tracing back all lines in the expanded
+context. As we mentioned above, LLM4SZZ provides LLMs with more context to help them locate
+buggy statements. If changes are within functions, we expand the context by providing LLMs with
+the full content of the function. Otherwise, we provide it with the three nearest code statements to
+the changed lines. However, there are still some bug-inducing commits that cannot be found even
+by tracing back all lines in the expanded context.
+In 27 test cases, LLM4SZZ fails to find bug-inducing commits due to this issue. In eight of these
+cases, the bug-fixing commits and their corresponding bug-inducing commits modify completely
+different files. In the remaining cases, the bug-fixing and bug-inducing commits modify the same
+files but different functions. Although expanding the context further might help find these bug-
+inducing commits, an excessively long context will undermine the overall performance ofLLM4SZZ,
+as mentioned earlier.
+Failing to locate buggy statements correctly. LLM4SZZ fails to find correct bug-inducing
+commits in 11 cases due to this issue. One main reason for this is that LLM4SZZ focuses only on
+modified lines in the context. Sometimes, it is the unmodified code statements in the context that
+lead to the bug. Although we provide more context to LLMs to avoid this issue, they still face
+challenges in accurately locating buggy statements.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

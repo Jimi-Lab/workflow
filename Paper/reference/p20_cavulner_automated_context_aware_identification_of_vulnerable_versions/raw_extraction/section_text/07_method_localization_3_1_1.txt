@@ -1,0 +1,32 @@
+Method Localization (§3.1.1)
+Fine-grained Vulnerable Code 
+Block Identification (§3.1.2)
+Fig. 2. Overview of CaVulner
+commits, the approach determines the range of affected versions with improved accuracy, even in
+complex or long-lived vulnerability cases.
+3.1 LLM-based Vulnerable Code Block Identification
+The first step progressively narrows down the location of vulnerable code through two stages.
+It begins with coarse-grained method localization, identifying methods likely associated with
+the vulnerability based on contextual signals such as CVE descriptions, commit messages, and
+surrounding code. Building on this, the module then performs fine-grained analysis to isolate the
+specific code blocks within those methods that directly correspond to the vulnerable behavior. By
+combining these two stages, the module achieves both breadth and precision in identifying the
+code regions most relevant to the vulnerability.
+3.1.1 Coarse-grained Vulnerable Method Localization. Directly feeding raw fix commit diffs to
+the LLM often leads to hallucinations because the model may struggle to distinguish the actual
+remediation logic from irrelevant code churn. To mitigate this issue, this submodule serves as a
+pre-filter to identify methods strictly relevant to the vulnerability and thereby reduces the search
+space for the subsequent fine-grained analysis. However, effectively filtering these methods presents
+a challenge as developers frequently interleave security patches with non-security maintenance
+such as refactoring, formatting, or feature updates.
+To address this, we introduce Method Change Type (MCT) as a semantic abstraction mechanism.
+Unlike raw line-level diffs, MCT categorizes how a method is modified, establishing a correlation
+between the nature of the repair and the vulnerability type. For instance, fixing a Missing Input
+Validation vulnerability typically involves adding conditional checks, whereas remediating an
+Information Exposure vulnerability involves deletions. By explicitly defining these patterns, we
+guide the LLM to focus on methods whose modification signatures align with the expected repair
+strategy for the specific vulnerability.
+Formally, we guide the LLM in localizing potentially vulnerable methods by a vulnerability
+knowledge tuple 𝐾vul = (MCT,CVE,CWE), which is composed as follows:
+•MCT (Method Change Type). MCT provides a high-level classification of modified methods in
+patches, facilitating the LLM’s focus on vulnerable methods during Coarse-grained Vulnerable

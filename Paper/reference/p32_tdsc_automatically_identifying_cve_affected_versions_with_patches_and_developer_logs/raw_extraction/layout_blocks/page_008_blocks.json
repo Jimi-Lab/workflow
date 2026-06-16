@@ -1,0 +1,302 @@
+[
+  {
+    "page": 8,
+    "block_id": "page_008:block_001",
+    "block_type": "text",
+    "text": "912 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024",
+    "bbox": [
+      42.119998931884766,
+      32.560523986816406,
+      556.1945190429688,
+      40.343284606933594
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_003",
+    "block_type": "text",
+    "text": "Fig. 7. Examples of partial matching code (The left side shows the diff hunk",
+    "bbox": [
+      42.119998931884766,
+      416.78485107421875,
+      293.1885070800781,
+      425.6794738769531
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_004",
+    "block_type": "text",
+    "text": "( DH ) of each CVE patch, and the right side shows the corresponding source code fragment ( SF )).",
+    "bbox": [
+      42.11920166015625,
+      425.74884033203125,
+      293.1868591308594,
+      443.607421875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_005",
+    "block_type": "text",
+    "text": "the software versions that are partially matched with patches may or may not be vulnerable.",
+    "bbox": [
+      42.119998931884766,
+      470.4715881347656,
+      293.17047119140625,
+      493.5509338378906
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_006",
+    "block_type": "text",
+    "text": "In order to leverage the information of partial matches, we ﬁrst",
+    "bbox": [
+      52.08259963989258,
+      494.38482666015625,
+      293.1265563964844,
+      505.5030822753906
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_007",
+    "block_type": "text",
+    "text": "classify partial matches into three categories, and then we design the method to locate the partially matching code fragments based on the diff hunk(s) of a given CVE. Finally we justify whether the code has the CVE vulnerability based on git logs and partial matches so as to determine the ﬁrst vulnerable version V from .",
+    "bbox": [
+      42.119998931884766,
+      506.3369140625,
+      293.17547607421875,
+      566.3464965820312
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_008",
+    "block_type": "text",
+    "text": "1) Classiﬁcation and Detection of Partial Matches: By ana-",
+    "bbox": [
+      52.08417892456055,
+      566.1146240234375,
+      293.1661682128906,
+      577.23291015625
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_009",
+    "block_type": "text",
+    "text": "lyzing the partial matches in a large number of early versions, we summarize the code features into the following three cate- gories, and then we detect and locate the matching source code fragments according to their categories. For ease of presentation, we introduce a few notations. We use DH to denote a Diff Hunk composed of sub and oth , Fun to denote the vulnerable Function, and SF to denote the Source code Fragment in the CVE-speciﬁed ﬁle corresponding to the DH . In Fig. 7(a) and (b) , “Function()” in the DH (also in SF ) represents the Fun , and in Fig. 7(c) , “FunctionB1()” of the DH represents the Fun .",
+    "bbox": [
+      42.12059020996094,
+      578.07568359375,
+      293.1820068359375,
+      696.7901000976562
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_010",
+    "block_type": "text",
+    "text": "Case 1. The SF only partially matches oth of the DH . As",
+    "bbox": [
+      52.082191467285156,
+      697.2553100585938,
+      293.1820983886719,
+      708.7421875
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_011",
+    "block_type": "text",
+    "text": "shown in Fig. 7(a) , corresponding to the oth code in the DH , SF does not call funcD1 and it has “return err” instead of the “break”",
+    "bbox": [
+      42.11859893798828,
+      709.5850219726562,
+      293.1781311035156,
+      732.6554565429688
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_012",
+    "block_type": "text",
+    "text": "statement in the “if(err)” branch. Moreover, it calls funcD2, which has a different name from funcD1 in oth . In this case, SF contains all the code in sub .",
+    "bbox": [
+      305.13323974609375,
+      63.954769134521484,
+      556.1778564453125,
+      98.98623657226562
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_013",
+    "block_type": "text",
+    "text": "Case 2. The SF partially matches the sub of the DH . As shown",
+    "bbox": [
+      315.0958251953125,
+      99.45150756835938,
+      556.1777954101562,
+      110.93838500976562
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_014",
+    "block_type": "text",
+    "text": "in Fig. 7(b) , the SF lacks “int n” and “if” statements of the DH . For oth , SF may not contain the entire oth , but it contains at least one oth and one sub statement.",
+    "bbox": [
+      305.13323974609375,
+      111.772216796875,
+      556.1878662109375,
+      146.80374145507812
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_015",
+    "block_type": "text",
+    "text": "Case 3. The SF only partially matches the contextual func-",
+    "bbox": [
+      315.0958251953125,
+      147.26895141601562,
+      556.1688842773438,
+      158.75582885742188
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_016",
+    "block_type": "text",
+    "text": "tions of the DH , but the SF contains the entire sub . As shown in Fig. 7(c) , contextual functions A1 and C1 are used to locate the vulnerable function B1 in DH , but they are named A2 and C2 in the SF . Although the functions B1 and B2 also have different parameters, they might still be the same vulnerable function. For example, for CVE-2013-1959, the function used to locate Fun is “set_cred_user_ns”, but this function does not exist in SF before the Linux kernel version 3.8. For CVE-2017-14991, the Fun is “sg_ﬁll_request_table”, but before Linux kernel version 4.13, the function in SF is “sg_ioctl”, and they are the same vulnerable code in different functions. For CVE-2017-8069, the contextual function of the DH is “async_set_reg_cb”, but it is the “ctrl_callback” function in the SF in Linux kernel version 3.2.86.",
+    "bbox": [
+      305.1322326660156,
+      159.59356689453125,
+      556.2037963867188,
+      326.12542724609375
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_017",
+    "block_type": "text",
+    "text": "Given the Diff Hunk( DH ) of a CVE, we will detect and locate",
+    "bbox": [
+      315.1007995605469,
+      326.96826171875,
+      556.1928100585938,
+      338.0865173339844
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_018",
+    "block_type": "text",
+    "text": "all the Source code Fragments (SFs) in the early versions for three partial match cases, respectively. The high level idea of our algorithm is as follows. In all three cases, there is at least one line of matched code in SF with that in DH . Therefore, we use one or two lines of matched code as the anchor point to select three blocks of code in the function( Fun ) of the source code. Let us take the example of only one line of Matched Code (called MC), and assume there are L1 and L2 lines of code before MC and after MC, respectively, in the DH . To locate SF , in the Fun of the source code, we select L1 and L2 lines of code before Matched Code(MC) and after MC as the ﬁrst and the third block, respectively while MC serves as the second block. When there are two or more lines of matched code, the code in the source code between the ﬁrst MC and the last MC forms the second block while the ﬁrst and third blocks are selected in the same way as previously. The detailed algorithm is presented in the supplemental document (available online) .",
+    "bbox": [
+      305.1361999511719,
+      338.9203796386719,
+      556.197998046875,
+      541.3265380859375
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_019",
+    "block_type": "text",
+    "text": "2) Justify the Vulnerable Versions by Git Logs: After we lo-",
+    "bbox": [
+      315.0987854003906,
+      542.160400390625,
+      556.1887817382812,
+      553.2786865234375
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_020",
+    "block_type": "text",
+    "text": "cated all the Source code Fragments( SFs ) in the partial matches, we will justify whether these SFs contain the vulnerability with the help of git log information. We propose an automatic log tracing method to trace the corresponding git logs. We illustrate our idea through the example in Fig. 8 . Here, with respect to a CVE, the versions between V 1 . 0 and V 2 . 1 shared the same (partial matching) source code fragment SF3 . After an update on SF3 , the versions between V 2 . 2 and V 2 . 5 shared the same SF2 . After another update on SF2 , the versions starting from V 2 . 6 shared the (exact matching) SF1 . Let sf-diff represent the difference between the SFs of two versions, and it can be generated through a diff tool [41] . Since each update resulted in a git log that recorded the difference in the form of a Diff Hunk, we can use each sf-diff to traverse every git log in the git log list whose release time was earlier than T CV E , and ﬁnd",
+    "bbox": [
+      305.1356201171875,
+      554.1215209960938,
+      556.2039794921875,
+      733.6653442382812
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 8,
+    "block_id": "page_008:block_021",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

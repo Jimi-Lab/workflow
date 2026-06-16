@@ -1,0 +1,202 @@
+(4) TTP Classifier Model Building
+(1) Ground Truth
+Building
+Initial Dataset
+(Labeling CVEs 
+based on TTPs)
+(2) Attack Pattern Extraction (5) Prediction and Adaptation Outputs
+TTPs
+Description
+Technique IDs
+...
+CAPECs
+Description
+Taxonomy-
+Mappings
+...
+CWEs
+Description
+Related Attack
+Patterns
+...
+CVEs
+Description
+Weakness
+Enumeration
+...
+>92K CVEs
+141 TTPs
+Unseen
+CVE Report
+Inputs
+CVEs
+CWEs CAP-
+ECs
+TTPs
+CTI Knowledge
+Bases
+(3) Dataset Enhancement
+Paraphrase
+it
+CVE
+Sample
+Llama-3.1-8B
+Pick a
+CVE
+Sample
+Generate a
+new
+Add to
+Repeat it
+n times
+Pick a
+GPT-4o-
+mini
+Update
+Dataset
+Returns
+CVE
+Prompt
+Generate Adjust
+Labels
+Adjusted
+Labels
+TTP Labels
+LLM
+Fine-
+tuningAdding
+Tokenizing
+HyperparametersSamples
+Training
+Feedback
+Database
+Clustering
+Dictionary
+TTP Classifier
+Model
+TTPs
+Mitigation
+Techniques
+Detection
+Techniques
+Etc.
+Prediction
+Label Adjustment CVE Sample Augmentation
+Attack Patterns (APs)
+Description
+Assigned TTPs
+Missed TTPs
+Adapt
+Predictions
+1
+2
+[T1, T2, ... T5]
+[T1, ... T4, T6]
+Model Adaptation
+Cluster Highly Correlated TTPs
+Unseen
+CVE
+1
+2
+[T1, T2, ... T5]
+[T1, ... T4]
+1 2
+CVE
+Context
+APs
+TTP Classifier
+Model
+Predicted
+TTPs
+TTP Prediction
+Correct Wrong/Missed
+Analyst FeedbackAPD
+Model
+Sub-sentences
+without attack
+patterns
+ Update
+OR
+Dataset with
+Attack Patterns
+Go for
+Prediction
+Not relevant to TTPs
+Sub-
+sentences with
+attack patterns
+SRL
+Model
+Unseen
+CVE
+Description(s)
+Tokenized
+Sentences
+Inclu-desSubject Verb Object
+OR
+ Sub-
+Sentences
+Data Preprocessing Attack Pattern Classification
+Texts
+Possible Flows
+Training
+Prediction
+Fig. 2: The system overview ofNEXUS.
+and feedback adaptation, while supervised models provide efﬁ-
+cient, interpretable, and scalable multi-label TTP classiﬁcation.
+As shown in Section IV-C, comparisons with generative-only
+approaches [37] demonstrate the beneﬁts of this hybrid design.
+NEXUS comprises ﬁve main steps (Figure 2). (1) Ground
+Truth Building (Section III-B) tackles Challenge 1 by auto-
+matically mapping CVEs to TTPs using four CTI knowledge
+bases (CVE, CWE, CAPEC, ATT&CK). (2) Attack Pattern
+Extraction (Section III-C) addresses Challenge 2 by extracting
+attack patterns [3], [10], [32] from CVE text via SRL [33] and
+binary classiﬁcation. (3) Dataset Enhancement (Section III-D)
+addresses Challenge 3 by adding missing TTPs and reducing
+TTP imbalance. (4) Model Building (Section III-E) ﬁne-tunes
+BERT-based models [18], [20], [43] to predict TTPs for unseen
+CVEs. (5) Prediction and Adaptation (Section III-F) addresses
+Challenge 4 by predicting TTPs for new CVEs and reﬁning
+results with analyst feedback, without retraining.
+B. Ground Truth Building
+We construct the initial CVE-to-TTP mapping by leveraging
+the structured CVE–CWE–CAPEC–TTP relationships pro-
+vided in the NIST [44] and MITRE [2] knowledge bases. Each
+CVE is ﬁrst linked to its corresponding CWE entries, which
+describe the vulnerability type. These CWEs are then mapped
+to CAPEC attack patterns, which in turn are associated with
+MITRE ATT&CK TTPs [2]. When a CAPEC lacks a direct
+TTP link, we inherit TTPs from its parent CAPECs to maintain
+coverage. All data is collected from the NVD, CWE, CAPEC,
+and ATT&CK repositories [45]–[48] and standardized into
+CSV , JSON, and STIX formats for integration. This entire
+mapping workﬂow runs automatically without any manual an-
+notation. To further improve TTP coverage, we apply the label-
+adjustment sub-step using generative models (Section III-D1),
+which corrects errors and recovers missing techniques.
+Figure 3a and 3b show CVE and TTP distributions across 13
+ATT&CK tactics, with Defense Evasion most common (31.6%
+of CVEs, 25.1% of TTPs), followed by Persistence, Privilege
+(a) Distribution of 92,632 CVEs
+across 13 enterprise tactics.
+(b) Distribution of 141 TTPs
+across 13 enterprise tactics.
+(c) Total supported CVEs per knowledge base by CVE publication
+year (Jan 1999–May 2024).
+Fig. 3: Summary of our initial labelled dataset.
+Escalation, Credential Access, and Discovery. Many CVEs
+and TTPs span multiple tactics, reﬂecting their interconnected
+nature. Figure 3c shows that newer CVEs map to more TTPs
+due to additional CWE and CAPEC associations.
+Example 1. Figure 4 shows the mapping of
+CVE-2024-4985 by matching the corresponding IDs:
+the CVE description indicates the related CWE, CWE-303
+(authentication bypass), the CWE description indicates the
+related CAPEC, CAPEC-114 (authentication abuse), and
+the CAPEC points to the TTP T1548 (Abuse Elevation
+Control Mechanism). This mapping reﬂects the nature of the
+vulnerability itself: an authentication ﬂaw enables privilege
+escalation, which logically aligns with the corresponding
+TTP.
+3

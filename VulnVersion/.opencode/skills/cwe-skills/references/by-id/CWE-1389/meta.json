@@ -1,0 +1,249 @@
+{
+  "cwe_id": "CWE-1389",
+  "name": "Incorrect Parsing of Numbers with Different Radices",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product parses numeric input assuming base 10 (decimal) values, but it does not account for inputs that use a different base number (radix).",
+  "extended_description": "Frequently, a numeric input that begins with \"0\" is treated as octal, or \"0x\" causes it to be treated as hexadecimal, e.g. by the inet_addr() function. For example, \"023\" (octal) is 35 decimal, or \"0x31\" is 49 decimal. Other bases may be used as well. If the developer assumes decimal-only inputs, the code could produce incorrect numbers when the inputs are parsed using a different base. This can result in unexpected and/or dangerous behavior. For example, a \"0127.0.0.1\" IP address is parsed as octal due to the leading \"0\", whose numeric value would be the same as 87.0.0.1 (decimal), where the developer likely expected to use 127.0.0.1. The consequences vary depending on the surrounding code in which this weakness occurs, but they can include bypassing network-based access control using unexpected IP addresses or netmasks, or causing apparently-symbolic identifiers to be processed as if they are numbers. In web applications, this can enable bypassing of SSRF restrictions.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-704",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Incorrect Type Conversion or Cast"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product parses numeric input assuming base 10 (decimal) values, but it does not account for inputs that use a different base number (radix).",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "decimal",
+      "different",
+      "numbers",
+      "numeric"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "decimal",
+      "different",
+      "numbers",
+      "numeric",
+      "inputs",
+      "octal",
+      "base",
+      "unexpected"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "The below demonstrative example uses an IP validator that splits up an IP address by octet, tests to ensure each octet can be casted into an integer, and then...",
+        "snippet": "import subprocess def validate_ip(ip: str): split_ip = ip.split('.') if len(split_ip) > 4 or len(split_ip) == 0: raise ValueError(\"Invalid IP length\") for octet in split_ip: try: int(octet, 10) except ValueError as e:..."
+      },
+      {
+        "language": "Python",
+        "nature": "Bad",
+        "summary": "This code uses a regular expression to validate an IP string prior to using it in a call to the \"ping\" command.",
+        "snippet": "import subprocess import re def validate_ip_regex(ip: str): ip_validator = re.compile(r\"((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}\") if ip_validator.match(ip): return ip else: raise ValueError(\"IP address does not match..."
+      },
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Consider the following scenario, inspired by CWE team member Kelly Todd. Kelly wants to set up monitoring systems for his two cats, who pose very different...",
+        "snippet": "taki.example.com 10.1.0.7 night.example.com 010.1.0.8"
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2021-29662",
+        "description": "Chain: Use of zero-prepended IP addresses in Perl-based IP validation module can lead to an access control bypass.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-29662"
+      },
+      {
+        "reference": "CVE-2021-28918",
+        "description": "Chain: Use of zero-prepended IP addresses in a product that manages IP blocks can lead to an SSRF.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-28918"
+      },
+      {
+        "reference": "CVE-2021-29921",
+        "description": "Chain: Use of zero-prepended IP addresses in a Python standard library package can lead to an SSRF.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-29921"
+      },
+      {
+        "reference": "CVE-2021-29923",
+        "description": "Chain: Use of zero-prepended IP addresses in the net Golang library can lead to an access control bypass.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-29923"
+      },
+      {
+        "reference": "CVE-2021-29424",
+        "description": "Chain: Use of zero-prepended IP addresses in Perl netmask module allows bypass of IP-based access control.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-29424"
+      },
+      {
+        "reference": "CVE-2016-4029",
+        "description": "Chain: incorrect validation of intended decimal-based IP address format (CWE-1286) enables parsing of octal or hexadecimal formats (CWE-1389), allowing bypass of an SSRF protection mechanism (CWE-918).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2016-4029"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

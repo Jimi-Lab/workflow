@@ -1,0 +1,347 @@
+function (ext2_get_page), this is detected by VUDDY
+because as described in subsection IV-A-S2, we abstract the
+function calls by replacing the names of the called function
+with FUNCCALL.
+The contents of function ext2_get_page and
+nilfs_get_page are also identical except for their
+names and a few identiﬁers, and thus we attempted to
+trigger the vulnerability in Ubuntu 16.04 which is built upon
+kernel version 4.4. Surprisingly, we could trigger the “printk
+ﬂoods” vulnerability which in turn causes denial of service,
+by mounting a corrupted image of the nilfs2 ﬁle system.
+We contacted a security ofﬁcer of Redhat Linux, and he
+conﬁrmed that this vulnerability should be patched. This case
+shows that VUDDY is capable of detecting unknown variants
+of known vulnerability.
+X. D ISCUSSION
+A. The use of function-level granularity
+In this section, we discuss the reasoning behind selecting
+the function level as the basis for clone detection, through a
+theoretical and empirical analysis of time complexity, storage
+use, and accuracy of detection. As a way of answering the
+research question of “Which granularity is best for scal-
+able and accurate vulnerability detection?” we parameterize
+the granularity level, and observe the performance curve of
+VUDDY .
+1) Time complexity: Given a function F consisting of l
+LoC, c characters per line on average, assume that we use
+g lines as a granularity unit. Then, each processing window
+will consist of g blocks, and the number of windows inF
+will be l−g+1. We can compute the cost of preprocessing
+a function as the multiplication of the number of windows
+by the preprocessing time per window. When preprocessing
+a retrieved function, VUDDY conducts abstraction, normal-
+ization, and length computation, and then applies the MD5
+hash algorithm. However, the ﬁrst three operations require a
+trivial amount of time relative to the MD5 hash computation,
+of which the complexity is denoted asax + b where x is
+the number of input characters4. Thus, the Cost function is
+approximated as follows:
+Cost(g)=( #windows)∗(HashTime/window) (7)
+=(l−g+1) ∗(a(cg)+ b) (8)
+=−acg2 +(acl+ac−b)g+b(l+1) (9)
+This formula is empirically validated by measuring the time
+VUDDY requires to preprocess functions of various lines of
+code. As illustrated in Fig. 8, the cost function is parabolic,
+peaking at g =2 /l. The minimum value of each graph is
+attained wheng = l, which means the least time is required
+for any function when we take advantage of the function-
+level granularity. Note that these properties are observed for
+all functions in our vulnerability database, with sizes ranging
+from 51 to 2526, but in consideration of the readability of the
+graphs, we only plotted six representative functions.
+4To the best of our knowledge, the time complexity of MD5 implementation
+in Python Hashlib is not known. Therefore, we empirically measured the time
+complexity in subsection VI-B to ﬁnd that it is linear to the length of input
+plaintext.
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+0 100 200 300 400 500 600 700 800 900
+Time cost (in ms)
+g (granularity in LoC)
+l=100
+l=300
+l=506
+2222222222222
+222222
+2222222
+2
+22
+2222
+222222222222222222
+2
+l=602
+▽▽▽▽▽▽▽▽▽▽▽▽▽▽
+▽▽▽▽
+▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽
+▽▽▽▽▽▽▽▽
+▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽
+▽
+l=702
+◦◦◦◦◦◦◦◦◦◦◦◦◦
+◦◦
+◦◦◦◦◦◦◦
+◦◦
+◦
+◦◦◦◦◦
+◦
+◦
+◦◦◦
+◦◦◦◦◦◦◦◦◦
+◦
+◦◦◦
+◦◦◦◦◦◦◦◦◦◦
+◦◦◦◦◦◦◦◦◦◦◦◦◦
+◦
+l=817
+++++
+++++
++++++
+++++++
++++++++
+++++++++++
++++
+++++++++++
++
++++++++
+++
++++
++
++++++
+++++++++++++++
++
+Fig. 8: Time required for preprocessing the functions by vary-
+ing the granularity level. The graphs represent six functions
+with 100, 300, 506, 602, 702, and 817 LoC, respectively.
+0
+5
+10
+15
+20
+25
+30
+35
+40
+0 100 200 300 400 500 600 700
+Beneﬁt
+l (in LoC)
+××××××××××××××××××××
+×
+×
+××××××××
+×
+×××××××××××××
+×
+×××
+×
+×
+××
+×
+×
+×
+×××
+×
+×××
+×
+×
+×
+×××
+××××××
+×
+×
+×
+×
+××××××
+××
+×××××××××
+×
+××
+×
+×
+×××
+××××
+××
+××
+×××
+××
+×
+×××××
+×
+××××
+×××
+×××
+×
+×
+×
+×××××× ××
+××××
+××××
+×
+××
+×
+×
+××
+×
+××
+×
+××
+××
+×
+×
+×
+×
+××
+××
+×
+×
+×××
+×
+×××××
+×
+×
+×××××××××
+×××
+×
+×
+×××
+×
+×
+×
+×××××
+××
+×
+×
+×
+××
+××
+×
+××
+×
+××
+×
+×
+×
+××××
+×
+×
+×××
+×
+×
+×
+×
+×
+×××
+×
+×
+×
+×
+×××
+×
+×
+×××××
+××
+×
+×××
+×
+×
+××
+×
+×
+×
+×
+×
+××
+×
+××
+× ×××
+×
+××
+××
+×
+×
+×
+×
+××
+×
+××
+×
+××
+×××
+××
+×××
+××
+××
+×
+×
+×
+×
+××
+××
+××
+×
+×
+××××
+××××
+×
+×
+×
+×
+×
+××
+×
+××
+××
+×
+×
+×
+××
+×
+×
+×
+××
+×
+×
+×
+×
+×
+×
+××
+×
+××××××
+×
+Approximation: 0.0068l−0.042
+0.0002l+0.006
+Fig. 9: Relative time beneﬁt ofcost(g =l)(i.e., function-level
+granularity) over cost(g =4 ) (i.e., as of ReDeBug) along
+varying sized functions in the vulnerability database. Each
+point (x-shaped) represents a function consisting ofl lines,
+and the curved line represents an approximate ﬁtted curve.
+Using the cost function, we now estimate the relative
+beneﬁt, (i.e., speedup) of function-level granularity (VUDDY)
+over using four LoC as granularity (default of ReDeBug). The
+Benefit function is given by:
+Benefit(l)= cost(g =4 )
+cost(g =l) (10)
+= (4ac+b)l−(12ac+3b)
+acl+b (11)
+To prove the validity of our theoretical estimation, we
+conducted another experiment to assess the beneﬁt, with the
+functions of our vulnerability database. The result is shown
+in Fig. 9. By observing the open source projects in our
+dataset, we determined the average number of characters,c,
+to be 10, and through the experiment in subsection VI-B,
+the complexity of the MD5 hash algorithm was found to be
+2.00e−5x+0.006. This observation, enabled us to obtain a
+graph that approximately ﬁts the experimental data (the curved
+graph in Fig. 9), whereBenefit(l)asymptotically approaches
+34 as l increases.
+2) Memory usage:Memory usage is another crucial factor
+that determines the scalability of a method. Technically, our
+608
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

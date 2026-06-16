@@ -1,0 +1,111 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2225
+Using git, we collect 78,384 potential bug-ﬁxing com-
+mits with Fixes:. We further mine all bug-inducing com-
+mits in each bug-ﬁxing commit. In the ﬁrst step, we use
+[0-9a-f]{7,40} to ﬁnd the partial commit IDs (7-40 digits)
+of potential bug-inducing commits. We exclude partial com-
+mit IDs with fewer than seven characters to prevent ambi-
+guity. In the second step, we search for the partial commit
+IDs in the list of actual complete commit IDs in the repos-
+itory. If the partial commit ID can be found anywhere as
+a substring of a complete commit ID, we return the com-
+plete commit ID as the bug-inducing commit. To investi-
+gate the number of false positives in this step, we compare
+our results with those obtained using the git rev-parse com-
+mand, which returns the full hash from a partial commit ID.9
+As a result of this comparative analysis (of 104 cases), we
+observed two main issues that account for the differences
+between our method and the git rev-parse command: (1) Over-
+lapping Partial Commit IDs: In certain instances, a par-
+tial commit ID is shared by multiple complete commit IDs,
+leading to false positives. We manually veriﬁed such cases
+and corrected 51. (2) Typos in Commit IDs: We found
+that the remaining 55 cases were the result of typos in com-
+mit IDs. Occasionally, commit IDs in the Linux kernel are
+incorrect due to typos, such as missing characters, which
+prevents git rev-parse from identifying the correct commit.
+For example, the partial commit ID af4df655040 should ac-
+tually be 3af4df655040, making git rev-parse unable to ﬁnd
+3af4df65504088e9a7d20c0251e1016e521ad4fc. Searching for
+partial commit IDs in the list accurately identiﬁed 55 of 56
+cases. We encountered one instance where the commit did not
+belong to any branch in the repository, being part of a fork
+outside the repository. In the last step, we collect all the potential
+bug-ﬁxing commits for which we can ﬁnd at least one bug-
+inducing commit into the Bug-ﬁxing Commit Dataset. We
+then collect those commits for which we cannot ﬁnd any bug-
+inducing commits into the CSV ﬁle included in the replica-
+tion package.
+Our resulting Bug-ﬁxing Commit Dataset contains 76,046
+commits from between Oct 24, 2013 and Nov 20, 2022 that
+contain one or more properly formatted Fixes: annotations. The
+Linux kernel does not have an associated bug tracker through
+which we can validate that the annotated commits are ﬁxing
+bugs. Nevertheless, the Fixes: annotation has, like the rest of
+the commit, been subject to the Linux kernel review process.
+Furthermore, we ﬁnd that over 99% of the Fixes: annotations
+refer to existing commits.
+We name our newly collected dataset KFC (Linux Kernel
+Bug-Fixing Commits). KFC contains a one-to-many relation-
+ship between bug-inducing commits and bug-ﬁxing commits,
+as a single bug-inducing commit can lead to multiple future
+bug-ﬁxing commits. Conversely, there is also a many-to-one
+relationship, where a single bug-ﬁxing commit may be the result
+of multiple bug-inducing commits.
+9https://git-scm.com/docs/git-rev-parse
+C. Veriﬁcation of the Dataset
+To verify the quality of our dataset, we conduct a manual
+analysis on a subset of the KFC dataset. This analysis aims to
+conﬁrm that the “Fixes:” ﬁeld is indeed used in practice to point
+to the cause of the bug, rather than mistakenly pointing to the
+initial implementation of related functionalities.
+In this study, we followed four steps to validate the subset of
+the KFC dataset:
+(i) Sampling: The complete KFC dataset includes 76,046
+bug-ﬁxing commits. We selected a random sample of 383
+cases to provide a statistically signiﬁcant representation,
+aiming for a 95% conﬁdence level with a 5% margin of
+error, according to standard sample size calculations.10
+(ii) Preparation: Three annotators initially discussed and re-
+ﬁned their approach to ensure consistent labeling, based
+on an examination of a preliminary set of examples. This
+led to the creation of a comprehensive set of labeling
+guidelines.
+(iii) Labeling: Following these guidelines, the dataset was
+then labeled. One annotator was responsible for labeling
+all 383 cases, while the other two split the complete set,
+each labeling either 191 or 192 cases.
+(iv) Discussion: Upon completion of labeling, the annotators
+met to discuss and resolve all discrepancies.
+After the preparation step, six categories were established
+for the labeling process: (1) “Yes”: The bug-inducing commit
+clearly points to the cause of the bug. (2) “Affected by other
+changes”: External modiﬁcations led to the emergence of the
+bug. (3) “Partial ﬁx”: An intermediate commit attempted to ﬁx
+the bug but did not completely succeed. (4) “Introducing a new
+function”: The commit introduced new functionality that was
+later involved in a bug, but was not directly the cause. (5) “No”:
+The bug-inducing commit does not point to the cause of the bug
+and does not ﬁt into categories (2)-(4). Annotators are required
+to mark the reasoning behind this classiﬁcation. (6) “Not sure”:
+The annotator could not determine whether the bug-inducing
+commit is related to the cause of the bug and is instructed to
+mark the reasons for this uncertainty.
+After the Labeling and Discussion steps, we found that 81%
+(317 out of 383) of the sample cases fell into the “Yes” cate-
+gory. Additionally, classiﬁcations for the remaining cases were
+distributed as follows: 4% (15 out of 383) were categorized as
+“Introducing a new function,” 2% (9 out of 383) as “Affected
+by other changes,” and 3% (11 out of 383) as “Partial ﬁx.”
+A further 2% (9 out of 383) of cases were labeled as “No,”
+as the annotators could not discern a relationship between the
+bug-ﬁxing and bug-inducing commits. Lastly, 7% (26 out of
+383) of the cases were tagged as “Not sure,” due to the anno-
+tators’ lack of expertise in the Linux kernel, which prevented
+them from making judgments. Despite a small percentage of
+cases not directly representing the cause of the bug, the vast
+majority of the dataset accurately reﬂects the intended use of the
+“Fixes:” ﬁeld.
+10https://www.surveymonkey.com/mp/sample-size-calculator
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

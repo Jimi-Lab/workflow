@@ -1,0 +1,267 @@
+{
+  "cwe_id": "CWE-1429",
+  "name": "Missing Security-Relevant Feedback for Unexecuted Operations in Hardware Interface",
+  "abstraction": "Base",
+  "status": "Incomplete",
+  "description": "The product has a hardware interface that silently discards operations in situations for which feedback would be security-relevant, such as the timely detection of failures or attacks.",
+  "extended_description": "While some systems intentionally withhold feedback as a security measure, this approach must be strictly controlled to ensure it does not obscure operational failures that require prompt detection and remediation. Without these essential confirmations, failures go undetected, increasing the risk of data loss, security vulnerabilities, and overall system instability. Even when withholding feedback is an intentional part of a security policy designed, for example, to prevent attackers from gleaning sensitive internal details, the absence of expected feedback becomes a critical weakness when it masks operational failures that require prompt detection and remediation. For instance, certain encryption algorithms always return ciphertext regardless of errors to prevent attackers from gaining insight into internal state details. However, if such an algorithm fails to generate the expected ciphertext and provides no error feedback, the system cannot distinguish between a legitimate output and a malfunction. This can lead to undetected cryptographic failures, potentially compromising data security and system reliability. Without proper notification, a critical failure might remain hidden, undermining both the reliability and security of the process. Therefore, this weakness captures issues across various hardware interfaces where operations are discarded without any feedback, error handling, or logging. Such omissions can lead to data loss, security vulnerabilities, and system instability, with potential impacts ranging from minor to catastrophic. For some kinds of hardware products, some errors may be correctly identified and subsequently discarded, and the lack of feedback may have been an intentional design decision. However, this could result in a weakness if system operators or other authorized entities are not provided feedback about security-critical operations or failures that could prevent the operators from detecting and responding to an attack. For example: In a System-on-Chip (SoC) platform, write operations to reserved memory addresses might be correctly identified as invalid and subsequently discarded. However, if no feedback is provided to system operators, they may misinterpret the device's state, failing to recognize conditions that could lead to broader failures or security vulnerabilities. For example, if an attacker attempts unauthorized writes to protected regions, the system may silently discard these writes without alerting security mechanisms. This lack of feedback could obscure intrusion attempts or misconfigurations, increasing the risk of unnoticed system compromise Microcontroller Interrupt Systems: When interrupts are silently ignored due to priority conflicts or internal errors without notifying higher-level control, it becomes challenging to diagnose system failures or detect potential security breaches in a timely manner. Network Interface Controllers: Dropping packets - perhaps due to buffer overflows - without any error feedback can not only cause data loss but may also contribute to exploitable timing discrepancies that reveal sensitive internal processing details.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-223",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Omission of Security-relevant Information"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-392",
+        "nature": "PeerOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Missing Report of Error Condition"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "C",
+      "C++",
+      "Verilog",
+      "Hardware Description Language",
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Security Hardware",
+      "Processor Hardware",
+      "Microcontroller Hardware",
+      "System on Chip"
+    ],
+    "architectures": [
+      "ARM",
+      "x86",
+      "Embedded"
+    ],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation",
+    "Requirements"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product has a hardware interface that silently discards operations in situations for which feedback would be security-relevant, such as the timely detection of failures or attacks.",
+    "typical_preconditions": [
+      "external length/index value",
+      "allocation-size mismatch",
+      "Architecture and Design",
+      "Implementation",
+      "Requirements"
+    ],
+    "typical_sources": [
+      "external length/index value",
+      "allocation-size mismatch"
+    ],
+    "typical_sinks": [
+      "write/copy sink",
+      "array/pointer write"
+    ],
+    "typical_fix_actions": [
+      "add bounds check",
+      "clamp size/index",
+      "repair allocation arithmetic"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "feedback",
+      "system",
+      "failures",
+      "operations"
+    ],
+    "fix_search_patterns": [
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ],
+    "guard_patterns": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "feedback",
+      "system",
+      "failures",
+      "operations",
+      "hardware",
+      "internal",
+      "could",
+      "vulnerabilities"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any",
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same function scope",
+      "sink and bound variables co-occur"
+    ],
+    "recommended_predicate_templates": [
+      "write sink + unchecked length/index",
+      "capacity smaller than write amount",
+      "if (len > cap)",
+      "checked allocation",
+      "safe wrapper around copy/write"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "if (len > cap)",
+        "checked allocation"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount",
+        "same function scope",
+        "sink and bound variables co-occur"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (len > cap)",
+        "checked allocation",
+        "write sink + unchecked length/index",
+        "capacity smaller than write amount"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This code creates an interrupt handler. If the interrupt's priority is lower than the currently active one, the interrupt is discarded without any feedback,...",
+        "snippet": "void interrupt_handler(int irq) { if (irq_priority[irq] < current_priority) { return; } process_interrupt(irq); }"
+      },
+      {
+        "language": "Other",
+        "nature": "Bad",
+        "summary": "Consider a SoC design with these component IPs: IP 1. Execution Core <--> IP 2 SoC Fabric (NoC, tile etc. ) <--> IP 3 Memory Controller <--> External/ internal...",
+        "snippet": "If an uncorrectable error occurs, the design does not explicitly trigger an alert back to the execution core."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "This code creates an interrupt handler. If the interrupt's priority is lower than the currently active one, the interrupt is discarded without any feedback,...",
+        "snippet": "// Priority threshold for active interrupts int current_priority = 3; // Simulated priority levels for different IRQs int irq_priority[5] = {1, 2, 3, 4, 5}; void process_interrupt(int irq) { printf(\"Processing interrupt..."
+      },
+      {
+        "language": "Other",
+        "nature": "Good",
+        "summary": "Consider a SoC design with these component IPs: IP 1. Execution Core <--> IP 2 SoC Fabric (NoC, tile etc. ) <--> IP 3 Memory Controller <--> External/ internal...",
+        "snippet": "Modify the design so that any uncorrectable error triggers an alert back to the execution core and gets handled before the core can consume the data read/written through the corrupted transactions. Update design access..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "[REF-1468]",
+        "description": "Open source silicon root of trust (RoT) product does not immediately report when an integrity check fails for memory requests, causing the product to accept and continue processing data [REF-1468]",
+        "link": "https://github.com/lowRISC/opentitan/issues/11336"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

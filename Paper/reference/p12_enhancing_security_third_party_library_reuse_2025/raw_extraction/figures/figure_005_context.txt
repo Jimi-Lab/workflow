@@ -1,0 +1,42 @@
+shown in Figure 5, the horizontal axis represents
+the CVE ID with the number of candidate commits in the
+brackets; the vertical axis denotes the time overhead, measured
+in seconds. As observed, the time overhead of each approach
+positively correlates with the number of candidate commits.
+Besides, with the number of candidate commits increases, the
+time overhead of VFCFinder becomes substantially large; in
+contrast, even when the number of candidate commits reaches
+TABLE IV: Time and Space Cost of Security Patch Mapping
+Scheme Time Cost (s) Space Cost (MB)
+Mean Median Mean
+VFCFinder 285.92 71.90 337.94
+VULTURE 84.68 42.31 0.00
+CVE-2011-1764 (30)CVE-2016-1897 (42)CVE-2019-10899 (48)CVE-2016-6306 (221)CVE-2019-9183 (294)CVE-2021-28135 (387)CVE-2022-23094 (934)CVE-2007-6441 (1,407)CVE-2012-5360 (3,831)
+CVE-ID (Number of Candidate Commits)
+0
+1000
+2000
+3000
+4000Time Cost (s)
+VFCFinder
+Vulture
+Fig. 5: Correlation between the number of candidate commits
+and the time cost
+thousands, V ULTURE can still keep the time overhead within
+a few hundred seconds.
+C. Benchmark Vulnerability Detection
+We further assessed how V ULTURE performs when detect-
+ing 1-day vulnerabilities introduced by the reused TPLs. We
+compared V ULTURE with the state-of-the-art work, V1SCAN.
+The other tools were excluded because of various constraints.
+In detail, OSSFP is not available as open-source, and SNYK
+requires information on copyright and license, which is incom-
+patible with our benchmark.
+Vulnerability benchmark. To the best of our knowledge, there
+is no existing benchmark specifically for 1-day vulnerabilities
+in C/C++ programs. Therefore, we manually constructed a
+ground truth vulnerability benchmark. The benchmark com-
+prises 200 vulnerable function reuse cases sourced from var-
+ious repositories with more than 100 stars on GitHub. These
+200 cases cover the reuse of 66 CVEs. Among these cases,
+45% have patched the CVE they reused, 

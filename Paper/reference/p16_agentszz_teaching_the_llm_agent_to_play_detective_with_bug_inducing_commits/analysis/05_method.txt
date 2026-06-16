@@ -1,0 +1,46 @@
+System Overview:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+- Abstract The SZZ algorithm is the dominant technique for identifying bug- inducing commits and underpins many software engineering tasks, such as defect prediction and vulnerability analysis.
+- Despite numer- ous variants, including recent LLM-based approaches, performance remains limited on developer-annotated datasets (e.g., recall of 0.552 on the Linux kernel).
+Pipeline Stages:
+- [NEEDS EVIDENCE] pipeline stages require manual confirmation
+Core Algorithm:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- To address this, we introduced scoped parameters (e.g., line ranges, file filters, and search bounds) to constrain the search space.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+Data Structures:
+- Through this process, we iteratively refined the tool design, do- main knowledge, and context management.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- Beyond tool refinement, we distilled domain knowledge from these investigations and existing literature.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+Model / Agent Components:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- Through this process, we iteratively refined the tool design, do- main knowledge, and context management.
+- Initially, we employed git_blame and git_show as core tools following standard SZZ practices.
+- These tools were implemented as thin wrappers with only essential parameters (e.g., commit hash and file path), which often produced excessive outputs and led to inefficient investiga- tion.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+Design Choices:
+- To address this, we introduced scoped parameters (e.g., line ranges, file filters, and search bounds) to constrain the search space.
+Why Each Choice Is Needed:
+- [NEEDS EVIDENCE] requires close reading of method subsections.
+Failure Handling:
+- To address this, we introduced scoped parameters (e.g., line ranges, file filters, and search bounds) to constrain the search space.
+- We further observed that tool outputs can be large, introducing unnec- essary noise and increasing token consumption.
+Complexity / Cost Discussion:
+- We did not scale up this set due to the high cost of in-depth case analysis, as our goal was to perform detailed investigations to understand key challenges and inform component design.
+- We further observed that tool outputs can be large, introducing unnec- essary noise and increasing token consumption.
+- This observation motivated the design of structured context compression to preserve essential evidence while reducing token usage.
+- Ablation studies show that task-specific tools and domain knowledge are critical, while compression tool outputs reduces token consumption by over 30% with negligible impact.
+Pseudocode or Algorithm Blocks:
+- See raw_extraction/algorithms/ if present; otherwise [NEEDS ALGORITHM REPAIR].
+Static Reproducibility Signals:
+- Source path: [NEEDS ARTIFACT] no local source/artifact path detected beside the PDF; source code was not available locally in the requested path. [EXECUTION NOT REQUESTED]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Present the method as a pipeline from security evidence extraction to candidate generation/filtering/ranking/validation, with each stage tied to a specific failure mode.

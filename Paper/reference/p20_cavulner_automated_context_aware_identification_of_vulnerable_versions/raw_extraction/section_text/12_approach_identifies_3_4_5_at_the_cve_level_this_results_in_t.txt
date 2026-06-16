@@ -1,0 +1,345 @@
+approach identifies [𝑣3, 𝑣4, 𝑣5]. At the CVE level, this results in True = 0, False = 1, resulting in an
+accuracy of 0.00%. At the version level, TP = 2, FP = 1, FN = 2. Accordingly, the precision is 66.67%,
+the recall is 50.00%, and the F1-score is 57.14%.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 013 =====
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 13
+4.3 RQ1. Effectiveness Evaluation
+We select three representative state-of-the-art methods for identifying vulnerable versions in the
+Java ecosystem as our baselines: V-SZZ [ 9], which is based on commit tracing; VERJava [ 42],
+which leverages code similarity; and LLM4SZZ [43], which utilizes LLMs for vulnerability versions
+identification.
+V-SZZ traces all deleted lines in a fix commit back to their origin using git blame , treating
+them as vulnerability-inducing lines. To improve the accuracy of locating vulnerability-inducing
+commits (VICs), it also uses an AST-based line mapping algorithm. However, V-SZZ cannot handle
+cases where the fix commit contains no deleted lines, and the AST-based line mapping is not
+always accurate. VERJava addresses this limitation by supporting fix commits without deleted lines.
+It computes vulnerable versions at both the function level and the entire patch level, and then
+synthesizes the results to determine the final set of vulnerable versions. Since VERJava requires
+comparing every version, the computational cost is very high. As a result, the authors evaluated
+only a subset of versions. In contrast, to ensure the accuracy of our evaluation, we evaluate all
+versions of each project. For example, the VERJava study only assessed 13 versions of the Liferay
+Portal project, while we evaluated all 233 versions. LLM4SZZ employs rank-based identification
+and context-enhanced identification to handle different types of fixing commits.
+Table 2 and 3 present the results of CaVulner and baselines in identifying vulnerable versions in
+the CVE level and version level, respectively. Both LLM4SZZ andCaVulner use DeepSeek V3 as the
+large language model. According to the evaluation metrics, the criteria for CVE level statistics are
+particularly strict: if even a single predicted vulnerable version does not match the ground truth,
+the result cannot be counted as true. As a result, the accuracy at the CVE level is generally lower
+than precision and recall at the version level.
+Despite the stringent requirements for CVE-level accuracy, Table 2 reveals thatCaVulner achieves
+the highest overall accuracy of 73.30%, outperforming LLM4SZZ (33.52%), V -SZZ (37.50%) and
+VERJava (20.45%). These results highlight the effectiveness of CaVulner in accurately identifying
+complete vulnerable version sets for each CVE.
+We examined the 47 failure cases where CaVulner failed, aiming to clarify the underlying causes
+of these inaccuracies. Specifically, 8 cases erroneously included non-vulnerable early versions,
+while 39 failed to cover the complete vulnerable range. Further analysis reveals that 27 failures
+stemmed from misjudged semantic equivalence, while 14 cases resulted from errors in identifying
+duplicated commits, and the remaining 6 were caused by incorrect initial code localization.
+At the version level, where predictions are evaluated at a finer granularity, Table 3 demonstrates
+that CaVulner again achieves superior performance across all metrics. It achieves the highest
+precision (98.14%), recall (83.15%), and F1-score (90.02%), indicating that it can reliably identify
+most vulnerable versions while introducing few false positives. In comparison, LLM4SZZ achieves
+a lower recall (47.20%) and F1-score (61.38%), suggesting its vulnerability identification is more
+conservative and incomplete. Meanwhile, VERJava, although showing slightly better recall (68.56%)
+than V-SZZ (51.21%), suffers from a high false positive rate, as reflected by its lower precision
+(63.78%) and F1-score (66.08%).
+Notably, CaVulner achieves 100% precision in several projects such as jackson-databind, jenkins,
+spring-security, and struts, indicating its ability to avoid introducing any irrelevant versions during
+prediction. Even in large-scale projects like jenkins and jackson-databind, which contain thousands
+of versions, CaVulner maintains consistently high accuracy and recall.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 014 =====
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+14 Anon.
+Table 4. The results of different variants
+CVE Level Version Level
+Accuracy Precision Recall F1-score
+CaVulner_diff 49.43% 94.11% 58.12% 71.86%
+CaVulner_ast 65.91% 99.22% 80.23% 88.72%
+CaVulner 73.30% 98.14% 83.15% 90.02%
+RQ1: CaVulner consistently outperforms state-of-the-art baselines at both the CVE and
+version levels. The improvements in accuracy, precision, recall, and F1-score demonstrate
+the effectiveness of CaVulner in identifying vulnerable versions.
+4.4 RQ2. Ablation Study
+In this section, we evaluate the effectiveness of the key components of CaVulner. During the
+vulnerable code identification stage of CaVulner_diff, we remove the coarse-grained vulnerable
+methods localization and fine-grained vulnerable code blocks identification based on multi-source
+information fusion. Instead, we let the LLM identify the vulnerable code based on the fix commit
+diff files and CVE information. In the VIC tracing phase, we use the same approach as CaVulner. In
+CaVulner_ast, after identifying the vulnerable code blocks, we replace the use of LLM for tracing
+the VICs with an AST-based line mapping approach.
+As shown in Table 4, at the CVE level,CaVulner_diff achieves only 49.43% accuracy, indicating that
+without Coarse-grained Vulnerable Method Localization and Fine-grained Vulnerable Code Block
+Identification the LLM often misidentifies vulnerable versions. Introducing AST-based tracing raises
+CVE accuracy to 65.91%. Finally, the full CaVulner reaches 73.30%, outperforming CaVulner_diff
+and CaVulner_ast.
+To validate the effectiveness of our LLM-based VIC tracing module, we further compare its
+performance against the AST-based baseline (CaVulner_ast) using the strict CVE-level accuracy
+metric. As shown in Table 4, the AST-based approach achieves a CVE accuracy of 65.91%. Since
+CVE-level accuracy requires an exact match of the entire vulnerable version range, any deviation
+in identifying the VIC results in a failure for that CVE. By replacing the AST algorithm with our
+LLM-based semantic tracing, CaVulner significantly improves the accuracy to 73.30%. This absolute
+gain of 7.39% demonstrates that the LLM-based approach is superior in correctly pinpointing the
+exact VIC. Unlike the AST method, which may be disrupted by complex code refactorings and
+fail to identify the true origin, the LLM’s semantic understanding enables CaVulner to correctly
+determine the start of the vulnerability lifecycle in substantially more cases, thereby securing the
+correctness of the final version sets.
+At the version level, CaVulner_diff achieves a high precision (94.11%) but suffers from poor recall
+(58.12%) and a moderate F1-score (71.86%). CaVulner_ast improves substantially on recall (80.23%)
+and F1-score (88.72%) and achieves high precision (99.22%). However, both its recall and F1-score
+remain lower than those of CaVulner. This demonstrates that although AST -based tracing can
+boost precision, integrating LLM-driven VIC tracing is essential to maximize recall and overall F1
+performance.
+We further evaluated three additional LLMs, including DeepSeek R1, GPT 4.1-mini, and Qwen
+turbo. Table 5 compares the performance of four different large language models on both CVE and
+version levels, all run with zero temperature to ensure determinism.
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 015 =====
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712
+713
+714
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 15
+Table 5. The results of different LLMs
+LLM CVE Level Version Level
+Accuracy Precision Recall F1-score
+deepseek-v3 73.30% 98.14% 83.15% 90.02%
+deepseek-r1 72.73% 97.63% 85.56% 91.20%
+gpt-4.1-mini 52.27% 87.78% 62.88% 73.27%
+qwen-turbo 43.75% 84.52% 60.98% 70.84%
+Table 6. Average LLM resource consumption per CVE vulnerable version identification
+LLM input(k) output(k) total(k) cost($) time(s)
+deepseek-v3 102.47 28.25 130.72 0.060 38.68
+deepseek-r1 100.83 296.53 397.36 0.721 206.49
+gpt-4.1-mini 91.55 31.08 122.63 0.086 21.61
+qwen-turbo 92.86 22.67 115.53 0.006 21.27
+Overall, the performance of different LLMs on the vulnerable version identification task varies,
+reflecting each model’s inherent capacity for understanding and reasoning about vulnerabilities.
+DeepSeek-v3 and DeepSeek-R1 exhibit comparable performance, and both achieve the best results
+among all evaluated LLMs.
+At the CVE level, every LLM outperforms the traditional baselines. Even the weakest model,
+Qwen-turbo, attains an accuracy of 43.75%, surpassing the best baseline (V-SZZ) at 37.50%. This
+demonstrates that, under the strict all -match criterion, general -purpose LLMs can still exceed
+baseline approaches.
+At the version level, even the worst-performing Qwen-turbo still has an F1-score (70.84%) higher
+than the best F1-score in the baseline, VERJava (66.08%), further demonstrating the advantage of
+CaVulner in identifying vulnerable versions.
+RQ2: The ablation study validates that each key component of CaVulner is essential to its
+effectiveness. Additionally, all evaluated LLMs outperformed the baseline in vulnerability
+version identification.
+4.5 RQ3. Resource Consumption
+We implement CaVulner by invoking LLM APIs. Since analyzing the root cause of a vulnerability
+and localizing the corresponding code blocks requires a non-trivial amount of time and tokens, we
+assess the cost of LLM usage. As shown in Figure 2,CaVulner relies on LLM in three stages: Coarse-
+grained Vulnerable Methods Localization, Fine-grained Vulnerable Code Block Identification, and
+Vulnerability-inducing Commit Tracing. We evaluate the token consumption, and time overhead
+during these stages.
+Table 6 shows the average LLM resource consumption per CVE vulnerability-version identifi-
+cation. In terms of input, output, and total tokens, DeepSeek V3, GPT 4.1-mini, and Qwen turbo
+exhibit similar consumption. DeepSeek R1, as a reasoning model, exhibits significantly higher
+output token consumption. It consumes about ten times more output tokens than DeepSeek V3
+, Vol. 1, No. 1, Article . Publication date: January 2018.
+
+===== Page 016 =====
+736
+737
+738
+739
+740
+741
+742
+743
+744
+745
+746
+747
+748
+749
+750
+751
+752
+753
+754
+755
+756
+757
+758
+759
+760
+761
+762
+763
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775
+776
+777
+778
+779
+780
+781
+782
+783
+784
+16 Anon.
+while using an equivalent number of input tokens. For runtime, GPT 4.1 -mini and Qwen turbo
+require the least processing time, DeepSeek V3 takes approximately twice as long, and DeepSeek
+R1 incurs the highest latency.
+RQ3: CaVulner demonstrates high economic feasibility. Using DeepSeek V3, the average
+cost is only $0.06 per CVE. This confirms that standard LLMs offer a scalable and cost-
+effective solution for automated vulnerable version identification.

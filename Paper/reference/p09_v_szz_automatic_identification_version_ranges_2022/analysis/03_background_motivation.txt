@@ -1,0 +1,30 @@
+# 03 Background and Motivation Analysis
+
+Task Definition:
+- Given a CVE vulnerability and fixing commit(s), identify vulnerability-inducing commit(s), then infer which release/version tags are affected.
+- A software version is treated as vulnerable if it contains vulnerable code; otherwise it is not vulnerable.
+
+Domain Concepts:
+- B-SZZ traces deleted/modified lines in fixing commits back to candidate inducing commits.
+- AG-SZZ improves line tracking by ignoring non-semantic lines and using annotation graph ideas.
+- MA-SZZ addresses meta-changes such as branch/merge/property changes.
+- RA-SZZ addresses refactoring-related false inducing commits but is Java-limited in this study.
+
+Motivation Case 1: CVE-2018-6621 / FFmpeg
+- The CVE affected-version text changed from through 3.4.1 to through 3.2 after several years.
+- The paper uses the example to show that affected versions can be refined by checking vulnerable code presence across version tags between inducing and fixing commits.
+- It also shows development/release tags can require careful boundary checking.
+
+Motivation Case 2: CVE-2015-1830 / Apache ActiveMQ
+- Classic SZZ would stop at the previous commit, which fails to produce the affected versions expected from the vulnerability description.
+- Continuing into descendant/earlier modifications identifies the commit where the vulnerable line was first added.
+- This motivates V-SZZ's earliest-modification assumption for vulnerabilities.
+
+Why Prior Work Is Insufficient:
+- Classic SZZ assumes the last modification to a fixed line introduced the bug.
+- This assumption conflicts with foundational vulnerabilities that have existed since initial or early versions.
+- Prior affected-version refinement inherits this weakness when it depends on classic SZZ output.
+
+Useful For Our Paper:
+- Provides a clear baseline narrative for why affected-version identification is not merely metadata parsing.
+- The two-case motivation style is reusable: first show inaccurate version metadata, then show why the method-level baseline fails.

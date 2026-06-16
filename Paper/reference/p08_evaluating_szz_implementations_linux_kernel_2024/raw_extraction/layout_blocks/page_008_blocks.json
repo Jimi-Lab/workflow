@@ -1,0 +1,482 @@
+[
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:001",
+    "block_type": "text",
+    "text": "2226\nIEEE TRANSACTIONS ON SOFTWARE ENGINEERING, VOL. 50, NO. 9, SEPTEMBER 2024",
+    "bbox": [
+      42.35,
+      32.52,
+      556.42,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:002",
+    "block_type": "text",
+    "text": "IV. STUDY DESIGN",
+    "bbox": [
+      128.86,
+      63.79,
+      206.88,
+      74.91
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:003",
+    "block_type": "text",
+    "text": "The purpose of this study is to empirically evaluate the var-\nious implementations of the SZZ algorithm on the currently\nlargest dataset for SZZ evaluation and to investigate patterns\nthat cannot be identiﬁed by SZZ (i.e., how to improve the recall\nof the SZZ algorithms), particularly Ghost Commits. To achieve\nthese goals, we formulate three research questions:\nRQ1: How well do the different variants of SZZ perform\nin identifying bug-inducing changes?\nIn our ﬁrst research question, we aim to examine the per-\nformance of different SZZ variants on our dataset relative to\na previous study by Rosa et al. [28]. Our study involves a\ndataset with more bug-ﬁxing commits than in previous studies.\nEvaluating SZZ is crucial to ascertain if the prior studies’claims\nremain valid in an updated and more comprehensive dataset\nfrom a complete software project.\nRQ2: What is the impact of Ghost Commits on the\nbehavior of SZZ in a real software project?\nIn our second research question, we aim to explore the effects\nof ghost commits on the use of SZZ variants in a real software\nproject, We divide RQ2 into two speciﬁc questions: (1) How\nfrequently do ghost commits (Remove Mapping Ghost as bug-\nﬁxing commits, Add Mapping Ghost as bug-inducing commits)\noccur? (2) How do ghost commits impact the SZZ algorithms?\nRQ3: What other situations, besides Ghost Commits,\nare undetectable by SZZ algorithms? In our ﬁnal research\nquestion, we aim to identify additional situations where the SZZ\nalgorithms fail, apart from the Ghost Commit situation. Given\nthat SZZ algorithms are founded on the assumption that “a bug-\ninducing change adds lines that are later removed by a ﬁx,”\nwe address two speciﬁc questions within RQ3: (1) Do all fail-\nure cases, besides Ghost Commits, adhere to this assumption?\n(2) Beyond the previously studied situation, what other situa-\ntions prevent SZZ from successfully identifying bug-inducing\ncommits?",
+    "bbox": [
+      42.34,
+      81.73,
+      293.45,
+      487.36
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:004",
+    "block_type": "text",
+    "text": "A. Algorithm Selection & Data Collection",
+    "bbox": [
+      42.35,
+      504.29,
+      215.95,
+      515.25
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:005",
+    "block_type": "text",
+    "text": "We conduct experiments on several variants of the SZZ al-\ngorithm. Speciﬁcally, we adapt the main variants from the prior\nstudy by Rosa et al. [28] to run on our dataset. Of these, we do\nnot use SZZ Unleashed since our commits are not associated\nwith an issue tracker; thus there is no issue date. We do not\nuse OpenSZZ since it needs a Jira URL as input. RA-SZZ∗",
+    "bbox": [
+      42.35,
+      521.08,
+      293.4,
+      592.17
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:006",
+    "block_type": "text",
+    "text": "only works on Java as Refactoring Miner [30] can only detect\nrefactoring operations in Java ﬁles. Therefore we do not use\nRA-SZZ∗because the Linux kernel is a C-based project. In\nsummary, we use B-SZZ, AG-SZZ, L-SZZ, R-SZZ, MA-SZZ,\nand PyDriller (SZZ@PYD). We used the KFC dataset, featur-\ning the complete set of 76,046 Fixes: annotated bug-ﬁxes.",
+    "bbox": [
+      42.34,
+      592.81,
+      293.41,
+      663.71
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:007",
+    "block_type": "text",
+    "text": "B. Data Analysis",
+    "bbox": [
+      42.34,
+      680.63,
+      113.08,
+      691.59
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:008",
+    "block_type": "text",
+    "text": "Given the set of bug-inducing commits predicted by the\ntested SZZ algorithms and the collected dataset, we evaluate\nthe accuracy of the tested SZZ algorithms using recall and\nprecision, two well-known Information Retrieval metrics [51].",
+    "bbox": [
+      42.34,
+      697.42,
+      293.44,
+      744.4
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:009",
+    "block_type": "text",
+    "text": "We also use F1 score [52], which calculates the harmonic\nmean of recall and precision. These metrics have been used\nin previous studies to evaluate SZZ performance [28], [46].\nThe metrics for a bug-ﬁxing commits are deﬁned as follows,\nwhere correctci is the ground truth of bug-ﬁxing commit ci,\ni.e., the bug-inducing commits annotated by the original Linux\nkernel developer, identiﬁedci is the bug-inducing commits of\nbug-ﬁxing commit ci identiﬁed by the SZZ algorithms, and N\nis the total number of bug-ﬁxing commits:",
+    "bbox": [
+      305.35,
+      63.79,
+      556.41,
+      170.55
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:010",
+    "block_type": "text",
+    "text": "recall = 1",
+    "bbox": [
+      354.4,
+      182.74,
+      398.37,
+      200.92
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:011",
+    "block_type": "text",
+    "text": "N",
+    "bbox": [
+      391.34,
+      197.79,
+      399.34,
+      207.75
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:012",
+    "block_type": "text",
+    "text": "N\n\u0002",
+    "bbox": [
+      404.25,
+      180.74,
+      418.64,
+      218.45
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:013",
+    "block_type": "text",
+    "text": "ci=1",
+    "bbox": [
+      403.28,
+      204.01,
+      419.61,
+      212.52
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:014",
+    "block_type": "text",
+    "text": "|correctci ∩identiﬁedci|",
+    "bbox": [
+      422.46,
+      183.97,
+      521.68,
+      203.75
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:015",
+    "block_type": "text",
+    "text": "|correctci|",
+    "bbox": [
+      451.26,
+      197.54,
+      492.88,
+      214.82
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:016",
+    "block_type": "text",
+    "text": "precision = 1",
+    "bbox": [
+      338.89,
+      221.77,
+      398.37,
+      239.94
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:017",
+    "block_type": "text",
+    "text": "N",
+    "bbox": [
+      391.34,
+      236.81,
+      399.34,
+      246.77
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:018",
+    "block_type": "text",
+    "text": "N\n\u0002",
+    "bbox": [
+      404.25,
+      219.77,
+      418.64,
+      257.48
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:019",
+    "block_type": "text",
+    "text": "ci=1",
+    "bbox": [
+      403.28,
+      243.04,
+      419.61,
+      251.55
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:020",
+    "block_type": "text",
+    "text": "|correctci ∩identiﬁedci|",
+    "bbox": [
+      422.46,
+      222.99,
+      521.68,
+      242.77
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:021",
+    "block_type": "text",
+    "text": "|identiﬁedci|",
+    "bbox": [
+      446.04,
+      236.56,
+      498.1,
+      253.85
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:022",
+    "block_type": "text",
+    "text": "cF1 = 2 · recall × precision",
+    "bbox": [
+      360.88,
+      257.47,
+      482.09,
+      281.49
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:023",
+    "block_type": "text",
+    "text": "recall + precision",
+    "bbox": [
+      403.52,
+      271.29,
+      482.09,
+      281.25
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:024",
+    "block_type": "text",
+    "text": "We also analyze the complementarity of the SZZ variants\nfollowing previous work [28]. Given the set of evaluated SZZ\nvariants SZZ eval = {v1, v2, . . . , vn}, we compute their comple-\nmentarity using the following metrics for each vi [53]:",
+    "bbox": [
+      305.35,
+      288.14,
+      556.41,
+      336.62
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:025",
+    "block_type": "text",
+    "text": "correctvi∩vj = |correctvi ∩correctvj|",
+    "bbox": [
+      351.42,
+      344.53,
+      507.86,
+      369.17
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:026",
+    "block_type": "text",
+    "text": "|correctvi ∪correctvj|",
+    "bbox": [
+      415.48,
+      358.71,
+      507.86,
+      378.49
+    ],
+    "reading_order": 26,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:027",
+    "block_type": "text",
+    "text": "correctvi\\(SZZ exp\\vi) = |correctvi \\ correct(SZZ exp\\vi)|",
+    "bbox": [
+      315.81,
+      376.61,
+      543.92,
+      401.55
+    ],
+    "reading_order": 27,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:028",
+    "block_type": "text",
+    "text": "|correctvi ∪correct(SZZ exp\\vi)|",
+    "bbox": [
+      415.48,
+      391.09,
+      544.75,
+      410.87
+    ],
+    "reading_order": 28,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:029",
+    "block_type": "text",
+    "text": "correctvi denotes the set of correct bug-inducing commits\npredicted by the SZZ algorithm vi. correct(SZZexp\\vi) de-\nnotes the correct bug-inducing commits predicted by all eval-\nuated SZZ algorithms except for vi. correctvi∩vj represents\nthe overlap between the correct bug-inducing commits identi-\nﬁed by the SZZ algorithm vi and another SZZ algorithm vj.\ncorrectvi\\(SZZexp\\vi), denotes the correct bug-inducing com-\nmits that are only identiﬁed by the SZZ algorithm vi.\nTo analyze the frequency of each Remove Mapping Ghost\nand Add Mapping Ghost, we use the same computation as Rezk\net al. [17]. Remove Mapping Ghost: the percentage of bug-\nﬁxing commits that do not remove lines and only add lines out\nof all bug-ﬁxing commits. Add Mapping Ghost: the percentage\nof commits that do not add lines and only remove lines out of all\ncommits. With respect to Add Mapping Ghost, we also report\nthe percentage of bug-inducing commits that do not add lines\nand only remove lines out of the set of bug-inducing commits, as\nthese are the only commits that only remove lines that actually\nhave an impact on the SZZ results.",
+    "bbox": [
+      305.35,
+      410.02,
+      556.42,
+      636.34
+    ],
+    "reading_order": 29,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:030",
+    "block_type": "text",
+    "text": "V. TC-SZZ",
+    "bbox": [
+      407.65,
+      655.57,
+      454.13,
+      666.69
+    ],
+    "reading_order": 30,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:031",
+    "block_type": "text",
+    "text": "The fundamental premise of the SZZ algorithm is that “a bug-\ninducing change adds lines that are later removed by a ﬁx.” In\nother words, for a bug-ﬁxing commit, the SZZ algorithms use\nthe git show command to identify deleted or modiﬁed lines, and\nthe git blame command to identify the most recent change to\neach such line. However, we discovered that some bug-inducing",
+    "bbox": [
+      305.35,
+      673.5,
+      556.45,
+      744.4
+    ],
+    "reading_order": 31,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:008:032",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 32,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

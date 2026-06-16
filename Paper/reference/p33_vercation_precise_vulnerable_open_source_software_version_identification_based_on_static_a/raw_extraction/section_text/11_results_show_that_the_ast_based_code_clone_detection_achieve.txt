@@ -1,0 +1,27 @@
+results show that the AST-based code clone detection achieves
+the best performance. Because the edit distance and hash value
+methods terminate the backtrack in cases of low textual simi-
+larity without considering code behavior, thus leads to a large
+number of false negatives. The results show that our method is
+robust against low syntactic similarity. CodeBERT embedding
+comparison, while effective for semantic similarity, cannot cap-
+ture ﬁne-grained structural information. AST representations
+preserve the exact syntactic structure of code, allowing for more
+precise comparisons of code organization and logic ﬂow. This
+structural analysis can identify clones that CodeBERT might
+miss, especially in cases where s imilar functionality is imple-
+mented with different coding patterns or variable names, which
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 015 =====
+390 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+can be addressed by AST normalization. Although FCDetector
+also extracts AST as a feature and normalizes variable names
+and constant values, it cannot identify function outline cases (as
+shown in Listing 2). Moreover, the CFG features that FCDetec-
+tor focuses on are not particularly effective when there are only
+a few vulnerable statements.
+2) Analysis of Refactoring Commits: As motivated in Exam-
+ple 2 of Section II-C, refactoring commits can signiﬁcantly im-
+pact vulnerable version identiﬁcation by introducing structural
+differences while preserving code behavior. To validate this

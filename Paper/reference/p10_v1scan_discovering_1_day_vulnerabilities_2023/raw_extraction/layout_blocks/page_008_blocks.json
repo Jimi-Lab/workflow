@@ -1,0 +1,257 @@
+[
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:001",
+    "block_type": "text",
+    "text": "3.4\nConsolidation phase (P3)",
+    "bbox": [
+      54.0,
+      70.49,
+      208.44,
+      86.04
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:002",
+    "block_type": "text",
+    "text": "By consolidating the vulnerability detection results of the\nimproved version- and code-based approaches, V1SCAN de-\ntermines vulnerabilities that exist in the target program.\nAs explained in P1 and P2, V1SCAN reduces false posi-\ntives and negatives in the version- and code-based approach.\nThe false alarms produced by the version-based approach\nwere removed through the reuse code classification-based\nfiltering, and the false alarms of the code-based approach\nwere prevented by using both the hash and line comparisons.\nMoreover, V1SCAN covers the false negatives of version- and\ncode-based approaches by combining their results. Vulnera-\nbilities included in less frequently identified versions (i.e., not\na prevalent version) can be covered by detecting them with\nthe code-based approach of V1SCAN. In addition, by leverag-\ning vulnerable code classification and focusing only on core\nvulnerable code lines, V1SCAN can address false negatives\nof existing code-based approaches. Therefore, we denote the\nunion of the detection results of both approaches as the list of\nvulnerabilities contained in the target programs.",
+    "bbox": [
+      53.64,
+      89.44,
+      295.86,
+      316.64
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:003",
+    "block_type": "text",
+    "text": "4\nImplementation of V1SCAN",
+    "bbox": [
+      54.0,
+      325.64,
+      213.46,
+      341.19
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:004",
+    "block_type": "text",
+    "text": "This section introduces the implementation of V1SCAN, in-\ncluding its architecture and the datasets.",
+    "bbox": [
+      53.69,
+      347.19,
+      295.77,
+      371.15
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:005",
+    "block_type": "text",
+    "text": "4.1\nArchitecture",
+    "bbox": [
+      54.0,
+      381.02,
+      145.53,
+      396.57
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:006",
+    "block_type": "text",
+    "text": "V1SCAN comprises the two modules: a dataset collector and\na vulnerability detector. The dataset collector constructs the\nOSS and CVE datasets (see Section 4.2 and Section 4.3).\nThe vulnerability detector performs vulnerability discovery\non the target program, which is implemented in approximately\n1,800 lines of Python code excluding external libraries. We\nuse CENTRIS [36] to identify the OSS components in the\ntarget program. For the parser and LSH algorithm, we utilize\nCtags [5] and TLSH [23,30]. Ctags is a regular expression-\nbased parser, and has the advantage of scalability and detec-\ntion accuracy; it can be used to precisely parse C/C++ source\nfiles without being affected by the code size of the target pro-\ngram. In addition, because Ctags provides the functionality\nto identify functions, structures, macros, and variables from\nsource files, it can be effectively used to classify vulnerable\nlocations. Next, we selected the TLSH [23,30] as the LSH\nalgorithm, which is both accurate and scalable. We used the\nsimilarity measurement function provided by TLSH as it is,\nand selected the cutoff value of 30 (see Section 3.1), which\nwas observed to be the most efficient in their paper [23].",
+    "bbox": [
+      53.25,
+      401.97,
+      295.77,
+      641.12
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:007",
+    "block_type": "text",
+    "text": "4.2\nOSS dataset",
+    "bbox": [
+      54.0,
+      654.97,
+      143.01,
+      670.53
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:008",
+    "block_type": "text",
+    "text": "The OSS dataset is utilized for identifying OSS components\nin the target program. We leveraged the OSS dataset provided\nby CENTRIS [36], which consists of all versions of the 10,241\npopular C/C++ OSS projects on GitHub.",
+    "bbox": [
+      53.69,
+      674.93,
+      294.86,
+      722.8
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:009",
+    "block_type": "text",
+    "text": "Table 3: CVE dataset overview.",
+    "bbox": [
+      378.01,
+      71.06,
+      497.57,
+      82.73
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:010",
+    "block_type": "text",
+    "text": "Category\nCount (#)",
+    "bbox": [
+      389.77,
+      85.71,
+      539.93,
+      97.37
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:011",
+    "block_type": "text",
+    "text": "• Security patches\n4,612\n- Vulnerable and patched function pairs\n7,675\n- Vulnerable and patched structure pairs\n106\n- Vulnerable and patched macro pairs\n221\n- Vulnerable and patched variable pairs\n598\n• CPE database\n- Contained CVEs\n137,892\n- Collected vulnerable software\n75,489\n- Collected vulnerable versions\n559,305",
+    "bbox": [
+      327.18,
+      99.86,
+      536.2,
+      199.05
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:012",
+    "block_type": "text",
+    "text": "Since the dataset of CENTRIS was constructed in April\n2020, we additionally collected versions generated after that\nof each repository (as of April 2022). As a result, the number\nof versions increased from 229,326 to 246,512 in V1SCAN.",
+    "bbox": [
+      317.88,
+      212.93,
+      558.17,
+      260.8
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:013",
+    "block_type": "text",
+    "text": "4.3\nCVE dataset",
+    "bbox": [
+      317.88,
+      275.04,
+      409.53,
+      290.6
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:014",
+    "block_type": "text",
+    "text": "For each CVE, V1SCAN first collects the security patch, and\nthen extracts necessary information (e.g., vulnerable func-\ntions) from the patch. V1SCAN then constructs the CPE\ndatabase, which is used in the improved version-based ap-\nproach. Table 3 summarizes the CVE dataset.",
+    "bbox": [
+      317.88,
+      295.99,
+      559.65,
+      355.82
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:015",
+    "block_type": "text",
+    "text": "Collecting security patches. We collected security patches\nof CVE vulnerabilities by leveraging existing approaches [11,",
+    "bbox": [
+      317.88,
+      359.41,
+      559.25,
+      383.73
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:016",
+    "block_type": "text",
+    "text": "16, 35, 37]. We examined CVEs in the NVD and checked\nwhether a “Git commit” URL was included in the references;\nthis URL provides the code-level security patches. Hence, we\ncan obtain the security patch commits for CVE vulnerabilities\nby crawling the URLs. As a result, we collected 4,612 C/C++\nsecurity patches from the NVD (as of August 2022).",
+    "bbox": [
+      317.13,
+      383.68,
+      559.4,
+      455.46
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 8,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:008:017",
+    "block_type": "text",
+    "text": "Identifying vulnerable locations. Because V1SCAN uses\nvulnerable code classification, it is necessary to identify the\nlocation to which the code modified by the security patch\nbelongs. Each security patch provides (1) a Git index and (2)\ncode line numbers that include vulnerable and patched code.\nWe access the index to obtain the vulnerable and patched\nsource files (e.g., using the “git show” command). We then\nparse the source files using Ctags [5]. Using this output, we\ncan obtain the start and end line numbers of each function,\nstructure, macro, and variable. Finally, we identify the loca-\ntions that contain the modified code lines in the patch. If\nthe modified code lines belong to a function or structure, the\nentire code of the vulnerable and patched function (and struc-\nture) is extracted. If the modified code lines belong to a macro\nor variable, the exact lines of code are extracted.\nAs a result, we collected 7,675 vulnerable and patched\nfunction pairs, 106 structure pairs, 221 macro pairs, and 598\nvariable pairs. Over 97% of the code repaired by the patch was\nincluded in one of the four locations. The remaining 3% were\ncode patches that very rarely appear, such as changing header\nfile names. This confirms that considering these four locations\nfor vulnerability detection is sufficiently comprehensive.",
+    "bbox": [
+      317.63,
+      459.05,
+      559.66,
+      722.48
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

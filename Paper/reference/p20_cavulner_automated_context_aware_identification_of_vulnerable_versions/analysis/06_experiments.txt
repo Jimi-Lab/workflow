@@ -1,0 +1,54 @@
+Research Questions:
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+Datasets:
+- We leveraged the dataset compiled by Ponta et al.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+- The dataset of V-SZZ covered various types of vulnerabilities.
+- VERJava selected the TOP6 projects with respect to the number of CVEs having available patches.
+- Additionally, it included Liferay-portal, which contains the highest number of CVEs in NVD.
+- The CVEs in the VERJava dataset span a broad period of each project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+- Our study specifically targeted CVEs from this collection that affect open-source projects hosted on GitHub.
+- To construct our dataset, we merged the CVEs used by V-SZZ and VERJava, then excluded those whose vulnerable versions were not available on GitHub, such as tomcat 5.x.x or 6.x.x.
+Baselines:
+- How does the performance of CaVulner compare to state-of-the-art approaches?
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+- The dataset of V-SZZ covered various types of vulnerabilities.
+- To construct our dataset, we merged the CVEs used by V-SZZ and VERJava, then excluded those whose vulnerable versions were not available on GitHub, such as tomcat 5.x.x or 6.x.x.
+- Comparison with baselines at the CVE level (GT: Ground Truth) Project GT V-SZZ VERJava LLM4SZZ CaVulner True False Accuracy True False Accuracy True False Accuracy True False Accuracy jackson-databind 62 0 62 0.00% 0 62 0.00% 0 62 0.00% 42 20 67.74% liferay-portal 18 8 10 44.44% 1 17 5.56% 6 12 33.33% 10 8 55.56% jenkins 17 3 14 17.65% 4 13 23.53% 3 14 17.65% 12 5 70.59% struts 14 9 5 64.29% 9 5 64.29% 8 6 57.14% 13 1 92.86% tomcat 7 4 3 57.14% 3 4 42.86% 6 1 85.71% 6 1 85.71% spring-framework 7 4 3 57.14% 3 4 42.86% 5 2 71.43% 6 1 85.71% spring-security 3 2 1 66.67% 1 2 33.33% 2 1 66.67% 3 0 100.00% other 48 36 12 75.00% 15 33 31.25% 29 19 60.42% 37 11 77.08% Total 176 66 110 37.50% 36 140 20.45% 59 117 33.52% 129 47 73.30% further verified and refined the fix commit datasets for both V-SZZ and VERJava based on GitHub issues and official project websites.
+- We found that the V-SZZ and VERJava datasets share 23 overlapping CVEs.
+- V-SZZ classifies any version containing deleted lines as vulnerable, while VERJava determines vulnerable versions by comparing the code of each candidate version with both the deleted code and the added code to decide whether the vulnerability exists.
+Metrics:
+- VERJava selected the TOP6 projects with respect to the number of CVEs having available patches.
+- Comparison with baselines at the CVE level (GT: Ground Truth) Project GT V-SZZ VERJava LLM4SZZ CaVulner True False Accuracy True False Accuracy True False Accuracy True False Accuracy jackson-databind 62 0 62 0.00% 0 62 0.00% 0 62 0.00% 42 20 67.74% liferay-portal 18 8 10 44.44% 1 17 5.56% 6 12 33.33% 10 8 55.56% jenkins 17 3 14 17.65% 4 13 23.53% 3 14 17.65% 12 5 70.59% struts 14 9 5 64.29% 9 5 64.29% 8 6 57.14% 13 1 92.86% tomcat 7 4 3 57.14% 3 4 42.86% 6 1 85.71% 6 1 85.71% spring-framework 7 4 3 57.14% 3 4 42.86% 5 2 71.43% 6 1 85.71% spring-security 3 2 1 66.67% 1 2 33.33% 2 1 66.67% 3 0 100.00% other 48 36 12 75.00% 15 33 31.25% 29 19 60.42% 37 11 77.08% Total 176 66 110 37.50% 36 140 20.45% 59 117 33.52% 129 47 73.30% further verified and refined the fix commit datasets for both V-SZZ and VERJava based on GitHub issues and official project websites.
+Experimental Protocol:
+- 4 Evaluation Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+- All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32 GB of RAM, and running Ubuntu 20.04.
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+Implementation Details:
+- 4 Evaluation Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+- Our approach is implemented in about 8,500 lines of Python code in total.
+- [35], who manually collected and curated vulnerabilities in open-source software along with their corresponding fixing commits.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+- VERJava selected the TOP6 projects with respect to the number of CVEs having available patches.
+- The CVEs in the VERJava dataset span a broad period of each project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+Hyperparameters / Settings:
+- To mitigate stochastic noise in LLM-generated responses and reduce logical bias, we set the temperature to zero for LLMs.
+Hardware / Environment:
+- All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32 GB of RAM, and running Ubuntu 20.04.
+Static Reproducibility Materials:
+- Local requested path contains PDF evidence only; no README/config/script/data directory detected for this paper. [NEEDS ARTIFACT]
+Execution Status:
+- [EXECUTION NOT REQUESTED]
+What Is Measured:
+- 4 Evaluation Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+- All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32 GB of RAM, and running Ubuntu 20.04.
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+- We leveraged the dataset compiled by Ponta et al.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+- The dataset of V-SZZ covered various types of vulnerabilities.
+- The CVEs in the VERJava dataset span a broad period of each project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+What Is Not Measured:
+- [NEEDS EVIDENCE]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Frame evaluation by RQs, dataset construction, baselines, then quantitative and case-study evidence.

@@ -1,0 +1,34 @@
+# 02 Introduction Analysis
+
+Paragraph-Level Rhetorical Structure:
+
+Opening:
+- Starts from software vulnerabilities as security bugs that threaten systems and motivates NVD/CVE as the public vulnerability information infrastructure.
+- Establishes that affected-version information is operationally important for organizations.
+
+Pain Point:
+- Introduces software supply-chain risk and SCA tools, then links SCA output to CVE/NVD data quality.
+- Uses CVE-2018-6621 as an example where affected-version information changed years after disclosure.
+- Frames conservative NVD affected-version propagation as costly because organizations may upgrade or remediate versions that are not actually affected.
+
+Prior Work Gap:
+- Notes that many studies address vulnerability management or patches, but few refine CVE affected versions.
+- Positions Nguyen et al. as closest prior work: it identifies spurious NVD claims using inducing commits from original SZZ.
+- The gap is that original SZZ is optimized for common bugs rather than vulnerabilities.
+
+Challenge:
+- Vulnerabilities can be foundational or introduced earlier than the previous commit selected by classic SZZ.
+- Existing SZZ variants have known accuracy issues and their suitability for vulnerability-induced commits is uncertain.
+
+Insight:
+- For vulnerability affected-version analysis, going further backward through line history may be necessary because the relevant inducing commit is often earlier than the last modification of a fixed line.
+- Affected versions can be inferred by locating version tags between inducing and fixing commits, but duplicated patches across branches must be handled.
+
+Contribution Framing:
+- The paper states two contributions: a dataset of 172 CVEs with inducing commits and manually verified affected versions, and V-SZZ as an improved SZZ-based approach for affected-version refinement.
+
+Reusable Writing Pattern:
+- Start with a high-stakes operational dependency on public vulnerability metadata.
+- Show a concrete metadata error that causes wasted remediation effort.
+- Explain why the closest algorithmic baseline has an assumption mismatch.
+- State a vulnerability-specific insight, then convert it into dataset plus method contributions.

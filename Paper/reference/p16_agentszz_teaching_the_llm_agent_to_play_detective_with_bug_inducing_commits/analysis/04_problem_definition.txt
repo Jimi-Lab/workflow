@@ -1,0 +1,32 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- These tools were implemented as thin wrappers with only essential parameters (e.g., commit hash and file path), which often produced excessive outputs and led to inefficient investiga- tion.
+- We further observed that tool outputs can be large, introducing unnec- essary noise and increasing token consumption.
+Objective:
+- Given a bug-fixing commit, SZZ identifies the bug-inducing commits that introduced the defect.
+- They have been widely used in many downstream tasks such as defect prediction [13, 15, 28, 34, 46], analysis of how bugs are in- troduced [5, 6, 39], and vulnerability version identification [4, 8].
+- More recently, security code generation benchmarks also rely on SZZ algorithms to identify vulnerability-inducing commits [7].
+- Many variants of SZZ algorithms have been proposed to improve the accuracy of bug-inducing commit identification.
+Constraints:
+- These tools were implemented as thin wrappers with only essential parameters (e.g., commit hash and file path), which often produced excessive outputs and led to inefficient investiga- tion.
+- We exclude git bisect, as it requires compiling and executing.
+- These heuristics guide deeper exploration and enable the identification of bug-inducing commits that require non-trivial investigation.
+- To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee.
+Evaluation Target:
+- experiments on three widely used datasets show thatAgentSZZ consistently outperforms state-of-the-art SZZ algorithms across all settings, achieving F1-score gains of up to 27.2% over prior LLM- based approaches.
+- The improvements are especially pronounced in challenging scenarios such as cross-file and ghost commits, with recall gains of up to 300% and 60%, respectively.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- For example, LLM4SZZ achieves a recall of only 0.552 on the Linux ker- nel dataset, indicating that nearly half of the bug-inducing commits remain unidentified.
+- Thefundamental limitationis that existing SZZ algorithms rely heavily ongit blameto trace modified lines in bug-fixing com- mits.
+- Several challenges remain: ❶ agents struggle with tool selection, ❷ actions lack domain-specific guidance, and ❸ tool outputs can be large, leading to excessive token consumption, increased latency, and noisy context that may hinder reasoning.
+- These gains are especially pronounced in challenging scenarios such as cross-file and ghost commits, where recall improves by up to 300% and 60%, respectively, highlighting the ability ofAgentSZZto improve the fundamental limitations of blame-based methods.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

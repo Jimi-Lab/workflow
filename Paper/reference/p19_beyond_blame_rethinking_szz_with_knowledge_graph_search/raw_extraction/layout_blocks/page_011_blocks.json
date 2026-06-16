@@ -1,0 +1,227 @@
+[
+  {
+    "page": 11,
+    "block_id": "page_011:block_001",
+    "block_type": "text",
+    "text": "Beyond Blame: Rethinking SZZ with Knowledge Graph Search 11",
+    "bbox": [
+      45.827999114990234,
+      60.6286735534668,
+      440.172607421875,
+      69.8819580078125
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_002",
+    "block_type": "text",
+    "text": "LLM4SZZ [ 36 ] is the current state-of-the-art approach that leverages LLMs to identify BICs from blame candidates. It employs two strategies: rank-based identification that asks the LLM to rank buggy statements by their relevance to the root cause, and context-enhanced identification that provides additional context for direct BIC selection. LLM4SZZ expands context around modified lines (full function bodies or ± 2 surrounding lines) and blames these expanded lines as well for candidate collection. This enables LLM4SZZ to handle blameless cases and reach some BICs beyond the immediate deleted-line blame set. However, LLM4SZZ does not traverse commit history, which is the gap that AgenticSZZ addresses through TKG-based exploration. In summary, LLM4SZZ’s context expansion extends blame beyond deleted lines but does not traverse commit history. Furthermore, only LLM4SZZ handles blameless cases; none of the other baselines can provide any candidates when the bug fix contains only additions.",
+    "bbox": [
+      45.827999114990234,
+      83.43709564208984,
+      440.4259948730469,
+      216.75738525390625
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_003",
+    "block_type": "text",
+    "text": "5.2 Evaluation Metrics Following LLM4SZZ, we adopt standard information retrieval metrics. Let 𝑃 denote the set of predicted BICs and 𝐺 denote the set of ground truth BICs for a given BFC. Precision measures the fraction of predictions that match ground truth BICs, Recall measures the fraction of ground truth BICs that are correctly identified, and F1-score is the harmonic mean of Precision and Recall, providing a balanced measure:",
+    "bbox": [
+      45.827999114990234,
+      227.86624145507812,
+      441.2630920410156,
+      303.3833923339844
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_004",
+    "block_type": "text",
+    "text": "Precision = | 𝑃 ∩ 𝐺 |",
+    "bbox": [
+      94.78799438476562,
+      318.6473388671875,
+      173.7761993408203,
+      343.14569091796875
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_005",
+    "block_type": "text",
+    "text": "| 𝑃 | , Recall = | 𝑃 ∩ 𝐺 |",
+    "bbox": [
+      154.27999877929688,
+      318.6473388671875,
+      247.4462127685547,
+      349.9797058105469
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_006",
+    "block_type": "text",
+    "text": "| 𝐺 | , F1-score = 2 × Precision × Recall",
+    "bbox": [
+      227.3470001220703,
+      315.7880859375,
+      390.0181579589844,
+      349.9797058105469
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_007",
+    "block_type": "text",
+    "text": "Precision + Recall (1)",
+    "bbox": [
+      309.59698486328125,
+      322.5330810546875,
+      440.7692565917969,
+      349.9797058105469
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_008",
+    "block_type": "text",
+    "text": "For BFCs with multiple ground truth BICs, a prediction is considered correct if it matches any valid BIC in 𝐺 . Following prior work [ 36 ], each approach returns a single predicted BIC per case.",
+    "bbox": [
+      45.57899856567383,
+      347.43109130859375,
+      440.4296569824219,
+      373.1543884277344
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_009",
+    "block_type": "text",
+    "text": "5.3 Implementation",
+    "bbox": [
+      45.827999114990234,
+      384.2642517089844,
+      141.4191436767578,
+      397.1159973144531
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_010",
+    "block_type": "text",
+    "text": "AgenticSZZ is implemented in Python 3.12 using the following components: (1) LLM Backend. We use DeepSeek-V3.2 [ 9 ] as the agent’s reasoning engine, accessed via the official API. The LLM operates with temperature 0 for reproducibility.",
+    "bbox": [
+      45.479000091552734,
+      398.19207763671875,
+      440.1699523925781,
+      435.8703918457031
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_011",
+    "block_type": "text",
+    "text": "(2) Knowledge Graph. The TKG is stored in Neo4j 2 using the Graphiti framework [ 28 ] for temporal knowledge graph management. Graphiti provides native support for temporal entity and edge management, enabling efficient retrieval of commits and their relationships while maintaining chronological ordering. We design the domain-specific schema (commit, file, and function nodes; temporal and structural edges) and tool APIs on top of this general-purpose framework.",
+    "bbox": [
+      45.827999114990234,
+      430.4410705566406,
+      440.8812561035156,
+      495.6463928222656
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_012",
+    "block_type": "text",
+    "text": "(3) TKG Configuration. For commit traversal, we set the maximum file-history depth to 100 commits in each direction (BFC ancestor and blame ancestor), with a hard cap of 200 total candidates per TKG. These generous upper bounds ensure high coverage (RQ0 shows that 80% of ancestor BICs are reachable within depth 24); the actual number of commits collected depends on each file’s history length. The agent evaluates the top- 𝐾 =20 candidates ranked by fitness score; we analyze sensitivity to 𝐾 in Section 8 .",
+    "bbox": [
+      45.827999114990234,
+      493.8330993652344,
+      440.3564147949219,
+      567.3773803710938
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_013",
+    "block_type": "text",
+    "text": "(4) Agent Framework. We implement the search agent using pydantic-ai, 3 a Python agent framework that provides typed tool interfaces and structured output parsing. The agent receives the BFC context (commit message, modified files, extracted functions) and iteratively calls tools until it reaches a decision or exhausts the step limit of 50.",
+    "bbox": [
+      45.827999114990234,
+      561.9480590820312,
+      440.42901611328125,
+      615.1983642578125
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_014",
+    "block_type": "text",
+    "text": "2 https://neo4j.com/ 3 https://ai.pydantic.dev/",
+    "bbox": [
+      45.827999114990234,
+      635.4871826171875,
+      124.29591369628906,
+      657.1163330078125
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 11,
+    "block_id": "page_011:block_015",
+    "block_type": "text",
+    "text": ", Vol. 1, No. 1, Article . Publication date: February 2026.",
+    "bbox": [
+      260.1289978027344,
+      671.4816284179688,
+      440.1734313964844,
+      682.496337890625
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

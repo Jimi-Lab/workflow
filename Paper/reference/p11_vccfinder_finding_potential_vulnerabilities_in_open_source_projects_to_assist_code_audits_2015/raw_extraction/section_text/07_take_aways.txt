@@ -1,0 +1,93 @@
+6. TAKE-A W AYS
+As the results above show, the performance of VCCFinder
+means that it can realistically be used in production en-
+vironments without overburdening developers with a huge
+number of reviews. Since it can work on code snippets it
+can used automatically when new commits come in without
+requiring a complex test environment.
+TP FP FN TN
+Pre
+cision
+R
+ecall
+Flawfinder
+Top 100 1 99 218 79121 0.01 0.00
+Top 500 6 494 213 78726 0.01 0.03
+Top 1000 13 987 206 78233 0.01 0.06
+VCCFinder
+Top 100 56 44 163 79176 0.56 0.26
+Top 500 88 412 131 78808 0.18 0.40
+Top 1000 105 895 114 78325 0.11 0.48
+Table 5: Confusion matrix of the tools by top X
+commits. T: True, F: False, P: Positive, N: Negative.
+Apart from this, we would like to present some qualitative
+take-aways we found while developing and evaluating VC-
+CFinder, which can be useful even without using the tool.
+While some of these take-aways confirm well-known beliefs,
+we found it interesting to see that our machine-learning ap-
+proach also came to these conclusions and backed them up
+with quantitative data, but also generated new insights.
+Error handling is hard.
+When looking at the features the SVM learnt by classify-
+ing VCCs, we saw that the adage “gotos considered harmful”
+[16] still holds true today, as amongst others the keyword
+goto and the according jump labels such as out: and er-
+ror: increase the likelihood of vulnerable code. We can
+confirm this by looking at Table 2. However, we found that
+the SVM also flags returning error values such as -EINVAL
+as potentially dangerous. Combined with gotos, these are
+common C mechanisms for error and exception handling. So
+unlike Dijkstra’s argument that gotos are harmful because
+they lead to unreadable code, in our context gotos are con-
+sidered harmful because they frequently occur in an error-
+handling context. So instead of merely detecting gotos, our
+SVM gives exception and error-handling code a higher po-
+tential vulnerability ranking. Our explanation of this eﬀect
+is as follows: because it is easy to miss some cases, exception
+handling is easy to get wrong (e.g. Apple’s goto fail bug in
+their TLS implementation12).
+Variable Usage and Memory Management.
+When examining highly ranked features of the SVM, we
+noticed that some memory management constructs lead to a
+higher vulnerability ranking. For instance, sizeof(struct,
+a high usage of sizeof in general, len and length as vari-
+able names occurred more often in vulnerable commits. In
+addition, we observed that variable names consisting of spe-
+cific strings often occurred in VCCs: buf, net, socket and
+sk. While the presented keywords and variables alone do
+not lead to vulnerabilities, they may indicate more critical
+areas of the code.
+12https://www.imperialviolet.org/2014/02/22/
+applebug.html
+435
+
+===== PAGE 011 =====
+
+True False False True
+positive positive negative negative Precision Recall
+Flawfinder 53 5,460 166 73760 0.01 0.24
+VCCFinder
+- with same recall/true positives 53 36 166 79184 0.60 0.24
+- with same number of false positives 144 5460 75 73760 0.03 0.66
+- with same precision 185 24288 34 54932 0.01 0.84
+Table 4: Comparison of the tools
+Help new contributors.
+We found that new contributors, i.e. contributors with
+less than 1 % of all commits in a given project, are about
+five times as likely to commit a vulnerability as their coun-
+terparts who frequently contribute. While new contributors
+authored 470 of 95,621 VCCs, or 0.49 %, frequent contrib-
+utors authored only 244 of 255,074 VCCs, or 0.10 % (Pear-
+son’s χ2: p <0.0001). While this is of course also no big
+surprise, we hope quantifying this risk will help convince
+projects to introduce more stringent review policies.
+Final Thoughts.
+As both the evaluation and the take-aways show, commits
+have a myriad of possible reasons for being flagged as VCCs.
+These reasons can be code-based or metadata-based or, im-
+portantly, a combination of the two. The examples above
+give us an intuitive understanding of why this is. While
+our main recommendation is to use VCCFinder to classify
+potentially vulnerable commits to prioritize reviews, there
+also general recommendation which can be extracted from
+the classifier results.

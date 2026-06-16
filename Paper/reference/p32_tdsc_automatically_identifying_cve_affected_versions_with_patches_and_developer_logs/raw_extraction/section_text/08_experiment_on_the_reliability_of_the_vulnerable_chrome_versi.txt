@@ -1,0 +1,84 @@
+experiment on the reliability of the vulnerable Chrome versions
+in the NVD. They use the Chrome vulnerabilities with the
+bug-ﬁxes IDs to manually verify the inaccuracy of the NVD
+report, but they cannot handle the situation without the bug IDs.
+Dong et al. [14] analyzed a large number of inconsistencies
+by extracting software names and software versions in public
+security vulnerability reports, but they did not provide a practical
+solution to justify the incorrect software versions of the NVD.
+Anwar et al.[15] focused on the inconsistencies between the
+entries of the NVD and the CVE, and they explored methods
+for rectifying the vulnerability’s publication date, CWE class,
+CVSS rating, and the affected CPE information of the NVD,
+but we aim to use develop log to quantify the inaccuracy of the
+Know Affected Software Versions of the NVD.
+Vulnerability Detection.Security patches are released to dis-
+cover and ﬁx the vulnerabilities that have been released. This is
+also the most critical process for managing security systems.
+Using patches to discover vulnerabilities in the system has
+always been the focus of research in the security ﬁeld[45].A
+vulnerability detection system with a high false positive rate or a
+high false negative rate is unusable. Many researchers[20], [25],
+[32], [43] have studied the use of security patches for source
+code vulnerability detection. However, only based on patches,
+the error rate is still high. Li proposed VulDeePecker[23] using
+RNN training on code snippets related to library/API function
+calls to detect improper calls. The dataset they used in their
+work tried to compare with VUDDY , but no false positives
+of VUDDY were found. Further, considering silent security
+patches, Xiao et al.[46] proposed MVP and they enriched the
+dataset with commits obtained from their industrial collaborator,
+but such datasets were not publicly accessible. The methods
+proposed in[47], [48] use trees and graphs as the representation
+methods for detecting vulnerabilities, and they cannot capture
+the exact nuance of vulnerabilities, so than they are not suitable
+for determining which vulnerable versions are really affected by
+CVEs.
+Reproducing Vulnerabilities.Reproducing a vulnerability is
+the most convincing evidence for a vulnerable version. Her-
+cules [49] is based on symbolic execution to generate input
+examples to crash the software at the speciﬁed location. Sem-
+fuzz [50] makes use of CVE reports and Linux git logs to
+generate PoC exploits. Many research proposes the techniques of
+generating patch that ﬁxes the vulnerability based on examples,
+while Huang et. al.[51] propose a property-based method to
+generate vulnerability patches, but their method is dependent on
+experts to specify the properties. As claimed in[17] reproduc-
+ing a vulnerability requires information such as conﬁgurations,
+trigger method, PoC, as well as a lot of manual work of experts,
+meanwhile these information are usually incomplete or unavail-
+able. It is very challenging especial for our task with a large sale
+of software versions.
+Fuzzing combines symbolic execution and constraint solving
+to detect vulnerabilities. Cassez et al.[21] use a static analysis
+tool for intermediate representation based on LLVM to check
+whether there is a run of a speciﬁed error block and reach the
+intermediate representation, which is mainly used to detect three
+types of vulnerabilities: zero error, pointer overﬂow, and dead
+code. In general, it is hard to perform directed fuzzing on Linux
+kernel. On the one hand, entering the kernel layer depends on
+the call of the application layer, which is equivalent to writing an
+application layer call for each CVE. On the other hand, Linux
+kernel is a large-scale system, which means that it has a very
+large number of conditional branch instructions. It is difﬁcult for
+fuzzing to ﬁnd the code where the diff hunk is located. Therefore,
+this type of methods are very expensive to employ in the context
+of vulnerability detection.
+VII. DISCUSSION
+Our method has several assumptions which may limit its ap-
+plication. First, developer logs and patches may be unavailable.
+Second, the software packages must be open-sourced. Third,
+although we propose log tracing to reduce the search space, the
+partial matching method still requires human experts to review
+some commits to determine whether the code is vulnerable, but
+the cost of this process is quite minor. In order to overcome
+these limitations, future work is needed. For the problem of
+unavailable patches, an approach is to identify and generate the
+patch from the respective software versions. If the source code
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply. 
+
+===== Page 014 =====
+918 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+is not open, binary based patch detection can be used. Natural
+language processing can be used to lessen human efforts in the
+partial matching. Errors in the developer logs and patches are

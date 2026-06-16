@@ -1,0 +1,58 @@
+ISSTA016:6 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+1      ZooKeeperInstance(Configuration config, ZooCacheFactory zcf) {
+2          ArgumentChecker.notNull(config);
+3          if (config instanceof ClientConfiguration) {
+4            this.clientConf = (ClientConfiguration) config;
+5          } else {
+6            this.clientConf = new ClientConfiguration(config);
+7          }
+8          this.instanceId = clientConf.get(ClientProperty.INSTANCE_ID);
+9      this.instanceName = clientConf.get(ClientProperty.INSTANCE_NAME);
+10      if ((instanceId == null) == (instanceName == null))
+11          throw new IllegalArgumentException("Expected exactly one of instanceName and instanceId to be set");
+12        this.zooKeepers = clientConf.get(ClientProperty.INSTANCE_ZK_HOST);
+13        this.zooKeepersSessionTimeOut = (int)AccumuloConfiguration.getTimeInMillis(clientConf.get(ClientProperty.INSTANCE_ZK_TIMEOUT));
+14        zooCache = zcf.getZooCache(zooKeepers, zooKeepersSessionTimeOut);
+15 +     if (null != instanceName) {
+16 +     // Validates that the provided instanceName actually exists
+17 +       getInstanceID();
+18 +     }
+19     }
+Fixing Commit: c5153331c in Accumulo
+Enforce a valid instance name on ZKI creation by calling getInstanceID(), which would throw a RuntimeException if the user passed in an 
+instance name which did not exist in the zookeepers provided..….
+4 files changed, 29 insertions(+), 8 deletions(-)
+ZooKeeperInstance.java
+Fig. 2. Motivation example two
+However, LLMs face challenges when handling large bug-fixing commits, so it is benefi-
+cial to filter out irrelevant files before identifying buggy statements. This is demonstrated in
+the second motivation example illustrated in Figure 2. This commit modifies four files, introducing
+twenty-nine insertions and making eight deletions. Due to page limits, we only show the most
+important part related to the identification of bug-inducing commits. The lines highlighted in
+blue are added by us and are not in the original patch content. According to the commit message,
+the bug arises because the program fails to call the getInstanceId function to enforce a valid
+instance name and the bug is only related to the instanceNamevariable. If we directly input the
+whole patch into the LLM and require it to identify the code statements leading to the bug, it
+erroneously points the @Test(expected = RuntimeException.class)statement in another file
+named ZooKeeperInstanceTest.java.
+This example also demonstrates that LLMs have the potential to understand commit
+messages and accurately locate buggy statements, but they need sufficient context. If we ex-
+clude the other files and only feed the LLM with changes in the correct file ZooKeeperInstance.java,
+the LLM still cannot output the correct code statements. Concretely, if we provide the LLM with the
+commit message and the original patch content (lines 12 to 19 in Figure 2), it still incorrectly identifies
+line 14 as buggy code statements. This is due to insufficient context. According to the commit mes-
+sage, the bug is related to the variable instanceName. However, in the original patch content(lines
+12 to 19), the only code statement related to the variable instanceNameis line 15, which is used to
+fix the bug. The full content of theZooKeeperInstance constructor(lines 1 to 19 in Figure 2) con-
+tains the statementthis.instanceName = clientConf.get(ClientProperty.INSTANCE_NAME),
+which relates to the instanceName variable. But this statement is not displayed in the original
+patch. By providing the expanded context(lines 1 to 19), which includes the entire constructor, the
+LLM can correctly identify the code statement in line 9.
+3 Approach
+Building on the motivation examples, we propose a new framework called LLM4SZZ to effectively
+detect buggy statements and locate bug-inducing commits. Fig. 3 presents the overview of our
+framework, which consists of three parts: preparation, context-enhanced assessment, and commits
+identification. In the preparation phase, we analyze the bug-fixing commit, identify the core files
+related to the bug, and determine its root cause. During the context-enhanced assessment, we
+assess whether the LLM can understand the bug and determine its presence in the commit. If the
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

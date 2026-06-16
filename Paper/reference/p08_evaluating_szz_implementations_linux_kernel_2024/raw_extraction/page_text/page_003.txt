@@ -1,0 +1,99 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2221
+Fig. 1.
+The motivating example of Tracing-Commit SZZ.
+recent change, but are rather concealed deeper in the change
+history.
+To facilitate this exploration, we propose the Tracing-
+Commit SZZ (TC-SZZ) algorithm, which iteratively uses git
+blame until the initial commit is located, and then considers
+all commits in the change history as potential bug-inducing
+commits. Unlike all previous SZZ variants which identify only
+a single bug-inducing commit for a deleted line. This favors
+recall, but may increase the number of false positives as it
+returns commits in the line’s change history that are not relevant
+to the bug. For example, as shown in Fig. 1, TC-SZZ returns
+all ﬁve commits in a line’s change history as potentially bug-
+inducing commits, successfully identifying commit 40747f as
+the bug-inducing commit. In contrast, B-SZZ only considers
+the previous commit. Applying TC-SZZ to the 17,552 cases
+that are not detected by the SZZ algorithms but do not in-
+volve ghost commits revealed that 3,115 out of the 17,552
+failure cases (17.7%) are located in the change history and
+not the most recent change. Algorithms that skip over refac-
+toring changes have the potential to identify such bug intro-
+ducing commits more accurately, but refactoring detection is
+language speciﬁc, and such approaches have only been devel-
+oped for Java [29], [30], while the Linux kernel is entirely
+C code.
+For the remaining 14,437 bug-ﬁxing commits, 34.6% of the
+failure cases are found in the function history but not in the
+history of the lines that are changed by the bug-ﬁxing commit.
+This means that the bug-inducing commit can be identiﬁed
+by applying git log -L on the changed functions (referred to
+as Function-Log Detection). For detailed examples, refer to
+Section VI-C. Additionally, 27.5% of failure are found in the ﬁle
+history but not in the history of the changed functions in that ﬁle.
+Here, the bug-inducing commit can be found by applying git
+log to the changed ﬁles (referred to as Within-File Detection).
+Finally, 37.9% of failure are in the history of a ﬁle other than
+the changed ﬁles (referred to as Cross-File Detection).
+Experiments with ChatGPT: For the Function-Log De-
+tection, Within-File Detection, and Cross-File Detection cases,
+where the bug-inducing commit is not in the history of the
+lines changed by the bug-ﬁxing commit, we experiment with
+ChatGPT. As ChatGPT has exhibited potential in addressing
+Software Engineering tasks [31], [32], we consider whether
+ChatGPT, speciﬁcally the GPT-4 version, can help SZZ algo-
+rithms identify bug-inducing commits for these failure cases.
+Speciﬁcally, we use the commit log subject and body of the bug-
+ﬁxing commit, as well as all of the changed function’s code,
+as input for ChatGPT. For Within-File Detection and Cross-
+File Detection, we leverage ChatGPT to help locate the bug-
+inducing function or ﬁle based on the bug-ﬁxing commit, since
+the function or ﬁle responsible for the bug is not known from
+the bug-ﬁxing commits. Our aim is for ChatGPT to pinpoint
+the speciﬁc line of code in the function that may have induced
+the bug and thus caused the bug-ﬁxing commit. Given this
+line of code, we can then apply an iterated git blame to it
+to identify the bug-inducing commits. On 375 samples, for
+identifying bug-inducing commits Function-Blame Detection
+(a subcategory of Function-Log Detection, using git blame once
+for identifying the bug-inducing commit), ChatGPT showed
+increased efﬁcacy in recall (with a precision of 0.28, recall
+of 0.62, and F1 of 0.39). However, when it came to dealing
+with failure cases both in and out of the ﬁle history, ChatGPT’s
+performance was notably less successful. This is partly due to
+the challenge of a general-purpose Large Language Model in
+inferring function names or ﬁles not explicitly referenced in the
+bug-ﬁxing commit.
+Overview: In summary, our paper makes the following
+contributions:
+• Dataset Creation. We identify the Linux kernel as a data
+source and collect a developer annotated and validated
+dataset of over 76K bug-ﬁxing commits, which we have
+made publicly available.1
+• Evaluation. We conduct a comprehensive evaluation of
+six SZZ algorithms, revealing hidden dangers in real-world
+usage scenarios and analyzing the impact of ghost commits
+on the Linux kernel dataset.
+• Further Analysis. We show that by utilizing TC-SZZ, we
+can address 17.7% of the failure cases. We classiﬁed the
+remaining failure situations as Function-Log Detection,
+Within-File Detection, and Cross-File Detection.
+• ChatGPT Efﬁcacy Assessment. We investigate the efﬁ-
+cacy of ChatGPT in identifying bug-inducing commits in
+the three failure situations.
+The rest of this paper is organized as follows. In Section II,
+we discuss the background and related work of our study.
+In Section III, we discuss how we build the dataset of bug-
+inducing commits. Section IV presents the design of our study.
+Section V introduces TC-SZZ. In Section VI, we show the eval-
+uation results and answer our research questions. In Section VII,
+we explore the potential of ChatGPT to identify bug-inducing
+commits. Section VIII discusses the reason of SZZ failures.
+We discuss the threats to validity in Section IX. Finally, we
+draw the conclusions of our work and present future directions
+in Section X.
+1https://doi.org/10.6084/m9.ﬁgshare.23889792.v2
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

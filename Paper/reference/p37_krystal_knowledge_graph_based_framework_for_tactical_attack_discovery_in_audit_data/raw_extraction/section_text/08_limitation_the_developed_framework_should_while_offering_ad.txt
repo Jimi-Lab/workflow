@@ -1,0 +1,197 @@
+limitation, the developed framework should – while offering ad- 
+equate performance –m a k e it possible to: (i) formulate and ex- 
+change rules for detection, alerting, and attack graph reconstruc- 
+tion in a declarative language, (ii) exchange instances of prove- 
+nance graphs in a standard representation, (iii) query the prove- 
+nance graphs in a standard language, (iv) incorporate and exchange 
+threat information, and (v) reuse and combine analytic techniques. 
+R3. Threat intelligence linking Connecting isolated events to re- 
+construct a complete attack scenario is an important step to under- 
+stand the relevance and impact of alerts. In this context, an ability 
+to link low-level threat evidence to phases of complex multi-stage 
+attacks would be highly beneﬁcial. While some existing approaches 
+( Hassan et al., 2020; Milajerdi et al., 2019b; Zou et al., 2020 ) aim to 
+identify steps and associate them with high-level APT phases, they 
+do not take advantage of the abundance of available Cyber Threat 
+Intelligence (CTI) information available in external sources such as 
+MITRE ATT&CK ( Mitre, 2021 ), which offers links to Common Vul- 
+nerabilities and Exposures (CVE) ( CVE, 2021 ), Common Weakness 
+Enumeration (CWE) ( CWE, 2021 ), and others. We therefore deﬁne 
+the ability to leverage such connections and provide integrated 
+querying capabilities as a key requirement for the developed ap- 
+proach. This will facilitates abstraction from low-level event graphs 
+to higher level techniques and tactics, provide additional informa- 
+10 https://www.w3.org/TR/sparql11-federated-query/ 
+tion for prioritization, impact assessment and mitigation, and make 
+tedious attack investigations more eﬃcient and effective. 
+R4. Cross-platform Interoperability Integrating provenance 
+data from heterogeneous sources and constructing integrated at- 
+tack graphs spanning multiple systems would be highly beneﬁcial 
+in the face of complex multi-host/multi-platform attacks ( Li et al., 
+2021 ). This necessitates a uniﬁed provenance representation that 
+can abstract from speciﬁcs of individual platforms. 
+5. Conceptualization 
+In this section, we describe the conceptualization of our ap- 
+proach and the use of inference for provenance graph construction. 
+5.1. System-Call provenance representation 
+Provenance graphs are a highly effective representation to keep 
+track of information ﬂows ( Li et al., 2021 ). They represent inter- 
+actions between objects as events. Each event involves a subject , 
+i.e., a system object (e.g., a process, thread) that performs a par- 
+ticular operation (e.g., write, read, send) on an object (e.g., ﬁle, 
+socket, registry). As objects typically appear in multiple events, 
+a graph emerges. Although system-call provenance is represented 
+similarly across different existing approaches ( Hassan et al., 2020; 
+Hossain et al., 2017; 2020; Milajerdi et al., 2019b ), no formal and 
+standardized representation (ontology) exists. Instead, existing ap- 
+proaches typically use ad-hoc and hard-coded data models which 
+limits their interoperability, reusability and extensibility. 
+5.2. KRYSTAL Provenance ontology 
+We propose the KRYSTAL ontology 11 as as t a n d a r d representa- 
+tion for system-call provenance graphs. Key beneﬁts of using on- 
+tologies is the ability to share a common understanding – includ- 
+ing concepts and structure, making assumptions explicit, facilitat- 
+ing semantic reasoning, and promoting concept reuse ( Noy and 
+McGuinness, 2001 ). Furthermore, the use of an ontology for prove- 
+nance graph representation makes it easy to integrate background 
+knowledge and unify the conceptual model across different threat 
+detection approaches. 
+In developing the KRYSTAL ontology, we followed a hybrid ap- 
+proach, i.e., using bottom-up and top-down approaches concurrently 
+( Noy and McGuinness, 2001 ). Bottom-up, we started by analysing 
+low-level data structures from applications (e.g., auditlog) and 
+identifying their entities and relations. Top-down, we considered 
+attack patterns from existing cyberthreat intelligence sources (e.g., 
+MITRE ATT&CK Mitre, 2021 ) and compared our ontology to existing 
+non-ontological provenance models/schemas. Our developed ontol- 
+ogy is able to represent low-level system-call provenance data and 
+link it to high-level attack patterns (cf. Section 6.4 ). 
+Figure 2 depicts an excerpt of the KRYSTAL Ontology centered 
+around core concepts such as User , Host , System Object . 
+The latter represent system entities such as Process es, File s, 
+and Socket s. We assign each system object so to a class 
+(identiﬁed by rdfs:Class ) and potential sub-classes (identi- 
+ﬁed by rdfs:subClassOf ). Each system object so is a ver- 
+tex v and the relations between system objects (e.g., writes , 
+isReadBy , sends , etc.) are represented via edges e (identiﬁed by 
+owl:ObjectProperty ). 
+The SystemObject class represent system entities in general. It 
+has three sub-classes such as Process , File and Socket . The Pro- 
+cess class represents a running process in a system (e.g. ﬁrefox, 
+ssh, etc.) while the File class represents a ﬁle (e.g., system ﬁle, ap- 
+plication ﬁle, etc.). We introduce kry:writes , kry:isReadBy 
+11 https://w3id.org/sepses/vocab/event/log/ 
+5 
+
+===== Page 005 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 2. Krystal Ontology - nodes represent concepts (classes) and edges represent 
+the class relationship (properties). 
+Table 2 
+RDFS & OWL Reasoning Rules. 
+Rule Premise Conclusion 
+rdfs2 e 1 (v 1 , v 2 ) , rdfs:domain (e 1 , X) v 1 ∈ X
+rdfs3 e 1 (v 1 , v 2 ) , rdfs:range (e 1 , Y ) v 2 ∈ Y 
+rdfs7 e 1 (v 1 , v 2 ) , rdfs:subPropertyOf (e 1 , e 2 ) e 2 (v 1 , v 2 ) 
+owl: InverseOf e 1 (v 1 , v 2 ) , owl:inverseOf (e 1 , e 2 ) e 2 (v 2 , v 1 ) 
+and kry:isExecutedBy , kry:deletes , kry:mmap proper- 
+ties to represent links between Process class and File class. 
+The Socket class represents a network connection (combination 
+of an IPAddress and Port ). We deﬁned kry:sends and 
+kry:isReceivedBy properties that link the Process class to the 
+Socket class. 
+We also deﬁned User , a class that describes user of a system. 
+It has three sub-classes, i.e., (i) RootUser , that represents the root- 
+level user, (ii) SystemUser , represents the system-level user, (iii) 
+LocalUser , represents the local-level user. 
+We also deﬁned Host class that represent a host machine. The 
+kry:hasUser property connects Process class to the User class, 
+while the kry:originatesFrom property links it to Host class. 
+Finally, we also deﬁned several other classes such as Executable 
+class that identiﬁes an executable ﬁle and IPAddress that repre- 
+sents an IP Address. The kry:hasExe property connects Process 
+to Executable and kry:hasHostIP that links Process to IPAd- 
+dress . 
+Furthermore, we introduce a provenance relation (identiﬁed by 
+kry:provRel ) that self-links to SystemObject . It is a generic, 
+upper-level relation property that is used to represent provenance 
+relationships between system objects (e.g., socket to process, pro- 
+cess to ﬁle, ﬁle to process). This provenance relation is automati- 
+cally inferred from more speciﬁc relation properties, as explained 
+in the following. 
+5.3. Inference features in KRYSTAL ontology 
+The KRYSTAL ontology uses the RDF-S entailment and OWL rea- 
+soning rules summarized in Table 2 for provenance graph con- 
+struction. 
+rdfs2 & rdfs3 These rules are used to automatically infer the 
+speciﬁc type of a given system object based on its relations. 12 
+For example, as depicted in Fig. 3 , system object :Firefox 13 
+has the relation kry:writes to another system object 
+12 We represent objects with different colors: orange for processes, purple for ﬁles, 
+blue for sockets, and transparent-dotted circles for inferred system object types. 
+13 Note that we deﬁne preﬁx “: ”f o r an instance and “kry: ”f o r Krystal ontology. We 
+omit it in ﬁgures for simplicity. 
+Fig. 3. RDFS & OWL reasoning for vertice/edge inference. 12 
+Fig. 4. rdfs7 ( rdfs:subPropertyOf ) inference example. 
+:/home/admin/clean , since in the ontology we deﬁne kry:writes 
+as owl:ObjectProperty with an rdfs:domain of kry:Process . 
+Consequently, based on rdfs2 rule deﬁnition, it will be automat- 
+ically inferred that :Firefox ∈ kry:Process . The system object 
+:/home/admin/clean is another example. Since kry:writes has 
+rdfs:range of kry:File , based on the rdfs3 rule deﬁnition, it will 
+be deduced that :/home/admin/clean ∈ kry:File . This class type 
+inference is useful for, e.g., formulating semantic graph queries 
+to detect attack patterns based on the system object type and 
+their relations. We discuss the query processes in more detail in 
+Section 6 . 
+rdfs7 This rule is used to generalize relations based on prop- 
+erty hierarchies identiﬁed by rdfs:subPropertyOf . In the exam- 
+ple in Fig. 4 , for instance, :Firefox has the relation kry:writes 
+to :/home/admin/clean , and in the ontology, kry:writes is a sub- 
+property of the more generic property kry:provRel , which repre- 
+sents provenance relationships. 
+Based on the rdfs7 rule, kry:provRel will be automatically in- 
+ferred between objects that have a more speciﬁc relation; this 
+creates provenance links for all system object relationships (e.g., 
+from the :Firefox process to the :/home/admin/clean ﬁle to the 
+:Clean process etc.). This is helpful to identify information ﬂows, 
+track causality of events, and reconstruct attack graph. We discuss 
+the advantage of having explicit provenance relations (e.g., during 
+backward-forward analysis for attack graph reconstruction) further 
+in Section 6.3 . 
+owl:InverseOf Finally, a reasoning technique that we use in our 
+ontology is property inversion, identiﬁed by owl:InverseOf , which 
+creates relations between system objects in both directions. For in- 
+stance, as depicted in Fig. 3 , :Firefox has a relation kry:writes 
+to :/home/admin/clean and in the ontology, kry:writes is deﬁned 
+as owl:inverseOf to kry:isWrittenBy . Based on the owl:inverseOf 
+rule, it will be automatically inferred that :/home/admin/clean also 
+has a relation kry:isWrittenBy to :Firefox . The same holds for 
+property kry:executes , since it has the relation owl:inverseOf to 
+kry:isExecutedBy in the ontology. 
+6. Solution architecture 
+In this section we present KRYSTAL , a modular framework for 
+tactical attack discovery in audit data. The proposed framework in- 
+6 
+
+===== Page 006 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 5. Krystal Framework Architecture. 
+Listing 1. Excerpt of an RDF-based provenance graph generated from a log event. 
+tegrates a variety of attack discovery mechanisms and takes advan- 
+tage of its semantic model to include internal and external knowl- 
+edge in the analysis. Fig. 5 gives an overview of the KRYSTAL attack 
+discovery framework which consists of three main parts, i.e., (i) 
+provenance graph building, (ii) threat detection and alerting, and 
+(iii) attack graph and scenario reconstruction. 
+Security analysis is typically conducted either online or oﬄine . 
+Online refers to an analysis performed in a running system in 
+(near) real-time, whereas oﬄine refers to analysis over collected 
+data. These two modes have a different purpose (monitoring vs 
+forensics), but they can complement each other in hybrid settings 
+( Marz and Warren, 2015 ). 
+KRYSTAL works in an online mode in that it imports each 
+log event in sequence from potentially heterogeneous hosts (e.g., 
+Linux, Windows, FreeBSD). The Provenance Graph Building mod- 
+ule then generates an RDF-based provenance graph, taking advan- 
+tage of the well-deﬁned ontology and enabling enrichment with

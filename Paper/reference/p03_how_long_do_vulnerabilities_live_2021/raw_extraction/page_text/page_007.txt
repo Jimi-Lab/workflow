@@ -1,0 +1,105 @@
+drastically reduce the search space for subsequent manual
+auditing, such accuracy is perfectly acceptable. Indeed, the
+authors of VCCFinder showed that it is successful in find-
+ing previously unflagged vulnerabilities and outperformed
+existing approaches.
+4.2 Our approach
+A key observation is that we donot need to pinpoint the exact
+VCCs for our purposes. It is sufficient to approximate the
+point in time when a vulnerability was introduced. We found
+that we can estimate this the closest by repurposing the VC-
+CFinder heuristic with some slight modifications (similar to
+the ones by Yang et al. [41]). We modify the heuristic in such
+a way that it returns an approximation (in days) of how long
+the code was vulnerable instead of the exact VCC. This is
+done by averaging multiple possible dates when the vulner-
+ability could have been introduced, and assigning different
+weights corresponding to how often each individual commit
+was blamed. Our approach is as follows:
+1) We use git blame -w14 to map every “interesting” change
+of a fixing commit to potential VCCs:
+– Ignore changes to tests, comments, empty lines and non
+C/C++ files.
+– Blame every line that was removed.
+– Blame before and after every added block of code (two or
+more lines) if it is not a function definition as these can be
+inserted arbitrarily.
+– Blame before and after each single line the fixing commit
+added if it contains at least one of these keywords ("if", "else",
+"goto", "return", "sizeof", "break", "NULL") or is a function
+call. This approach was shown to perform well in blaming
+actual VCCs by Yang et al. [41].
+2) We then calculate our estimated introduction date dh from
+the list of blamed commits. For n commits we have:
+dh = dre f + 1
+∑n
+i=1 bi
+n
+∑
+i=1
+bi(di −dre f) (1)
+where bi is determined by the number of blames the commit
+i received and di is the respective commit date. For easier
+calculation, the dates are represented as difference in days to
+a static reference date dre f (January 1, 1900).
+Using this heuristic, we decrease the mean error on our
+ground truth set by 66% compared to using the lower-bound
+blaming heuristic of Li & Paxson, effectively overestimat-
+ing the actual average lifetime by 117 days (see Table 2).
+However, having a low error on the ground truth dataset does
+not necessarily mean that the approach is suitable for our
+needs. We have to address some additional important points
+regarding the robustness of the approach.
+14All projects that we investigated either used git or offered a git mirror of
+their repositories. However, the approach is generalizable, as other version
+control systems offer similar commands (e.g. svn blame or hg annotate).
+−2000 −1500 −1000 −500 0 500 1000 1500 2000
+Heuristic error (days)
+0.0000
+0.0002
+0.0004
+0.0006
+0.0008
+0.0010
+0.0012
+0.0014
+0.0016Density
+Figure 2: Distribution of heuristic errors in days (excluding data
+points with no error for readability). Equally sized bins.
+How many data points are needed? A standard deviation
+of more than 900 days means that individual measurements
+are generally not reliable. Therefore, we need to rely on mea-
+surements of the mean over larger sample sizes. Treating the
+errors as independent random variables sampled from the
+error distribution of Figure 2, we can compute the standard
+deviation of the sample mean for a given sample size with the
+Bienaymé formula. According to the Central Limit Theorem,
+the distribution of the sample mean will be normal for a large
+enough number of samples. We empirically conclude that
+at least for 20 or more samples, this holds for the distribu-
+tion of the errors. Therefore, we can compute bounds for the
+sample mean using normal distribution tables. For example,
+for a sample size of 20 and a confidence level of 95%, the
+sample mean will lie in the interval [117-395, 117+395] days.
+Making the simplification that the mean error is 0 (necessary
+for generalization), we can say that for a confidence level of
+95%, the margin of error will be ±395 days for 20 samples,
+±250 days for 50 samples, and ±176 days for 100 samples
+(compared to an average lifetime of almost 1150 days, cal-
+culated from the ground truth data). We consider the margin
+of error for 20 samples as the maximum tolerable error for
+our study, and set the minimum number of data points for a
+measurement to 20. We, therefore study means of at least 20
+CVE samples, although for most of our analysis (e.g. average
+lifetimes per project, vulnerability types), we consider means
+of 60 or more samples. Note that the calculations above are
+approximate and their aim is to get a lower bound for the
+number of samples required for meaningful estimation.
+Does the weighted average heuristic generalize (over time
+and between projects)? Although we have a limited number
+of data points in our ground truth dataset, we can see that the
+performance of our heuristic is similar for the three different
+projects (see Table 2). Another source of confidence in the
+robustness of our heuristic is that its error is symmetrically
+(nearly normally) distributed around a low mean value (that
+can be assumed to be zero), as can be seen in Figure 2. In-

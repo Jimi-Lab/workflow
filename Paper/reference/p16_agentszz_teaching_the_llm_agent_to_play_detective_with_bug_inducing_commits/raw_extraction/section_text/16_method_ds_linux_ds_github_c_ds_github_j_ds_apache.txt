@@ -1,0 +1,147 @@
+Method DS_LINUX DS_GITHUB-c DS_GITHUB-j DS_APACHE
+Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1
+B-SZZ 0.452 0.578 0.507 0.361 0.656 0.466 0.285 0.680 0.401 0.251 0.435 0.318
+AG-SZZ 0.448 0.553 0.495 0.410 0.592 0.484 0.421 0.533 0.470 0.328 0.310 0.318
+MA-SZZ 0.421 0.538 0.472 0.335 0.624 0.436 0.239 0.560 0.335 0.307 0.345 0.329
+R-SZZ 0.583 0.448 0.507 0.671 0.582 0.620 0.538 0.467 0.500 0.497 0.288 0.364
+L-SZZ 0.560 0.430 0.486 0.486 0.422 0.452 0.492 0.427 0.457 0.366 0.211 0.267
+RA-SZZ – – – – – – 0.337 0.440 0.382 0.264 0.325 0.293
+Neural-SZZ – – – – – – 0.556 0.486 0.520 0.563 0.364 0.442
+LLM4SZZ 0.628 0.552 0.588 0.687 0.641 0.663 0.607 0.569 0.587 0.610 0.398 0.482
+LLM4SZZ (5-mini) 0.580 0.607 0.593 0.691 0.655 0.673 0.696 0.600 0.616 0.623 0.401 0.488
+mini-swe-agent 0.865 0.010 0.149 0.870 0.139 0.240 1.000 0.160 0.276 0.633 0.054 0.099
+AgentSZZ0.788 0.711 0.748 0.830 0.800 0.815 0.750 0.720 0.735 0.724 0.452 0.556
+w/o Tools 0.212 0.125 0.157 0.009 0.007 0.008 0.029 0.027 0.028 0.000 0.000 0.000
+w/o Domain 0.798 0.641 0.711 0.889 0.775 0.828 0.754 0.653 0.700 0.739 0.393 0.513
+w/o Compression 0.792 0.746 0.768 0.812 0.789 0.801 0.841 0.773 0.806 0.706 0.469 0.564
+Table 3: Cost analysis ofAgentSZZin terms of tokens and
+time consumption.
+MethodTime (s) Tokens Turns Cost ($)
+LLM4SZZ 26.2 13,033 11.2 0.003
+LLM4SZZ (5-mini) 125.2 18,230 12.6 0.015
+mini-swe-agent 183.3 330,327 18.6 0.035
+AgentSZZ39.1 34,657 5.7 0.009
+w/o Compression 29.8 52,237 4.7 0.014
+1,580 tokens/turn). This indicates thatAgentSZZextracts signifi-
+cantly more information per step through structured tool use, and
+converges with fewer, more targeted interactions.
+When LLM4SZZ is powered by GPT-5-mini, it becomes substan-
+tially slower (160s), due to higher latency per API call, while its
+token usage and interaction patterns remain largely unchanged.
+This suggests that stronger model reasoning alone does not im-
+prove efficiency in static pipelines. In contrast,AgentSZZachieves
+both faster execution and higher accuracy by leveraging structured
+tool interaction rather than relying solely on internal reasoning.
+mini-swe-agent is significantly less efficient across all dimensions,
+consuming 4.7×more time, 9.5×more tokens, and 3.9×higher cost
+thanAgentSZZ. Its higher turn count and excessive token usage
+reflect prolonged, unfocused exploration, a known limitation of
+open-ended bash-based agents. By contrast,AgentSZZconstrains
+the action space to curated git-based tools, enabling more directed
+and efficient investigation.
+AgentSZZachieves a strong balance between efficiency and
+performance. Compared to LLM4SZZ, it incurs only a modest in-
+crease in runtime (39.1s vs. 26.2s) and token usage, while using
+fewer interaction turns (5.7 vs. 11.2), indicating more efficient rea-
+soning and faster convergence. Despite using more tokens than
+LLM4SZZ, the reduced number of turns suggests thatAgentSZZ
+extracts more useful information per step through targeted tool us-
+age. In contrast, mini-swe-agent is significantly less efficient, with
+much higher runtime (183.3s), token consumption (330k), and cost,
+due to prolonged and unfocused exploration.AgentSZZreduces
+runtime by over 4×and token usage by nearly 10×compared to
+mini-swe-agent, while achieving substantially better accuracy.
+Answers to RQ2:AgentSZZachieves a strong trade-off be-
+tween efficiency and effectiveness. It requires only 5.7 turns on
+average, with a per-turn information density 3.8×higher than
+LLM4SZZ. Compared to mini-swe-agent, it reduces runtime,
+token usage, and cost by 4.7×, 9.5×, and 3.9×, respectively.
+5.3 RQ3. Key Components ofAgentSZZ
+As shown in Table 2, the last three rows present the results of our
+ablation study, where we evaluate the contribution of each key
+component ofAgentSZZby removing it individually. We consider
+three variants: (1)w/o Tools, which removes all tool access and
+forces the agent to rely solely on fix commit information without
+interactive investigation; (2)w/o Domain, which replaces the do-
+main knowledge prompt with minimal task instructions; and (3)w/o
+Compression, which disables all context compression module.
+Structured tools are indispensable.Removing task-specific
+tools causes performance to collapse across all datasets, with F1
+dropping from 0.748 to 0.157 on Linux, from 0.815 to 0.008 on
+GitHub-C, and to 0.000 on Apache. Without structured tool inter-
+faces, the agent must compose commands, interpret raw outputs,
+and manage context within a limited turn budget—tasks that even
+
+===== Page 009 =====
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+strong LLMs struggle with. This confirms that structured tools are
+the most critical component ofAgentSZZ.
+Domain knowledge consistently improves recall.Remov-
+ing domain knowledge leads to consistent recall drops across all
+datasets, with the largest decrease observed on Apache (−13.0%),
+where commits are larger and more complex. On GitHub-C, remov-
+ing domain knowledge slightly increases precision (0.830→0.889)
+but reduces recall, resulting in a marginal F1 increase (0.815→0.828),
+while all other cases show an F1 decrease. Overall, domain knowl-
+edge promotes broader exploration—occasionally introducing false
+positives but consistently improving recall—while generalizing
+across both C and Java.
+Context compression improves efficiency with minimal
+impact on effectiveness.Disabling compression has limited im-
+pact on effectiveness, with F1 changes within ±2% on the three
+larger datasets. In contrast, its impact on efficiency is substantial:
+token consumption decreases by 33.6% (52,237→34,657) and cost
+by 35.7% ($0.014→$0.009). This highlights the importance of com-
+pression for practical deployment. We focus on the three larger
+datasets due to higher variance in GitHub-J.
+Figure 4 shows the distribution of tool usage across investigation
+turns. Most cases are resolved within 4–6 turns, with git_show
+and git_blame accounting for approximately 40% and 18% of tool
+calls, respectively. Early turns are dominated by git_blame, while
+git_show peaks during candidate inspection. In later turns, the
+agent increasingly relies on broader search tools (git_log_s and
+git_grep), reflecting a transition from local blame to global search
+when initial evidence is insufficient. git_log_func is used spar-
+ingly as a fallback for function-level tracing. Exploratory tools
+(git_grep, git_log_s) appear more frequently in harder scenar-
+ios (e.g., omission, refactor-penetration, cross-file cases), where
+they serve as escalation mechanisms for cross-file and semantic
+tracing. git_log_func plays a minor role as a specialized fallback.
+Answers to RQ3: Designed Tools are indispensable, with F1
+dropping to near zero without them. Domain knowledge im-
+proves recall, while context compression reduces token con-
+sumption by over 30% with minimal impact on effectiveness.
+5.4 RQ4. Challenging Scenarios
+To evaluateAgentSZZin challenging scenarios, we focus on bug-
+fixing commits categorized as cross-file and ghost cases (Table 4).
+Following Lyu et al. [23], a case is defined as cross-file if none of
+its bug-inducing commits appear in the history of files modified by
+the fix (via git log), and as a ghost case if the bug-fixing commit
+contains no deleted or modified lines.
+The results show that our approach significantly outperforms
+LLM4SZZ in both cross-file and ghost commit scenarios. For cross-
+file cases,AgentSZZachieves recall of 18.60%, 24.24%, and 42.72%
+on Apache, GitHub, and Linux, respectively, corresponding to im-
+provements of 100.0%, 300.0%, and 160.1%.
+LLM4SZZ can handle a small number of cross-file cases, but its
+success mainly stems from indirect coverage rather than explicit
+cross-file reasoning. Its pipeline remains centered on a single fix-
+side file, where buggy statements are extracted and traced within
+the same file history. As a result, it only succeeds when sufficient
+local signals remain (e.g., due to file renaming or residual context
+in the patch). In contrast,AgentSZZis not restricted to a single
+file history. Starting from a git_blame→git_show backbone, it
+can escalate to git_grep and git_log_s to bridge symbol-level,
+statement-level, and cross-file relationships, enabling reliable tran-
+sitions from the fix location to the true origin.
+A similar pattern explains the gap on ghost commits. LLM4SZZ
+relies on explicit line-level signals from the fixing patch to recover
+candidate commits. When no lines are deleted or modified, this sig-
+nal becomes unavailable, significantly weakening the pipeline. By
+contrast,AgentSZZleverages broader context, semantic reasoning,
+and tool-assisted exploration to identify the bug-inducing commit
+even without direct line-level evidence, making it substantially
+more robust in ghost scenarios.
+Answers to RQ4: Our approach significantly outperforms
+LLM4SZZ in challenging scenarios, improving recall by up to
+300% on cross-file cases and 60% on ghost commits.

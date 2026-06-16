@@ -1,0 +1,4 @@
+| field | value |
+| --- | --- |
+| caption | Table 6 shows the average LLM resource consumption per CVE vulnerability-version identifi- cation. In terms of input, output, and total tokens, DeepSeek V3, GPT 4.1-mini, and Qwen turbo exhibit similar consumption. DeepSeek R1, as a reasoning model, exhibits significantly higher |
+| repair | [NEEDS TABLE REPAIR] |

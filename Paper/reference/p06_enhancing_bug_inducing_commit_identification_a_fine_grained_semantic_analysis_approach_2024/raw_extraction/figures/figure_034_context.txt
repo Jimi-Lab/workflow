@@ -1,0 +1,13 @@
+3050 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 15. A failing example of the BUGNNINGS approach.
+the commit message, the bug occurs because the bug-inducing
+commit introduces the dma variable but does not set the burst
+size. In S EM-SZZ, the data flow of the lpss variable is com-
+pared, which correctly locates line 4, highlighted in yellow.
+Conversely, BUGNNINGS incorrectly locates the place where
+lpssis defined, which is line 1.
+In fact, BUGNNINGS often tends to locate line numbers far
+from the added lines based on PDGs. As mentioned earlier,
+most bug-inducing commits can be found by tracing back the
+lines near the added lines. This is the one main reason for its
+poor performance. Anoth

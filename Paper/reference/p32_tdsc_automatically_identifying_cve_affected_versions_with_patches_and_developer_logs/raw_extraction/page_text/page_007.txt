@@ -1,0 +1,92 @@
+HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 911
+the repatch after locating the previous commit-id in the title or
+text body of git log, for example, the diff hunk of “repatch” of
+CVE-2014-9715. We use it against thenf_conntrack_core.c
+ﬁle to judge the existence of this vulnerability. Through the
+above process we can accurately justify whether there is an
+unpatched CVE vulnerability (i.e., without being repatched)
+after the maximum committed version.
+Next, we present our algorithm for determiningV upto with
+our running example in Fig.4. Here,V4.0.4 is the highest version
+of the committed version set. First, we determine whether the
+unpatched code still exists in major versions afterV4.0.4 based
+on exact matching. If it does not exist, it means the vulnerability
+has been ﬁxed in all versions afterV4.0.4,s oV4.0.4 is regarded
+as V upto(E). On the other hand, if unpatched code exists in
+a later major version, sayV5.0, we will check if a repatch has
+been applied to it to avoid false reporting. Speciﬁcally, we ﬁrst
+check whether there is an unpatch status in the git log list of the
+vulnerable ﬁle. if it does not exist, repatch cannot exist either,
+so the last unpatched version will be regarded asV upto(I).
+However, if unpatch exists, we will check if a repatch exists in
+the git log list indexed by the same vulnerable ﬁle, the author or
+the committer of the patch, and accordingly locate the diff hunk,
+as described in the paragraph above. IfV5.0 has been repatched, it
+does not have this vulnerability any more, soV4.0.4 is regarded
+as V upto(E). On the contrary, if the last unpatched version,
+say V5.0.3, has not been repatched, and it will be regarded as
+V upto(I). Therefore, we accurately determined the boundary of
+the vulnerable versions on the far right of the version tree.
+C. Determine the Last Vulnerable V ersion in Each Branch (R2)
+The committed version set output from R1 of our tool does not
+give us the complete knowledge on the vulnerable versions. First,
+some branches in the version tree may correspond to non-long-
+term stable versions[39], and they are no longer maintained.
+Therefore, even though the versions in these branches are still
+vulnerable with respect to a CVE, they are no longer patched.
+In other words, although not covered in the committed version
+set, there may be vulnerable versions in these branches. Second,
+some versions may have no changelogs submitted, so they have
+slipped out from our detection, because our tool uses changelogs
+as the input to generate the committed version set.
+To address the problem, intuitively we can check each version
+against the patch. This is clearly inefﬁcient and unscalable.
+Instead, we leverage the following heuristics: (1) in each version
+branch, the release time of a minor versionVi.j.k must be later
+than the major versionVi.j or the earlier minor versionVi.j.k−1,
+(2) a changelog states which vulnerabilities it has ﬁxed and
+it is released together with the current software version. For
+example, ifV4.14.177 in Fig.5 is a committed version (because
+its changelog states the vulnerability has been ﬁxed), the vul-
+nerability must not exist inV4.14.178 and the other later minor
+version. The similar examples includeV4.19.116, V5.4.33 etc.
+Let us denote the disclosure time of the CVE asTCV E.A s
+reported by Li et al.[40], CVE publication time in NVD is not the
+same as CVE disclosure time, but the median difference is only
+Fig. 5. The relationship between CVE-ID committed time and version release
+time.
+Fig. 6. Look for the upper boundary of the vulnerability in the version tree.
+one month, so that we can use CVE publication time to approx-
+imate its disclosure time. When the CVE is released, it may or
+may not have patches available. We useTCV Eto quickly identify
+the potentially vulnerable versions in each branch. Speciﬁcally,
+for each branch, we ﬁrst compareTE, which is the release time
+of its last versionVi.j.E, with TCV E.I f TE <T CV E, that is,
+version Vi.j.E was released before the CVE, we then determine
+whether Vi.j.E contains the vulnerable code by matching against
+the patch. If it is an exact match (not patched), we directly take
+Vi.j.E as V i.j.U (I) of this branch. If it is a partial match, we will
+use the method in the next subsection to verify whetherVi.j.E
+has the vulnerability. Otherwise, we will look for the boundary
+in the earlier versions backward,If the boundary does not exist,
+then Vi.j.E is considered asV i.j.U . Otherwise we refer to the last
+unpatched version asV i.j.U , and verify that the patching record
+of the version following the boundary version is missing from the
+changelog. Therefore, we accurately determined the boundary
+of the vulnerable versions in each branch of the version tree.
+D. Determine the First Vulnerable V ersion Number of CVE-ID
+(R3)
+For a given CVE-ID, once we discoverV from and V upto,t h e
+boundary containing all the vulnerable versions is determined.
+However, it is very challenging to identify the ﬁrst vulnerable
+version V from . On the one hand, we should not immediately
+label the minimum committed version reported by changelog
+(e.g., V3.0.6 in Fig.4)a sV from , because early versions might
+not have the corresponding changelog or the changelog was
+incomplete. On the other hand, open-source code versions are
+continuously updated and released and for some early versions,
+the code related to the CVE vulnerability may have gone through
+many changes, so that they can not be matched exactly with the
+patches. Recall that it is apartial matchwhen a diff hunk does
+not completely match the corresponding source code. In theory,
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

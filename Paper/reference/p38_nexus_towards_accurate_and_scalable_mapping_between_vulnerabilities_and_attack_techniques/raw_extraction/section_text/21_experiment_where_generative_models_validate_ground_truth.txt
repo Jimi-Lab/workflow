@@ -1,0 +1,99 @@
+experiment where generative models validate ground-truth
+labels under a controlled setup. Instead of comparing against
+all TTPs, models verify only existing labels, with controlled
+noise (0–10) introduced by randomly removing correct TTPs
+and injecting wrong ones. Models must validate both original
+and removed labels. This setup shows that focusing on speciﬁc
+candidate sets improves the balance between precision and
+recall, supporting our strategy for missed TTP recovery.
+Figure 27 shows that on 200 aggregated ATT&CK proce-
+dures, GPT-4o-mini and Llama-3.1-8B achieve higher preci-
+(a) Precision across
+noise levels.
+(b) Recall across
+noise levels.
+(c) F1-score across
+noise levels.
+Fig. 27: Precision, Recall, and F1-score of GPT-4o-mini,
+Llama-3.1-8B, and Ladder on the 200 aggregated ATT&CK
+procedures under increasing noise levels.
+(a) Precision across
+noise levels.
+(b) Recall across
+noise levels.
+(c) F1-score across
+noise levels.
+Fig. 28: Precision, Recall, and F1-score of GPT-4o-mini,
+Llama-3.1-8B, and Ladder on D5 across noise levels.
+Use Cases Tools Why NEXUS Fits?
+Automated enrichment
+of threat-intelligence
+MISP , OpenCTI,
+STIX/TAXII feeds
+Allows automated enrichment of CVE records in
+threat-intelligence platforms with related TTPs.
+Coverage visualization
+and reporting
+ATT&CK Navigator,
+DeTT&CT
+Enables accurate visualization of an organization’s
+exposure to speciﬁc threats based on discovered TTPs.
+Vuln. management
+and exposure analytics
+Qualys VMDR, Tenable
+Nessus, Rapid7 InsightVM
+Enables reliable estimation of attacker actions and
+improved vulnerability prioritization.
+TABLE XIV:NEXUS in sufﬁciently good use cases.
+Use Cases Tools Why Analyst Oversight Helps?
+Detection-rule deri-
+vation and SIEM corr.
+SigmaHQ, Splunk ESCU,
+Elastic Security
+Analysts should verify and adjust rule boundaries
+and parameters before operational deployment.
+Threat-campaign and
+APT report analysis
+ATT&CK Workbench,
+Mandiant Advantage
+NEXUS may lose accuracy on long APT reports,
+that are contextually different than CVEs.
+SOC triage and inci-
+dent enrichment
+TheHive, Cortex, Palo Alto
+XSOAR, Microsoft Sentinel
+Analyst validation ensures the inferred behaviors
+align with real log evidence and system conditions.
+TABLE XV: NEXUS in use cases that requires analyst over-
+sight and caution.
+Use Cases Tools Why Less Useful?
+Runtime exploit or
+intrusion detection
+Suricata, Snort, Zeek,
+Sysmon, OSQuery
+NEXUS cannot correlate runtime events or temporal
+indicators needed for exploit or intrusion detection.
+Automated log-to-
+TTP correlation TREC [88] NEXUS cannot analyze log-based or
+provenance-based correlation.
+Zero-day ExploitDB (PoCs without
+vulnerability descriptions) NEXUS depends on descriptive text to infer TTPs.
+TABLE XVI:NEXUS in less useful use cases.
+sion and F1-scores at 0 noise, with stable recall highlighting
+our annotation strategy’s precision boost. As noise increases,
+LLMs better correct false positives and recover missing labels,
+while Ladder underperforms. Figure 28 shows similar trends
+on D5, conﬁrming their robustness to corrupted ground truth.
+To validate newly assigned and existing TTPs, we run
+an experiment on a 15K-sample subset of D1. GPT-4o-mini
+veriﬁes only ground-truth TTPs without comparing unrelated
+candidates. Accordingly, it achieves 100% precision, 93.68%
+recall, and a 96.74% F1-score, conﬁrming its ability to pre-
+serve original mappings and minimize false negatives during
+label adjustment.
+A
+PPENDIX D
+LISTS OF NEXUS POSSIBLE USES
+Tables XIV-XVI summarize the possible applications of
+NEXUS discussed in Section VI-D.
+18

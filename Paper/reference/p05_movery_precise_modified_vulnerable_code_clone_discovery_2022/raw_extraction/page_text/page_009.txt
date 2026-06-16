@@ -1,0 +1,99 @@
+Table 2: Vulnerability dataset overview.
+Category Count (#)
+Security patches 4,219
+Disclosed vulnerable and patched function pairs 7,762
+Oldest vulnerable functions 5,936
+4 Implementation of M OVERY
+In this section, we introduce the implementation of MOVERY ,
+including the vulnerability dataset and the architecture.
+4.1 Vulnerability dataset
+Collecting security patches. We collected security patches
+by leveraging the method used in the previous approaches [19,
+32]; we examined CVEs in the National Vulnerability
+Database (NVD) and checked ifgit commitURLs (i.e., secu-
+rity patch commits) were included in the references. We then
+gathered security patches by crawling such patch commits
+from the corresponding Git repositories. We chose the C/C++
+vulnerabilities as our initial targets, because code fragments
+reuse and modified OSS reuse are prominent in C/C++ soft-
+ware [17, 47–49]. Consequently, we collected 4,219 C/C++
+security patches from the NVD (as of March 2021).
+Reconstructing functions. We then reconstructed vulnerable
+and patched functions from the collected security patches. We
+focused on the header of a security patch, which provides file
+commits before and after applying the patch [17, 49]. For ex-
+ample, in Listing 3, “aafa3dca2” and “d02e11328” indicate
+the commit of the vulnerable and patched file, respectively.
+After accessing the vulnerable ( resp. patched) file, we ex-
+tracted every function containing code lines deleted ( resp.
+added) from the patch as the disclosed vulnerable function fd
+(resp. patched function fp). Here we excluded (fd, fp) pairs
+that the code changes were not intended to fix vulnerabilities,
+such as comment or whitespace changes.
+To reconstruct the oldest vulnerable function (fo), we identi-
+fied the oldest vulnerable version of the software from which
+the vulnerability originated, by referring to Common Plat-
+form Enumeration (CPE) [30] of the NVD. Since NVD may
+provide incorrect CPEs for some CVEs [47], we manually
+examined versions sequentially starting from the oldest ver-
+sion specified in the CPE: if a version containing a function
+with the same name as fd is first detected, we determined that
+the version is the oldest vulnerable version. When software
+is maintained with parallel versioning (e.g., OpenSSL 1.0.0*
+and 1.0.1*), we infer the version order based on the version
+release date. We then accessed the oldest vulnerable version
+and extracted fo that: (1) had the same name as fd, and (2) ex-
+isted in the path of the vulnerable file; we did not reconstruct
+fo where the syntax of fo was the same as that of fd.
+Consequently, we reconstructed 7,762 ( fd, fp) pairs and
+5,936 oldest vulnerable functions (see Table 2).
+Dataset observations. We noted that internal modifications
+of OSS can play a leading role in the syntax diversity of
+vulnerable codes. To be specific, among the 5,936 vulnerable
+functions that exist in multiple OSS versions, we found the
+4,623 cases (78%) where fd and fo had different syntaxes.
+When we measured the Jaccard similarity between every fd
+and fo pair, the average similarity score was 56%. The facts
+that fo and fd are different in many cases ( i.e., 78%) and
+that OSS internal updates change the vulnerable code syntax
+on average by 44%, suggest that internal OSS modifications
+should be considered in VCC discovery.
+4.2 Architecture
+MOVERY comprises the following three modules: (1) a
+dataset collector, (2) a signature generator, and (3) a VCC
+discoverer. The dataset collector gathers security patches and
+reconstructs vulnerable and patched functions. The signa-
+ture generator, literally, generates vulnerability and patch sig-
+natures for every collected vulnerability. Finally, the VCC
+discoverer performs the actual vulnerable code clone discov-
+ery on the target software. Each module consists of 800 to
+1,000 lines of Python code, excluding external libraries such
+as function parsers. The source code of MOVERY is pub-
+licly available at https://github.com/wooseunghoon/
+MOVERY-public.
+Function parser and analyzer.To extract functions from vul-
+nerable files, patched files, and the target software, we utilized
+universal Ctags [6], a precise and fast open-source function
+parser. In addition, we used the Joern parser [50] to examine
+control and data dependencies of functions for generating
+signatures. In particular, MOVERY generates a code property
+graph (i.e., a graph that incorporates an abstract syntax tree,
+a control flow graph, and a program dependency graph) of
+the extracted vulnerable and patched functions using Joern
+parser; from the graph, MOVERY can obtain (1) the entire
+control flow of the function, and (2) dependencies between
+each code line, which are used to generate signatures.
+5 Evaluation
+In this section, we evaluateMOVERY . Section 5.1 investigates
+how accurately MOVERY discovers VCCs in modified com-
+ponents, compared to existing VCC discovery techniques (i.e.,
+VUDDY [17] and ReDeBug [14]). Section 5.2 and Section
+5.3 compare MOVERY to the recurring vulnerability detection
+technique (i.e., MVP [49]) and the SCA-based technique (i.e.,
+CENTRIS [48]), respectively, We evaluate the speed and scal-
+ability of MOVERY in Section 5.4, and introduce the efficacy
+of the search space reduction in Section 5.5. Finally, Section
+5.6 presents a case study observed in our experiments. We
+ran MOVERY on a machine with Ubuntu 16.04, Intel Xeon
+Processor @ 2.40 GHz, 32GB RAM, and 6TB HDD.
+3044    31st USENIX Security Symposium USENIX Association

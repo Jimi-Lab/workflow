@@ -1,0 +1,4 @@
+| field | value |
+| --- | --- |
+| caption | Table 2: Performance comparison of methods for identifying bug-inducing commits on C and Java datasets. RA-SZZ and Neural-SZZ are only applicable to Java, so their results are marked as “–” for C datasets. Ablation results are shown in the bottom rows; For the main methods, the best value in each column is bold and the second-best is underlined. |
+| repair | [NEEDS TABLE REPAIR] |

@@ -1,0 +1,104 @@
+Table 6: VCC discovery results of MVP and CENTRIS .
+Name #VCCs ∗ #TP #FP #FN #Unique† Precision Recall
+MVP 266 220 46 184 8 0.83 0.54
+CENTRIS 553 281 272 152 37 0.51 0.65
+*: #VCCs discovered for ten target software, †: #VCCs not discovered by MOVERY .
+5.2 Comparison with MVP
+We then compare MOVERY with MVP [49], a recurring vul-
+nerability detection technique, to demonstrate that MOVERY
+is more effective in discovering VCCs from modified compo-
+nents. Since MVP is not available owing to the commercial
+issue, we implemented MVP based on their paper [49] with
+their default options.
+Result analysis. When we applied MVP to ten target software,
+it discovered 220 VCCs (i.e., TPs) while reporting 46 FPs and
+184 FNs (see Table 6). It is noteworthy that MVP hardly dis-
+covered VCCs belonging to T1 and T2 (see Table 5), because
+MVP does not consider internal OSS modifications. MVP can
+only discover VCCs that contain all the code lines deleted
+from the security patch, and therefore it failed to discover 32
+VCCs that do not contain such deleted code lines ( T1). In
+addition, MVP failed to discover 142 VCCs with various syn-
+taxes derived from fo (T2). Specifically, variable types and
+caller function names in vulnerable functions are frequently
+changed during internal OSS modifications; MVP does not
+consider such changes, thereby yielding FNs. The remaining
+FNs were caused by semantically similar but syntactically
+changed code and threshold issues, similar to MOVERY .
+MVP produced 46 FPs owing to the (1) syntactically simi-
+lar functions and (2) the abstraction method. MVP misinter-
+preted a safe function as vulnerable when the function has a
+similar syntax to the vulnerable function but is semantically
+different (11 FPs). The remaining 35 FPs were caused by
+the abstraction method: if the security patch only fixes the
+abstraction targets of MVP (e.g., variable names), MVP fails
+to differentiate between a vulnerable function and a patched
+function, producing FPs. Note that MOVERY could eliminate
+31 of 35 FPs by utilizing the selective abstraction method.
+Finally, MVP discovered 8 VCCs that MOVERY misses;
+all of these are VCCs with syntax similarities less than θ to
+the disclosed vulnerable functions; two of these VCCs were
+also not found in VUDDY and ReDeBug.
+Our analysis results affirmed that MVP, which is not ca-
+pable of addressing internal OSS modifications, may not be
+effective in discovering VCCs from modified components as
+it reported much more FNs (i.e., 184 FNs) than MOVERY .
+Threats to validity. Although we implemented MVP based
+on their paper, some functions may not be reproduced per-
+fectly. In addition, the purpose of MVP is to detect recur-
+ring vulnerabilities and not to discover propagated vulnerable
+codes. Our intention is not to deny the effectiveness of MVP,
+but to demonstrate that MOVERY is more efficient in discov-
+ering VCCs from modified components.
+5.3 Comparison with C ENTRIS
+Several existing approaches ( e.g., [9, 48]), including com-
+mercial tools such as Trivy [1] and Black Duck [38], have
+attempted to discover vulnerabilities contained in OSS com-
+ponents by clarifying reused OSS components and their ver-
+sions. However, they do not seem to consider the modified
+OSS reuse, and further, they do not disclose detailed vulnera-
+bility discovery algorithms (even their algorithms frequently
+change). Hence, we decided to compare the VCC discov-
+ery results of MOVERY with CENTRIS [48], a recent SCA
+technique for identifying modified OSS components.
+To investigate the vulnerabilities that affect the identified
+components, we utilized the “product search” and “version
+search” provided by CVE Details [7], i.e., functionalities for
+providing CVEs that affect a given software name and version.
+For every component identified in each target software, we in-
+vestigated CVEs affecting the component and then considered
+them the VCCs discovered by CENTRIS .
+Result analysis. In our experiments, CENTRIS -based ap-
+proach discovered 553 VCCs in ten target software, of which
+272 (49%) VCCs were confirmed to be FPs (see Table 6).
+Such FPs occurred when: (1) the vulnerable code was not
+reused, or (2) the vulnerable code was patched through back-
+porting (an example is introduced in Section 2.2).
+Furthermore, the CENTRIS -based approach failed to dis-
+cover 152 (38%) out of 396 VCCs discovered byMOVERY , es-
+pecially when (1) there is a vulnerability in a component that
+CENTRIS failed to identify, or (2) CENTRIS predicted incor-
+rect version information. Finally, CENTRIS -based approach
+discovered 37 VCCs that were not discovered by MOVERY .
+We observed that all of them were the cases where security
+patches did not be released via Git; if these patches are added
+to our dataset, MOVERY can also discover them.
+Consequently, we confirmed that discovering vulnerabili-
+ties simply based on the component name and version pro-
+duced many false results, especially FPs (i.e., 272 FPs), owing
+to the OSS modifications. This demonstrates that MOVERY
+considerably outperformed the SCA-based approach in terms
+of discovering vulnerabilities from modified components.
+5.4 Speed and scalability of M OVERY
+In this section, we evaluate the speed and scalability of
+MOVERY in VCC discovery. We classify the total time tak-
+ing to discover VCCs into signature generation (i.e., the
+elapsed time for generating signatures), target preprocessing
+(i.e., the elapsed time for analyzing the target software), and
+matching times (i.e., the elapsed time required to discover the
+VCCs). We measured all the times for MOVERY , ReDeBug,
+and VUDDY , and then compared the results.
+Signature generation time. The signature generation time
+using the collected 4,219 security patches (see Table 2) was
+2 h in VUDDY and 32 h in MOVERY ; because ReDeBug
+USENIX Association 31st USENIX Security Symposium    3047

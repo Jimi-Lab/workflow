@@ -1,0 +1,249 @@
+{
+  "cwe_id": "CWE-690",
+  "name": "Unchecked Return Value to NULL Pointer Dereference",
+  "abstraction": "Compound",
+  "status": "Draft",
+  "description": "The product does not check for an error after calling a function that can return with a NULL pointer if the function fails, which leads to a resultant NULL pointer dereference.",
+  "extended_description": "While unchecked return value weaknesses are not limited to returns of NULL pointers (see the examples in CWE-252), functions often return NULL to indicate an error status. When this error condition is not checked, a NULL pointer dereference can occur.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-252",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Unchecked Return Value"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-252",
+        "nature": "StartsWith",
+        "view_id": "709",
+        "ordinal": null,
+        "name": "Unchecked Return Value"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Memory-Unsafe",
+      "C",
+      "C++"
+    ],
+    "technologies": [],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "This CWE entry is a named chain, which combines multiple weaknesses."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not check for an error after calling a function that can return with a NULL pointer if the function fails, which leads to a resultant NULL pointer dereference.",
+    "typical_preconditions": [
+      "unchecked return value",
+      "optional allocation/use path",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "unchecked return value",
+      "optional allocation/use path"
+    ],
+    "typical_sinks": [
+      "dereference/call through possibly-null pointer"
+    ],
+    "typical_fix_actions": [
+      "null check",
+      "early return",
+      "fallback path"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "pointer use without preceding null check",
+      "null",
+      "return",
+      "dereference",
+      "error"
+    ],
+    "fix_search_patterns": [
+      "if (!ptr)",
+      "if (ptr == NULL)",
+      "return error on null"
+    ],
+    "guard_patterns": [
+      "same pointer variable in check and use"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "null",
+      "return",
+      "dereference",
+      "error",
+      "unchecked",
+      "weaknesses",
+      "resultant",
+      "indicate"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "basic_block",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "regex"
+    ],
+    "recommended_guard_templates": [
+      "same pointer variable in check and use"
+    ],
+    "recommended_predicate_templates": [
+      "pointer use without preceding null check",
+      "if (!ptr)",
+      "if (ptr == NULL)",
+      "return error on null"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "pointer use without preceding null check",
+        "if (!ptr)",
+        "if (ptr == NULL)"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "pointer use without preceding null check",
+        "same pointer variable in check and use"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "if (!ptr)",
+        "if (ptr == NULL)",
+        "pointer use without preceding null check"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The code below makes a call to the getUserName() function but doesn't check the return value before dereferencing (which may cause a NullPointerException).",
+        "snippet": "String username = getUserName(); if (username.equals(ADMIN_USER)) { ... }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This example takes an IP address from a user, verifies that it is well formed and then looks up the hostname and copies it into a buffer.",
+        "snippet": "void host_lookup(char *user_supplied_addr){ struct hostent *hp; in_addr_t *addr; char hostname[64]; in_addr_t inet_addr(const char *cp); /*routine that ensures user_supplied_addr is in the right format for conversion */..."
+      }
+    ],
+    "good_examples": [],
+    "observed_examples": [
+      {
+        "reference": "CVE-2008-1052",
+        "description": "Large Content-Length value leads to NULL pointer dereference when malloc fails.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-1052"
+      },
+      {
+        "reference": "CVE-2006-6227",
+        "description": "Large message length field leads to NULL pointer dereference when malloc fails.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-6227"
+      },
+      {
+        "reference": "CVE-2006-2555",
+        "description": "Parsing routine encounters NULL dereference when input is missing a colon separator.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2006-2555"
+      },
+      {
+        "reference": "CVE-2003-1054",
+        "description": "URI parsing API sets argument to NULL when a parsing failure occurs, such as when the Referer header is missing a hostname, leading to NULL dereference.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-1054"
+      },
+      {
+        "reference": "CVE-2008-5183",
+        "description": "chain: unchecked return value can lead to NULL dereference",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-5183"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

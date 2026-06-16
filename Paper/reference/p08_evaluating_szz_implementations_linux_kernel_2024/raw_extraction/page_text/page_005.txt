@@ -1,0 +1,112 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2223
+during the ﬁltering phase are reported as bug-inducing commits
+by B-SZZ.
+Subsequent studies have proposed various ﬁltering methods,
+including Content Filters [2], [41] and Suspiciousness Filters
+[12]. If all the potential bug-inducing commits are ﬁltered out
+for a given bug-ﬁxing commit, Rezk et al. refer to the bug-ﬁxing
+commit as a Filtering Ghost (FG).
+We do not further examine the limitations of the ﬁltering step
+in the SZZ algorithms for two reasons: (1) The ﬁltering step
+heavily depends on data from the ITS, but we bypass any ITS
+by using the tags found directly in the Linux kernel commits;
+(2) The ﬁltering process aims to improve precision by eliminat-
+ing commits from the potential bug-ﬁxing commits, while our
+focus is on enhancing the recall of the existing SZZ algorithm,
+i.e., adding potentially correct bug-inducing commits that were
+missing.
+B. Improvements for B-SZZ
+Despite the numerous proposals aimed at enhancing the ac-
+curacy of the SZZ algorithm [2], [12], [13], [14], [15], [16], the
+examination of bug-inducing commits not detected by SZZ is
+still in its infancy, and only limited efforts have been made to
+improve the recall [2], [17], [19].
+Kim et al. [2] found that B-SZZ may incorrectly label bug-
+inducing commits due to considering formatting or cosmetic
+changes. To address this, they proposed AG-SZZ, which ig-
+nores such changes during the mapping process, improving the
+accuracy of locating bug-introducing commits. Moreover, as
+B-SZZ employs the CVS annotate command for mapping lines
+removed in bug-ﬁxing commits to recent revisions, it cannot
+pinpoint the corresponding lines in earlier revisions. Kim et al.
+observed that such mappings might lead to inaccurately linked
+code segments. AG-SZZ, therefore, utilizes annotation graphs
+[42] to map line numbers across revisions, ensuring that both
+the starting and mapped lines belong to functions with the same
+name, improving the accuracy of the mapping process.
+Williams et al. [15] propose DJ-SZZ to address the lim-
+itations of annotation graphs which cannot track individual
+lines through extensive modiﬁcations by using a line-number
+mapping approach [43]. Furthermore, they used DiffJ [44] to
+exclude non-executable changes.
+Davies et al. [16] propose L-SZZ and R-SZZ, which improve
+on the AG-SZZ algorithm by selecting only one bug-inducing
+commit from all the candidate commits. L-SZZ selects the
+commit that changes the most lines. R-SZZ selects the most
+recent one.
+Da Costa et al. [12] found that AG-SZZ identiﬁes meta-
+changes (i.e., branch changes, merge changes, and property
+changes) as bug-inducing commits. AG-SZZ includes these
+commits as the annotation graph is unable to map the code
+between meta-changes and their preceding changes. To address
+this issue, Da Costa et al. propose MA-SZZ that connects
+all nodes in the annotation graph to their prior changes. This
+enhancement ensures that MA-SZZ does not identify meta-
+changes as bug-inducing commits.
+Neto et al. [13] found that refactoring operations, which do
+not modify a program’s behavior, impact the SZZ results. They
+extended MA-SZZ as two variants, RA-SZZ [13] and RA-SZZ*
+[14], to reduce the set of false positives reported by MA-SZZ.
+RA-SZZ and RA-SZZ* use RefDiff [29] and Refactoring Miner
+[30], respectively, to exclude refactoring operations from bug-
+inducing commit candidates, but both algorithms only work on
+Java ﬁles.
+PyDriller (SZZ@PYD) [33], SZZ Unleashed [34], and Open-
+SZZ [35] are three open-source implementations of SZZ al-
+gorithms. PyDriller is a Python framework that analyzes Git
+repositories by extracting information about commits, diffs,
+and other information. It also implements B-SZZ and ignores
+C-style and Python-style comment lines. SZZ Unleashed uses
+line-number mapping without DiffJ, which allows it to work
+on non-Java ﬁles. OpenSZZ implements B-SZZ by using the
+git blame command.
+To improve the recall of the SZZ algorithm, Sahal et al. [19]
+propose a syntax-based variation, A-SZZ, to address the case
+of bug-ﬁxing commits that do not have removed lines (Remove
+Mapping Ghost). This algorithm traces changes for all lines
+within the code blocks that contain the additions. Rezk et al.
+[17] enhance the A-SZZ approach by incorporating context-
+aware data ﬂow analysis, which includes mitigation strategies
+for speciﬁc programming scenarios such as null checks, cre-
+ation of new entities, method overrides, logging operations, and
+class expansions. These strategies use data ﬂow analysis on
+identiﬁers in added code lines, and then use B-SZZ to map the
+lines within these identiﬁers’ data ﬂow paths.
+Table I presents the datasets that have been used for evalu-
+ating these algorithms, detailing the dataset type, the number
+of projects, and the bug-ﬁxing commit count. In most cases,
+the ground truth is labeled by researchers without specialized
+domain knowledge. MA-SZZ uses an evaluation framework
+when there is no ground-truth label available between the bug-
+ﬁxing commit and the bug-inducing commit. Speciﬁcally, it
+uses an automatic metric with three criteria to evaluate SZZ:
+earliest bug appearance, future impact of a change, and realism
+of bug introduction [12]. The only dataset labeled by develop-
+ers contains, on average, only 1.2 commits per project, which
+may not sufﬁciently represent the entirety of issues arising in
+the development process of each project. This underlines the
+signiﬁcance of collecting a dataset annotated by developers,
+encapsulating a range of problems that could emerge during a
+project’s lifespan.
+C. SZZ in SE Research
+Many prior studies have discussed the signiﬁcant role that
+SZZ plays in software engineering research [28], [45], [46].
+SZZ is used as the ﬁrst step in many studies, especially in
+the area of defect prediction. Many defect prediction studies
+use the SZZ algorithm to build datasets to train and evaluate
+their models [5], [6], [11], [20], [21], [22], [23], [24]. Herbold
+et al. [36] found that as of August 2019, 8 out of 15 of the public
+datasets used for defect prediction used B-SZZ to construct their
+ground truth. However, this approach suggests that the precision
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

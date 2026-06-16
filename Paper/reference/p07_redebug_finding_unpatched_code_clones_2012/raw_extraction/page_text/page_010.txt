@@ -1,0 +1,119 @@
+es = -1;
+N = 1;
+do {
++
+if (N >= 2*1024*1024) RETURN(←
+BZ_DATA_ERROR);
+if (nextSym == BZ_RUNA) es = es + (0+1) *←
+N; else
+if (nextSym == BZ_RUNB) es = es + (1+1) *←
+N;
+N = N * 2;
+Listing 2: CVE-2010-0405
+We matched the above code to libcompress-bzip2-perl. How-
+ever, the package maintainers stated that the matched code
+was not an actual vulnerability since it was dead code.
+At the post-processing step, we eliminated such dead
+code which was not included at build time. We measured
+the number of code clones in non-dead code for the 1,354
+reported unpatched code clones from 149 Debian Squeeze
+packages. 831 out of 1,354 (61%) unpatched code clones
+are conﬁrmed as non-dead code, which likely represent
+real vulnerabilities. Dead code may still be a problem that
+should be ﬁxed: the accompanied library code may be used
+depending on users’ necessity by ﬂipping compilation ﬂags,
+and the vulnerability would still likely exist. Nonetheless, we
+now do post-processing to remove dead code for compiled
+code from our results.
+Note that in the overall system, these errors are ultimately
+removed, and would never be shown or affect the end user.
+G. Examples of Security-Related Bugs
+In order to evaluate the practical impact of ReDeBug, we
+reported 1,532 unpatched code clones identiﬁed in Debian
+Squeeze packages to the Debian security team and develop-
+ers. So far 145 real bugs have been conﬁrmed by developers
+either in email or by issuing a patch. In this section, we show
+several examples of the real bugs we found.
+Qemu is a processor emulator that can be used as a hosted
+virtual machine monitor. Various bugs, such as the one in
+Listing 3, which allows root access on the host machine [13],
+have been ﬁxed over the past few years. These include CVE-
+2008-0928 and CVE-2010-2784.
+int len, i, shift, ret;
+QCowHeader header;
+-
+ret = bdrv_file_open(&s->hd, filename, flags)←
+;
++
+ret = bdrv_file_open(&s->hd, filename, flags ←
+| BDRV_O_AUTOGROW);
+if (ret < 0)
+return ret;
+if (bdrv_pread(s->hd, 0, &header, sizeof(←
+header)) != sizeof(header))
+Listing 3: CVE-2008-0928
+These patches were not applied to the derivative package
+xen-qemu, the Xen version of Qemu. When contacted,
+Debian and upstream developers conﬁrmed the presence of
+real bugs and indicated that ﬁxing these bugs was necessary.
+The patch in Listing 4 was issued to ﬁx a vulnerability in
+rsyslog, a Linux and Unix system logger. This vulnerability
+involved sending a specially crafted log message that leads
+to denial of service [18].
+i = 0;
+- while(lenMsg > 0 && *p2parse != ’:’ && *←
+p2parse != ’ ’ && i < CONF_TAG_MAXSIZE) {
++ while(lenMsg > 0 && *p2parse != ’:’ && *←
+p2parse != ’ ’ && i < CONF_TAG_MAXSIZE - 2) ←
+{
+bufParseTAG[i++] = *p2parse++;
+--lenMsg;
+Listing 4: CVE-2011-3200
+This patch was not applied to the Debian package rsyslog-
+gssapi, a version of rsyslog with plugins that allowed rsyslog
+to write and receive GSSAPI encrypted logging messages.
+The package maintainers when contacted decided to ﬁx the
+vulnerability by issuing an update.
+The patch below was issued to ﬁx a heap based buffer
+overﬂow vulnerability in the Paint Shop Pro plugin in GIMP
+2.6.11 [17].
+-
+if (code >= max_code)
++
+if (code == max_code)
+{
+-
+*sp++ = firstcode;
++
+if (sp < &(stack[STACK_SIZE]))
++
+*sp++ = firstcode;
+code = oldcode;
+}
+-
+while (code >= clear_code)
++
+while (code >= clear_code && sp < &(stack←
+[STACK_SIZE]))
+{
+*sp++ = table[1][code];
+if (code == table[0][code])
+Listing 5: CVE-2011-1782
+When contacted, the developers of Deutex, a Debian package
+used to manipulate ﬁles for various games, indicated that this
+was likely a real vulnerability.
+The following patch was issued to ﬁx an integer overﬂow
+in PHP before 5.3.6 which could lead to a denial of service
+and possibly information leak [16]. This patch was not
+employed to the Debian PHP package. After contacted, the
+package maintainer issued a patch to ﬁx the bug.
+- if (start + count > shmop->size || count < 0) ←
+{
++ if (count < 0 || start > (INT_MAX - count) || ←
+start + count > shmop->size) {
+php_error_docref(NULL TSRMLS_CC, E_WARNING, ←
+"count is out of range");
+RETURN_FALSE;
+Listing 6: CVE-2011-1092
+57
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

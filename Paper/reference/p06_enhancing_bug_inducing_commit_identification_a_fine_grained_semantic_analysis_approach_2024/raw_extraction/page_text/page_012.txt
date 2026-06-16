@@ -1,0 +1,87 @@
+3048 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024
+Fig. 12. A failing example.
+The outcome reveals that it takes approximately three hours
+and fifty minutes to process all examples in DATASET-A,
+equating to an average of 1.95 seconds per test case. Compared
+to A-SZZ, our approach takes approximately three times longer.
+This is attributed to the fact that our method involves analyzing
+both the previous and current versions of the program, whereas
+A-SZZ only needs to focus on the current version. Additionally,
+our approach requires collecting states and comparing them
+between two program versions. Despite the increased time over-
+head, we believe our approach remains practical and applicable
+in real-world scenarios.
+RQ-3: SEM-SZZ takes approximately 1.95 seconds to han-
+dle a fixing commit from scratch. This duration includes
+tasks such as extracting the source files, collecting and
+comparing states, and locating bug-inducing commits.
+VI. D
+ISCUSSION
+A. Analysis for the Failure Case
+In this section, we aim to analyze the reasons behind the
+failures observed in some cases. We randomly select 100 cases
+to analyze the reasons for the failures. After analysis, the failed
+reasons can be summarized as follows:
+Line similarity fails to determine whether a commit is
+buggy. Out of the 100 cases analyzed, 28 cases fail because
+S
+EM-SZZ fails to determine whether a commit is buggy.
+The main reason for this is the line similarity matching pro-
+tocol used in our method. In our approach, for each statement
+contributing to the bug, if there all exists a line with string
+similarity beyond a threshold, we assume that the commit is
+influenced by the buggy. However, this method sometimes fails
+to accurately identify the bug-inducing commits. For instance,
+consider the commit 15273ffd7ef [38], which adds a new
+line ret = 0;. Our method generates two buggy statements:
+if (!ret) and return ret;. However, when locating
+the bug-inducing commit, the method encounters many state-
+ments like if (ret), which exhibit high line similarity but
+have completely different semantic meanings. This can lead to
+incorrect judgments and result in finding false bug-inducing
+commits. This issue is particularly prevalent when the buggy
+statements contain many short statements.
+Fig. 13. An example to show the effectiveness of program slicing.
+Failing to point out buggy statements correctly. Another
+main reason for the failure is that our method fails to point out
+buggy statements correctly. This issue is responsible for most of
+the remaining failing cases. F or instance, while the added line
+may influence the variable’s data flow, analyzing the affected
+variable’s data flow may not yield correct results.
+Consider the commit 072b30642f9[39], illustrated in Fig.12.
+This commit introduces a new code line at line 2, highlighted in
+green, impacting the data flow of the variabledrv. Our method,
+accordingly, compares its data flow with the previous version
+and identifies lines 1 and 3 as buggy statements. However,
+tracing back these unmodified lines does not lead us to the bug-
+inducing commit, resulting in the failure of our method in this
+scenario.
+After carefully analyzing the bug-fixing commit and the bug-
+inducing commit, we find that the bug occurs because the
+bug-inducing commit attempts to introduce a new function
+in the program but forgets to use it. Specifically, it creates
+the iwl_load_fw_dbg_tlv function. However, the bug-
+inducing commit only defines the function and forgets to use
+it. Consequently, the bug-fixing commit fixes the bug by using
+the iwl_load_fw_dbg_tlv function in line 2. Therefore,
+we can conclude that the bug has nothing to do with the data
+flow of the drvvariable. As a result, S
+EM-SZZ fails to identify
+the bug-inducing commit in this case.
+B. Effectiveness of Program Slicing in Finding
+Bug-Inducing Commits
+Although tracing back the unmodified lines near the added
+lines is an effective approach for finding bug-inducing com-
+mits if we do not consider precisi on, there are still some bug-
+inducing commits that cannot be found in this way. In this
+section, we discuss whether program slicing, which explores N
+basic blocks near the added lines, helps find more bug-inducing
+commits that the baselines cannot detect.
+In the experiment, we try to find bug-inducing commits that
+S
+EM-SZZ can detect but baselines can not. The experimental
+result shows that S EM-SZZ does find bug-inducing commits
+that the baselines cannot detect, accounting for 1.4% of the
+total test cases. One typical example is the commit bfab7c8ff89
+[40], shown in Fig. 13. In this case, the bug occurs because
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

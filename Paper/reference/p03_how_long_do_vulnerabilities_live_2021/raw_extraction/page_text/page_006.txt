@@ -1,0 +1,100 @@
+These efforts resulted in a dataset of 5,914 CVEs across 11
+projects that can be linked to one or more fixing commits. The
+corresponding numbers of CVEs as well as the resulting num-
+ber of mappings from this process are listed in Table 1. CVEs
+with associated fixing commits are a subset of all of the CVEs
+in the NVD. For the calculation of vulnerability lifetime we
+could only consider those CVEs, where an associated fixing
+commit could be identified in the code repository. Rather
+than being a limitation of the approach, this addresses an im-
+portant problem with the NVD regarding the reliability of
+information on vulnerable products and versions (highlighted
+in previous research [23, 24]). Contrary to Li and Paxson [18]
+Project CVEs w/ fix. com. # fix. com.
+Linux (kernel) 4,302 1,473 1,528
+Firefox 2,179 1,498 3,751
+Chromium 2,781 1, 580 2,820
+Wireshark 600 314 343
+Php 663 281 932
+Ffmpeg 326 277 373
+Openssl 214 144 259
+Httpd 248 132 476
+Tcpdump 167 115 128
+Qemu 340 213 290
+Postgres 139 76 141
+Total 11,959 5,914 11,041
+Table 1: Number of CVEs and mappings per project. First column
+gives the total number of CVEs returned from a search of the NVD.
+Second column gives the number of those CVEs for which at least
+one fixing commit was found in the project repository. Third column
+gives the total number of fixing commits found per project.
+we focused our efforts on a smaller set of projects with a
+significant number of NVD entries available. We dedicated
+considerable efforts towards achieving the highest mapping
+rate that we could for these projects. In order to do that we
+made sure to identify all potential syntaxes for denoting bug
+IDs, all websites and corresponding hyperlinks belonging to
+the same bug tracking system as well as combining multiple
+of the introduced techniques. Consequently, we believe our
+dataset to be the most complete mapping for the included
+projects. Additionally, we also consider it to be more diverse
+than the one used in Li and Paxson’s work, as over 40% of
+their data originates from the Linux kernel or an operating
+system based on it.
+4 Lifetime estimation
+In this section, we describe our methodology for automated
+lifetime estimation from vulnerability fixing commits. We
+start off by evaluating a lower-bound approach used in previ-
+ous work [18]. To the best of our knowledge, we are the first
+to evaluate this approach against ground truth data.
+4.1 Lifetime estimation in previous work
+Calculating the lifetime of a vulnerability is a non-trivial task,
+as finding VCCs can be very difficult [20]. One approach used
+before is manually identifying VCCs via thorough analysis of
+the fixing commits of a vulnerability [28]. While this method
+likely yields the most accurate results, it is unsuitable for
+large scale studies. Therefore, Li and Paxson [18] opted for
+an automated approach to the problem. They approximated
+a lower bound of a vulnerability’s lifetime by using the git
+blame command. Git blame finds which commit last changed
+a specific line in a given file, and so can be used to trace a vul-
+nerability back to its origin. Li and Paxson’s approach was to
+run the command on every deleted or modified line of a given
+fixing commit; this process usually returns multiple candidate
+VCCs. They then picked the most recent of the commit dates
+of those VCCs as their vulnerability introduction date, going
+for a lower bound approach.
+Although our empirical evaluation showed that this ap-
+proach is indeed correct for getting a lower bound on the
+lifetime of a vulnerability, we found it too conservative for
+our needs. To be precise, we found that it underestimates the
+average lifetime for vulnerabilities in our ground truth dataset
+by 346.88 days. Due to the large underestimation of average
+lifetime, we deem this approach unsuitable for our study.
+A heuristic similar to Li and Paxson’s was used by Perl et
+al. in VCCFinder [31], albeit for a different goal. Their git
+blame-based heuristic aims to pinpoint the exact VCC, with
+the goal of creating a dataset suitable for training a classifier
+that can flag risky commits. Contrary to the Li and Paxson
+approach (that only blames lines that were deleted or modified
+in the fixing commit), the VCCFinder heuristic also takes into
+account lines added by the fixing commit. The commit that is
+blamed the most often is then marked as the VCC.
+In VCCFinder, the accuracy of the heuristic is calculated
+at 96%. This figure was derived by the authors by taking a
+15% sample of VCCs (96 in total) that the heuristic identi-
+fied, and manually checking them. Naturally, simply applying
+this heuristic seemed like a good fit for our use-case. Un-
+fortunately, in our evaluation of the heuristic against ground
+truth data, we could not observe similar accuracy (accuracy
+~40%). We attribute the optimistic evaluation of the heuristic
+by Perl et al. to the difficulty of pinpointing VCCs manually.
+Our results seem sensible considering the fact that software
+developers put a significant amount of manual effort13 into
+regression trackingwhich includes identifying VCCs. Thus,
+it seems likely that the accuracy of a relatively simple heuris-
+tic like this, is limited. However, for the purpose of training
+a classifier that pinpoints “risky” commits, with the aim to
+13https://lore.kernel.org/lkml/3519198.TemPj1OATJ@vostro.
+rjw.lan/
+https://yarchive.net/comp/linux/regression_tracking.html

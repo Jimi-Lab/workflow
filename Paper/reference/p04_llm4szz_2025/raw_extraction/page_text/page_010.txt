@@ -1,0 +1,75 @@
+ISSTA016:10 Lingxiao Tang, Jiakun Liu, Zhongxin Liu, Xiaohu Yang, and Lingfeng Bao
+SMU Classification: Restricted
++    driver_deferred_probe_trigger();
++    flush_work(&deferred_probe_work);
++    list_for_each_entry_safe(private, p, &deferred_probe_pending_list,     
+deferred_probe)
++                 dev_info(private->device, "deferred probe pending");
++     }
++    static  DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
++              deferred_probe_timeout_work_func);
+driver_deferred_probe_trigger();
+  flush_work(&deferred_probe_work);
+  
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list, 
+deferred_probe)
+-             dev_info(private->device, "deferred probe pending");
+  }
+  static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+            deferred_probe_timeout_work_func);
+driver_deferred_probe_trigger();
+  flush_work(&deferred_probe_work);
+  
+  list_for_each_entry_safe(private, p, &deferred_probe_pending_list,    
+deferred_probe)
++             dev_info(private->device, "deferred probe pending\n");
+  }
+  static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, 
+            deferred_probe_timeout_work_func);
+<empty>
+eb7fbc9fb11 eb7fbc9fb11^1
+25b4e70dcce
+（initial commit） 25b4e70dcce^1
+Candidate
+commit1
+Candidate
+commit2
+Fig. 6. An example of context-enhanced identification
+To enhance the LLM’s ability to determine whether the candidate commit𝐶𝑗 contains the bug,
+we split the determination process into two steps. In the first step, we input the context of commit
+𝐶𝑗 and the buggy statements in the hint to the LLM, asking the LLM to determine whether the
+commit contains the buggy code statements or code statements with similar semantic meanings to
+the buggy code statements. If the LLM answers "no", we simply believe that the commit𝐶𝑗 does
+not contain the bug. If the LLM answers "yes", we proceed to let it determine whether the commit
+is buggy. In the second step, we feed the context of commit 𝐶𝑗 , the root cause of the bug, and the
+hint to the LLM, asking it to determine whether the commit contains the bug.
+We utilize the LLM to check the candidate commits in the list from index1 to 𝑖. If we can find
+an index 𝑓, where the LLM believes that the context of the commit 𝐶𝑓 is buggy but 𝐶∧
+𝑓 1 is not,
+we designate it as the bug-inducing commit. If we can not find such a commit, we fall back to
+rank-based identification conservatively.
+Figure 6 provides an example, which corresponds to the first motivation example. Firstly,
+LLM4SZZ traces back the buggy statements in the hint and finds two candidate commits, the
+commit 𝑒𝑏7𝑓𝑏𝑐9𝑓𝑏11 (denoted as 𝐶1) and commit 25𝑏4𝑒70𝑑𝑐𝑐𝑒 (denoted as 𝐶2). We sort them based
+on their commit date in descending order and get the candidates list {𝐶1, 𝐶2}. We first check the
+contexts for commits 𝐶1 and 𝐶1∧1, following the steps above and requiring the LLM to determine
+whether the two versions are buggy. The LLM identifies that both the 𝐶1 and 𝐶1∧1 versions of
+the program contain the bug. Therefore, this candidate commit is not the bug-inducing commit.
+LLM4SZZ then checks the commit 𝐶2 and 𝐶2∧1 , following the same steps. Here, 𝐶2 is the initial
+commit that introduces the file. Therefore, the context of𝐶2∧1 is empty. The LLM finds the commit
+𝐶2 contains the bug and the context of commit 𝐶2∧1 contains no code statements and is not buggy.
+Therefore, LLM4SZZ finally designates the commit 𝐶2 as the final bug-inducing commit.
+3.3.2 Rank-Based Identification. Rank-based identification addresses cases where the LLM
+cannot fully understand the bug and cannot determine whether the bug exists in the program.
+Therefore, in this approach, we do not use LLMs to select the final bug-inducing commit from
+candidate commits. Instead, we simply follow the idea of NerualSZZ [Tang et al. 2023] and proceed
+as follows:
+•Buggy Statements Identification: We first ask the LLM to identify buggy statements from
+the bug-fixing commit based on the commit message and the root cause obtained in section
+3.1. In this phase, we input only the root cause, the commit message, and the original changed
+files obtained in section 3.1. We do not provide the LLM with expanded context, as we observe
+that if the LLM cannot understand the bug, additional context will undermine its performance
+(see Section 5.2).
+•Relevance Ranking: By utilizing a listwise rank algorithm [Sun et al. 2023] based on the
+LLM, we rank these buggy statements according to their relevance to the root cause.
+Proc. ACM Softw. Eng., Vol. 2, No. ISSTA, Article ISSTA016. Publication date: July 2025.

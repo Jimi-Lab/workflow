@@ -1,0 +1,96 @@
+CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 381
+prompt also concludes with a declaration of the ﬁxed output
+format expected for the model’s response. The content of the
+user prompt includes detailed CVE information including CVE
+ID, CWE ID, CVE description, and dangerous ﬂow extracted
+from program slicing. The extracted dangerous ﬂows are
+formatted with line numbers preﬁxed to each statement when
+constructing prompts, such as “ 4442 total_size +=
+msec->size; 4444 stash->info_ptr_memory =
+(bfd_byte *) bfd_malloc (total_size);”.
+Additionally, we use the following prompt strategies to op-
+timize the performance of LLM:
+(i) Few-shot prompting is a technique where we provide the
+LLM with a small number of examples demonstrating
+the desired task before presenting the actual problem. We
+carefully select two examples from publicly available and
+veriﬁed CVE cases. To avoid data leakage, the cases are
+not included in our experimental dataset. The selection
+of examples follows speciﬁc criteria: (1) having complete
+and clear CVE descriptions, (2) containing explicit vul-
+nerability ﬁx code, and (3) feat uring easily understand-
+able vulnerability logic. These examples were created
+and reviewed through a systematic process: analyzing
+CVE descriptions and patch code, extracting key vulner-
+ability logic, annotating relev ant vulnerable statements,
+and writing clear vulnerabilityanalysis explanations. The
+examples were created by the ﬁrst author and reviewed
+by the fourth and ﬁfth authors. To ensure experimen-
+tal reproducibility, we maint ain a ﬁxed set of examples
+throughout all experiments. Each example consists of: a)
+A sample CVE ID, CWE ID and CVE description, b)
+Corresponding dangerous ﬂow extracted from program
+slicing, c) The expected vulnerability logic analysis, and
+d) The correctly identiﬁed vulnerable statements.
+(ii) Chain-of-thought (CoT) prompting provides LLM with a
+prompt that encourages it to generate intermediate rea-
+soning steps before arriving at a ﬁnal answer [46].W e
+prompt the model to “Please analyze the code follow-
+ing these steps: 1. Explain the vulnerability logic from
+the code 2. Indicate which statements are relevant to
+the vulnerability logic”. This structured format naturally
+implements a chain of thought - requiring the model to
+ﬁrst reason about and explain the vulnerability logic (the
+reasoning step) before identifying the speciﬁc vulnerable
+lines (the identiﬁcation step). This approach identiﬁes the
+vulnerable statements using the code understanding ca-
+pability of LLM rather than superﬁcial pattern matching.
+Table III shows our prompting template, and we take the
+vulnerable statements from the response as the input for
+the next step.
+B. Code Clone Detection
+Given the vulnerable statements S
+v of a ﬁxing commit (ex-
+tracted in Section III-A), VERCATION performs a commit back-
+track to identify which previous commit introduced Sv by
+tracing the history of earlier modiﬁcations. To achieve this,
+VERCATION employs the git blame command to backtrack
+Fig. 3. The LLM prompt structure.
+through previous commits. Fig. 4 illustrates our code clone
+detection process. For each intermediate commit between the
+vfc and the potential vic, we compare the post-modiﬁcation
+statements (S) with the pre-modiﬁcation statements ( S′)u s i n g
+two levels of similarity detection: a quick syntactic check us-
+ing edit distance and a deeper structural analysis using ASTs.
+The results from both comparisons, combined with statement
+weights assigned in Section III-B3, contribute to a ﬁnal simi-
+larity score. If this score is below the threshold θ3, we identify
+the commit as the vic. Otherwise, we continue the backtrack
+process.
+1) Syntactic Similarity Analysis: First, we use line map-
+ping to pre-ﬁlter highly similar lines in S′ with S, where
+S ⊆Sv. If such lines are found, it indicates that the com-
+mit is not the ﬁrst to introduce Sv. We use the edit dis-
+tance to calculate line similarity SimilarityA(S′
+i,Si), where
+S′
+i ∈S′ and Si ∈S. We set a similarity threshold ϑ1;i f
+SimilarityA(S′
+i,Si)≥ϑ1, we continue to backtrack the pre-
+vious commit. If SimilarityA(S′
+i,Si)<ϑ1, we proceed to the
+more detailed structural analysis. To note, when encountering
+merge commits with multiple parents during backtrack, we
+traverse each parent path independently and select the chrono-
+logically earliest vic across all branches.
+2) Structural Similarity Analysis: As exempliﬁed in Ex-
+ample 2 of Section II-C, Lines 5-6 (deleted pre-commit lines)
+and 7-8 (added line of post-commit, e.g., included in S
+v)e x -
+hibit high similarity in code behavior. However, previous re-
+search failed to identify this high similarity through simple line
+mapping, resulting in the commi t (version) being erroneously
+labeled as an introducing commit (vulnerable version). We pro-
+pose a ﬁne-grained similarity comparison method at the AST-
+level to address this limitation. AST is a tree representation
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

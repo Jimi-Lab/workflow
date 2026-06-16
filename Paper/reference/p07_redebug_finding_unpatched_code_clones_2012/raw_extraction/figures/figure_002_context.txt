@@ -1,0 +1,75 @@
+diff
+svn commit
+patch
+Extract original
+code snippet 
+including context
+Normalize/
+Tokenize
+DB
+(Bloom filter 
+per file)
+Sources
+Debian, Ubuntu, 
+Kernel, ...
+Normalize/
+Tokenize
+Hash n-tokens 
+into Bloom filters 
+Unpatched 
+Code Clone List
+Remove 
+BF errors/ 
+dead code
+Build DB
+Unpatched
+code clones
+Find Bugs
+Similarity
+Feature hashing
+n-tokens
+DB
+(Bitvector per 
+file/function)
+Pairwise 
+Similarity
+Measurement
+Compute
+bitwise similarity
+Measure Similarity
+Unpatched Code Clone Detection
+Code Similarity Detection
+(parallelized)
+set membership 
+test
+Figure 2: The ReDeBug workﬂow.
+that, else we obtain it from the original source
+ﬁles.
+2) Normalizes and tokenizes the extracted original
+buggy code snippets. The normalization process is
+the same as described in Step 1. For C, C++, Java,
+and Python we remove any partial comments in
+the c context lines since those languages support
+multi-line comments and c context lines may have
+only the head or tail part of multi-line comments.
+3) Hashes the n-token window into a set of hashes
+fp.
+4) Performs a Bloom ﬁlter set membership test
+on each hashed n-token window. We report an
+unpatched code clone with ﬁle f if CONTAIN-
+MENT(fp, f) ≥θ.
+• Step 3: Post-process the reported clones. Given re-
+ported unpatched code clones, ReDeBug automatically:
+1) Performs an exact-matching test to remove Bloom
+ﬁlter errors.
+2) Excludes dead code which is not included at
+build time. For C we add assert statements
+to the buggy code region, and compile with -g
+option which allows us to check the presence
+of assert statements using objdump -S. For
+non-compiled languages this step is omitted.
+3) ReDeBug reports only non-dead code to the user.
+We use Bloom ﬁlters [8] because they are a space efﬁcient
+randomized data structure used for set membership tests.
+Suppose there is a data set S, i.e., in our setting a set of
+n-tokens. A Bloom ﬁlter r

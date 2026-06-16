@@ -1,0 +1,124 @@
+392 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+signatures, then uses these to identify potentially vulnerable
+functions. V0Finder [16] generates ﬁngerprints for vulnerable
+functions and uses a clone-based technique to detect vulner-
+able versions across different software releases. VCCFinder
+[73] uses machine learning techniques to identify vulnerability-
+contributing commits. VUDDY [74] proposes a scalable ap-
+proach for vulnerable code clone detection in large-scale code
+bases. Existing approaches often rely on predeﬁned patterns
+and syntactic-level analysis, leading to imprecision in vulner-
+ability characterization and code clone detection. V
+ERCATION
+combines static analysis with LLM for code understanding and
+introduces AST-based code clone detection to address the code
+structure modiﬁcation problem.
+C. Code Refactoring Detection
+Some researchers conducted studies on the characteristics of
+code refactoring not altering the code behavior of the code and
+have proposed detection methods. MLRefScanner [75] detects
+refactoring commits in Python projects by analyzing commit
+history and extracting features that represent refactoring activ-
+ities without altering code behavior. Abid et al. [76] perform a
+study outlining different levels ofrefactoring from code level to
+architecture and discuss the importance of maintaining behavior
+during refactoring. Eman et al. [77] focus on how refactor-
+ing is integrated into the code review process while ensuring
+that the original software behavior is preserved. Existing code
+refactoring detection methods primarily focus on high-level
+changes like renaming and method/class moves. Our approach,
+however, targets statement-level changes through ﬁne-grained
+AST expansion and normalization, including inline function
+expansion during AST generation.
+D. Code Clone Detection
+Some SOTA techniques utilize static analysis to conduct code
+clone detection. SCDetector [78] feeds tokens with graph detail
+into a Siamese architecture neural network to train a code clone
+detector. Fang et al.[18] propose a joint code representation that
+applies fusion embedding techniques to learn hidden features
+of source codes, then train a supervised deep learning model
+to detect functional code clones. FCDetection [18] generates
+AST and CFG representations and uses Word2vec to embed
+these features into vectors. Then the fused feature vectors are
+input into a deep neural network model for classiﬁcation of code
+clones.
+VIII. C
+ONCLUSION AND FUTURE WORK
+This paper proposed V ERCATION, an approach designed for
+vulnerable version identiﬁcation of open-source C/C ++ soft-
+ware. Our approach introduces two key innovations: leveraging
+LLMs to enhance the extraction of vulnerability-related state-
+ments and employing code clone detection based on expanded
+and normalized ASTs. Experimental results on our dataset of
+122 CVEs across 12 popular open-source projects validate that
+V
+ERCATION surpasses existing techniques for vulnerable ver-
+sion identiﬁcation, demonstrating notable improvements in both
+precision and recall. V ERCATION’s novelty lies not in individ-
+ual techniques but in the systematic integration of semantic
+analysis and methodological innovations in LLM application.
+The combination creates a qualitatively different approach that
+advances the state-of-the-art in both accuracy and practical
+applicability, opening new research directions for AI-assisted
+software security analysis.
+In the future, we plan to empirically validate V
+ERCATION on
+a broader set of languages (Java, Python, JavaScript, and PHP)
+to conﬁrm its effectiveness. Furthermore, we are interested in
+exploring integrating inter-procedural analysis techniques to
+enhance the detection of cross-functional vulnerability patterns.
+A
+CKNOWLEDGMENT
+We thank the anonymous reviewers for their insightful com-
+ments. Any opinions, ﬁndings and conclusions or recommen-
+dations expressed in this material are those of the author(s)
+and do not reﬂect the views of National Research Foundation,
+Singapore or the Smart Nation Group.
+REFERENCES
+[1] “NVD - home,” 2009. Accessed: Oct. 18, 2009. [Online]. Available:
+https://nvd.nist.gov/
+[2] “CVE-2018-5785,” 2018. Accessed: Jan. 19, 2018. [Online]. Available:
+https://nvd.nist.gov/vuln/detail/CVE-2018-5785
+[3] Y . Dong, W. Guo, Y . Chen, X. Xing, Y . Zhang, and G. Wang, “Towards
+the detection of inconsistencies in public security vulnerability reports,”
+in Proc. 28th USENIX Secur. Symp. (USENIX Secur. 19), 2019, pp. 869–
+885.
+[4] D. Mu et al., “Understanding th e reproducibility of crowd-reported
+security vulnerabilities,” in Proc. 27th USENIX Secur. Symp. (USENIX
+Secur. 18), 2018, pp. 919–936.
+[5] X. Tan et al., “Locating the secur ity patches for disclosed OSS vulner-
+abilities with vulnerability-commit correlation ranking,” in Proc. ACM
+SIGSAC Conf. Comput. Commun. Secur. , 2021, pp. 3282–3299.
+[6] V . H. Nguyen and F. Massacci, “The (un) reliability of NVD vulnerable
+versions data: An empirical experiment on google chrome vulnerabili-
+ties,” in Proc. 8th ACM SIGSAC Symp. Inf., Comput. Commun. Secur. ,
+2013, pp. 493–498.
+[7] J. Dai et al., “Facilitating vulnerability assessment through POC mi-
+gration,” in Proc. ACM SIGSAC Conf. Comput. Commun. Secur. , 2021,
+pp. 3300–3317.
+[8] D. A. Da Costa, S. McIntosh, W. Shang, U. Kulesza, R. Coelho, and
+A. E. Hassan, “A framework for evaluating the results of the SZZ
+approach for identifying bug-introducing changes,” IEEE Trans. Softw.
+Eng., vol. 43, no. 7, pp. 641–657, Jul. 2017.
+[9] G. Rosa et al., “Evaluating SZZ im plementations through a developer-
+informed oracle,” inProc. IEEE/ACM 43rd Int. Conf. Softw. Eng. (ICSE),
+Piscataway, NJ, USA: IEEE Press, 2021, pp. 436–447.
+[10] V . H. Nguyen, S. Dashevskyi, and F. Massacci, “An automatic method
+for assessing the versions affected by a vulnerability,” Empirical Softw.
+Eng., vol. 21, no. 6, pp. 2268–2297, 2016.
+[11] G. Rodríguez-Pérez, G. Robles, A. Serebrenik, A. Zaidman, D. M.
+Germán, and J. M. Gonzalez-Barahona, “How bugs are born: A model
+to identify how bugs are introduced in software components,” Empirical
+Softw. Eng., vol. 25, no. 2, pp. 1294–1340, 2020.
+[12] Y . Xiao et al., “MVP: Detecting vulnerabilities using patch-enhanced
+vulnerability signatures,” in Proc. 29th USENIX Secur. Symp. (USENIX
+Secur. 20), 2020, pp. 1165–1182.
+[13] Y . Shi, Y . Zhang, T. Luo, X. Mao, and M. Yang, “Precise (un) affected
+version analysis for web vulnerabilities,” in Proc. 37th IEEE/ACM Int.
+Conf. Automated Softw. Eng. , 2022, pp. 1–13.
+[14] J. Jang, A. Agrawal, and D. Brumley, “RedeBug: Finding unpatched
+code clones in entire OS distributions,” in Proc. IEEE Symp. Secur.
+Privacy, Piscataway, NJ, USA: IEEE Press, 2012, pp. 48–62.
+[15] S. Woo, H. Hong, E. Choi, and H. Lee, “MOVERY: A precise approach
+for modiﬁed vulnerable code clone discovery from modiﬁed open-source
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

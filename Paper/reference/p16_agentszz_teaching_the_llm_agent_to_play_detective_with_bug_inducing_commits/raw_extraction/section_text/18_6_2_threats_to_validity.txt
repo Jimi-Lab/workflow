@@ -1,0 +1,74 @@
+6.2 Threats to Validity
+Internal Validity.LLMs may produce non-deterministic outputs
+even with temperature set to 0, potentially affecting reproducibility.
+We mitigate this by running each experiment three times and re-
+porting average results. The domain knowledge in our prompt was
+derived from 50 Linux kernel cases. Although results show strong
+cross-dataset and cross-language generalizability, the prompt may
+encode Linux-specific patterns that are less relevant to other projects.
+3https://github.com/apache/accumulo/commit/a2c2d38aa
+4,
+5https://github.com/torvalds/linux/commit/7ecb37f62fe5
+
+===== Page 010 =====
+Preprint, Under Submission, Arxiv Lyu et al.
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+Turn
+0
+20
+40
+60
+80
+100Proportion (%)
+Linux
+show
+blame
+log_s
+grep
+log_func
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+Turn
+Proportion (%)
+GitHub
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+Turn
+Proportion (%)
+Apache
+Figure 4: Distribution of tool usage across investigation steps inAgentSZZ. The values are normalized proportions per turn.
+Table 4: Distribution, recall, and relative improvement ofAgentSZZover LLM4SZZ on cross-file and ghost commit cases.
+Dataset Total Cross-file Ghost Cross-file Recall Ghost Recall
+AgentSZZLLM4SZZ Improv.AgentSZZLLM4SZZ Improv.
+Apache 243 34 (14.0%) 10 (4.1%) 18.60 9.30 +100.0% 53.33 40.00 +33.3%
+GitHub 355 33 (9.3%) 37 (10.2%) 24.24 6.06 +300.0% 70.27 48.65 +44.4%
+Linux 1500 209 (13.9%) 263 (17.5%) 42.72 16.43 +160.1% 64.18 39.93 +60.7%
+Overall 2104 276 (13.1%) 310 (14.7%) 37.02 14.19 +160.9% 64.38 40.94 +57.2%
+Future work could explore project-adaptive prompt generation to
+further improve robustness. The design process involved two au-
+thors interacting with an LLM to simulate agent behavior, introduc-
+ing potential subjectivity in tool and prompt design. To mitigate this,
+the 50 design cases were excluded from all evaluation datasets, and
+all design choices were validated through ablation studies (RQ3).
+Prior work has shown that potential data leakage in similar set-
+tings does not materially affect evaluation outcomes. Therefore,
+we do not conduct additional experiments on this aspect, as it is
+orthogonal to the focus of this study.
+In addition, the performance ofAgentSZZdepends on the qual-
+ity of tool outputs and repository metadata (e.g., commit history and
+file structure). Incomplete or inconsistent repository information
+may affect the accuracy of tracing results.AgentSZZattempts pre-
+fix matching at progressively shorter lengths (12, 10, 8, 7 characters)
+to recover from minor errors.
+External Validity.Our evaluation spans three datasets, two
+programming languages (C and Java), and over 285 repositories,
+covering a broader scope than most prior SZZ studies. However, gen-
+eralizability to other languages (e.g., Python, JavaScript) and project
+types (e.g., web or mobile applications) remains to be validated. We
+use developer-annotated ground truth, the highest-quality labeling
+available for SZZ evaluation. However, annotations may still con-
+tain errors or ambiguities, especially for complex bugs involving
+multiple commits. Additionally, DS_GITHUB excludes six reposito-
+ries due to unavailability during our evaluation period, which may
+slightly affect comparability with prior work. Finally, our evaluation
+focuses on open-source projects; the applicability ofAgentSZZ
+to proprietary or industrial codebases with different development
+practices remains an open question.

@@ -1,0 +1,105 @@
+• High false detection rate: The advanced heuristics
+used to ﬁnd more code clones introduce a high false
+detection rate, i.e., a large number of false code clones
+are reported. For example, Deja Vu boasts the highest
+accuracy we are aware of at 26-34%, meaning 66-74%
+are false code clones. That’s 2 out of every 3 reports.
+A considerable amount of resources would be wasted
+to inspect all the reported cases.
+ReDeBug tackles a new point in the design space where
+we trade more expensive, yet thorough, pattern matching
+algorithms for speed, scalability, and a language-agnostic
+property:
+• Scalability: ReDeBug uses a syntax-based pattern
+matching approach that can be implemented using
+extremely efﬁcient data structures which allow fast
+querying for code clones when given a patch. ReDeBug
+processed source code into a database at about 700,000
+LoC/min on a commodity desktop. This database of
+over 2.1 billion lines of code can then be queried in less
+than 8 minutes. Therefore, ReDeBug can also be used
+as part of the normal development and patch process
+on hardware available to an average developer or user,
+e.g., an average desktop.
+• Language agnostic: Roughly speaking, ReDeBug per-
+forms simple normalization where all whitespace is
+removed and all characters are transformed to their
+lower-case equivalent. Such simple normalization al-
+lows ReDeBug to identify a variety of latent security
+vulnerabilities in programs written in many different
+languages. Interestingly, in our evaluation, Deckard –
+a tree-based code clone detection technique – missed
+6x more code clones than ReDeBug, not counting
+languages handled by ReDeBug but not supported by
+Deckard (§ IV-A).
+• Lower false detection rate: ReDeBug focuses on de-
+creasing false detection rate by using a close-to-exact
+matching instead of fuzzier matching employed by pre-
+vious code clone work. This means we may ﬁnd fewer
+unpatched code clones, but that we will also have fewer
+false positives due to mis-matches. ReDeBug has false
+positives when vulnerable code is not detected as dead
+code by the underlying compiler, and when a previously
+identiﬁed vulnerable code segment is used in a way
+that makes it non-exploitable. Deja Vu and similar
+approaches have similar sources of false detection, plus
+errors in the matching algorithms themselves [21, 23–
+25]. As a result, Deja Vu had a false detection rate
+of 66-74%, which is on the better end of similar code
+clone detection mechanisms [21, 23–25]. ReDeBug has
+zero errors due to matching, thus does not suffer from
+the major source of false positives found in previous
+work.
+We have used ReDeBug to check for unpatched code
+clones in Debian 6.0 Squeeze (348,754,939 LoC 1), De-
+bian 5.0 Lenny (257,796,235 LoC), Ubuntu 11.10 Oneiric
+(397,399,865 LoC), Ubuntu 10.10 Maverick (245,237,215
+LoC), Linux Kernel (8,968,871 LoC), and all C/C++
+projects at SourceForge (922,424,743 LoC). So far, Re-
+DeBug has found 15,546 unpatched code clones in the
+total 2,180,581,868 LoC by checking 376 Debian/Ubuntu
+security-related patches. The patches address a variety of
+issues ranging from buffer overﬂows, to information dis-
+closure vulnerabilities, to denial of service vulnerabilities.
+Our measurements indicate that even though ReDeBug is
+simpler, it actually ﬁnds a comparable number of code clones
+to existing approaches (§ IV-A).
+Previous work has shown that once a patch is released, an
+attacker can use the patch to reverse engineer the bug and
+automatically create an exploit in only a few minutes [10].
+Our experiments indicate one security implication of ReDe-
+Bug is an attacker, using a single laptop, could potentially
+ﬁnd thousands of vulnerable applications among billions of
+lines of code in only a few minutes once a patch is released,
+assuming he has already preprocessed the code.
+In addition to ﬁnding unpatched code clones, we have
+conducted the ﬁrst study of the amount of code cloning in
+the entire Debian Lenny source base. By performing pair-
+wise comparison among functions, ReDeBug provides the
+distribution of function pairs based upon their similarity (see
+§ III-H)
+Overall, our main contributions are:
+• We analyze entire OS distributions to comprehend the
+current trends of unpatched code clones. To the best
+of our knowledge, ReDeBug is the ﬁrst tool to explore
+over 2.1 billion lines of entire OS distributions to under-
+stand unpatched code clone problems. We show that un-
+patched code clones are a recurring problem in modern
+distributions, and ﬁnd 15,546 unpatched code clones
+from Debian Lenny/Squeeze, Ubuntu Maverick/Oneiric
+distributions, the Linux kernel, and SourceForge. So far,
+ReDeBug has conﬁrmed 145 real bugs.
+• We describe ReDeBug, which suggests a new design
+space for code clone detection in terms of scalability,
+speed, and false detection rate. In particular, the design
+point makes ReDeBug realistic for use by typical de-
+velopers in everyday environments in order to improve
+the security of their code by quickly querying known
+vulnerabilities.
+• We provide the ﬁrst empirical measurement of the
+total amount of copied code in OS distributions. This
+suggests that in the future, unpatched code clones will
+continue to be important and relevant.
+1We always count non-empty, non-comment lines.
+49
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

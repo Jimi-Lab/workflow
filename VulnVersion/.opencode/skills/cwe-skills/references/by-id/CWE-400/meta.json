@@ -1,0 +1,278 @@
+{
+  "cwe_id": "CWE-400",
+  "name": "Uncontrolled Resource Consumption",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product does not properly control the allocation and maintenance of a limited resource.",
+  "extended_description": "",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-664",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Control of a Resource Through its Lifetime"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Operation",
+    "System Configuration",
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Discouraged",
+    "fit": "",
+    "rationale": "CWE-400 is intended for incorrect behaviors in which the product is expected to track and restrict how many resources it consumes, but CWE-400 is often misused because it is conflated with the \"technical impact\" of vulnerabilities in which resource consumption occurs. It is sometimes used for low-information vulnerability reports. It is a level-1 Class (i.e., a child of a Pillar)."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not properly control the allocation and maintenance of a limited resource.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Operation",
+      "System Configuration",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "uncontrolled",
+      "consumption",
+      "maintenance",
+      "allocation"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "uncontrolled",
+      "consumption",
+      "maintenance",
+      "allocation",
+      "properly",
+      "limited"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following example demonstrates the weakness.",
+        "snippet": "class Worker implements Executor { ... public void execute(Runnable r) { try { ... } catch (InterruptedException ie) { // postpone response Thread.currentThread().interrupt(); } } public Worker(Channel ch, int nworkers)..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "This code allocates a socket and forks each time it receives a new connection.",
+        "snippet": "sock=socket(AF_INET, SOCK_STREAM, 0); while (1) { newsock=accept(sock, ...); printf(\"A connection has been accepted\\n\"); pid = fork(); }"
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following example a server socket connection is used to accept a request to store data on the local file system using a specified filename. The method...",
+        "snippet": "int writeDataFromSocketToFile(char *host, int port) { char filename[FILENAME_SIZE]; char buffer[BUFFER_SIZE]; int socket = openSocketConnection(host, port); if (socket < 0) { printf(\"Unable to open socket connection\");..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "In the following example, the processMessage method receives a two dimensional character array containing the message to be processed. The two-dimensional...",
+        "snippet": "/* process message accepts a two-dimensional character array of the form [length][body] containing the message to be processed */ int processMessage(char **message) { char *body; int length =..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "In the following example, the processMessage method receives a two dimensional character array containing the message to be processed. The two-dimensional...",
+        "snippet": "unsigned int length = getMessageLength(message[0]); if ((length > 0) && (length < MAX_LENGTH)) {...}"
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following example, a server object creates a server socket and accepts client connections to the socket. For every client connection to the socket a...",
+        "snippet": "public static final int SERVER_PORT = 4444; public static final int MAX_CONNECTIONS = 10; ... public void acceptConnections() { try { ServerSocket serverSocket = new ServerSocket(SERVER_PORT); int counter = 0; boolean..."
+      },
+      {
+        "language": "Go",
+        "nature": "Good",
+        "summary": "In the following example, the serve function receives an http request and an http response writer. It reads the entire request body.",
+        "snippet": "func serve(w http.ResponseWriter, r *http.Request) { var body []byte const MaxRespBodyLength = 1e6 if r.Body != nil { r.Body = http.MaxBytesReader(w, r.Body, MaxRespBodyLength) if data, err := io.ReadAll(r.Body); err ==..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2019-19911",
+        "description": "Chain: Python library does not limit the resources used to process images that specify a very large number of bands (CWE-1284), leading to excessive memory consumption (CWE-789) or an integer overflow (CWE-190).",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-19911"
+      },
+      {
+        "reference": "CVE-2020-7218",
+        "description": "Go-based workload orchestrator does not limit resource usage with unauthenticated connections, allowing a DoS by flooding the service",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-7218"
+      },
+      {
+        "reference": "CVE-2020-3566",
+        "description": "Resource exhaustion in distributed OS because of \"insufficient\" IGMP queue management, as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-3566"
+      },
+      {
+        "reference": "CVE-2009-2874",
+        "description": "Product allows attackers to cause a crash via a large number of connections.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2874"
+      },
+      {
+        "reference": "CVE-2009-1928",
+        "description": "Malformed request triggers uncontrolled recursion, leading to stack exhaustion.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1928"
+      },
+      {
+        "reference": "CVE-2009-2858",
+        "description": "Chain: memory leak (CWE-404) leads to resource exhaustion.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2858"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

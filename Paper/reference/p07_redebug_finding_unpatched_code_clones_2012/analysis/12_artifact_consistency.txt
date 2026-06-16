@@ -1,0 +1,45 @@
+Paper Claims:
+- The paper describes an original ReDeBug implementation of about 1000 lines of C and 250 lines of Python.
+- It reports large-scale evaluation over OS distributions, SourceForge, Linux, and hundreds of security-related patches.
+
+Local Artifact Evidence:
+- Local path contains a Python reimplementation with README and LICENSE.
+- README explicitly states it is different from the original faster C implementation used in IEEE S&P evaluation.
+
+Implemented Components:
+- CLI entrypoint: redebug.py.
+- Patch parsing/signature generation: patchloader.py.
+- Source traversal/Bloom-filter candidate matching: sourceloader.py.
+- Exact matching and HTML output: reporter.py.
+- Shared constants, regexes, hashes, namedtuples: common.py.
+
+Unimplemented or Stubbed Components:
+- Original C implementation absent.
+- Large-scale source database build/compression implementation from the paper is not locally visible as the original evaluated system.
+
+Dataset Availability:
+[NEEDS ARTIFACT] Debian/Ubuntu/SourceForge/Linux datasets and patch corpus are not visible in the target.
+
+Benchmark / Evaluation Scripts Visible by Static Inspection:
+The local reimplementation has runnable-style CLI structure, but no evaluation scripts or datasets for the paper's experiments were observed.
+
+Static Reproduction Instructions or Missing Instructions:
+README provides dependencies and CLI usage. It does not provide original evaluation reproduction instructions.
+
+Config Files:
+No dependency lockfile or config file observed.
+
+Environment Constraints:
+README lists bitarray, python-magic, argparse, and libmagic. The code uses Python 2 print/except syntax by static inspection.
+
+Paper-Code Mismatches:
+The main mismatch is explicit: local source is a Python reimplementation, not the original C implementation used for paper evaluation.
+
+Engineering Lessons for Our Paper:
+If releasing artifacts, separate "research evaluation implementation" from "usable reimplementation" and label any performance mismatch clearly.
+
+Execution Status:
+[EXECUTION NOT REQUESTED]
+
+Source Path:
+E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\ReDeBug\ReDeBug

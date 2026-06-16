@@ -1,0 +1,89 @@
+approach; Section 6 introduces our knowledge graph-based attack 
+detection framework, and Section 7 discusses the implementation 
+and introduces application scenarios; we evaluate our approach in 
+Section 8 , discuss the results in Section 9 and conclude with an 
+outlook on future research in Section 10 . 
+2. Related work 
+In this article we focus on misuse-based intrusion detec- 
+tion techniques, which search for well-deﬁned patterns of at- 
+tack ( Kumar, 1996 ). Consequently, we organize related work on 
+threat detection and attack graph construction into the following 
+categories: (i) provenance-based tracking, (ii) tactical attack con- 
+struction, (iii) graph queries, and (iv) ontology-based threat detec- 
+tion. Table 1 summarizes and compares existing attack discovery 
+approaches, which will be discussed in the following sections. 
+Provenance-based Tracking Seminal work on provenance-based 
+attack detection ( King and Chen, 2003a ) introduced the idea to 
+investigate attacks through backward tracking. A major limita- 
+tion of initial “naive” backtracking approaches is that they are 
+based on coarse-grained provenance data. This typically introduces 
+a large number of false dependencies in the graph, a problem 
+known as “dependence explosion” ( Hossain et al., 2018 ). Several re- 
+4 https://github.com/sepses/Krystal 
+searchers introduced approaches to mitigate this problem through 
+ﬁned-grained taint-tracking or information ﬂow tracking ( Ji et al., 
+2017; 2018; Kemerlis et al., 2012 ). Although these approaches 
+can accurately distinguish suspicious and benign nodes, scaling 
+them remains a challenge ( Hossain et al., 2018 ). Another ap- 
+proach tried to solve this problem by introducing tag-propagation . 
+SLEUTH ( Hossain et al., 2017 ), for instance, introduced trustwor- 
+thiness tags (t-tags) and conﬁdentiality tags (c-tags) that are used 
+to assign suspicion levels to nodes and propagate them through 
+the provenance graph. In combination with a policy framework, 
+these tags can trigger alarms and successfully identify unseen at- 
+tacks in real-time and with low overhead. However, SLEUTH suffers 
+from numerous false-positives for attacks with long-running pro- 
+cesses ( Hossain et al., 2020 ). MORSE ( Hossain et al., 2020 ) extends 
+this approach by introducing tag-attenuation and tag-decay to cut 
+down false alarms by more than an order of magnitude. To reduce 
+the provenance graph, it indexes all subjects and objects using a 
+numeric index. However, none of these approaches leverage stan- 
+dard representations, but rely on custom graph models and hard- 
+coded rules and policies. Consequently, they are diﬃcult to expand 
+and it is diﬃcult to investigate the resulting attack graphs further, 
+e.g., by linking them to background knowledge. Furthermore, both 
+SLEUTH and MORSE do not explicitly represent the high-level con- 
+text of attacks. As a result, it becomes exceedingly diﬃcult to iden- 
+tify attacks as attack graphs become more complex. 
+Our approach introduces a standard and ﬂexible graph model 
+based on an ontology. Hence, with a standard graph model and 
+declarative rules and policies, our approach can produce compact 
+attack graphs and also ﬂexibly integrate and link them to back- 
+ground knowledge. For graph reduction, we use (Header, Dictio- 
+nary, Triples) HDT ( Fernández et al., 2013 ), a compact RDF-based 
+structure that keeps large provenance graph compressed. We dis- 
+cuss it in more detail in Section 6.1 . 
+Tactical Attack Construction Provenance-based tracking typi- 
+cally relies on a bottom-up approach, i.e., identifying attacks based 
+on the causality relationship of system objects, such as processes, 
+ﬁles, and sockets. By contrast, several approaches follow a top- 
+3 
+
+===== Page 003 =====
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+down strategy, i.e., they aim to identify attacks based on high- 
+level models of APT campaigns (e.g. techniques, tactics) and/or kill- 
+chain phases. HOLMES ( Milajerdi et al., 2019b ) introduced threat 
+scores and 16 techniques, tactics, procedures (TTP) proposed by 
+the authors to construct a high-level scenario graph (HSG) from 
+a provenance graph. This approach can mitigate dependence ex- 
+plosion and offers a map to TTP. However, its ability to identify 
+attacks with only a single APT stage is limited ( Hossain et al., 
+2020 ). RapSheet ( Hassan et al., 2020 ) is an attack graph con- 
+struction approach based on alert correlation from a commer- 
+cial Endpoint Detection and Response (EDR) tool. By incorporating 
+67 EDR rules, it can relate alerts into a tactical provenance graph 
+based on MITRE’s ATT&CK TTPs. For graph reduction, it implements 
+causality-preserved reduction (CPR) ( Xu et al., 2016 ) that merges 
+edges with identical operations and keeps only the edge with the 
+latest timestamp. Our approach also facilitates TTP mappings, but 
+we rather incorporate rules from open, standard and community- 
+driven detection rules (i.e., SIGMA Roth and Patzke, 2021 ), thus 
+avoiding a dependence on a commercial platform. 
+Another recently proposed approach ( Zou et al., 2020 ) uses 
+tactic-centric Advanced Persistent Threat (APT) recognition to de- 
+tect APT tactics based on APT techniques’ prerequisites (i.e., re- 
+quirements for techniques to be matched to a tactic) and post- 
+conditions (i.e., the result of a technique, e.g., malicious process 
+being created). The identiﬁed attack techniques are mapped to 
+speciﬁc tactics and ranked based on their tactic matching. This

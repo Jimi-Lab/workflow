@@ -1,0 +1,129 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VULTURE\VULTURE
+Analysis Mode: static-only
+Runtime behavior: [EXECUTION NOT REQUESTED]
+Artifact Type: Type A (paper + source code + local benchmark/data-like artifacts).
+
+Repository / File Layout Observed:
+- OneDayDetector/
+- TPLReuseDetector/
+- TPLselection/
+- Python source files inspected statically: 16
+- Total files observed: 81
+- Local artifact/data-like files observed: 12
+
+Primary Files and Artifacts:
+- README.md: present=True, bytes=3810
+- requirements.txt: present=True, bytes=181
+- setup_pyenv.sh: present=True, bytes=1508
+- CommitBenckmark: present=True, bytes=16693
+- VulnerabilityBenckmark.xlsx: present=True, bytes=36732
+- iotList.txt: present=True, bytes=76402
+- vulture.png: present=True, bytes=68319
+- OneDayDetector/VersionBasedDetection.py: present=True, bytes=35943
+- OneDayDetector/ChunkExtraction.py: present=True, bytes=37523
+- OneDayDetector/DBConstruction.py: present=True, bytes=14493
+- TPLReuseDetector/Detector.py: present=True, bytes=13627
+- TPLReuseDetector/fp_eliminator.py: present=True, bytes=12878
+- TPLselection/src/preprocessor/Preprocessor.py: present=True, bytes=8879
+- TPLselection/src/patchcollector/collect_patch.py: present=True, bytes=2383
+- TPLselection/src/patchcollector/utils.py: present=True, bytes=14720
+- TPLselection/src/patchcollector/README.md: present=True, bytes=1344
+
+Static Python Symbol Inventory:
+- OneDayDetector\42_vulture_auto.py
+  imports: import os; import subprocess
+  classes: none
+  functions: none
+- OneDayDetector\ChunkExtraction.py
+  imports: import os; import re; import sys; import json; import subprocess; import time; import argparse; import clang.cindex; from clang.cindex import Index, CursorKind; import ItemSplit
+  classes: DiffInfo
+  functions: DiffInfo.__init__, format_file_code, find_smallest_range, identify_control_stmts, get_diff, chunk_extraction, simplify_file, simplify_file_single_function, amplify_code_chunks, getScore, checkExistance, chunkMatch, lineMatch, operationMatch, checkOneDay, CodeBasedDetection
+- OneDayDetector\DBConstruction.py
+  imports: import os; import re; import sys; import json; import subprocess; import time; import clang.cindex; from clang.cindex import Index, CursorKind
+  classes: none
+  functions: remove_text_between_quotes, normalize_version, remove_type_cast, format_file_code, get_diff, extract_code_elements, getModifiedLinesWithNumbers, runOnDiff, visit_CVE
+- OneDayDetector\ItemSplit.py
+  imports: import re; import regex; import sys; import json; import subprocess; import clang.cindex; from clang.cindex import Index, CursorKind
+  classes: none
+  functions: parse_code, identify_cursor_kind
+- OneDayDetector\pathDiff.py
+  imports: import os; import re; import sys; import json; import subprocess; import clang.cindex; from clang.cindex import Index, CursorKind; import ItemSplit; from ItemSplit import *
+  classes: none
+  functions: extract_code_elements, extract_modified_from_pre_patch, extract_modified_from_post_patch, extractModifiedItems, lineStrip, extractModifiedItemsKind, remove_text_between_quotes, remove_type_cast, getModifiedLinesWithNumbers, getModifiedLines, getModifiedFunctions, runOnDiff
+- OneDayDetector\VersionBasedDetection.py
+  imports: import time; import subprocess; import random; import os; import sys; import tlsh; import argparse; import ast; import json; import re
+  classes: none
+  functions: readFile, normalize_forhashing, removeComment, computeTlsh, fileHashingFull, fileHashing, targetHashing, CPEjsonParser, getReuseInfo, getFunctionHash, normalize_version, normalize_version_list, getAffectedCVEs, versionBasedDetection
+- OneDayDetector\VersionBasedDetection_cxc.py
+  imports: import time; import subprocess; import random; import os; import sys; import tlsh; import argparse; import ast; import json; import re
+  classes: none
+  functions: readFile, normalize_forhashing, removeComment, computeTlsh, fileHashingFull, fileHashing, targetHashing, CPEjsonParser, getReuseInfo, getFunctionHash, normalize_version, normalize_version_list, getAffectedCVEs, versionBasedDetection
+- OneDayDetector\VersionBasedDetection_origin.py
+  imports: import time; import subprocess; import random; import os; import sys; import tlsh; import argparse; import ast; import json; import re
+  classes: none
+  functions: readFile, normalize_forhashing, removeComment, computeTlsh, fileHashingFull, fileHashing, targetHashing, CPEjsonParser, getReuseInfo, getFunctionHash, normalize_version, normalize_version_list, getAffectedCVEs, versionBasedDetection
+- TPLReuseDetector\Detector.py
+  imports: import os; import sys; import subprocess; import re; import shutil; import json; import time; import tlsh
+  classes: none
+  functions: computeTlsh, removeComment, normalize, hashing, getAveFuncs, readComponentDB, readAllVers, readWeigts, readVerDate, detector, main
+- TPLReuseDetector\fp_eliminator.py
+  imports: import copy; import os; import sys; import re; import shutil; import json; import math; import tlsh; import argparse; import os
+  classes: none
+  functions: extractVerDate, readVerDate, getAveFuncs, compare_hash_sets, string_to_vector, calculate_jaccard_similarity, compare_file_name, compareFuncMap, getCandidateFuncMap, main
+- TPLselection\src\batchProcessing.py
+  imports: import json; import os; import subprocess
+  classes: none
+  functions: read_json, get_latest_commit_hash, write_to_files, main
+- TPLselection\src\git_all_spider.py
+  imports: import argparse; import os; import requests; import threading; from queue import Queue; import subprocess; import json; import time
+  classes: none
+  functions: write_to_file, classify_and_store, fetch_repos, handle_stars
+- TPLselection\src\osscollector\OSS_Collector.py
+  imports: import argparse; import os; import sys; import subprocess; import re; import random; import time; import tlsh
+  classes: none
+  functions: computeTlsh, removeComment, normalize, hashing, indexing, list_first_layer_subdirs, main
+- TPLselection\src\patchcollector\collect_patch.py
+  imports: from utils import initialize_llm_analyzer, for_one_cve; from utils import STR_PROMPT_CVE_DESCRIPTION_FORMALIZATION, STR_PROMPT_FINAL_PATCH_COMMIT_DETERMINATION, CVEDescriptionAnalysisOutputParser, StrOutputParser
+  classes: none
+  functions: main
+- TPLselection\src\patchcollector\utils.py
+  imports: import os; import re; import json; import requests; import openai; from langchain_openai import ChatOpenAI; from langchain_core.prompts import ChatPromptTemplate; from langchain_core.output_parsers import StrOutputParser
+  classes: CommitsAnalysisOutputParser, CVEDescriptionAnalysisOutputParser
+  functions: CommitsAnalysisOutputParser.parse, CVEDescriptionAnalysisOutputParser.parse, initialize_llm_analyzer, get_commit_detail, analyze_target_slice, get_commits_between_tags, sub_slice_commit_filter, align_single_cve_commit, for_one_cve
+- TPLselection\src\preprocessor\Preprocessor.py
+  imports: import os; import sys; import re; import shutil; import json; import math
+  classes: none
+  functions: extractVerDate, redundancyElimination, saveMetaInfos, readVerDate, getAveFuncs, codeSegmentation, main
+
+Key Static Evidence:
+- README states VULTURE detects 1-day vulnerabilities arising from vulnerable third-party library reuse and is composed of TPLFILTER construction, TPL reuse identification, and 1-day vulnerability detection.
+- README points to an external Zenodo dataset; local artifacts include benchmarks and preprocessor outputs, but the complete dataset state is not verified. [NEEDS ARTIFACT]
+- OneDayDetector contains version-based detection, chunk extraction, database construction, path diff, and item split code using tlsh, libclang, subprocess, and JSON artifacts.
+- TPLReuseDetector contains hashing-based Detector.py plus fp_eliminator.py and local result-like artifacts for LiteOS.
+- TPLselection contains OSS collection, patch collection, preprocessing, componentDB, funcDate, initialSigs, metaInfos, and verIDX artifacts for several projects.
+- patchcollector README requires GitHub, NVD, and OpenAI API keys; requirements include OpenAI/LangChain packages. No API/network calls were executed. [EXECUTION NOT REQUESTED]
+- setup_pyenv.sh installs system packages and Python versions; it was not executed. [EXECUTION NOT REQUESTED]
+
+Static Consistency Notes:
+- Paper claims about TPLFILTER, TPL reuse identification, version-based detection, and chunk-based analysis are reflected by README and source layout at a static level.
+- Local code and artifact tree is richer than paper-only, but complete reproduction remains unverified because external dataset/API-dependent collection and environment setup were not run. [EXECUTION NOT REQUESTED]
+- Exact reported counts and benchmark metrics need table repair and artifact verification before citation-ready use. [NEEDS TABLE REPAIR]
+
+Observed Local Output / Data Artifacts:
+- CommitBenckmark: bytes=16693
+- iotList.txt: bytes=76402
+- requirements.txt: bytes=181
+- setup_pyenv.sh: bytes=1508
+- TPLReuseDetector\fp_eliminationLiteOS: bytes=6699
+- TPLReuseDetector\modified_result_without_funcLiteOS: bytes=35957
+- TPLReuseDetector\modified_resultLiteOS: bytes=519589
+- TPLReuseDetector\time.txt: bytes=31
+- TPLselection\src\patchcollector\environment.yml: bytes=4626
+- TPLselection\src\patchcollector\example.pdf: bytes=173660
+- VulnerabilityBenckmark.xlsx: bytes=36732
+- vulture.png: bytes=68319
+
+Missing Data / Missing Entrypoints:
+- External Zenodo dataset referenced by README was not downloaded or verified. [NEEDS ARTIFACT]
+- API keys and live GitHub/NVD/OpenAI collection path were not used. [EXECUTION NOT REQUESTED]
+- No scripts, setup, detectors, preprocessors, or notebooks were executed. [EXECUTION NOT REQUESTED]

@@ -1,0 +1,317 @@
+[
+  {
+    "page": 9,
+    "block_id": "page_009:block_001",
+    "block_type": "text",
+    "text": "HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 913",
+    "bbox": [
+      37.90800094604492,
+      32.560523986816406,
+      552.0032348632812,
+      40.343284606933594
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_003",
+    "block_type": "text",
+    "text": "Fig. 8. Some earlier major versions that are continuously updated. V 2 . 2 to",
+    "bbox": [
+      37.90800094604492,
+      210.45973205566406,
+      288.96112060546875,
+      220.551513671875
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_004",
+    "block_type": "text",
+    "text": "V 2 . 5 have the same partial matching vulnerable code (red dotted frame).",
+    "bbox": [
+      37.9085693359375,
+      219.42372131347656,
+      268.43511962890625,
+      229.5155029296875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_005",
+    "block_type": "text",
+    "text": "the corresponding git log by exactly matching the sf-diff against the DHs in the git logs. Then, we manually use log information (e.g., description, commit-id) to accurately determine whether the current version is vulnerable. This process is done for each sf-diff in the backward temporal order. Note that a sf-diff may consist of multiple consecutive diff hunks, and the diff hunks may be recorded in multiple git logs.",
+    "bbox": [
+      37.90800094604492,
+      255.2816162109375,
+      288.9744567871094,
+      338.13055419921875
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_006",
+    "block_type": "text",
+    "text": "Propercommitmessageswithinformationaboutwhatisbeing",
+    "bbox": [
+      47.870601654052734,
+      338.9734191894531,
+      288.9227294921875,
+      350.0916748046875
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_007",
+    "block_type": "text",
+    "text": "merged and why they merge are not always logged [42] . There- fore, our justiﬁcation result for a partially matching software version can be divided into three types: Yes, No, Probable. Among them, “Yes” means it is a vulnerable version because there is detailed information in the git logs, such as the exploit of Proof-of-Concept (POC) or the dependency relationship of the vulnerability, which is established in the form of text or commit-id.“No”meansitisanonvulnerableversionbecausethe CVE-related Source fragments (SFs) does not exist. “Probable” means it is a suspicious version because we have no sufﬁcient information. It is worth noting that, in order to ensure the in- tegrity of the results, although some partially matching versions need to be reviewed by human experts to determine whether the code is vulnerable, the proportion of these versions is small and the cost is not high. We will report the number of CVEs/commit that require manual inspection and the total man-hours spend in the next evaluation section.",
+    "bbox": [
+      37.90800094604492,
+      350.925537109375,
+      288.974365234375,
+      553.32275390625
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_008",
+    "block_type": "text",
+    "text": "We use one example to illustrate the idea. According to",
+    "bbox": [
+      47.870601654052734,
+      554.1655883789062,
+      288.97845458984375,
+      565.2838745117188
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_009",
+    "block_type": "text",
+    "text": "description of CVE-2011-2521, there is a vulnerability in func- tion ”x86_assign_hw_event”. However, when our tool checks the patch, many earlier versions are partially matched. By log tracing based on the commit-id of the patch, it is found that this vulnerability was originally introduced from the commit 41bf498, and patched twice afterwards because the ﬁrst patch was not complete. This example demonstrates how the log tracing helps to identify the ﬁrst version of the vulnerability,",
+    "bbox": [
+      37.90800094604492,
+      566.11767578125,
+      288.9784240722656,
+      660.9277954101562
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_010",
+    "block_type": "text",
+    "text": "3) The Method to Find the First Vulnerable Version: Our",
+    "bbox": [
+      47.870601654052734,
+      661.7616577148438,
+      288.96051025390625,
+      672.8799438476562
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_011",
+    "block_type": "text",
+    "text": "algorithm for determining V from is as following. First, for a CVE-ID, we obtain the matching results (exact or partial matching) by checking each major version before the minimum committed version in the version tree (e.g., V 3 . 0 . 6 in Fig. 9 ). If all the matching results are exact matches, then the ﬁrst vulnerable version is the earliest version with exact matching. Otherwise,",
+    "bbox": [
+      37.90700149536133,
+      673.70947265625,
+      288.9705505371094,
+      744.6060180664062
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_013",
+    "block_type": "text",
+    "text": "Fig. 9. Identify the ﬁrst vulnerable version in the version tree.",
+    "bbox": [
+      300.92401123046875,
+      181.2907257080078,
+      504.52032470703125,
+      190.18536376953125
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_014",
+    "block_type": "text",
+    "text": "TABLE I",
+    "bbox": [
+      411.6597595214844,
+      202.0177764892578,
+      441.2423400878906,
+      210.91241455078125
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_015",
+    "block_type": "text",
+    "text": "W EBSITE D ISTRIBUTION OF P ATCHES",
+    "bbox": [
+      368.0186767578125,
+      210.9817657470703,
+      484.8706359863281,
+      219.87646484375
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_016",
+    "block_type": "text",
+    "text": "we determine V from by the log tracing and vulnerability jus- tiﬁcation methods introduced in Section IV-D2 . We illustrate the process for determining V from with our example in Fig. 8 . In the ﬁrst step, we ﬁnd the ﬁrst exact matching major version before V 3 . 0 . If it is V root , then V root is V from . If it is not, the ﬁrst exact matching version, say V 2 . 6 , will be regarded as V from as long as the vulnerable ﬁle does not exist in the early version V 2 . 5 . Otherwise, in the second step, if the last partial matching version V 2 . 5 doesnotcontainthevulnerabilityoritsvulnerability status cannot be veriﬁed by us, V 2 . 6 is regarded as V from . If the vulnerability exists, the versions before V 2 . 5 with the same partial matching code are all regarded as vulnerable versions. In the backward order, through log tracing, eventually we will be able to identify the ﬁrst vulnerable version and label it as V from .",
+    "bbox": [
+      300.9239501953125,
+      304.2955017089844,
+      551.9989624023438,
+      471.90045166015625
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_017",
+    "block_type": "text",
+    "text": "V. E VALUATION",
+    "bbox": [
+      394.1551208496094,
+      484.02532958984375,
+      458.70751953125,
+      495.1435852050781
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_018",
+    "block_type": "text",
+    "text": "We ﬁrst brieﬂy introduce the implementation of our system,",
+    "bbox": [
+      310.8869934082031,
+      500.9635009765625,
+      551.9871215820312,
+      512.081787109375
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_019",
+    "block_type": "text",
+    "text": "and then evaluate the effectiveness of our algorithms via stan- dard metrics such as precision and recall. Let TP be the number of true vulnerabilities detected (true-positives), FP be the num- ber of false vulnerabilities detected (false-positives), and FN be the number of true vulnerabilities undetected (false-negatives). The metric precision = TP/(TP + FP) reﬂects the correctness among the detected positives. The metric recall = TP/(TP + FN) reﬂects the completeness of the detected positives.",
+    "bbox": [
+      300.92340087890625,
+      512.9156494140625,
+      551.9762573242188,
+      607.7167358398438
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_020",
+    "block_type": "text",
+    "text": "A. Implementation",
+    "bbox": [
+      300.92340087890625,
+      621.0656127929688,
+      377.491943359375,
+      632.0244750976562
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_021",
+    "block_type": "text",
+    "text": "We implemented our system in Python 3.6.0. Our experi-",
+    "bbox": [
+      310.885986328125,
+      637.8456420898438,
+      551.9550170898438,
+      648.9639282226562
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_022",
+    "block_type": "text",
+    "text": "ments ran on a PC with Intel CPU core i5-8265 U operating at 1.80 GHz and 8 GB RAM. The implementation consists of Data Crawler , Vulnerable Version Finder , Log Tracer , and Result Generator . Data Crawler connects to the speciﬁed URLs to collect and preprocess software packages (such as Linux kernel, Qemu, OpenSSL), CVE database, patches, and Changelogs etc. Vulnerable Version Finder implements the algorithms in R1, R2 and R3 to ﬁnd the ﬁrst(‘from’) and last(‘upto’) vulnerable",
+    "bbox": [
+      300.9214172363281,
+      649.8067626953125,
+      551.9920043945312,
+      744.6078491210938
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 9,
+    "block_id": "page_009:block_023",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

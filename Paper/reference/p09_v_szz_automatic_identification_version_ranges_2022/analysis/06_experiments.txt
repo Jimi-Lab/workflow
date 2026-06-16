@@ -1,0 +1,35 @@
+# 06 Experiments Analysis
+
+Research Questions:
+- RQ1: Can the approach identify inducing commits for vulnerabilities?
+- RQ2: Can the approach refine software versions affected by CVE vulnerabilities?
+
+Datasets:
+- C/C++ dataset from Liu et al.: five projects: FFmpeg, ImageMagick, linux-kernel, OpenSSL, php-src.
+- Java dataset from Ponta et al.: more than 200 Java OSS projects used in SAP products/internal tools.
+- Manual study subset: 100 C/C++ vulnerabilities and 72 Java vulnerabilities, totaling 172 CVEs with 188 fixing commits.
+
+Selection Protocol:
+- Exclude vulnerabilities not listed in CVE/NVD.
+- Exclude fixing commits with no deleted lines because SZZ requires deleted/modified lines as trace anchors.
+- Exclude large fixing commits with more than five deleted lines to reduce manual annotation ambiguity.
+- Exclude CVEs whose affected-version text cannot map to repository version tags.
+
+Ground Truth Construction:
+- Two annotators used CVE descriptions, fixing commits, commit messages, and line-history navigation to infer true inducing commits.
+- The paper reports Fleiss Kappa 0.76 between annotators.
+- Boundary versions were manually checked for vulnerable code presence to verify affected-version labels.
+
+Baselines:
+- B-SZZ, AG-SZZ, MA-SZZ, and RA-SZZ for Java where applicable.
+- Local source includes baseline tools under the nested ICSE 2021 SZZ replication package and imports those variants in `main.py`.
+
+Metrics:
+- VIC identification: recall, precision, F1 over correct versus identified inducing commits.
+- Affected-version refinement: average recall, average precision, and average F1 over vulnerable-version tag sets.
+- Statistical testing: Wilcoxon signed-rank test at 95 percent level for affected-version F1 improvements.
+
+Implementation/Artifact Notes:
+- Local code includes workflow scripts, data loaders, baseline SZZ package, ASTMapEval jar directory, and zip artifacts.
+- Runtime reproduction was not performed. [EXECUTION NOT REQUESTED]
+- Configuration placeholders in `setting.py` require environment-specific paths. [NEEDS ARTIFACT]

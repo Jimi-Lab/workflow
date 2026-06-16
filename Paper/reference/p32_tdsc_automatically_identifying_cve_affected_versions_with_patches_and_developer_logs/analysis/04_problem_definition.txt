@@ -1,0 +1,33 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+Objective:
+- Abstract—While vulnerability databases are important sources of information for software security, it is known that information in these databases is inconsistent.
+- In this article, we employ developer logs and patches to automatically identify vulnerable source code versions that each CVE really affects.
+- Our tool organizes all versions of a piece of software into a version tree, and identiﬁes the ﬁrst vulner- able version, and the last vulnerable versions in the version tree trunk and branches.
+- For evaluation, we took Linux Kernel as the case study and quantiﬁed the error rate of the vulnerable versions reported by the NVD.
+Constraints:
+- The required input in- cludes the CVE-IDs for an open-source software project under investigation, the set of open-source code for all its versions, and the developer logs (including the set of changelogs and the set of git logs corresponding to the CVE-IDs).
+- As a running example, let us assume the three versions in green dashed circles in Fig.4 form the committed version set of this CVE-ID, in whichV3.0.6 and V4.0.4 are the minimum and maximum committed version, respectively.
+- Our tool is based on the assumption of correctness of patches, so that we only consider repatches that the earlier patches are correct, then unpatched totally or partially, ﬁnnaly repatched with better patches.
+- We already know that the information in the changelog is sometimes incomplete, so it is not enough to rely only on it.
+- It is similar to complete unpatch except that it only includes part of the diff hunk.
+Evaluation Target:
+- results from Vulnerable Version Finder with the Known Affected Software Conﬁgurations of the NVD, and outputs the justiﬁed affected versions and the accuracy of the NVD.
+- We collected Linux kernel vulnerabilities released from January 2003 to September 2020 from the NVD, which resulted in 2,576 CVE -IDs in total.
+- Accuracy Evaluation We scan 1,367 CVE-IDs of Linux kernel against its 3,086 open-source versions to detect all vulnerable versions in the three directions (R1, R2 and R3).
+- For our dataset, we manually verify the reported boundary of vulnerable versions in the version tree for each CVE-ID.
+- However, for FNs, since there are a great number of software versions(we do not regard the versions reported by NVD as the ground truth because it has many errors, as presented in the next subsection), we cannot directly report the FN rate or recall.
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- Sometimes patches may not be implemented correctly, which means that the software versions are vulnerable even if they are patched.
+- We plan to study how to identify incorrect(incomplete or wrong) patches in the future work.
+- For future research, it will be interesting to solve the above limitations, and explore whether partial matching and repatching can be extended for binary code vulnerability detection.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

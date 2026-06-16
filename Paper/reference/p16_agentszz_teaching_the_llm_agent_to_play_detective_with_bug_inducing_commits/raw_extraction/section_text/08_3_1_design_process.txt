@@ -1,0 +1,37 @@
+3.1 Design Process
+The components ofAgentSZZwere derived through an iterative,
+case-driven design process rather than predefined. To guide this
+process, we randomly sampled 50 cases from the Linux kernel
+dataset [23], excluding those used in the final evaluation [36]. We
+did not scale up this set due to the high cost of in-depth case analysis,
+as our goal was to perform detailed investigations to understand key
+challenges and inform component design. We conducted our study
+on the Linux kernel, a large and complex codebase that enables
+diverse and challenging cases. We investigated these cases while
+interacting with a LLM [2] to simulate the agent’s behavior.
+Through this process, we iteratively refined the tool design, do-
+main knowledge, and context management. Initially, we employed
+git_blame and git_show as core tools following standard SZZ
+practices. These tools were implemented as thin wrappers with
+only essential parameters (e.g., commit hash and file path), which
+often produced excessive outputs and led to inefficient investiga-
+tion. To address this, we introduced scoped parameters (e.g., line
+ranges, file filters, and search bounds) to constrain the search space.
+We further expanded the tool set to handle more complex scenar-
+ios by adding git_log_s for locating commits that introduce or
+remove specific identifiers, git_grep for repository-wide search,
+and git_log_func for function-level history tracing. We exclude
+git bisect, as it requires compiling and executing.
+Beyond tool refinement, we distilled domain knowledge from
+these investigations and existing literature. This includes heuristics
+such as starting with blame as a default entry point while allow-
+ing the agent to switch to broader search tools (e.g., git_log_s)
+when necessary. We also encourage continued blame tracing when
+encountering refactoring [11] or meta-changes [10] (e.g., merges),
+preventing premature convergence to non-causal commits. These
+heuristics guide deeper exploration and enable the identification of
+bug-inducing commits that require non-trivial investigation. We
+further observed that tool outputs can be large, introducing unnec-
+essary noise and increasing token consumption. This observation
+motivated the design of structured context compression to preserve
+essential evidence while reducing token usage.

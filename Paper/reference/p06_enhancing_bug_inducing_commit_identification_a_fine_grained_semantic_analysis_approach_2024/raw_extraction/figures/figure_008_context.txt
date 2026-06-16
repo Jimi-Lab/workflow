@@ -1,0 +1,21 @@
+tes of the two versions of the
+program—the bug-fixed version and the buggy version, there
+is no imperative need for the symbolic value of each variable.
+Instead, we collect each variable’s data flow for simplicity.
+As shown above, in order to collect the program’s state,
+we first construct its execution paths. We start from the ba-
+sic blocks without predecessors and then traverse recursively
+through all their successors. When we reach basic blocks with
+no successors, we mark all statements encountered in sequential
+order as an execution path. For example, in the sliced program
+illustrated in Fig.3, we start from thebeginblock and traverse
+its successors, including blocks a, c, d, until we arrive at the
+endblock, which has no further successors. During the process,
+we add each statement encountered to the execution path.
+Following path extraction, we proceed to generate the pro-
+gram’s state for the execution path. Algorithm 1 outlines the
+process. We iterate through the statements in the execution path.
+If the statement type belongs to path constraints (line 2), we
+include the statement in the path constraints. Otherwise, we
+extract the variables from the statement and incorporate them
+into the data flow of these variables (li

@@ -1,0 +1,123 @@
+…
+Patched
+function
+Disclosed
+vulnerable function
+Initial
+function
+Vulnerability
+patchfd fp
+Vulnerability
+introduction update
+Oldest
+vulnerable function
+fo
+update
+Figure 1: Depiction of the vulnerability fix flow from the vulner-
+ability introduction to the vulnerability patch.
+Using these terms, we can classify the propagation of vul-
+nerability caused by vulnerable OSS reuse into the following
+four categories (C1 to C4, see Table 1):
+Table 1: Classification of vulnerable function propagation.
+Category Description
+C1 fd is reused without code modification.
+C2 fd is reused with code modification.
+C3 fo is reused without code modification.
+C4 fo is reused with code modification.
+Regardless of the category, all propagated vulnerable func-
+tions should be discovered and patched.
+Technical challenges. The main technical challenge is ad-
+dressing the syntax diversity of vulnerable code, mostly arises
+for the following two reasons: internal and external modifi-
+cation of the OSS. As the source code of an OSS frequently
+changes during OSS version updates (i.e., internal modifica-
+tions of OSS), the syntax of a vulnerable function can also
+be changed ( i.e., C3 and C4). Moreover, developers often
+apply their own code patches to OSS components (i.e., exter-
+nal modifications of OSS), and thus, a propagated vulnerable
+function can exist with various syntaxes (i.e., C2 and C4).
+Such syntax diversity significantly impairs the accuracy
+of VCC discovery. Existing VCC discovery techniques (e.g.,
+[14, 17, 49]) can cover onlyC1 and limited C2, thereby pro-
+ducing many false negatives. Typically, they define code lines
+deleted from the security patch as vulnerable lines, and deter-
+mine a function as VCC only if the function contains all the
+vulnerable lines. However, the vulnerable lines in fd they de-
+fined may not exist in fo due to the OSS modifications; in this
+case, they fail to discover VCCs, producing false negatives.
+2.2 Motivating examples
+We introduce two VCC examples with different syntaxes from
+disclosed vulnerable codes; all are now fixed (i.e., patched)
+by the development teams. What we want to emphasize here
+is that syntactically different VCCs can appear in practice
+owing to internal and external OSS modifications, and that
+these are difficult to discover precisely.
+Example 1) We first introduce a memory allocation failure
+vulnerability that existed in LibZip before v1.3.0 (i.e., CVE-
+2017-14107). Listing 1 shows the patch snippet for fixing the
+vulnerability. We confirmed that PHP1, which was reusing
+vulnerable LibZip, backported the security patch in 2017; the
+patched function snippet in PHP is shown in Listing 2.
+1https://github.com/php/php-src
+Listing 1: A patch snippet for CVE-2017-14107 in LibZip.
+1 index 3bd593b1..9d3a4cbb 100644
+2 ––– a/lib/zip_open.c
+3 +++ b/lib/zip_open.c
+4 @@ ... @@ _zip_read_eocd64 (...) {
+5 zip_cdir_t *cd;
+6 zip_uint64_t offset;
+7 zip_uint8_t eocd[EOCD64LEN];
+8 ...
+9 zip_error_set(error, ZIP_ER_SEEK, EFBIG);
+10 return NULL;
+11 }
+12 - if ((flags & ZIP_CHECKCONS)
+&& offset+size != eocd_offset) {
+13 + if (offset+size > buf_offset + eocd_offset) {
+14 + /* cdir spans past EOCD record */
+15 + zip_error_set(error, ZIP_ER_INCONS, 0);
+16 + return NULL;
+17 + }
+18 + if ((flags & ZIP_CHECKCONS)
+&& offset+size != buf_offset + eocd_offset) {
+19 zip_error_set(error, ZIP_ER_INCONS, 0);
+Listing 2: The patched _zip_read_eocd64 function in PHP. High-
+lighted areas indicate the code parts that differ from the dis-
+closed patched function. The vulnerable _zip_read_eocd64 func-
+tion in PHP exhibited only 13% syntax similarity to the disclosed
+vulnerable function of LibZip.
+1 static struct zip_cdir * _zip_read_eocd64 (...) {
+2 struct zip_cdir_t *cd;
+3 zip_uint64_t offset;
+4 const zip_uint8_t *cdp;
+5 ...
+6 _zip_error_set(error, ZIP_ER_SEEK, EFBIG);
+7 return NULL;
+8 }
+9 if (offset+size > buf_offset + eocd_offset) {
+10 /* cdir spans past EOCD record */
+11 _zip_error_set(error, ZIP_ER_INCONS, 0);
+12 return NULL;
+13 }
+14 if ((flags & ZIP_CHECKCONS)
+&& offset+size != buf_offset + eocd_offset) {
+15 _zip_error_set(error, ZIP_ER_INCONS, 0);
+Because PHP reused an older version of LibZip (released
+in 2013) with code modifications, the syntax of the vulnerable
+function in PHP was different from that specified in the dis-
+closed patch for CVE-2017-14107. Considering the function
+as a set of code lines, when measuring Jaccard similarity [46]
+between the vulnerable function in PHP and the vulnerable
+function disclosed in LibZip, the measured similarity was
+13%. Moreover, the PHP team could not directly apply the se-
+curity patch owing to the syntax diversity. For these reasons,
+the PHP team modified and applied the disclosed security
+patch to their codebase, rather than updating the entire LibZip
+to a safe version (i.e., v1.3.0 or later).
+This suggests the need to discover VCCs with large code
+differences (in this case, 87%) from the disclosed vulnerable
+function. MOVERY , which considers the syntax of the oldest
+vulnerable function and uses only the core lines in signature
+generation, can discover even a VCC with such large code
+differences (details are explained in Section 3).
+USENIX Association 31st USENIX Security Symposium    3039

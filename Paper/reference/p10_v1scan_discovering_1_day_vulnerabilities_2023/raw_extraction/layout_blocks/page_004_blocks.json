@@ -1,0 +1,467 @@
+[
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:001",
+    "block_type": "text",
+    "text": "tween the disclosed vulnerable functions and the vulnerable\nfunctions that existed in ReactOS, indicated a similarity of\nless than 60% in the six cases. Moreover, because VUDDY\nis not designed to detect vulnerabilities that exist outside func-\ntions, it missed two vulnerabilities.\nFinally, VUDDY produced eight false positives, all of\nwhich were caused by abstraction. In the case of a security\npatch that changes only its abstraction targets, VUDDY can-\nnot distinguish between vulnerable and patched functions,\nthereby producing false positives.",
+    "bbox": [
+      53.64,
+      72.76,
+      295.77,
+      192.36
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:002",
+    "block_type": "text",
+    "text": "V1SCAN. V1SCAN discovered 26 vulnerabilities in ReactOS\nwhile eliminating most false positives and negatives produced\nby the existing approaches. It is noteworthy that V1SCAN\ndetected more vulnerabilities with significantly fewer false\npositives than the union results of existing approaches.\nHere we introduce the LibTIFF v4.0.10 case, which is\nreused in ReactOS. V1SCAN could filter out vulnerabilities\nof LibTIFF that were not reused in ReactOS (e.g., CVE-2020-\n35521). In addition, V1SCAN detected the CVE-2018-19210\nvulnerability that was not discovered in the version-based\napproach, because the CPE provides an incorrect version\n(v4.0.9). Moreover, the CVE-2019-14973 vulnerability, in\nwhich the security patch modified outside functions, was\nnot detected by the code-based approach but discovered in\nV1SCAN. Note that the aforementioned vulnerabilities have\nbeen patched in the latest version of ReactOS.",
+    "bbox": [
+      53.64,
+      197.95,
+      295.78,
+      389.64
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:003",
+    "block_type": "text",
+    "text": "3\nDesign of V1SCAN",
+    "bbox": [
+      54.0,
+      407.99,
+      166.31,
+      423.55
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:004",
+    "block_type": "text",
+    "text": "In this section, we describe the design of V1SCAN, which can\nprecisely detect propagated 1-day vulnerabilities.",
+    "bbox": [
+      54.0,
+      432.53,
+      294.12,
+      456.49
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:005",
+    "block_type": "text",
+    "text": "3.1\nOverview",
+    "bbox": [
+      54.0,
+      472.73,
+      129.8,
+      488.28
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:006",
+    "block_type": "text",
+    "text": "V1SCAN synergistically combines version- and code-based\napproaches to take advantage of their strengths and avoid\ntheir weaknesses. The key idea of V1SCAN, which is sig-\nnificantly distinguishable from existing version- and code-\nbased approaches is that it classifies reused and vulnerable\ncodes. Such code classification techniques allow V1SCAN to\neliminate false positives of version-based approaches while\naddressing false negatives of code-based approaches.",
+    "bbox": [
+      53.86,
+      493.68,
+      295.77,
+      589.37
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:007",
+    "block_type": "text",
+    "text": "Figure 2 depicts the workflow of V1SCAN, which com-\nprises three phases: classification (P1), detection\n(P2), and consolidation phase (P3). In P1, V1SCAN clas-\nsifies the reused codes of OSS components and the vulnerable\ncode locations in the target program based on code classi-\nfication (see Section 2.2). In P2, V1SCAN detects vulnera-\nbilities contained in the target program by using improved\nversion- and code-based approaches with code classification\ntechniques. Finally, in P3, V1SCAN examines the two detec-\ntion results and consolidates them to confirm the propagated\nvulnerabilities included in the target program.",
+    "bbox": [
+      53.67,
+      589.32,
+      295.77,
+      720.87
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:008",
+    "block_type": "text",
+    "text": "Target",
+    "bbox": [
+      322.85,
+      104.61,
+      340.63,
+      111.58
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:009",
+    "block_type": "text",
+    "text": "program",
+    "bbox": [
+      320.12,
+      110.01,
+      341.56,
+      116.98
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:010",
+    "block_type": "text",
+    "text": "INPUT\nOUTPUT",
+    "bbox": [
+      320.24,
+      95.87,
+      548.65,
+      103.7
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:011",
+    "block_type": "text",
+    "text": "1-day",
+    "bbox": [
+      528.83,
+      104.48,
+      543.15,
+      111.46
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:012",
+    "block_type": "text",
+    "text": "vulnerabilities",
+    "bbox": [
+      518.62,
+      109.89,
+      553.35,
+      116.87
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:013",
+    "block_type": "text",
+    "text": "P1. Classification\nP2.Detection\nP3. Consolidation",
+    "bbox": [
+      357.56,
+      73.32,
+      552.3,
+      79.4
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:014",
+    "block_type": "text",
+    "text": "Improved version-based approach",
+    "bbox": [
+      355.15,
+      82.94,
+      431.12,
+      89.02
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:015",
+    "block_type": "text",
+    "text": "Improved code-based approach",
+    "bbox": [
+      355.15,
+      110.29,
+      425.72,
+      116.38
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:016",
+    "block_type": "text",
+    "text": "Reused code\nclassification",
+    "bbox": [
+      363.81,
+      91.17,
+      394.14,
+      103.11
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:017",
+    "block_type": "text",
+    "text": "Vulnerable code",
+    "bbox": [
+      360.0,
+      118.67,
+      399.58,
+      125.19
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:018",
+    "block_type": "text",
+    "text": "classification",
+    "bbox": [
+      364.0,
+      124.07,
+      393.91,
+      130.6
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:019",
+    "block_type": "text",
+    "text": "Vulnerability",
+    "bbox": [
+      416.6,
+      91.17,
+      445.61,
+      97.7
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:020",
+    "block_type": "text",
+    "text": "detection",
+    "bbox": [
+      420.1,
+      96.59,
+      442.09,
+      103.11
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:021",
+    "block_type": "text",
+    "text": "Filtering",
+    "bbox": [
+      468.02,
+      91.17,
+      487.14,
+      97.7
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:022",
+    "block_type": "text",
+    "text": "false alarms",
+    "bbox": [
+      463.35,
+      96.59,
+      491.82,
+      103.11
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:023",
+    "block_type": "text",
+    "text": "Vulnerability",
+    "bbox": [
+      416.6,
+      118.67,
+      445.61,
+      125.19
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:024",
+    "block_type": "text",
+    "text": "detection",
+    "bbox": [
+      420.1,
+      124.07,
+      442.1,
+      130.6
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:025",
+    "block_type": "text",
+    "text": "Figure 2: High-level overview of V1SCAN.",
+    "bbox": [
+      357.94,
+      138.91,
+      517.94,
+      150.58
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:026",
+    "block_type": "text",
+    "text": "Design assumption and text preprocessing. We designed\nV1SCAN to detect vulnerabilities at the source code level. Al-\nthough V1SCAN can operate with any granularity unit, we fo-\ncus on the function units in the version-based approach, which\nare suitable for identifying reused OSS components [36].\nSubsequently, V1SCAN extracts (1) all functions from ev-\nery version of the OSS in our dataset (see Section 4.2), and\n(2) all functions of the target program, using a function parser\n(see Section 4.1). V1SCAN then performs text preprocessing\non all extracted functions to normalize the code; it removes\ncomments, linefeed, and whitespace from the function codes.\nMoreover, V1SCAN uses locality sensitive hashing (LSH),\nwhich hashes similar input items into the same “buckets” with\nhigh probability [33]; therefore, LSH can be utilized to ad-\ndress code modifications in a flexible manner.\nWe applied LSH to all text-preprocessed functions in (1)\nthe target program and (2) every version of OSS projects.\nEach LSH algorithm provides a functionality (Φ) to measure\nthe distance between two inputs and the cutoff value (i.e.,\nthreshold θ). Thus, the relationships in which the two func-\ntions (f1, f2) are identical, similar, or different can be defined\nas follows: let the output of Φ be an integer.",
+    "bbox": [
+      317.52,
+      167.15,
+      559.74,
+      430.69
+    ],
+    "reading_order": 26,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:027",
+    "block_type": "text",
+    "text": "• Identical: If Φ( f1, f2) = 0, f1 and f2 are identical.\n• Similar: If 0 < Φ(f1, f2) ≤θ, f1 and f2 are similar.\n• Different: If Φ(f1, f2) > θ, f1 and f2 are different.",
+    "bbox": [
+      327.84,
+      435.64,
+      543.35,
+      481.17
+    ],
+    "reading_order": 27,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:028",
+    "block_type": "text",
+    "text": "3.2\nClassification phase (P1)",
+    "bbox": [
+      317.88,
+      488.65,
+      469.65,
+      504.2
+    ],
+    "reading_order": 28,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:029",
+    "block_type": "text",
+    "text": "In this phase, V1SCAN classifies reused OSS functions and\nextracts code lines, which belong to the locations defined in\nthe vulnerable code classification, from the target program.",
+    "bbox": [
+      317.88,
+      509.6,
+      558.0,
+      545.51
+    ],
+    "reading_order": 29,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:030",
+    "block_type": "text",
+    "text": "3.2.1\nImproved version-based approach",
+    "bbox": [
+      317.88,
+      559.67,
+      493.23,
+      572.64
+    ],
+    "reading_order": 30,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 4,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:004:031",
+    "block_type": "text",
+    "text": "Component identification. The first step involved uncover-\ning the OSS components in the target program, which, how-\never, is difficult to precisely accomplish [9,36]. Because the\nidentification of components is beyond the scope of this paper,\nwe decided to use an existing, well-implemented component\nidentification tool. We took advantage of CENTRIS [36] be-\ncause it can precisely identify OSS components that have been\nmodified and its source code and dataset are publicly available.\nUsing CENTRIS, we extracted the names of OSS components\nincluded in the target program. Note that CENTRIS is only\nconcerned with component identification, and does not di-\nrectly participate in vulnerability detection.",
+    "bbox": [
+      317.52,
+      576.85,
+      559.75,
+      720.72
+    ],
+    "reading_order": 31,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

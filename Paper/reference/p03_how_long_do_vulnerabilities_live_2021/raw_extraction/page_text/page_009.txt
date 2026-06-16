@@ -1,0 +1,98 @@
+0 1000 2000 3000 4000 5000 6000
+Heuristic lifetime (days)
+0.0000
+0.0002
+0.0004
+0.0006Density
+Exponential fit
+Median
+Mean
+(a) Histogram for heuristic data
+0 1000 2000 3000 4000 5000 6000
+Ground truth lifetime (days)
+0.0000
+0.0005
+0.0010Density
+Exponential fit
+Median
+Mean (b) Histogram for groundtruth data
+0 1000 2000 3000 4000 5000 6000
+Exponential theoretical quantiles
+0
+2000
+4000
+6000Heur. quant.
+(c) Q-Q plot for heuristic data
+0 1000 2000 3000 4000 5000 6000
+Exponential theoretical quantiles
+0
+2000
+4000
+6000GT quant.
+ (d) Q-Q plot for ground truth data
+Figure 4: Comparison of histograms of lifetime distributions between heuristic and ground truth data for the same CVEs. The exponential fit
+to the histograms and the corresponding Q-Q plots are also provided.
+development, code churn) that we further touch upon in the
+following subsections. Also, we observe that the median is
+generally lower than the mean. This gives an indication re-
+garding the distribution of lifetimes within a project. This
+issue is specifically tackled in the following subsection.
+Project Lifetime
+Average Median
+Linux (kernel) 1,732.97 1,363.5
+Firefox 1,338.58 1,082.0
+Chromium 757.59 584.5
+Wireshark 1,833.86 1,475.0
+Php 2,872.40 2,676.0
+FFmpeg 1,091.99 845.5
+OpenSSL 2,601.91 2,509.0
+Httpd 1,899.96 1,575.5
+Tcpdump 3,168.58 3,236.0
+Qemu 1,743.86 1,554.0
+Postgres 2,336.56 2,140.0
+Average of projects 1,943.48 1,731.0
+All CVEs 1,501.47 1,078.0
+Table 3: Overview of average lifetimes per project (ordered by
+number of CVEs)
+5.2 Distribution
+Figure 5 shows the distribution of lifetimes for all CVEs,
+along with an exponential fit. Upon initial visual inspection of
+the histogram of Figure 5, we selected the exponential distri-
+bution as a potentially good fit to the data. Then, by employing
+a Q-Q plot [39] we verified that the exponential distribution
+is indeed an excellent fit for lifetimes of up to around 4,200
+days (Figure 6), accounting for 94% of our data. Then, the
+0 1000 2000 3000 4000 5000 6000 7000
+lifetime
+0.0000
+0.0002
+0.0004
+0.0006Density
+Exponential fit
+Median
+Mean
+Figure 5: Distribution of vulnerability lifetimes. Equally sized bins.
+distribution of the empirical values is a bit denser than the
+theoretical at around 5,000 days, and sparser for higher life-
+times (over 6,000 days). We assess that the exponential is still
+a good fit – and thus useful for calculations – for lifetimes
+up to around 5,000 days (98% of our data). We expected the
+existence of a cut-off point for the fit on the tail of the data
+since the exponential continues generating some small – yet
+non-negligible – mass for very high values (since it goes to
+infinity), while the lifetimes in our empirical dataset are natu-
+rally constrained by the age of the code. We then employed
+the Kolmogorov-Smirnov test as described in the seminal
+methodology of Clauset et al. [9] to statistically compare the
+fit of the exponential to other candidate distributions, such as
+the power law or the lognormal. We found the exponential to
+be a statistically significant better fit. Further evidence sup-
+porting the goodness of fit of the exponential can be found in
+Appendix A.2.
+Given the above, the distribution for the lifetimes can be
+approximated by the probability density function below17:
+f (x) = 1
+1501.47e− 1
+1501.47 x (2)
+17For most of the probability mass, except the tail (>5,000 days) as dis-
+cussed above.

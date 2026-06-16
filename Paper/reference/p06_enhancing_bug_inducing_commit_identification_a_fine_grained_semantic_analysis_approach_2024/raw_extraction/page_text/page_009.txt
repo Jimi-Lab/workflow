@@ -1,0 +1,121 @@
+TANG et al.: ENHANCING BUG-INDUCING COMMIT IDENTIFICATI ON: A FINE-GRAINED SEMANTIC ANALYSIS APPROACH 3045
+TABLE I
+THE ST A T I S T I C SO FT H EBUGS AND CORRESPONDING BUG-FIXING
+COMMITS IN THREE DATASETS
+DATASET #Bug-Fixing #Bug-Inducing #SMALL #LARGE
+DATASET-A
+DATASET-FA
+DATASET-D
+6,233
+11,426
+48,736
+6,419
+11,829
+50,978
+7,959
+4,394
+16,615
+3,467
+1,839
+25,975
+cases, forming the DATASET -D. Here, the suffix “D” means
+the deleted lines. Note that as long as a bug-fixing commit
+contains deleted lines, it can be included in DATASET-D. Thus,
+DATASET-D includes bug-fixing commits with only deleted
+lines and bug-fixing commits with both added and deleted lines.
+Table I presents the statistics of our three datasets. We cat-
+egorize the bug-fixing commits following previous research
+[17], [18]. Notice that if a bug-fixing commit contains fewer
+than five changed lines, we categorize it as a small bug-fixing
+commit; otherwise, we categorize it as large. From the table, we
+can see that all three datasets contain multiple large bug-fixing
+commits. This is helpful when we want to demonstrate that
+our approach can scale to large bug-fixing commits. Moreover,
+we can also see that one bug-fixing commit may correspond to
+multiple bug-inducing commits.
+C. Baselines
+Few previous research studies have proposed methods to
+identify bug-inducing commits that involve only added lines.
+To enhance the evaluation of our approach, we introduce a
+new set of baselines of our own, complementing the existing
+approaches. All the following baselines have the prefix “A”.
+Here, the “A” stands for “added lines,” indicating that these
+baselines are designed to handle bug-fixing commits with only
+added lines.
+• A-SZZ. A-SZZ, proposed by Sahal et al. [21], is an ap-
+proach that initially identifies the added lines, then locates
+the block encapsulating the new code change, and finally
+utilizes the git blame tool to trace back the historical
+changes of the code block.
+• AB-SZZ. Building on the concept of B-SZZ [6],w ei n t r o -
+duce an additional baseline named AB-SZZ. Similar to the
+B-SZZ algorithm, which utilizes the git blame tool on each
+deletion line, our variant also aims to find lines for each
+added line to trace back. In contrast to the relatively coarse
+scope of A-SZZ, which covers the whole code block, our
+approach only selects the two nearest unmodified lines
+above and below each added line. In this way, we can
+guarantee that each added line has unmodified lines to
+trace back.
+Our study also adopts the concept of B-SZZ variants, such as
+AG-SZZ, MA-SZZ, R-SZZ and L-SZZ to introduce baselines,
+which is the same as three previous studies [17], [20], [37] .
+Note that we exclude the RA-SZZ algorithm [9], because there
+are no existing tools to identify refactors in the C programming
+language.
+• AAG-SZZ. The original AG-SZZ algorithm, proposed by
+Kim et al. [7], enhances the B-SZZ algorithm by filtering
+out non-semantic lines, such as blank lines, comment lines,
+and format modifications. Additionally, they leverage the
+annotation graph to gather more information than the an-
+notatecommand. Given that the git blame tool already
+leverages the annotation graph, the AAG-SZZ algorithm
+only needs to filter out non-semantic lines identified in the
+AB-SZZ algorithm.
+• AMA-SZZ. The original MA-SZZ algorithm is proposed
+by Da Costa et al. [8]. They notice that the existence
+of meta-changes introduces noise in the identified bug-
+inducing commits. Meta-changes refer to changes that do
+not alter the semantics of code, such as branch changes,
+merge changes, and property file changes. To implement
+AMA-SZZ, we need to filter out meta-changes based on
+the AAG-SZZ algorithm.
+• AR-SZZ and AL-SZZ. The original R-SZZ and
+L-SZZ algorithms were proposed by Davies et al. [33].
+The R-SZZ algorithm selects the most recent commit from
+the AG-SZZ algorithm results, while the L-SZZ selects the
+commit that changed the most lines. In the AR-SZZ and
+AL-SZZ algorithms, we adopt the same selection strategy
+as the R-SZZ and L-SZZ algorithms to select the final com-
+mit from the results produced by the AAG-SZZ algorithm.
+To evaluate our approach in scenarios where the bug-fixing
+commit contains deleted lines, we adopt the approaches B-SZZ,
+AG-SZZ, MA-SZZ, L-SZZ and R-SZZ as in previous studies
+[17], [20]
+, [37].
+D. Metrics
+Following previous research practices [17], [18], [20],w e
+adopt three widely used metrics (i.e., Precision, Recall, and
+F1-score) to assess the performance of our approach and other
+baselines.
+Precision Precision gauges the accuracy of positive predic-
+tions made by the SZZ algorithm. In this context, we define I
+T
+as the SZZ algorithm’s correctly identified true bug-inducing
+commits and IF as the falsely identified bug-inducing commits.
+Therefore, precision can be calculated as follows:
+P = IT
+IT +IF
+(3)
+Recall is a measure of the SZZ algorithm’s ability of cap-
+turing true bug-inducing commits among all bug-inducing
+commits. Here IT is defined as the SZZ algorithm’s correctly
+identified true bug-inducing commits and M is the number of
+all bug-inducing commits. Thus, recall can be calculated as
+follows:
+R= IT
+M (4)
+F1-score is the harmonic mean of precision and recall. It
+provides a balance between these two metrics, taking both false
+positives and false negatives into account. After obtainingP as
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

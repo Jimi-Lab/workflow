@@ -1,0 +1,58 @@
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\MOVERY\MOVERY
+Analysis Mode: static-only
+Runtime behavior: [EXECUTION NOT REQUESTED]
+Artifact Type: Type B (paper + source code only; required dataset/config binaries are not present locally).
+
+Repository / File Layout Observed:
+- config/
+- Python source files inspected statically: 4
+- Total files observed: 4
+- README: missing. [NEEDS ARTIFACT]
+
+Primary Files:
+- Detector.py: present=True, bytes=18240
+- Preprocessing.py: present=True, bytes=11888
+- movery_auto.py: present=True, bytes=801
+- config/movery_config.py: present=True, bytes=77
+
+Static Python Symbol Inventory:
+- config\movery_config.py
+  imports: none
+  functions: none
+  top_level_assignments: vulpath, oldpath
+- Detector.py
+  imports: import os; import sys; import movery_config; import subprocess; import re; import json; import time
+  functions: intersect, union, jaccard_sim, normalize, removeComment, readFile, readOSSIDX, readIDX2VER, readVulHashes, spaceReduction, detector, main
+  top_level_assignments: currentPath, delimiter, theta, vulESSLinePath, vulDEPLinePath, noOldESSLinePath, noOldDEPLinePath, patESSLinePath, patDEPLinePath, vulBodyPath, vulHashPath, targetPath, ossidxPath, idx2verPath
+- movery_auto.py
+  imports: import os; import subprocess
+  functions: none
+  top_level_assignments: prepy, detpy, output_dir, vul_repo_dir, test_oss_list
+- Preprocessing.py
+  imports: import os; import sys; import subprocess; import re; import json; import time; from hashlib import md5
+  functions: intersect, union, jaccard_sim, normalize, normalize_hash, abstract, removeComment, readFile, preprocessor, main
+  top_level_assignments: currentPath, possible, delimiter, targetPath, pathToCtags
+
+Key Static Evidence:
+- Detector.py defines normalization/comment-removal helpers, dataset readers, search-space reduction, and detector(tar).
+- Detector.py hardcodes dataset paths under dataset/vulESSLines, vulDEPLines, noOldESSLines, patESSLines, vulBodySet, vulHashes, tarFuncs, oss_idx.txt, and idx2cve.txt.
+- Detector.py uses theta = 0.5 and a spaceReduction step that intersects target function hashes with vulnerability hashes and OSS index metadata.
+- Preprocessing.py extracts C/C++ functions from a target path using ctags, normalizes/abstracts functions, hashes raw bodies, and writes target function/hash artifacts under dataset/tarFuncs.
+- Preprocessing.py hardcodes pathToCtags = /home/cxy/MOVERY/config/ctags, which is not present in the local tree. [NEEDS ARTIFACT]
+- movery_auto.py is a wrapper around Preprocessing.py and Detector.py over vuln_repo_input and MOVERY_output; it was not executed. [EXECUTION NOT REQUESTED]
+- config/movery_config.py points to D:/NEWRESEARCH/vulFuncs and D:/NEWRESEARCH/oldestFuncs; these paths are external to the provided target tree. [NEEDS ARTIFACT]
+
+Static Consistency Notes:
+- Paper claims about vulnerable/patch signatures and OSS-reuse-based search-space reduction are partially reflected by Detector.py and Preprocessing.py names, paths, and functions.
+- Dataset construction, vulnerability metadata, target software corpus, and evaluation artifacts are absent locally, so evaluation claims cannot be checked from this artifact alone. [NEEDS ARTIFACT]
+- Runtime behavior, parser behavior, generated outputs, precision/recall, and scalability were not checked. [EXECUTION NOT REQUESTED]
+
+Observed Local Output / Data Artifacts:
+- No local dataset/ directory was observed under the MOVERY source path.
+- No README, requirements file, environment file, or bundled ctags binary was observed.
+
+Missing Data / Missing Entrypoints:
+- dataset/* directories required by Detector.py and Preprocessing.py. [NEEDS ARTIFACT]
+- config/ctags binary expected by Preprocessing.py. [NEEDS ARTIFACT]
+- vuln_repo_input and MOVERY_output paths used by movery_auto.py. [NEEDS ARTIFACT]
+- Published vulnerability dataset and target software artifacts for reproducing reported evaluation. [NEEDS ARTIFACT]

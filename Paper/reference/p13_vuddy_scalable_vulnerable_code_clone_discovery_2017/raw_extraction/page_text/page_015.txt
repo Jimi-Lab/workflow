@@ -1,0 +1,116 @@
+method takes variable granularityl, which always equals the
+length of a function. This is highly advantageous compared to
+approaches that utilize a ﬁxed granularity-level, e.g., ReDeBug
+or CCFinder, in terms of memory usage. Table V shows the
+amount of memory used when the functions in our vulner-
+ability database are preprocessed. Whenl was taken as the
+granularity level, the least memory was used because only one
+ﬁngerprint was generated per function. When the granularity
+g was 4 LoC, it consumed 651 MB of memory for processing
+and storing the ﬁngerprints of ﬁne-grained functions. This is
+considerable overhead, considering that the total size of ﬁles
+in the vulnerability database is 21 MB (see subsection V-A).
+Formally, l − g +1 ﬁngerprints were generated for each
+function, which led an increase in the amount of memory
+space required. It can be observed in Table V that when
+the granularity level is increased, memory use decreases.
+However, this does not necessarily imply that the use of
+larger granularity reduces memory usage. Instead, the main
+reason for the lower memory usage is that functions shorter
+than the ﬁxed granularity are not processed. For example, if
+we take 100 LoC as the granularity level, functions with a
+length is shorter than 100 cannot be processed, and are thus
+discarded. Therefore, we can conﬁdently argue that function-
+level granularity promotes memory efﬁciency more than other
+ﬁxed granularity levels.
+3) Accuracy: Considering the former discussion from a
+different standpoint, ﬁxed granularity can impair the accuracy
+of an approach. In other words, an approach that attempts
+to detect vulnerable code clones using granularityg cannot
+detect clones with a length smaller than g, which causes
+false negatives. As a remedy, we could generate ﬁngerprints
+for every possibleg value and search for the corresponding
+ﬁngerprint from every dictionary whenever it fails to detect
+functions smaller than the ﬁxed granularity, which causes a
+tremendous amount of overhead. Moreover, it is obvious that
+the false positive rate increases when we use ﬁner granularity,
+as shown in subsection VII-C. The false positive rate is directly
+related to the trustworthiness of a vulnerable clone detector.
+Vulnerable clone detectors that report numerous false alarms
+do not actually help developers identify the problems in their
+code; instead, they lead to increased efforts to routinely check
+meaningless alarms. In this respect, we believe that our design
+of VUDDY achieves the right balance between accuracy and
+scalability.
+B. Room for speedup
+Currently, a large portion of the overhead is concentrated
+in the parsing step. When generating a ﬁngerprint of Android
+ﬁrmware, VUDDY spent 973 seconds (95.1 %) out of 1023
+seconds only for parsing. To resolve this performance bottle-
+neck, we also implemented a faster version of VUDDY , called
+VUDDY -fast, which utilizes regular expression to identify and
+analyze functions. VUDDY -fast required only 1 hour and 17
+minutes for generating ﬁngerprint dictionary of 1 BLoC input
+in Table I, but it identiﬁed 9.7 % less functions. As one of the
+future works, we plan to improve the performance of parser
+by optimizing the grammar and leveraging parser generator
+which is faster than ANTLR.
+TABLE V: Memory use when preprocessing functions in the
+vulnerability database with the given granularity.l refers to
+the LoC of a function.
+Property Granularity (LoC) Memory use (MB)
+V ariable l 48
+Fixed
+4 651
+10 496
+40 172
+100 49
+C. Open service
+In April 2016, we launched an open web service via web
+with which anyone can use VUDDY to inspect their programs.
+A number of open source developers, device manufacturers,
+and commercial product developers tested more than 14 BLoC
+for 11 months, and VUDDY detected 144,496 vulnerable
+functions. For lack of space, the results and insights drawn
+from the service is described in the Appendix.
+XI. C ONCLUSION AND FUTURE WORK
+In this paper, we proposed VUDDY , which is an approach
+for scalable and accurate vulnerable code clone discovery. The
+design principles of VUDDY are directed towards extending
+scalability through function-level granularity and a length
+ﬁlter, while maintaining accuracy so that it can afford to detect
+vulnerable clones from the rapidly expanding pool of open
+source software. VUDDY adopts a vulnerability preserving
+abstraction scheme which enables it to discover 24 % more
+unknown variants of vulnerabilities. We implemented VUDDY
+to demonstrate its efﬁcacy and effectiveness. The results
+show that VUDDY can actually detect numerous vulnerable
+clones from a large code base with unprecedented scalability
+and accuracy. In the case study, we presented several cases
+discovered by VUDDY , in which vulnerable functions remain
+unﬁxed for years and propagate to other programs.
+Tremendous number of vulnerable code fragments will
+continue to be propagated to countless programs and devices.
+We strongly believe that VUDDY is a must-have approach to
+be used for securing various software when scalability and
+accuracy is required.
+Our work can be extended in multiple directions. Firstly, we
+plan to continue improving the performance of VUDDY by
+reﬁning the parser and expanding the vulnerability database.
+It will boost the speed of VUDDY and increase detec-
+tion rate. Moreover, we will try to combine our approach
+with other types of vulnerability-detecting techniques (e.g.,
+fuzzers), which will allow a more sophisticated detection of
+vulnerability.
+ACKNOWLEDGMENT
+We thank the anonymous reviewers for their insightful
+comments to improve the quality of the paper. We are also
+grateful to Donghyeok Kim for his contribution on the parser
+generation, and Taebeom Kim for his help on the manual
+inspection process. This work was supported by Institute for
+Information & communications Technology Promotion (IITP)
+grant funded by the Korea government (MSIP) (No.R0190-16-
+2011, Development of Vulnerability Discovery Technologies
+for IoT Software Security).
+609
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

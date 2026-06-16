@@ -1,0 +1,34 @@
+Page: 3
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2221
+Fig. 1.
+The motivating example of Tracing-Commit SZZ.
+recent change, but are rather concealed deeper in the change
+history.
+To facilitate this exploration, we propose the Tracing-
+Commit SZZ (TC-SZZ) algorithm, which iteratively uses git
+blame until the initial commit is located, and then considers
+all commits in the change history as potential bug-inducing
+commits. Unlike all previous SZZ variants which identify only
+a single bug-inducing commit for a deleted line. This favors
+recall, but may increase the number of false positives as it
+returns commits in the line’s change history that are not relevant
+to the bug. For example, as shown in Fig. 1, TC-SZZ returns
+all ﬁve commits in a line’s change history as potentially bug-
+inducing commits, successfully identifying commit 40747f as
+the bug-inducing commit. In contrast, B-SZZ only considers
+the previous commit. Applying TC-SZZ to the 17,552 cases
+that are not detected by the SZZ algorithms but do not in-
+volve ghost commits revealed that 3,115 out of the 17,552
+failure cases (17.7%) are located in the change history and
+not the most recent change. Algorithms that skip over refac-
+toring changes have the potential to identify such bug intro-
+ducing commits more accurately, but refactoring detection is
+language speciﬁc, and such approaches have only been devel-
+oped for Java [29], [30], while the Linux kernel is entirely
+C code.
+For the remaining 14,437 bug-ﬁxing commits, 34.6% of the
+failure cases are found in the function history but not in the
+history of the lines that are ch

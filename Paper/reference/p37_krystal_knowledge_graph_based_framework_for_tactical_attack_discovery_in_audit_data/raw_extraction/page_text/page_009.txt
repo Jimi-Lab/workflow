@@ -1,0 +1,67 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Listing 6. Backward searching expressed as SPARQL query. 
+Listing 7. Forward chaining mechanism expressed as SPARQL query. 
+For this search, we leverage Property Paths 24 , a SPARQL feature 
+that allows us to ﬁnd routes between nodes in the RDF provenance 
+graph. Recall that we used rdfs7 inference to automatically gener- 
+ate an upper-level relation :provRel between system objects. 
+As shown in Listing 6 , the backward search query consists of 
+a triple pattern [ ?currentAlert ∧ :provRel ∗ ?s ], in which 
+∧ . ∗ represents the property path that ﬁnds all possible back- 
+ward connections from a node ?currentAlert to a node ?s 
+via the relation property :provRel , where ?s is classiﬁed as 
+part of another alert. We represent this condition as an RDF-star 25 
+statement, i.e., [ << ?s ?p ?o >> rule:hasDetectedRule 
+?rule ]. 
+Next, we iteratively update the alert scores for each prede- 
+cessor alert (+1). After scoring all alerts, we can construct attack 
+sequences, starting with the alerts with the highest values and 
+performing forward chaining to construct attack scenario graphs. 
+We use the same technique as we did for backward chaining, 
+i.e., property paths to ﬁnd forward routes connected to the de- 
+ﬁned starting nodes. Listing 7 shows the generic SPARQL query 
+to construct an attack scenario from the provenance graph. From 
+the ?startingNode , it ﬁnds possible routes and visits connected 
+nodes via the :provRel relation. A threshold deﬁnes which nodes 
+will be connected, e.g., only low integrity nodes with an integrity 
+tag lower than 0.5. 
+Graph Querying Graph querying can detect attack behavior in a 
+provenance graph based on attack patterns. The graph query pat- 
+terns can be constructed from observed behavior or existing in- 
+formation in published CTI, incident reports, public malware doc- 
+umentation, etc. Based on that, the patterns can be constructed 
+manually or –p o t e n t i a l l y –a l s o through automated extraction 
+methods such as AttacKG ( King and Chen, 2003b ). 
+Figure 8 visualizes a graph query example. A subset of the 
+graph (red box) represents an observed attack pattern inside the 
+provenance graph. Unlike previous work ( Gao et al., 2018a; 2018b; 
+Milajerdi et al., 2019a ) that use custom domain-speciﬁc languages 
+to perform graph querying, KRYSTAL provides a uniform graph 
+querying mechanism with a high expressivity through SPARQL. Fur- 
+thermore, it also supports linking to other datasets. 
+To formulate graph patterns in SPARQL 26 , we can deﬁne sys- 
+tem object types as nodes (i.e., via Classes ) and their interac- 
+tions as relation properties (i.e., via Object Properties ). The formu- 
+lated graph queries can be executed against the provenance graphs 
+24 https://www.w3.org/TR/sparql11-query/#propertypaths 
+25 https://w3c.github.io/rdf- star/cg- spec/editors _ draft.html 
+26 Graph pattern that identiﬁes a speciﬁc known attack pattern; deﬁned based on 
+the DARPA Transparent Computing TA5.1 Ground Truth Report ( DAR, 2021 ). 
+Fig. 8. Graph query alignment example: Graph query (red box) is aligned over the 
+provenance graph to detect potential attack patterns. The constructed attack graph 
+below represents a detected pattern. (For interpretation of the references to colour 
+in this ﬁgure legend, the reader is referred to the web version of this article.) 
+Listing 8. SPARQL graph query 26 for Fig. 8 . 
+to match potential attack patterns. Listing 8 27 depicts an exam- 
+ple graph query visualized in Fig. 8 . It detects a potential attack 
+where a browser receives a connection from a socket ( ?socket 
+:isReceivedBy ?browser ). The fact that ?browser is of 
+type :Browser is established in the background knowledge (i.e. 
+< http://w3id.org/sepses/..knowledge > ). The SPARQL 
+query federation mechanism is used to include the background 
+knowledge in the query ( SERVICE syntax). 
+Subsequently, the browser creates a ﬁle in the local system 
+(deﬁned by ?browser :writes ?file1 ). This ﬁle is then exe- 
+27 Note that the automatic construction of graph patterns from existing resources 
+is out of scope for this paper. 
+10

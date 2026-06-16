@@ -1,0 +1,510 @@
+[
+  {
+    "file": "1_get_input.py",
+    "functions": [
+      "get_cmp_cve"
+    ],
+    "classes": [],
+    "imports": [
+      "constant",
+      "git",
+      "io",
+      "json",
+      "os",
+      "re",
+      "time",
+      "tqdm",
+      "unidiff"
+    ]
+  },
+  {
+    "file": "2_get_vcc.py",
+    "functions": [],
+    "classes": [],
+    "imports": [
+      "constant",
+      "git",
+      "io",
+      "json",
+      "os",
+      "re",
+      "time",
+      "tqdm",
+      "unidiff"
+    ]
+  },
+  {
+    "file": "3_gen_vuln_version.py",
+    "functions": [
+      "cxc_generate_vulnerable_versions_fix_vcc",
+      "gen_cve_patch_dict",
+      "gen_vuln_version",
+      "get_cmp_cve",
+      "get_commit_tags"
+    ],
+    "classes": [],
+    "imports": [
+      "json",
+      "log_generation",
+      "os",
+      "time"
+    ]
+  },
+  {
+    "file": "4_get_duplicated_patch.py",
+    "functions": [],
+    "classes": [],
+    "imports": [
+      "json",
+      "os"
+    ]
+  },
+  {
+    "file": "5_parse_result_llm_conservative.py",
+    "functions": [
+      "get_introducing_cid",
+      "get_pre_diff_line"
+    ],
+    "classes": [],
+    "imports": [
+      "constant",
+      "functools",
+      "git",
+      "json",
+      "os",
+      "tree_sitter",
+      "tree_sitter_c",
+      "util"
+    ]
+  },
+  {
+    "file": "ablation.py",
+    "functions": [],
+    "classes": [],
+    "imports": [
+      "json",
+      "os"
+    ]
+  },
+  {
+    "file": "CFG.py",
+    "functions": [
+      "__init__",
+      "__init__",
+      "add_cfg_nodes",
+      "add_cfg_nodes_ids",
+      "add_pred_id",
+      "add_succ_id",
+      "dump_basic_blocks",
+      "get_basic_block",
+      "get_basic_block_str",
+      "get_beg_line",
+      "get_break",
+      "get_cfg_nodes",
+      "get_cfg_nodes_ids",
+      "get_continue",
+      "get_edge_info",
+      "get_end_line",
+      "get_goto",
+      "get_goto_node",
+      "get_isbeg",
+      "get_isend",
+      "get_labelstmt_node",
+      "get_node_id",
+      "get_node_info",
+      "get_path_str",
+      "get_preds_ids",
+      "get_return",
+      "get_succs_ids",
+      "is_blank_block",
+      "link_to_follow_block",
+      "new_basic_block",
+      "set_break",
+      "set_continue",
+      "set_goto",
+      "set_goto_node",
+      "set_isbeg",
+      "set_isend",
+      "set_labelstmt_node",
+      "set_return",
+      "visit",
+      "visit_break_statement",
+      "visit_compound_statement",
+      "visit_continue_statement",
+      "visit_declaration",
+      "visit_default",
+      "visit_do_statement",
+      "visit_else_clause",
+      "visit_expression_statement",
+      "visit_for_statement",
+      "visit_function_definition",
+      "visit_goto_statement",
+      "visit_if_statement",
+      "visit_labeled_statement",
+      "visit_return_statement",
+      "visit_switch_statement",
+      "visit_while_statement"
+    ],
+    "classes": [
+      "Basic_block",
+      "CFG"
+    ],
+    "imports": [
+      "copy",
+      "matplotlib.pyplot",
+      "networkx",
+      "tree_sitter"
+    ]
+  },
+  {
+    "file": "constant.py",
+    "functions": [],
+    "classes": [],
+    "imports": []
+  },
+  {
+    "file": "core\\abstract_szz.py",
+    "functions": [
+      "__cleanup_repo",
+      "__clear_gitpython",
+      "__del__",
+      "__eq__",
+      "__hash__",
+      "__init__",
+      "__init__",
+      "__init__",
+      "__str__",
+      "__str__",
+      "_blame",
+      "_is_comment",
+      "_parse_line_ranges",
+      "_set_working_tree_to_commit",
+      "find_bic",
+      "get_commit",
+      "get_commit_diff",
+      "get_commit_unified_diff_text",
+      "get_impacted_files",
+      "repository",
+      "repository_path"
+    ],
+    "classes": [
+      "AbstractSZZ",
+      "BlameData",
+      "DetectLineMoved",
+      "ImpactedFile"
+    ],
+    "imports": [
+      "abc",
+      "comment_parser",
+      "enum",
+      "git",
+      "logging",
+      "ntpath",
+      "os",
+      "pydriller",
+      "shutil",
+      "tempfile",
+      "typing"
+    ]
+  },
+  {
+    "file": "core\\comment_parser.py",
+    "functions": [
+      "js_comment_parser",
+      "parse_comments",
+      "parse_comments_srcml",
+      "php_comment_parser",
+      "py_comment_parser",
+      "rb_comment_parser"
+    ],
+    "classes": [],
+    "imports": [
+      "collections",
+      "logging",
+      "os",
+      "re",
+      "subprocess",
+      "tempfile"
+    ]
+  },
+  {
+    "file": "core\\vszz.py",
+    "functions": [
+      "__init__",
+      "compute_line_ratio",
+      "find_bic",
+      "map_modified_line",
+      "remove_whitespace"
+    ],
+    "classes": [
+      "MySZZ"
+    ],
+    "imports": [
+      "Levenshtein",
+      "core.abstract_szz",
+      "git",
+      "json",
+      "logging",
+      "os",
+      "pydriller",
+      "subprocess",
+      "sys",
+      "traceback",
+      "typing"
+    ]
+  },
+  {
+    "file": "diss.py",
+    "functions": [
+      "parse_pdg"
+    ],
+    "classes": [],
+    "imports": [
+      "CFG",
+      "Levenshtein",
+      "copy",
+      "functools",
+      "git",
+      "json",
+      "shutil",
+      "subprocess",
+      "traceback",
+      "tree_sitter",
+      "util"
+    ]
+  },
+  {
+    "file": "gen_baseline_results_for_dels.py",
+    "functions": [],
+    "classes": [],
+    "imports": [
+      "json",
+      "logging",
+      "os",
+      "sys",
+      "szz.ag_szz",
+      "szz.b_szz",
+      "szz.l_szz",
+      "szz.ma_szz",
+      "szz.r_szz",
+      "traceback"
+    ]
+  },
+  {
+    "file": "gen_baseline_results_for_no_deletes.py",
+    "functions": [],
+    "classes": [],
+    "imports": [
+      "json",
+      "logging",
+      "os",
+      "random",
+      "sys",
+      "szz.ag_szz",
+      "szz.b_szz",
+      "szz.l_szz",
+      "szz.ma_szz",
+      "szz.r_szz",
+      "traceback"
+    ]
+  },
+  {
+    "file": "gen_results_for_dels.py",
+    "functions": [
+      "get_introducing_cid",
+      "get_pre_diff_line"
+    ],
+    "classes": [],
+    "imports": [
+      "CFG",
+      "Levenshtein",
+      "argparse",
+      "copy",
+      "functools",
+      "git",
+      "json",
+      "sys",
+      "traceback",
+      "tree_sitter",
+      "tree_sitter_c",
+      "util"
+    ]
+  },
+  {
+    "file": "gen_results_for_no_dels.py",
+    "functions": [
+      "get_cur_diff_line",
+      "get_curr_diff_line1"
+    ],
+    "classes": [],
+    "imports": [
+      "CFG",
+      "Levenshtein",
+      "argparse",
+      "copy",
+      "functools",
+      "git",
+      "json",
+      "traceback",
+      "tree_sitter",
+      "tree_sitter_c",
+      "util"
+    ]
+  },
+  {
+    "file": "log_generation.py",
+    "functions": [
+      "__init__",
+      "fetch_tags",
+      "get_commit_time",
+      "get_commits_from",
+      "get_commits_range",
+      "get_tags",
+      "git_diff",
+      "git_diff_2",
+      "git_log",
+      "git_show",
+      "git_tag",
+      "git_tag_contins",
+      "inner",
+      "is_nosise",
+      "wrapper_change_path"
+    ],
+    "classes": [
+      "GitLog"
+    ],
+    "imports": [
+      "git",
+      "io",
+      "os",
+      "subprocess",
+      "sys",
+      "unidiff"
+    ]
+  },
+  {
+    "file": "parse_patch.py",
+    "functions": [
+      "__init__",
+      "__init__",
+      "__init__",
+      "__init__",
+      "__str__",
+      "__str__",
+      "__str__",
+      "add_hunk",
+      "add_line",
+      "get_author",
+      "get_cmsg",
+      "get_commit_id",
+      "get_date",
+      "get_diff",
+      "get_email",
+      "get_files",
+      "get_hunks",
+      "get_info",
+      "get_line_info",
+      "get_lines",
+      "get_patch_file_name",
+      "get_raw_file_str",
+      "parse",
+      "parse_author_email",
+      "parse_cid",
+      "parse_commit_msg",
+      "parse_file",
+      "parse_files",
+      "parse_hunk",
+      "parse_time",
+      "set_patch_file_name",
+      "to_str_without_del_lines"
+    ],
+    "classes": [
+      "File",
+      "Hunk",
+      "Line",
+      "Patch"
+    ],
+    "imports": [
+      "copy",
+      "re",
+      "time"
+    ]
+  },
+  {
+    "file": "util.py",
+    "functions": [
+      "__init__",
+      "__init__",
+      "__init__",
+      "__init__",
+      "__init__",
+      "__init__",
+      "__str__",
+      "add_constraint",
+      "add_dataflow",
+      "add_ident",
+      "add_line",
+      "collect_state",
+      "compute_line_ratio",
+      "copy_path",
+      "filter_path",
+      "gen_preds",
+      "gen_succs",
+      "gen_succs1",
+      "get_add_cond_info",
+      "get_add_ident_info",
+      "get_add_ident_info1",
+      "get_all_paths",
+      "get_basic_blocks_by_line",
+      "get_block_map",
+      "get_changed_lines",
+      "get_common_conds_num",
+      "get_common_lines",
+      "get_corr_paths_candidates",
+      "get_correspond_path",
+      "get_diff_index",
+      "get_file_content",
+      "get_func_call_names",
+      "get_func_defs",
+      "get_func_name",
+      "get_ident_names",
+      "get_introducing_cid",
+      "get_introducing_cid",
+      "get_introducing_cid",
+      "get_l_commits",
+      "get_line_map",
+      "get_most_early_commt",
+      "get_patch_content",
+      "get_path_max_line",
+      "get_r_commits",
+      "get_ts_node_by_line",
+      "get_var_names1",
+      "match_buggy_stmts",
+      "match_buggy_stmts_llm",
+      "my_compare",
+      "remove_whitespace"
+    ],
+    "classes": [
+      "BuggyStmt",
+      "CidFinder",
+      "CidFinder",
+      "Constraint",
+      "Identifier",
+      "State"
+    ],
+    "imports": [
+      "Levenshtein",
+      "collections",
+      "constant",
+      "copy",
+      "git",
+      "os",
+      "parse_patch",
+      "pydriller",
+      "subprocess",
+      "tempfile",
+      "tree_sitter",
+      "util"
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+evaluation run on our three datasets would cost approximately
+$400, making such models unsuitable for our study. While prior
+work [36] adopts GPT-4o-mini [25], we instead use GPT-5-mini [26],
+which provides stronger support for tool use and reasoning while
+remaining cost-effective.
+All experiments are conducted on a server equipped with an
+AMD EPYC 7763 64-core processor and 252 GB of RAM. We access
+LLM APIs via OpenRouter.2 We do not set the temperature to 0, as
+GPT-5 series models do not support temperature control [3]. The
+agent is limited to a maximum of 15 interaction turns.
+For the mini-SWE-agent (v2.2.5) baseline [ 47], we repurpose
+its bash-based repository interaction environment for BIC tracing
+instead of its default software repair workflow. The agent uses
+GPT-5-mini via OpenRouter and is run with a 300-second timeout
+per case. To ensure a fair comparison, it is provided with the same
+fix-side evidence asAgentSZZ: the repository path, the fix commit
+hash, and a filtered fix context derived from the fixing commit, with
+metadata trailers (e.g., Fixes:) removed. The agent is prompted to
+trace the origin of the bug using read-only git commands and to
+output the final BIC in a structured format.

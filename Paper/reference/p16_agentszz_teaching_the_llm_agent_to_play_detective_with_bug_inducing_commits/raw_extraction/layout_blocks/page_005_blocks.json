@@ -1,0 +1,527 @@
+[
+  {
+    "page": 5,
+    "block_id": "page_005:block_001",
+    "block_type": "text",
+    "text": "AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv",
+    "bbox": [
+      53.582000732421875,
+      61.119380950927734,
+      558.19921875,
+      69.2159652709961
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_002",
+    "block_type": "text",
+    "text": "the modified or deleted lines at the parent of the bug-fixing commit ( fix~1 ). For ghost commits (where the bug-fixing commit does not contain modified or deleted lines), our domain knowledge sug- gests blaming surrounding context lines. Moreover, we suggest that the agent use git_log_s or git_log_func to trace the history of relevant identifiers when blaming surrounding context does not work. For cross-file cases, we suggest that the agent may instead begin with broader search tools (e.g., git_log_s , git_grep ). Step 2 (Candidate analysis). Candidate commits surfaced during explo- ration are classified into two categories: (i) non-semantic changes , including refactoring and meta-changes (e.g., merge, branch), which are bypassed via iterative re-blame at the candidate’s parent com- mit to reach the true origin, following established SZZ practices such as MA-SZZ [ 11 ] and RA-SZZ [ 24 ]; and (ii) semantic introduc- tions , which introduce or modify logic and are treated as likely bug-inducing commits. When multiple semantic candidates exist, the prompt provides a counterfactual heuristic for disambiguation: “would the bug exist if this commit had not been introduced?” Step 3 (Causal confirmation). Before reporting, the agent verifies a direct causal link between the selected candidate and the bug, ensuring it is causally responsible rather than merely correlated. Rules. The prompt further encodes lightweight operational con- straints that can be applied at the agent’s discretion. These include prioritizing path-restricted queries before broadening scope, avoid- ing redundant inspection (e.g., limiting repeated git_show calls on the same commit), retrying with narrower parameters after time- outs, and accounting for file path changes across commits. It also encodes a key semantic distinction: commits that merely expose or trigger a pre-existing bug are not considered BICs; only commits that introduce faulty logic qualify.",
+    "bbox": [
+      52.78499984741211,
+      83.56178283691406,
+      295.5639953613281,
+      414.2545166015625
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_003",
+    "block_type": "text",
+    "text": "3.5 Context Compression",
+    "bbox": [
+      53.79800033569336,
+      430.53216552734375,
+      186.3326416015625,
+      445.17218017578125
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_004",
+    "block_type": "text",
+    "text": "To manage context consumption during multi-turn investigation, we design a multi-layer compression pipeline (Algorithm 1) that reduces tool output size while preserving high-signal evidence. Search Bound Enforcement. Before tool execution, the system automatically caps the before parameter of temporal search tools to the fix commit date 𝑑 𝑓𝑖𝑥 . Since a bug-inducing commit must predate its fix, this removes irrelevant results without requiring the agent to explicitly enforce this constraint. Layer 1: Cache Deduplication. A call-level cache keyed by tool name and arguments returns previously computed results when queries are repeated, preventing duplicate outputs from accumulat- ing across turns. Timeout Recovery. If a tool call times out, the system injects targeted hints (e.g., “ Retry with a smaller line range ”) to guide the agent toward narrower queries, avoiding repeated expensive operations. Layer 2: Formatted Outputs. Each tool applies internal for- matting before returning results to improve readability and reduce noise. git_blame converts git’s verbose porcelain format into a concise L{n}: {hash} | {code} representation with a commit legend. All commit-displaying tools filter out metadata trailers (e.g., Signed-off-by , Reviewed-by ) that are irrelevant to bug-inducing commit identification. Additionally, each tool enforces a maximum output length (100–300 lines) with truncation notifications, en- abling the agent to iteratively refine queries with narrower scopes.",
+    "bbox": [
+      53.46699905395508,
+      445.205810546875,
+      295.5594177246094,
+      709.6513671875
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_005",
+    "block_type": "text",
+    "text": "Algorithm 1 Structured Context Compression",
+    "bbox": [
+      317.62298583984375,
+      82.78779602050781,
+      489.8407897949219,
+      95.81597900390625
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_006",
+    "block_type": "text",
+    "text": "Require: Tool name 𝑡 , arguments 𝑎𝑟𝑔𝑠 , fix date 𝑑 𝑓𝑖𝑥 , threshold 𝜏 Ensure: Compressed output 𝑂 ′",
+    "bbox": [
+      317.9549560546875,
+      97.42079162597656,
+      554.99755859375,
+      121.41905975341797
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_007",
+    "block_type": "text",
+    "text": "1: // Search bound enforcement",
+    "bbox": [
+      323.8259582519531,
+      121.4179916381836,
+      433.80987548828125,
+      132.22250366210938
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_008",
+    "block_type": "text",
+    "text": "2: if 𝑡 ∈{ log_s , log_func } and 𝑎𝑟𝑔𝑠. before > 𝑑 𝑓𝑖𝑥 then",
+    "bbox": [
+      323.8259582519531,
+      130.29676818847656,
+      526.0880126953125,
+      148.84825134277344
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_009",
+    "block_type": "text",
+    "text": "3: 𝑎𝑟𝑔𝑠. before ← 𝑑 𝑓𝑖𝑥",
+    "bbox": [
+      323.8259582519531,
+      141.25575256347656,
+      415.6901550292969,
+      159.80723571777344
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_010",
+    "block_type": "text",
+    "text": "4: end if",
+    "bbox": [
+      323.8259582519531,
+      153.2100067138672,
+      356.7705078125,
+      165.242919921875
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_011",
+    "block_type": "text",
+    "text": "5: // Layer 1: Cache deduplication",
+    "bbox": [
+      323.8259582519531,
+      165.25393676757812,
+      443.260498046875,
+      176.05844116210938
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_012",
+    "block_type": "text",
+    "text": "6: if Cache.Has ( 𝑡,𝑎𝑟𝑔𝑠 ) then",
+    "bbox": [
+      323.8259582519531,
+      174.13270568847656,
+      434.92169189453125,
+      192.68418884277344
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_013",
+    "block_type": "text",
+    "text": "7: 𝑂 raw ← Cache.Get ( 𝑡,𝑎𝑟𝑔𝑠 )",
+    "bbox": [
+      323.8259582519531,
+      185.09169006347656,
+      448.8020324707031,
+      204.98814392089844
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_014",
+    "block_type": "text",
+    "text": "8: else",
+    "bbox": [
+      323.82598876953125,
+      197.0459442138672,
+      348.7097473144531,
+      209.078857421875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_015",
+    "block_type": "text",
+    "text": "9: 𝑂 raw ← ExecuteTool ( 𝑡,𝑎𝑟𝑔𝑠 )",
+    "bbox": [
+      323.82598876953125,
+      207.00965881347656,
+      458.3602294921875,
+      226.90611267089844
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_016",
+    "block_type": "text",
+    "text": "10: if 𝑂 raw is timeout then",
+    "bbox": [
+      320.5830078125,
+      217.96864318847656,
+      432.59320068359375,
+      231.70420837402344
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_017",
+    "block_type": "text",
+    "text": "11: Inject hint: “ Retry with narrower parameters ”",
+    "bbox": [
+      320.5830078125,
+      228.92665100097656,
+      523.0255737304688,
+      241.81137084960938
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_018",
+    "block_type": "text",
+    "text": "12: return timeout message",
+    "bbox": [
+      320.5830078125,
+      239.88563537597656,
+      449.86859130859375,
+      252.913818359375
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_019",
+    "block_type": "text",
+    "text": "13: end if",
+    "bbox": [
+      320.5830078125,
+      251.8398895263672,
+      370.219970703125,
+      263.872802734375
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_020",
+    "block_type": "text",
+    "text": "14: Cache.Store ( 𝑡,𝑎𝑟𝑔𝑠,𝑂 raw )",
+    "bbox": [
+      320.5830078125,
+      261.8036193847656,
+      445.6328125,
+      280.3551025390625
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_021",
+    "block_type": "text",
+    "text": "15: end if",
+    "bbox": [
+      320.5830078125,
+      273.75787353515625,
+      356.7703857421875,
+      285.790771484375
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_022",
+    "block_type": "text",
+    "text": "16: // Layer 2: Formatted output",
+    "bbox": [
+      320.5830078125,
+      285.8017883300781,
+      433.0476989746094,
+      296.6062927246094
+    ],
+    "reading_order": 22,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_023",
+    "block_type": "text",
+    "text": "17: 𝑂 ← Format ( 𝑡,𝑂 raw ) :",
+    "bbox": [
+      320.5830078125,
+      294.6805725097656,
+      415.7691955566406,
+      313.2320556640625
+    ],
+    "reading_order": 23,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_024",
+    "block_type": "text",
+    "text": "18: Reformat raw output into concise representation",
+    "bbox": [
+      320.5830078125,
+      305.6395568847656,
+      522.7924194335938,
+      318.0310974121094
+    ],
+    "reading_order": 24,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_025",
+    "block_type": "text",
+    "text": "19: Strip metadata trailers; truncate at max line limit",
+    "bbox": [
+      320.5830078125,
+      316.5985412597656,
+      523.1868896484375,
+      328.9900817871094
+    ],
+    "reading_order": 25,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_026",
+    "block_type": "text",
+    "text": "20: // Layer 3: Structured extraction",
+    "bbox": [
+      320.5830078125,
+      329.6377258300781,
+      445.82476806640625,
+      340.4422302246094
+    ],
+    "reading_order": 26,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_027",
+    "block_type": "text",
+    "text": "21: if | 𝑂 | ≤ 𝜏 then return 𝑂",
+    "bbox": [
+      320.5830078125,
+      339.51080322265625,
+      425.4888916015625,
+      357.0670166015625
+    ],
+    "reading_order": 27,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_028",
+    "block_type": "text",
+    "text": "22: end if",
+    "bbox": [
+      320.5830078125,
+      350.46978759765625,
+      356.7703857421875,
+      362.502685546875
+    ],
+    "reading_order": 28,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_029",
+    "block_type": "text",
+    "text": "23: 𝑂 ′ ← Extract ( 𝑡,𝑂 ) :",
+    "bbox": [
+      320.5830078125,
+      359.7518310546875,
+      411.83892822265625,
+      378.9849853515625
+    ],
+    "reading_order": 29,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_030",
+    "block_type": "text",
+    "text": "24: show : Strip diff context lines (keep only + / - / @@ ); head-tail truncate at 𝐾 1",
+    "bbox": [
+      320.5830078125,
+      371.392822265625,
+      558.2006225585938,
+      395.4738464355469
+    ],
+    "reading_order": 30,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_031",
+    "block_type": "text",
+    "text": "25: blame : Deduplicate commits into summary header; head- tail truncate at 𝐾 2",
+    "bbox": [
+      320.5829772949219,
+      393.3108215332031,
+      559.7146606445312,
+      417.391845703125
+    ],
+    "reading_order": 31,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_032",
+    "block_type": "text",
+    "text": "26: log : Keep first 𝐾 3 entries",
+    "bbox": [
+      320.5830078125,
+      415.22882080078125,
+      435.0694885253906,
+      428.9653625488281
+    ],
+    "reading_order": 32,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_033",
+    "block_type": "text",
+    "text": "27: grep : Group by file; keep first 𝐾 4 matches",
+    "bbox": [
+      320.5830078125,
+      426.1878356933594,
+      497.4579162597656,
+      439.92437744140625
+    ],
+    "reading_order": 33,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_034",
+    "block_type": "text",
+    "text": "28: return 𝑂 ′",
+    "bbox": [
+      320.5830078125,
+      438.14208984375,
+      370.1446228027344,
+      450.18609619140625
+    ],
+    "reading_order": 34,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_035",
+    "block_type": "text",
+    "text": "The truncation thresholds (100–300 lines) are set based on the typ- ical output volume of each tool: git_grep produces many short matching lines and is capped at 100 to avoid flooding the context with repetitive results, while git_log_func includes inline diffs that require more space and is allowed up to 300 lines. When output exceeds the threshold, the tool appends a truncation notification, prompting the agent to retry with narrower parameters (e.g., adding a path filter or line range). We did not perform systematic tuning of these thresholds; they are designed to balance information com- pleteness with context window efficiency. Layer 3: Structured Extraction. When formatted outputs ex- ceed a character threshold 𝜏 = 3000, a deterministic, tool-specific extractor further compresses them. For git_show , diff context lines are removed, retaining only change markers ( + / - / @@ ) and file head- ers with head-tail truncation at 𝐾 1 lines. For git_blame , repeated commits are deduplicated into a summary header, followed by head- tail truncation at 𝐾 2 lines. For git_log variants, only the first 𝐾 3 entries are retained, and for git_grep , matches are grouped by file before limiting to 𝐾 4 entries. These rules preserve structurally important information (e.g., commit hashes, line numbers, and changed code) while aggressively removing redundant context.",
+    "bbox": [
+      317.62298583984375,
+      478.0818176269531,
+      559.7173461914062,
+      709.6513671875
+    ],
+    "reading_order": 35,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

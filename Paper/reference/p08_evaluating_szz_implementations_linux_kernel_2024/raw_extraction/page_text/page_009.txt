@@ -1,0 +1,154 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2227
+commits are not the most recent changes before the bug ﬁx, but
+rather appeared earlier in a deleted or modiﬁed line’s change
+history.
+For example, Fig. 1 shows a line’s change history (i.e., it-
+eratively using git blame until the initial commit) of the bug-
+ﬁxing commit 68ad6d.11 Following Bao et al. [48], we call the
+immediately preceding the lines changed in the ﬁxing commit
+the previous commits (i.e., commit 53c13b in Fig. 1) and all
+commits (except the initial one) that previously modiﬁed these
+lines as the descendant commits (i.e., commit 8c49d9, 40747f,
+61a492 in Fig. 1). We refer to the commit at which tracing
+can no longer continue as the initial commit (i.e., commit
+454ede in Fig. 1). B-SZZ identiﬁed the previous commit as the
+bug-inducing commit, relying on using git blame once. Other
+algorithms, such as AG-SZZ and MA-SZZ, which improve on
+B-SZZ, access the rest of the descendant commits, identifying
+bug-inducing commits from other commits by considering cri-
+teria such as whether the commit is a meta-change. However, no
+existing algorithm comprehensively examines the line change
+history to identify the bug-inducing commit.
+Therefore, we propose the Tracing-Commit-SZZ (TC-SZZ)
+algorithm, which assumes a distinct function as compared to
+previous SZZ algorithms. Unlike the six SZZ algorithms dis-
+cussed in this paper, which normally identify only the pre-
+vious commit as the bug-inducing commit, and V-SZZ [48],
+which considers the initial commit based on the observation
+that vulnerabilities are often foundational, TC-SZZ is designed
+to more effectively locate and understand the position of the
+bug-inducing commit in the change history of lines. TC-SZZ
+applies git blame iteratively to all deleted or modiﬁed lines
+in the bug-ﬁxing commit until it reaches the initial commit,
+and returns all commits (i.e., the descendant commits and the
+initial commit in Fig. 1) in the change history of these lines.
+If git blame leads to a commit that has multiple removed
+lines, TC-SZZ chooses one among them to continue the iter-
+ation. Choosing all lines could lead to too much fanout, giving
+many false positives. For this, we have developed an algo-
+rithm based on V-SZZ [48]. Our algorithm takes into account
+both the string similarity and the relative distance between
+the line reported by git blame and the deleted lines in the
+same commit.
+An alternative to the iterative use of git blame would be to
+use git log -L, which tracks changes to speciﬁc lines through
+the history. TC-SZZ, however, adds an additional dimension
+by considering string similarity, which can account for moved
+lines, thus identifying more bug-inducing commits than git log
+-L. Take for example commit 5b47348.12 If we apply the git
+log -L command on the lines deleted by this bug-ﬁxing commit,
+we only trace back to commit ed928a3.13 In this commit, the
+developer relocated a few functionsto a different part of the ﬁle.
+11https://github.com/torvalds/linux/commit/d8ad6d39c35d2b44b3d48b787df
+7f3359381dcbf
+12https://github.com/torvalds/linux/commit/5b47348fc0b18a78c96f8474cc90
+b7525ad1bbfe
+13https://github.com/torvalds/linux/commit/ed928a3402d8a24a70c242c6310
+9c069a7b1f3ab
+TABLE II
+RECALL, PRECISION, AND F1 RESULTS OF ALL SZZ ALGORITHMS
+Algorithm
+datasetlinux
+datasetrosa
+Precision
+Recall
+F1
+Precision
+Recall
+F1
+B-SZZ
+0.42
+0.58
+0.49
+0.39
+0.69
+0.50
+AG-SZZ
+0.42
+0.56
+0.48
+0.45
+0.60
+0.52
+L-SZZ
+0.57
+0.43
+0.49
+0.52
+0.45
+0.48
+R-SZZ
+0.59
+0.45
+0.51
+0.66
+0.57
+0.61
+MA-SZZ
+0.40
+0.55
+0.46
+0.36
+0.64
+0.46
+SZZ@PYD
+0.43
+0.55
+0.48
+0.39
+0.67
+0.49
+The git log -L command interprets this as the initial commit
+for these lines. However, TC-SZZ goes beyond this by ﬁnding
+lines with similar content and executing git blame once more,
+enabling us to identify the bug-inducing commits.
+To facilitate future research on understanding the placement
+of bug-inducing commits in the change history, TC-SZZ offers
+multiple modes: (1) Chronological Trace Mode: For every
+deleted or modiﬁed line in a bug-ﬁxing commit, TC-SZZ re-
+turns all potential bug-inducing commits in the order of git
+blame. For instance, Fig. 1 illustrates the change history of
+a bug-ﬁxing commit for a speciﬁc deleted or modiﬁed line,
+with TC-SZZ providing the sequence: previous commit, de-
+scendants commit 61a492, 40747f, 8c49d9, and initial commit.
+(2) Unique Commits Mode: For the sake of conciseness, based
+on the results from Chronological Trace Mode, only unique
+potential bug-inducing commits are returned, eliminating du-
+plicates. (3) Custom Blame Invocation Mode: The user has
+the ability to specify the number of times git blame is invoked
+(a parameter of 1 is standard for SZZ, a parameter of 2 means
+using git blame twice for each modiﬁed line, and a parameter
+of -1 identiﬁes the initial commit). Our implementation of TC-
+SZZ is publicly available in the replication package.
+VI. RESULTS
+In this section, we answer the three Research Questions pro-
+posed in Section IV.
+A. RQ1: SZZ Performance
+Table II presents the results for the six SZZ algorithms,
+ordered chronologically, on our newly collected KFC dataset,
+compared against the results reported by Rosa et al. [28] for
+their dataset (datasetrosa).
+The results demonstrate that R-SZZ is the best algorithm
+(with the highest F1) on both datasets, given that F1 combines
+precision and recall. There are several factors that cause R-SZZ
+to outperform the other SZZ variants on our dataset. First and
+foremost, R-SZZ only returns the most recent commit among
+all candidates. At the same time, 96.1% (73,109) of the Linux
+bug-ﬁxing commits have only one bug-inducing commit. Thus,
+R-SZZ, by returning only one bug-inducing commit, achieves
+higher precision than SZZ algorithms that return multiple bug-
+inducing commits.
+Four of the six algorithms demonstrate better precision on the
+KFC dataset than on the baseline (i.e., Rosa’s result), with an
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

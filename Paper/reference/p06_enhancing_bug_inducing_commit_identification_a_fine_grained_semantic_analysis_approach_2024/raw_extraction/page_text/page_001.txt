@@ -1,0 +1,107 @@
+IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 50, NO. 11, NOVEMBER 2024 3037
+Enhancing Bug-Inducing Commit Identification:
+A Fine-Grained Semantic Analysis Approach
+Lingxiao Tang ,C h a oN i , Qiao Huang , and Lingfeng Bao
+Abstract—The SZZ algorithm and its variants have been
+extensively utilized for identifying bug-inducing commits based
+on bug-fixing commits. However, these algorithms face challenges
+when there are no deletion lines in the bug-fixing commit.
+Previous studies have attempted to address this issue by tracing
+back all lines in the block that encapsulates the added lines.
+However, this method is too coarse-grained and suffers from
+low precision. To address this issue, we propose a novel method
+in this paper called S
+EM-SZZ, which is based on fine-grained
+semantic analysis. Initially, w e observe that a significant number
+of bug-inducing commits can be identified by tracing back
+the unmodified lines near added lines, resulting in improved
+precision and F1-score. Building on this observation, we conduct
+a more fine-grained semantic analysis. We begin by performing
+program slicing to extract the program part near the added
+lines. Subsequently, we compare the program’s states between
+the previous version and the current version, focusing on data
+flow and control flow differences based on the extracted program
+part. Finally, we extract statements contributing to the bug
+based on these differences and utilize them to locate bug-
+inducing commits. We also extend our approach to fit the scenario
+where the bug-fixing commits contain deleted lines. Experimental
+results demonstrate that S
+EM-SZZ outperforms the state-of-the-
+art methods in identifying bug-inducing commits, regardless of
+whether the bug-fixing commit contains deleted lines.
+Index Terms—SZZ algorithm, data flow analysis, control flow
+analysis.
+I. I NTRODUCTION
+M
+ODERN software development evolves through a series
+of commits. When developers make commits, they save
+changes made to a set of files within a repository. Each commit
+Received 7 April 2024; revised 18 September 2024; accepted 22 Septem-
+ber 2024. Date of publication 9 October 2024; date of current version
+14 November 2024. This research was supported in part by the National Key
+Research and Development Program of China under Grant 2021YFB2701102,
+in part by the National Science Foundation of China under Grant 62372398,
+Grant 62302447, Grant 62202419, Grant 72342025, and Grant U20A20173,
+in part by the Fundamental Research Funds for the Central Universities
+under Grant 226-2022-00064, and in part by Zhejiang Provincial Natural
+Science Foundation of China under G rant LY24F020008. Recommended for
+acceptance by C. Treude (Corresponding author: Lingfeng Bao.)
+Lingxiao Tang and Lingfeng Bao are with the State Key Laboratory
+of Blockchain and Data Security , Zhejiang University, Hangzhou 310007,
+China, and also with Hangzhou High-Tech Zone (Binjiang) Blockchain
+and Data Security Research Ins titute, Hangzhou 310052, China (e-mail:
+12421037@zju.edu.cn; lingfengbao@zju.edu.cn).
+Chao Ni is with the State Key Laboratory of Blockchain and Data Security,
+Zhejiang University, Hangzhou 310007, Chin a (e-mail: chaoni@zju.edu.cn).
+Qiao Huang is with the School of Co mputer Science and Technology,
+Zhejiang Gongshang University, Hangzhou 310018, China (e-mail: qiao-
+huang@zjgsu.edu.cn).
+Digital Object Identifi er 10.1109/TSE.2024.3468296
+captures the state of the repository as a snapshot at a specific
+moment. To facilitate the management of commits, version con-
+trol systems such as Git have been developed. Among various
+types of commits, bug-inducing commits [1] hold particular
+significance, as they provide essential insights into the origins
+and evolution of bugs. Consequently, researchers have devoted
+additional attention to them. Prior studies have been conducted
+to understand the characteristics of bug-inducing commits [2],
+[3], [4], [5] and introduced numerous techniques to identify
+them [6], [7], [8], [9]. Building upon these identified bug-
+inducing commits, researchers have also proposed methods for
+Just-in-Time defect detection[9], [10], [11], [12] and automatic
+program repair [13], [14]. They have also worked on analyzing
+factors for software quality [15], [16], and pinpointing affected
+software versions of a vulnerability [17].
+Currently, the primary approaches for identifying bug-
+inducing commits are the original SZZ algorithm [6] and its
+variants. The original SZZ algorithm was introduced by Sliwer-
+ski, Zimmermann, and Zeller in 2005 [6]. They assume that the
+deleted lines in the bug-fixing commit introduce the bug. Thus,
+the algorithm operates by tracing back the deleted lines within
+bug-fixing commits. This tracing process aims to identify the
+commits that last modified those deleted lines. These identified
+commits are then marked as bug-inducing commits. Although
+the original SZZ algorithm has achieved great success, it suffers
+from low precision because bug-fixing commits may contain
+noise (e.g., blank lines, comments, and meta-changes) that is
+unrelated to bug fixes. To address this issue, numerous variants
+have been introduced[7], [8], [9]. Typically, these variants make
+use of static methods to filter out noise in bug-fixing commits.
+Additionally, deep learning methods have also been explored to
+further improve precision [18].
+However, previous research shows that the abovementioned
+methods fail to address the challenge posed by bug-fixing com-
+mits with only added lines [19]. When it happens, tools like git
+blame or annotate cannot identify deleted lines to link them
+with bug-inducing commits. Recent research has highlighted
+the prevalence of these kinds of commits in datasets, which
+significantly impacts the recall of SZZ algorithms. For instance,
+a dataset collected by Rezk et al. [19], containing 12 Apache
+projects, revealed that the highest percentage of such instances
+reached 11.72%. Further investigations, such as the study con-
+ducted by Lyu et al. [20], have demonstrated even higher oc-
+currences of bug-fixing commits only containing added lines.
+Lyu et al.’s dataset reported that 17.46% of bug-fixing commits
+0098-5589 © 2024 IEEE. Personal use is permitted, but repub lication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:26:22 UTC from IEEE Xplore.  Restrictions apply. 

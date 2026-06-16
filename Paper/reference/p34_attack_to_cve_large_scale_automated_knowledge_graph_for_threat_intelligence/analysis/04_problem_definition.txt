@@ -1,0 +1,35 @@
+Input:
+- Paper-specific input appears to involve vulnerability reports, patches, commits, repository history, developer logs, versions, or agent-readable code evidence. [NEEDS CITATION VERIFICATION]
+Output:
+- Paper-specific output appears to be bug/vulnerability-introducing commits, affected/vulnerable versions, or validation decisions. [NEEDS CITATION VERIFICATION]
+Objects / Entities:
+- CVE/vulnerability, patch, commit, file/function, version/tag/release, repository, knowledge graph or agent state when applicable.
+Formal Definitions:
+- 7 and T able II, consider CWE-20 (Improper Input V alidation).
+- This mapping underscores the critical- ity of input validation failures: adversaries routinely exploit unchecked inputs to manipulate control ﬂow , inject malicious payloads, or bypass security mechanisms, making this CWE foundational to a wide range of attacks.
+- CWE ID A TT&CK T echniques 20 (Improper Input V alidation) T1539 (Steal W eb Session Cookie); T1036.001 (Invalid Code Signature); T1027 (Obfuscated Files or Information); T1562.003 (Impair Command History Logging) 94 (Improper Control of Generation of Code (’Code Injection’)) T1027.006 (HTML Smuggling) 200 (Exposure of Sensitive Information to an Unauthorized Actor) T1057 (Process Discovery); T1087 (Account Discovery); T1124 (System Time Discovery); T1018 (Remote System Discovery); T1135 (Network Share Discovery); T1007 (System Service Discovery); T1046 (Network Service Discovery); T1033 (System Owner/User Discovery); T1069 (Permission Groups Discovery); T1120 (Peripheral Device Discovery); T1082 (System Information Discovery); T1083 (File and Directory Discovery); T1134.001 (T oken Impersonation/Theft); T1217 (Browser Information Discovery); T1562.003 (Impair Command History Logging); T1016 (System Network Conﬁguration Discovery); T1111 (Multi-Factor Authentication Interception); T1036.005 (Match Legitimate Resource Name or Location) 269 (Improper Privilege Management) T1548 (Abuse Elevation Control Mechanism) 287 (Improper Authentication) T1505.003 (W eb Shell); T1040 (Network Snifﬁng); T1557 (Adversary-in-the-Middle); T1134 (Access T oken Manipulation); T1185 (Browser Session Hijacking); T1548 (Abuse Elevation Control Mechanism) 400 (Uncontrolled Resource Consumption) T1499 (Endpoint Denial of Service) 434 (Unrestricted Upload of File with Dangerous T ype) T1574.010 (Services File Permissions W eakness) 798 (Use of Hard-coded Credentials) T1078.001 (Default Accounts); T1552.001 (Credentials In Files) 862 (Missing Authorization) T1211 (Exploitation for Defense Evasion) data components).
+- The summarized outputs for two representative groups– Scattered Spider (G1015) and V olt T yphoon (G1017)—are shown in T ables III, and IV, with corresponding path visualizations in Figs.
+Objective:
+- Those sources may include repos- itories that curate vulnerabilities, weaknesses, attack pattern related data in different formats with varying degrees of detail.
+- The resulting knowledge graph contains hundreds of thousands of interconnected entities and edges, enabling multi-hop analysis in various directions (e.g., from attack techniques to vulnerabilities, from vulnerabilities to attack techniques).
+- W e demonstrate the usefulness of the knowledge graph for comprehensive weakness analysis, linking adversary groups to exploited vulnerabilities, and graph-based inference tasks that include variable-length path traversal and link discov- ery .
+- Each of these resources is indispensable in its own domain, yet their siloed formats, differing schemas, and inconsistent cross-references present signiﬁcant hurdles for analysts who need an integrated and holistic view that interconnects vulnerabilities, weaknesses, attack patterns, and adversarial behaviors.
+Constraints:
+- CAPEC (MITRE) : For CAPEC data, the collected prop- erties include identiﬁers and metadata (ID, name, abstraction, status), description, likelihood, severity , mid-level structured sections such as mitigations, prerequisites, indicators, required skills and resources, example instances, notes, consequences, execution ﬂow (sequence of attacker actions), and content history .
+- These traversals not only provide the interme- diate steps involved in analyzing a threat, but also enhance individual data points (e.g., a CVE) by connecting them to a broader threat context—such as severity , affected platforms, available mitigations, and associated adversarial techniques.
+- Speciﬁcally , the knowledge graph links this technique to the attack pattern CAPEC-112, which maps to multiple underlying weaknesses: CWE-326 (Inadequate En- cryption Strength), CWE-330 (Use of Insufﬁciently Random V alues), and CWE-521 (W eak Password Requirements).
+- Here, only the graph’s structural properties (topology) are leveraged to quantify how strongly two entities are related, without requiring external features.
+- By enumerating and analyzing such mappings, defenders can proactively prioritize mitigation efforts around weakness classes most commonly tied to adversary behaviors, ensuring that secure coding practices, patching strategies, and monitor- ing controls align with real-world attack techniques.
+Evaluation Target:
+- [NEEDS EVIDENCE] evaluation target not cleanly extracted
+Boundary Conditions:
+- [NEEDS EVIDENCE]
+What Is Not Solved:
+- Abstract—Cyber threat intelligence (CTI) includes collecting and analyzing cybersecurity-related information across diverse and heterogeneous sources.
+- Those sources may include repos- itories that curate vulnerabilities, weaknesses, attack pattern related data in different formats with varying degrees of detail.
+- Analysts must continuously reconcile these sources to gain a coherent view of the evolving threat landscape, yet this process is often manual, incomplete, and error-prone.
+- Our case studies on CISA advisories show that hierarchical graph traversals uncover CVEs beyond those explicitly listed, bridging critical gaps in threat intelligence.
+- Index T erms—Cyber Threat Intelligence, Knowledge Graph, Graph Databases, CWE, CVE, A TT&CK, CAPEC I.
+- I N T RO D U C T I O N The modern cyber threat landscape is vast, dynamic, and fragmented across multiple authoritative but heterogeneous sources of intelligence.
+Reusable Formalization Pattern:
+- Represent the security task as mapping noisy vulnerability evidence to a precise commit/version artifact, then state exclusions explicitly.

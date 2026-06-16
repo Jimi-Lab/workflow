@@ -1,0 +1,66 @@
+K. Kurniawan, A. Ekelhart, E. Kiesling et al. Computers & Security 121 (2022) 102828 
+Fig. 11. Scenario 1 ( Nginx backdoor w/ Drakon in-memory ). This attack begins with a vulnerable Nginx web server hosted on a FreeBSD server that gets exploited by a 
+malformed HTTP request. The exploit leads to multiple ﬁle creations on the local system. The attacker successfully creates an executable ﬁle (“/tmp/XIM”), changes the 
+permissions and runs it as an elevated process. This process reads a sensitive ﬁle (“/etc/passwd”) and forwards data to an external network ( 53.158.101.118:80 ). 
+Table 4 
+Graph size reduction & compression. 
+Scenario ID Dataset ID Duration (hh:mm) Log data in JSON (GB) Prov. in RDF (MB) Prov. in HDT (MB) 
+1,2 CD I 48:59 7 150 7 
+3 CD II 90:01 12 250 10 
+4 TH 25:33 18.7 280 16 
+5 FD 19:27 16 25 0.9 
+Table 5 
+Scenario graph construction run-time. 
+Scenario ID Total Events (M) Prov. Graph Building & Alerting (events/sec) Forward Chaining (sec) Graph Querying (sec) 
+1,2 7.8 16.8 K 0.79 0.31 
+3 12.9 17.5 K 0.99 0.26 
+4 23.4 15.6 K 1.6 0.41 
+5 19.3 37.8 K 1.99 0.42 
+Time for constructing the scenario graphs via list:forward-chaining ; 
+and (iii) Time for generating scenario graphs through graph query- 
+ing . 
+We repeated each experiment ﬁve times and present average 
+results. 
+As shown in Table 5 , our approach can generate RDF-based 
+provenance graphs from log data with up to 20k events/sec on 
+average. The highest performance for provenance generation is 
+achieved in Scenario 5 ( FiveDirection dataset on Windows), with 
+37.8k events/sec. Compared to the other scenarios, FiveDirection has 
+a larger number of events that are not considered in our model, 
+resulting in a large number of events that can be excluded in the 
+provenance graph generation process. 
+Compared to MORSE, which achieved 100K events/sec 
+( Hossain et al., 2020 ), provenance construction is somewhat 
+slower. 41 This performance penalty with respect to approaches 
+based on optimized custom data structures is expected and 
+mainly attributable to the parsing, RDF lifting and the in-memory 
+SPARQL query execution times necessary for tag propagation. The 
+manageable reduction in run time performance in our evaluation 
+demonstrates that the approach is viable. Given the beneﬁts, in- 
+cluding improved reusability, interoperability, and enrichment with 
+41 Speciﬁcally, by a factor of 5 for Linux/FreeBSD and 3 for Windows, respectively. 
+background knowledge the tradeoff seems favorable. Overall, our 
+framework achieved a performance of 1.2 s per attack on average 
+in the scenario graph construction via list:forward-chaining . The 
+highest performance has been achieved in scenario 2 and 3 ( Cadets 
+dataset with FreeBSD) with 0.79 s. Note that we excluded time for 
+backward-chaining for root cause identiﬁcation as it is basically a 
+select query over the provenance graph (without constructing a 
+new graph) and therefore the run times are relatively fast. The run 
+time for scenario graph generation through graph querying is even 
+faster, i.e., less than 0.5 s for all scenarios. This indicates that our 
+RDF-based provenance graph data model scales well with respect 
+to graph size and query complexity when it comes to graph-query 
+based attack construction. 
+Propagation-Based Alert Detection Performance In the follow- 
+ing, we measure the effectiveness of our approach in detecting 
+alerts based on alerting policies over the tagged provenance graph. 
+We leverage alert policies such as Change Permission, File Execution, 
+File Corruption , or Data Leak from ( Hossain et al., 2020 ). In addi- 
+tion, we created a custom alert Reconn that detects connections 
+from external IPs to processes that access sensitive ﬁles. Table 6 
+summarizes the detected alerts for all scenarios. Overall, our ap- 
+proach detected all high-level attack activities in the ground truth 
+and achieved similar detection performance as the evaluation in 
+Hossain et al. (2020) (cf. Table 3 ). 
+13

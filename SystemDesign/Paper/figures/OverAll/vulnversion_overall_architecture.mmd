@@ -1,0 +1,192 @@
+%% VulnVersion overall architecture
+%% Source basis:
+%% - VulnVersion current source tree under E:/AI/Agent/workflow/VulnVersion
+%% - SystemDesign/Architecture/Develop/Agent-Enhance.md
+%% - SystemDesign/Architecture/Develop/step3.md
+%%
+%% Legend:
+%% - solid nodes/edges: implemented or current main path in source/docs
+%% - dashed nodes/edges: planned optimization or agent-enhancement layer
+
+flowchart TB
+  classDef input fill:#f7f7f2,stroke:#6b6b60,stroke-width:1px,color:#111;
+  classDef core fill:#e8f2ff,stroke:#2f5f93,stroke-width:1.4px,color:#0b243b;
+  classDef det fill:#eaf7ef,stroke:#277146,stroke-width:1.4px,color:#0d2b18;
+  classDef agent fill:#fff0e1,stroke:#9a5b14,stroke-width:1.4px,color:#3b2105;
+  classDef artifact fill:#f0edff,stroke:#6250a5,stroke-width:1.4px,color:#1f174a;
+  classDef planned fill:#fff8cc,stroke:#9b7d00,stroke-width:1.4px,stroke-dasharray: 6 4,color:#2f2600;
+  classDef eval fill:#ffe8ef,stroke:#9c3154,stroke-width:1.4px,color:#3a0e1d;
+
+  subgraph Inputs["Inputs and Reproducibility Boundary"]
+    D1["Dataset record<br/>CVE, CWE, affected versions,<br/>fixing_commits, optional vuln_commit"]:::input
+    D2["Target repository<br/>Git history, commits, release tags,<br/>branches and source files"]:::input
+    D3["CVE description<br/>NVD cache / crawler / user-provided text"]:::input
+    D4["Config and model profile<br/>artifacts_dir, OpenCode URL,<br/>provider/model, timeouts"]:::input
+  end
+
+  subgraph CLI["CLI and Orchestration"]
+    C0["vulnversion debug_cli.py<br/>semantic-aggregate | rci-extract | verify-tags"]:::core
+    C1["Path and input guards<br/>repo under repo/, artifacts under project root,<br/>run_inputs.json"]:::core
+    C2["Optional OpenCode session<br/>create_readonly_session('VulnVersion')"]:::agent
+  end
+
+  D1 --> C0
+  D2 --> C0
+  D3 --> C0
+  D4 --> C0
+  C0 --> C1
+  C0 --> C2
+
+  subgraph S1["Step 1: Semantic Patch / Vulnerable Chunk Recognition"]
+    S1A["Git diff extraction<br/>extract_chunks_multi()<br/>dedupe fix commits by patch hash"]:::det
+    S1B["Agent chunk annotation<br/>annotate_chunks(): PRIMARY_FIX,<br/>SUPPORTING_FIX, UNRELATED"]:::agent
+    S1C["patch_semantics.json<br/>all_chunks, chunk_roles,<br/>rci_relevant_chunks, excluded_chunks"]:::artifact
+  end
+
+  C1 --> S1A
+  C2 --> S1B
+  S1A --> S1B --> S1C
+
+  subgraph S2["Step 2: Root Cause and RCI Extraction"]
+    S2A["Navigation hints<br/>RepoMaster index when available"]:::det
+    S2B["Agent RCI induction<br/>root_cause, anchor, anchor_at_vuln,<br/>vuln/fix predicates, guards"]:::agent
+    S2C["JSON normalization and schema validation<br/>RCIModel + strict retry on invalid output"]:::det
+    S2D["Native git self-check<br/>anchor exists at vuln/fix,<br/>predicate token ratios"]:::det
+    S2E["rci.json + rci_self_check.json<br/>evidence pack and reliability signals"]:::artifact
+  end
+
+  S1C --> S2B
+  D2 --> S2A --> S2B
+  C2 --> S2B
+  S2B --> S2C --> S2D --> S2E
+
+  subgraph S3Plan["Step 3 Planning: Deterministic Release-Line Model"]
+    P0["build_tag_plan()<br/>VulnTree-only current main path"]:::det
+    P1["Release tag universe<br/>filter release tags, parse versions,<br/>line_key, line_family, line_partition"]:::det
+    P2["Fix/Vuln commit clustering<br/>classify_fix_commits(),<br/>find_equivalent_commits(), VIC seed from rci"]:::det
+    P3["VulnTree graph<br/>TagNode, LineNode, CommitCluster,<br/>LineBoundary"]:::det
+    P4["Family-local ordering<br/>newer_line / older_line inside family;<br/>OpenSSL mainline/fips/engine split"]:::det
+    P5["no-FIC subtype diagnosis<br/>duplicate_expansion_missed,<br/>never_fixed_on_this_line"]:::det
+    P6["tag_plan.json<br/>vuln_tree.json, line_boundaries.json,<br/>line_families, initial runtime"]:::artifact
+  end
+
+  S2E --> P0
+  D2 --> P1
+  D1 --> P2
+  P0 --> P1 --> P3
+  P0 --> P2 --> P3
+  P3 --> P4 --> P5 --> P6
+
+  subgraph S3Verify["Step 3 Verification: Version Impact Confirmation"]
+    V0["verify_tags()<br/>explicit tags compatibility OR VulnTree plan"]:::core
+    V1["Per-line ASBS<br/>run_asbs_boundary_search(): probe FIC,<br/>oldest, latest-before-FIC, binary boundary"]:::det
+    V2["Python-native prefetch<br/>anchor code, token grep, git show/diff;<br/>bypasses OpenCode tool crash classes"]:::det
+    V3["Static prefilter<br/>token-level NOT_AFFECTED where safe"]:::det
+    V4["Agent tag verdict<br/>given one tag + localized evidence;<br/>AFFECTED / NOT_AFFECTED only"]:::agent
+    V5["Line discoveries and anchor relocation<br/>current lightweight LineMemory-like state"]:::det
+    V6["ASBS interval inference<br/>inferred affected rows,<br/>monotonicity_certificate, certificate_id"]:::det
+    V7["Runtime graph closure<br/>sync tag/line/boundary runtime after verification"]:::det
+  end
+
+  P6 --> V0 --> V1
+  S2E --> V2
+  V1 --> V2 --> V3
+  V3 -- unresolved tag --> V4
+  C2 --> V4
+  V4 --> V5 --> V1
+  V1 --> V6 --> V7
+  V3 --> V7
+  V4 --> V7
+
+  subgraph Outputs["Artifacts and Evaluation Outputs"]
+    O1["per_tag_verdict.jsonl / csv<br/>TagVerdict: verdict, source,<br/>confidence, evidence, inferred_from"]:::artifact
+    O2["Artifact buckets<br/>agent / prefilter / inferred_interval / agent_error"]:::artifact
+    O3["Final VulnTree runtime snapshot<br/>vuln_tree_runtime.json as verifier-final graph state"]:::artifact
+    O4["eval.json<br/>confusion_matrix, metrics,<br/>resolved-only metrics, unmapped GT tags"]:::eval
+    O5["Failure surfaces<br/>FP, FN, UNK, TIMEOUT,<br/>backend_tool_error, boundary_violation"]:::eval
+  end
+
+  V7 --> O1 --> O2 --> O4
+  V7 --> O3 --> O4
+  O4 --> O5
+
+  subgraph Step3Future["Step3 Planned Optimization Layer"]
+    F1["BAPEE standalone first<br/>Branch-Aware Patch Equivalence Expansion"]:::planned
+    F2["Candidate generation and acceptance calibration<br/>P1-D / P1-F continue only with strong evidence"]:::planned
+    F3["GT boundary vs real FIC evidence separation<br/>avoid treating dataset boundary gaps as algorithm FN"]:::planned
+    F4["ASBS precision guard<br/>segmented recovery, sparse-line handling,<br/>confirmation probes"]:::planned
+    F5["1128-CVE / 9-repo ablation<br/>VulnTree, ASBS, no-FIC subtype,<br/>BAPEE, agent-memory layers"]:::planned
+  end
+
+  P2 -. "future equivalent-commit recovery" .-> F1
+  F1 -.-> F2 -.-> F3 -.-> F4 -.-> V1
+  O4 -.-> F5
+
+  subgraph RuntimeFuture["Planned Backend-Agnostic Agent Runtime"]
+    R0["AgentRuntime interface<br/>run_json(), capabilities(),<br/>readonly session, trace metadata"]:::planned
+    R1["OpenCodeRuntime<br/>compatibility wrapper for current OpenCodeAgent"]:::planned
+    R2["ClaudeCodeRuntime / CodexRuntime<br/>future backend comparison"]:::planned
+    R3["ReplayRuntime<br/>no-API replay from parsed historical traces"]:::planned
+    R4["Trace schema<br/>trace_id, backend, stage, prompt_hash,<br/>raw_output_path, parsed_output_path,<br/>latency, token usage, tool calls"]:::planned
+  end
+
+  C2 -. "to be replaced by stable runtime API" .-> R0
+  R0 -.-> R1
+  R0 -.-> R2
+  R0 -.-> R3
+  R0 -.-> R4
+  R1 -.-> S1B
+  R1 -.-> S2B
+  R1 -.-> V4
+  R2 -.-> S1B
+  R2 -.-> S2B
+  R2 -.-> V4
+  R3 -.-> S1B
+  R3 -.-> S2B
+  R3 -.-> V4
+
+  subgraph VulnMem["Planned VulnMem-Agent Layer"]
+    M0["Typed memory store<br/>scope: repo, CVE, CWE, stage,<br/>tag, line, backend"]:::planned
+    M1["EvidenceMemory<br/>git show/grep/diff facts,<br/>prefetch and agent evidence"]:::planned
+    M2["RepoMemory<br/>tag style, path migration,<br/>function aliases, repo adapters"]:::planned
+    M3["RCIMemory<br/>RCI templates, predicate reliability,<br/>guard risk, Stage3 feedback"]:::planned
+    M4["LineMemory<br/>confirmed paths, release-line frontier,<br/>line-local discoveries"]:::planned
+    M5["FailureMemory<br/>FP/FN/UNK/TIMEOUT attribution,<br/>backend/tool failures"]:::planned
+    M6["ProceduralMemory<br/>reusable verification trajectories"]:::planned
+    M7["SkillMemory<br/>short, verified, prompt-injectable rules"]:::planned
+    M8["ArtifactMemory<br/>repo_adapter, predicate_repair_rules,<br/>anchor_relocation_policy,<br/>verdict_calibration_rules"]:::planned
+  end
+
+  S1C -. "chunk role evidence" .-> M0
+  S2E -. "RCI + self-check" .-> M0
+  V2 -. "localized git evidence" .-> M1
+  V5 -. "line-local discoveries" .-> M4
+  O4 -. "eval outcomes" .-> M5
+  R4 -. "agent traces" .-> M0
+  M0 -.-> M1
+  M0 -.-> M2
+  M0 -.-> M3
+  M0 -.-> M4
+  M0 -.-> M5
+  M5 -.-> M6 -.-> M7 -.-> M8
+
+  subgraph Evolution["Planned Verifier-Gated Self-Evolution Loop"]
+    E1["Trace collection<br/>stage outputs, prompts, raw/parsed model output"]:::planned
+    E2["Error attribution<br/>predicate too broad/narrow, anchor drift,<br/>path migration, boundary violation"]:::planned
+    E3["Memory operation skills<br/>INSERT, UPDATE, MERGE, DELETE,<br/>PROMOTE, SUPPRESS"]:::planned
+    E4["Promotion chain<br/>raw trace -> evidence fact -> failure/success case -><br/>procedural memory -> verified skill -> artifact"]:::planned
+    E5["Verifier gates<br/>schema, evidence, replay, validation CVEs,<br/>conflict gate, backend gate"]:::planned
+    E6["Controlled injection<br/>stage-specific memory budget;<br/>no unverified conflict injection"]:::planned
+  end
+
+  O5 -.-> E1 --> E2 --> E3 --> E4 --> E5 --> E6
+  E3 -.-> M0
+  E4 -.-> M6
+  E5 -.-> M7
+  E5 -.-> M8
+  E6 -. "memory block" .-> S1B
+  E6 -. "RCI / repo memory" .-> S2B
+  E6 -. "line/evidence/procedural/skill memory" .-> V4
+  M8 -. "deterministic artifacts" .-> P0
+  M8 -. "deterministic artifacts" .-> V2
+  M8 -. "deterministic artifacts" .-> V3

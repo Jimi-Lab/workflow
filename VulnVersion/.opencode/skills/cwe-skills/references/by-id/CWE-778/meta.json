@@ -1,0 +1,270 @@
+{
+  "cwe_id": "CWE-778",
+  "name": "Insufficient Logging",
+  "abstraction": "Base",
+  "status": "Draft",
+  "description": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+  "extended_description": "When security-critical events are not logged properly, such as a failed login attempt, this can make malicious behavior more difficult to detect and may hinder forensic analysis after an attack succeeds. As organizations adopt cloud storage resources, these technologies often require configuration changes to enable detailed logging information, since detailed logging can incur additional costs. This could lead to telemetry gaps in critical audit logs. For example, in Azure, the default value for logging is disabled.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-223",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Omission of Security-relevant Information"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Cloud Computing",
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Operation"
+  ],
+  "likelihood_of_exploit": "Medium",
+  "mapping": {
+    "usage": "Allowed",
+    "fit": "",
+    "rationale": "This CWE entry is at the Base level of abstraction, which is a preferred level of abstraction for mapping to the root causes of vulnerabilities."
+  },
+  "mechanism": {
+    "root_cause_summary": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "logging",
+      "event",
+      "security-critical",
+      "detailed"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "logging",
+      "event",
+      "security-critical",
+      "detailed",
+      "configuration",
+      "organizations",
+      "technologies",
+      "information"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "XML",
+        "nature": "Bad",
+        "summary": "The example below shows a configuration for the service security audit feature in the Windows Communication Foundation (WCF).",
+        "snippet": "<system.serviceModel> <behaviors> <serviceBehaviors> <behavior name=\"NewBehavior\"> <serviceSecurityAudit auditLogLocation=\"Default\" suppressAuditFailure=\"false\" serviceAuthorizationAuditLevel=\"None\"..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java example the code attempts to authenticate the user. If the login fails a retry is made. Proper restrictions on the number of login...",
+        "snippet": "if LoginUser(){ // Login successful RunProgram(); } else { // Login unsuccessful LoginRetry(); }"
+      },
+      {
+        "language": "Shell",
+        "nature": "Bad",
+        "summary": "Consider this command for updating Azure's Storage Logging for Blob service, adapted from [REF-1307]:",
+        "snippet": "az storage logging update --account-name --account-key --services b --log d --retention 90"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "XML",
+        "nature": "Good",
+        "summary": "The example below shows a configuration for the service security audit feature in the Windows Communication Foundation (WCF).",
+        "snippet": "<system.serviceModel> <behaviors> <serviceBehaviors> <behavior name=\"NewBehavior\"> <serviceSecurityAudit auditLogLocation=\"Default\" suppressAuditFailure=\"false\" serviceAuthorizationAuditLevel=\"SuccessAndFailure\"..."
+      },
+      {
+        "language": "Java",
+        "nature": "Good",
+        "summary": "In the following Java example the code attempts to authenticate the user. If the login fails a retry is made. Proper restrictions on the number of login...",
+        "snippet": "if LoginUser(){ // Login successful log.warn(\"Login by user successful.\"); RunProgram(); } else { // Login unsuccessful log.warn(\"Login attempt by user failed, trying again.\"); LoginRetry(); }"
+      },
+      {
+        "language": "Shell",
+        "nature": "Good",
+        "summary": "Consider this command for updating Azure's Storage Logging for Blob service, adapted from [REF-1307]:",
+        "snippet": "az storage logging update --account-name --account-key --services b --log rwd --retention 90"
+      },
+      {
+        "language": "Shell",
+        "nature": "Good",
+        "summary": "Consider this command for updating Azure's Storage Logging for Blob service, adapted from [REF-1307]:",
+        "snippet": "Set-AzStorageServiceLoggingProperty -ServiceType Queue -LoggingOperations read,write,delete -RetentionDays 5 -Context $MyContextObject"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2008-4315",
+        "description": "server does not log failed authentication attempts, making it easier for attackers to perform brute force password guessing without being detected",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-4315"
+      },
+      {
+        "reference": "CVE-2008-1203",
+        "description": "admin interface does not log failed authentication attempts, making it easier for attackers to perform brute force password guessing without being detected",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-1203"
+      },
+      {
+        "reference": "CVE-2007-3730",
+        "description": "default configuration for POP server does not log source IP or username for login attempts",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-3730"
+      },
+      {
+        "reference": "CVE-2007-1225",
+        "description": "proxy does not log requests without \"http://\" in the URL, allowing web surfers to access restricted web content without detection",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2007-1225"
+      },
+      {
+        "reference": "CVE-2003-1566",
+        "description": "web server does not log requests for a non-standard request type",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2003-1566"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

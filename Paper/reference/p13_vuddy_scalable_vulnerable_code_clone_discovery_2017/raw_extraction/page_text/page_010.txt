@@ -1,0 +1,113 @@
+TABLE III: Accuracy of VUDDY , SourcererCC, DECKARD,
+and CCFinderX when detecting clones between the vulnera-
+bility database and Apache HTTPD 2.4.23.
+Technique Time Rep † TP FP FN Precision
+VUDDY 22 s 9 9 0 2 1.000
+SourcererCC (100)∗ 122 s 1 1 0 8 1.000
+SourcererCC (70)∗ 125 s 56 2 54 7 0.036
+DECKARD (100)∗ 58 s 57 3 54 8 0.053
+DECKARD (85)∗ 234 s 462 4 458 8 0.009
+CCFinderX 1201 s 74 11 63 1 0.147
+∗ The values between parentheses denote minimum similarity threshold
+conﬁguration in percent
+† Denotes the number of clones each technique reported
+of its ﬁltering heuristics. We lowered the minimum similarity
+threshold to 70 %, expecting that SourcererCC might detect
+more true positive cases. However, it ended up detecting only
+two legitimate vulnerable clones, whereas introducing 54 false
+positives. DECKARD with minimum similarity set to 100 %
+reported 57 clones, and 54 cases were conﬁrmed to be false
+positives. This shows that two perfectly matching abstract
+syntax trees are not necessarily generated from the same
+code fragments. Furthermore, when the minimum similarity
+threshold was set to 85 %, DECKARD detected only 4 true
+positive clones, with 458 false positives. This result accords
+with the observation of Jiang, et al. [29] which claims that
+DECKARD has 90 % false positive. CCFinderX was the only
+technique that reported more true positive cases than those of
+VUDDY . However, 63 out of 74 reported clones were false
+positives, and CCFinderX required the most time to complete.
+We analyzed the false positive cases of each tool, and
+discovered a fatal ﬂaw of the compared techniques. In most
+of the false positive cases, SourcererCC, DECKARD, and
+CCFinderX falsely identiﬁed patched functions in the target as
+clones of unpatched functions in the vulnerability database. We
+present one case in which patched benign function is identiﬁed
+as a clone of old, vulnerable version of the function, by all
+techniques but VUDDY . In Listing 3, we can observe that the
+statements removed and added by the patch are quite similar.
+Eventually, the unpatched function and patched function have
+so similar structure and tokens that SourcererCC, DECKARD,
+and CCFinderX misleadingly report them as a clone pair.
+We also analyzed the false negative cases. VUDDY did not
+detect two vulnerable functions that both SourcererCC (70 %
+similarity threshold) and DECKARD detected. The sole reason
+is that some lines of code, other than the vulnerable spot ad-
+dressed by security patches, were modiﬁed in the function. We
+currently have vulnerable functions of the repository snapshots
+right before the security patches are applied. However, this is a
+trivial issue that can be easily resolved, because we can retrieve
+every different versions of a vulnerable function and add them
+in our database. For example, a command “git log -p
+filename” retrieves the entire change history of the queried
+ﬁle. Older snapshots of vulnerable functions are naturally
+obtained from the change history, and we can insert these
+into our vulnerability database. From a different standpoint,
+it is very surprising that SourcererCC and DECKARD have
+more false negatives than VUDDY has. For these cases they
+failed to identify two identical functions as clones, implying
+that these techniques are not complete (see Equation 2).
+Listing 3: Snippet of the patch for CVE-2015-3183 which
+is already applied in request.c of Apache HTTPD 2.4.23.
+1 - if (access_status == OK) {
+2 - ap_log_rerror(APLOG_MARK, APLOG_TRACE3, 0, r,
+3 - "request authorized without authentication by "
+4 - "access_checker_ex hook: %s", r->uri);
+5 -}
+6 - else if (access_status != DECLINED) {
+7 - return decl_die(access_status, "check access", r);
+8 ...
+9 + else if (access_status == OK) {
+10 + ap_log_rerror(APLOG_MARK, APLOG_TRACE3, 0, r,
+11 + "request authorized without authentication by "
+12 + "access_checker_ex hook: %s", r->uri);
+13 +}
+14 + else {
+15 + return decl_die(access_status, "check access", r);
+In summary, although Apache HTTPD is a moderately-sized
+project consisting of 350 KLoC, a lot of false positive cases
+are reported by techniques other than VUDDY . It is only
+logical that the bigger a target program is, the more false
+alarms are generated. Therefore, we conﬁdently conclude that
+SourcererCC, DECKARD, and CCFinderX are not suitable for
+detecting vulnerable clones from large code bases, as they will
+report so many false positive cases which cannot be handled by
+restricted manpower. Moreover, SourcererCC and DECKARD
+had more false negatives than VUDDY had.
+D. Exact-matching vs Abstract matching
+Our abstraction scheme enables VUDDY to detect variants
+of known vulnerabilities. We tested VUDDY with an Android
+ﬁrmware (14.9 MLoC). VUDDY reported 166 vulnerable
+clones without abstraction and 206 clones with abstraction.
+This means that VUDDY detects 24 % more clones with
+abstraction, which are unknown vulnerabilities. We manually
+inspected the clones, and identiﬁed no false positive.
+VIII. I N-DEPTH COMPARISON WITH REDEBUG
+In subsection VII-C, we compared VUDDY with other
+clone detection techniques of which the designs do not con-
+sider vulnerability preservation in clones. Here, we compare
+VUDDY with ReDeBug, a line-based vulnerability detection
+technique which takes advantage of security patches to ﬁnd
+vulnerability. The sole purpose of ReDeBug is to scalably ﬁnd
+vulnerable code clones, which we believe to be very similar
+to our purpose. As ReDeBug takes a different design choice,
+(i.e., line-level granularity) for clone detection, we compare
+VUDDY and ReDeBug in detail to demonstrate the efﬁciency
+and effectiveness of VUDDY . Three major advantages of
+VUDDY over ReDeBug are as follows:
+• VUDDY is twice faster than ReDeBug.
+• VUDDY has far less false positive than ReDebug.
+• VUDDY is capable of detecting Type-2 clones, but
+ReDeBug is not.
+604
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

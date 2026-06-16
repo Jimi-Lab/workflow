@@ -1,0 +1,285 @@
+{
+  "cwe_id": "CWE-667",
+  "name": "Improper Locking",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product does not properly acquire or release a lock on a resource, leading to unexpected resource state changes and behaviors.",
+  "extended_description": "Locking is a type of synchronization behavior that ensures that multiple independently-operating processes or threads do not interfere with each other when accessing the same resource. All processes/threads are expected to follow the same steps for locking. If these steps are not followed precisely - or if no locking is done at all - then another process/thread could modify the shared resource in a way that is not visible or predictable to the original process. This can lead to data or memory corruption, denial of service, etc.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-662",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Synchronization"
+      },
+      {
+        "cwe_id": "CWE-662",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Improper Synchronization"
+      },
+      {
+        "cwe_id": "CWE-662",
+        "nature": "ChildOf",
+        "view_id": "1305",
+        "ordinal": "Primary",
+        "name": "Improper Synchronization"
+      },
+      {
+        "cwe_id": "CWE-662",
+        "nature": "ChildOf",
+        "view_id": "1340",
+        "ordinal": "Primary",
+        "name": "Improper Synchronization"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "Unknown",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry is a Class and might have Base-level children that would be more appropriate"
+  },
+  "mechanism": {
+    "root_cause_summary": "The product does not properly acquire or release a lock on a resource, leading to unexpected resource state changes and behaviors.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "locking",
+      "processes",
+      "process",
+      "threads"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "locking",
+      "processes",
+      "process",
+      "threads",
+      "steps",
+      "same",
+      "all",
+      "are"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the following Java snippet, methods are defined to get and set a long field in an instance of a class that is shared across multiple threads. Because...",
+        "snippet": "private long someLongValue; public long getLongValue() { return someLongValue; } public void setLongValue(long l) { someLongValue = l; }"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code tries to obtain a lock for a file, then writes to it.",
+        "snippet": "function writeToLog($message){ $logfile = fopen(\"logFile.log\", \"a\"); //attempt to get logfile lock if (flock($logfile, LOCK_EX)) { fwrite($logfile,$message); // unlock logfile flock($logfile, LOCK_UN); } else { print..."
+      },
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following function attempts to acquire a lock in order to perform operations on a shared resource.",
+        "snippet": "void f(pthread_mutex_t *mutex) { pthread_mutex_lock(mutex); /* access shared resource */ pthread_mutex_unlock(mutex); }"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "It may seem that the following bit of code achieves thread safety while avoiding unnecessary synchronization...",
+        "snippet": "if (helper == null) { synchronized (this) { if (helper == null) { helper = new Helper(); } } } return helper;"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "C",
+        "nature": "Good",
+        "summary": "The following function attempts to acquire a lock in order to perform operations on a shared resource.",
+        "snippet": "int f(pthread_mutex_t *mutex) { int result; result = pthread_mutex_lock(mutex); if (0 != result) return result; /* access shared resource */ return pthread_mutex_unlock(mutex); }"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2021-1782",
+        "description": "Chain: improper locking (CWE-667) leads to race condition (CWE-362), as exploited in the wild per CISA KEV.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2021-1782"
+      },
+      {
+        "reference": "CVE-2009-0935",
+        "description": "Attacker provides invalid address to a memory-reading function, causing a mutex to be unlocked twice",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-0935"
+      },
+      {
+        "reference": "CVE-2010-4210",
+        "description": "function in OS kernel unlocks a mutex that was not previously locked, causing a panic or overwrite of arbitrary memory.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2010-4210"
+      },
+      {
+        "reference": "CVE-2008-4302",
+        "description": "Chain: OS kernel does not properly handle a failure of a function call (CWE-755), leading to an unlock of a resource that was not locked (CWE-832), with resultant crash.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2008-4302"
+      },
+      {
+        "reference": "CVE-2009-1243",
+        "description": "OS kernel performs an unlock in some incorrect circumstances, leading to panic.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-1243"
+      },
+      {
+        "reference": "CVE-2009-2857",
+        "description": "OS deadlock",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-2857"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

@@ -1,0 +1,37 @@
+Domain Concepts Introduced:
+- Unpatched code clone.
+- Code clone detection.
+- Security-related patch.
+- Unified diff hunk.
+- Original buggy code snippet and context.
+- n-token window.
+- Bloom filter and feature hashing.
+- Containment and similarity metrics.
+
+Task Definition:
+Given a patch for buggy code and a large source corpus, identify files/locations containing clones of the original buggy code that were not patched.
+
+Threat Model / Assumptions:
+The paper assumes a patch has been released and an actor can use the patch to search large public source corpora. This can help defenders find residual vulnerable code but also implies attacker utility.
+
+Motivating Case:
+CVE-2009-3720 in Expat motivates clone propagation risk: code fixed in one location may remain copied elsewhere.
+
+Why the Case Is Chosen:
+It shows a small patch with many possible cloned vulnerable instances and makes the problem concrete.
+
+Definitions Needed by Readers:
+Readers need to understand unified diffs, deleted/added/context lines, clone detection, tokenization, Bloom filters, exact matching, and distribution-scale source packages.
+
+How Background Leads to Method:
+Because full clone detection is too expensive and broad, the method narrows the problem to clones of patched buggy code and chooses conservative syntax matching.
+
+Writing Pattern:
+Introduce the task through a patch example, then list failure modes of prior work, then define a narrower but scalable target problem.
+
+Relevance to Our Paper:
+Useful for explaining why pure signature matching is scalable but incomplete, and for motivating semantic/presence verification as a next step.
+
+Agent Evidence Anchors:
+- raw_extraction/section_text/02_introduction.txt
+- raw_extraction/section_text/03_redebug.txt

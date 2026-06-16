@@ -1,0 +1,89 @@
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712
+713
+714
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735
+CaVulner: Automated Context-Aware Identification of Vulnerable Versions 15
+Table 5. The results of different LLMs
+LLM CVE Level Version Level
+Accuracy Precision Recall F1-score
+deepseek-v3 73.30% 98.14% 83.15% 90.02%
+deepseek-r1 72.73% 97.63% 85.56% 91.20%
+gpt-4.1-mini 52.27% 87.78% 62.88% 73.27%
+qwen-turbo 43.75% 84.52% 60.98% 70.84%
+Table 6. Average LLM resource consumption per CVE vulnerable version identification
+LLM input(k) output(k) total(k) cost($) time(s)
+deepseek-v3 102.47 28.25 130.72 0.060 38.68
+deepseek-r1 100.83 296.53 397.36 0.721 206.49
+gpt-4.1-mini 91.55 31.08 122.63 0.086 21.61
+qwen-turbo 92.86 22.67 115.53 0.006 21.27
+Overall, the performance of different LLMs on the vulnerable version identification task varies,
+reflecting each model’s inherent capacity for understanding and reasoning about vulnerabilities.
+DeepSeek-v3 and DeepSeek-R1 exhibit comparable performance, and both achieve the best results
+among all evaluated LLMs.
+At the CVE level, every LLM outperforms the traditional baselines. Even the weakest model,
+Qwen-turbo, attains an accuracy of 43.75%, surpassing the best baseline (V-SZZ) at 37.50%. This
+demonstrates that, under the strict all -match criterion, general -purpose LLMs can still exceed
+baseline approaches.
+At the version level, even the worst-performing Qwen-turbo still has an F1-score (70.84%) higher
+than the best F1-score in the baseline, VERJava (66.08%), further demonstrating the advantage of
+CaVulner in identifying vulnerable versions.
+RQ2: The ablation study validates that each key component of CaVulner is essential to its
+effectiveness. Additionally, all evaluated LLMs outperformed the baseline in vulnerability
+version identification.
+4.5 RQ3. Resource Consumption
+We implement CaVulner by invoking LLM APIs. Since analyzing the root cause of a vulnerability
+and localizing the corresponding code blocks requires a non-trivial amount of time and tokens, we
+assess the cost of LLM usage. As shown in Figure 2,CaVulner relies on LLM in three stages: Coarse-
+grained Vulnerable Methods Localization, Fine-grained Vulnerable Code Block Identification, and
+Vulnerability-inducing Commit Tracing. We evaluate the token consumption, and time overhead
+during these stages.
+Table 6 shows the average LLM resource consumption per CVE vulnerability-version identifi-
+cation. In terms of input, output, and total tokens, DeepSeek V3, GPT 4.1-mini, and Qwen turbo
+exhibit similar consumption. DeepSeek R1, as a reasoning model, exhibits significantly higher
+output token consumption. It consumes about ten times more output tokens than DeepSeek V3
+, Vol. 1, No. 1, Article . Publication date: January 2018.

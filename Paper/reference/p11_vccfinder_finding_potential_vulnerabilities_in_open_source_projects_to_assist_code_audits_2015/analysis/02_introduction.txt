@@ -1,0 +1,26 @@
+Paper ID: p11_vccfinder_finding_potential_vulnerabilities_in_open_source_projects_to_assist_code_audits_2015
+Title: VCCFinder: Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits
+PDF Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder：Finding Potential Vulnerabilities in Open-Source Projects to Assist Code Audits.pdf
+Source Path: E:\AI\Agent\workflow\Replication\BaseLine(Vulnerability-affected versions identification How far are we)\Direct_Comparison_Papers(Baseline_Paper+Code)\VCCFinder\VCCFinder
+Analysis Mode: PDF evidence + static source/artifact inspection only
+Runtime Status: [EXECUTION NOT REQUESTED]
+
+Opening Context: The paper starts from increasing vulnerability discovery and insufficient audit manpower.
+Why the Problem Matters: Missed vulnerabilities enter production because exhaustive manual audit is not feasible.
+Concrete Pain Point: Metric-based scanners produce many false positives, so reviewers need prioritization, not just more warnings.
+Motivating Example: The paper motivates VCCFinder as a way to flag suspicious commits for focused review; concrete case examples appear in evaluation/case-study sections.
+Prior Work Framing: It positions itself against code-metric scanners and prior vulnerability prediction/mining studies.
+Why Prior Work Is Insufficient: Code metric tools lack enough context, while prior mapping efforts did not provide the same large-scale CVE-to-GitHub vulnerable commit database.
+Technical Challenges: Data labeling, noisy VCC heuristics, heterogeneous features, scalability, and explainability.
+Key Insight: Commit metadata and history/context features complement code metrics when ranking commits for audit.
+System / Method Preview: CVE/fixing-commit collection -> blame heuristic to identify VCCs -> feature extraction -> generalized bag-of-words/SVM classifier -> audit prioritization.
+Contribution List: database of vulnerable commits, SVM-based suspicious commit classifier, evaluation and lessons learned.
+Claim-Evidence Structure: practical audit bottleneck -> dataset construction -> ML ranking method -> precision/recall comparison and case studies.
+Agent Evidence Anchors: raw_extraction/section_text/02_introduction.txt; raw_extraction/section_text/04_methodology.txt; raw_extraction/section_text/06_evaluation.txt.
+Paragraph Map:
+P1: vulnerability/audit scalability context; evidence type is motivation.
+P2: false-positive burden of static metric tools; evidence type is problem statement.
+P3: proposed repository-metadata + code-metric method; evidence type is method preview.
+P4: contributions and claimed sharing; evidence type includes artifact claim needing verification. [NEEDS ARTIFACT]
+Reusable Moves: Frame ML as prioritization for human audit, not as replacing expert review.
+Risks for Our Paper: Avoid treating VCCFinder as affected-version identification; it ranks commits and constructs VCC labels.

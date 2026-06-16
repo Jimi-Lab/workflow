@@ -1,0 +1,46 @@
+Problem:
+- Given a bug-fixing commit, SZZ identifies the bug-inducing commits that introduced the defect.
+- They have been widely used in many downstream tasks such as defect prediction [13, 15, 28, 34, 46], analysis of how bugs are in- troduced [5, 6, 39], and vulnerability version identification [4, 8].
+- More recently, security code generation benchmarks also rely on SZZ algorithms to identify vulnerability-inducing commits [7].
+- Many variants of SZZ algorithms have been proposed to improve the accuracy of bug-inducing commit identification.
+- For example, LLM4SZZ achieves a recall of only 0.552 on the Linux ker- nel dataset, indicating that nearly half of the bug-inducing commits remain unidentified.
+Gap:
+- A key limitation is the reliance ongit blame, which traces line-level changes within the same file, failing in com- mon scenarios such as ghost and cross-file cases—making nearly one-quarter of bug-inducing commits inherently untraceable.
+- To address these challenges, we proposeAgentSZZ, an agent- based framework that leverages LLM-driven agents to explore repositories and identify bug-inducing commits.
+- Unlike prior meth- ods,AgentSZZintegrates task-specific tools, domain knowledge, and a ReAct-style loop to enable adaptive and causal tracing of bugs.
+- Thefundamental limitationis that existing SZZ algorithms rely heavily ongit blameto trace modified lines in bug-fixing com- mits.
+Core Idea:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+- Abstract The SZZ algorithm is the dominant technique for identifying bug- inducing commits and underpins many software engineering tasks, such as defect prediction and vulnerability analysis.
+- Despite numer- ous variants, including recent LLM-based approaches, performance remains limited on developer-annotated datasets (e.g., recall of 0.552 on the Linux kernel).
+Method:
+- 3.1 Design Process The components ofAgentSZZwere derived through an iterative, case-driven design process rather than predefined.
+- We investigated these cases while interacting with a LLM [2] to simulate the agent’s behavior.
+- We further expanded the tool set to handle more complex scenar- ios by adding git_log_s for locating commits that introduce or remove specific identifiers, git_grep for repository-wide search, and git_log_func for function-level history tracing.
+- This includes heuristics such as starting with blame as a default entry point while allow- ing the agent to switch to broader search tools (e.g., git_log_s) when necessary.
+- Abstract The SZZ algorithm is the dominant technique for identifying bug- inducing commits and underpins many software engineering tasks, such as defect prediction and vulnerability analysis.
+- Despite numer- ous variants, including recent LLM-based approaches, performance remains limited on developer-annotated datasets (e.g., recall of 0.552 on the Linux kernel).
+Evaluation Setup:
+- experiments on three widely used datasets show thatAgentSZZ consistently outperforms state-of-the-art SZZ algorithms across all settings, achieving F1-score gains of up to 27.2% over prior LLM- based approaches.
+- The improvements are especially pronounced in challenging scenarios such as cross-file and ghost commits, with recall gains of up to 300% and 60%, respectively.
+Main Results:
+- Despite numer- ous variants, including recent LLM-based approaches, performance remains limited on developer-annotated datasets (e.g., recall of 0.552 on the Linux kernel).
+- A structured compression module further improves efficiency by re- ducing redundant context while preserving key evidence.
+- Extensive experiments on three widely used datasets show thatAgentSZZ consistently outperforms state-of-the-art SZZ algorithms across all settings, achieving F1-score gains of up to 27.2% over prior LLM- based approaches.
+- The improvements are especially pronounced in challenging scenarios such as cross-file and ghost commits, with recall gains of up to 300% and 60%, respectively.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- For example, LLM4SZZ achieves a recall of only 0.552 on the Linux ker- nel dataset, indicating that nearly half of the bug-inducing commits remain unidentified.
+- Thefundamental limitationis that existing SZZ algorithms rely heavily ongit blameto trace modified lines in bug-fixing com- mits.
+- Several challenges remain: ❶ agents struggle with tool selection, ❷ actions lack domain-specific guidance, and ❸ tool outputs can be large, leading to excessive token consumption, increased latency, and noisy context that may hinder reasoning.
+- These gains are especially pronounced in challenging scenarios such as cross-file and ghost commits, where recall improves by up to 300% and 60%, respectively, highlighting the ability ofAgentSZZto improve the fundamental limitations of blame-based methods.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

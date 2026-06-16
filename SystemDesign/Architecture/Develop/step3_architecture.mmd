@@ -1,0 +1,157 @@
+flowchart TB
+  %% VulnVersion Step3 current architecture, 2026-05-02
+
+  classDef input fill:#E8F3FF,stroke:#2B6CB0,color:#102A43
+  classDef plan fill:#E9FBEF,stroke:#2F855A,color:#123524
+  classDef sched fill:#FFF7E6,stroke:#B7791F,color:#3B2F0B
+  classDef probe fill:#F3E8FF,stroke:#6B46C1,color:#2D1B69
+  classDef agent fill:#FFE8E8,stroke:#C53030,color:#4A1111
+  classDef artifact fill:#F7FAFC,stroke:#4A5568,color:#1A202C
+  classDef sim fill:#EDF2F7,stroke:#718096,color:#1A202C,stroke-dasharray: 5 5
+
+  subgraph Inputs["Inputs"]
+    I0["CVE id"]:::input
+    I1["Repo path"]:::input
+    I2["Fixing commits"]:::input
+    I3["Optional evidence path"]:::input
+    I4["Optional GT for eval"]:::input
+    I5["Explicit tags optional"]:::input
+  end
+
+  subgraph Planning["Deterministic Planning"]
+    P0["release tag discovery"]:::plan
+    P1["version_registry filter"]:::plan
+    P2["line and family parsing"]:::plan
+    P3["build VulnTree"]:::plan
+    P4["tag_plan.json"]:::artifact
+    P5["vuln_tree.json"]:::artifact
+    P6["vuln_tree_runtime.json"]:::artifact
+  end
+
+  subgraph Scheduling["Git Guided Scheduling"]
+    G0["git_reachability.batch_tags_containing"]:::sched
+    G1["line_scheduler.compute_seed_lines"]:::sched
+    G2["line_scheduler.run_staged_scheduler"]:::sched
+    G3["scheduler_plan.json"]:::artifact
+    CFG["NN_SENTINEL_COUNT 3\nAA_SENTINEL_COUNT 1\nFIXED_SEG_SENTINEL 1\nexpansion_radius 1\nstrategy staged_nofix_stride3_file"]:::sched
+  end
+
+  subgraph Probe["Probe And Inference"]
+    B0["line tasks"]:::probe
+    B1["asbs_line.run_fixed_segment_sentinel"]:::probe
+    B2["asbs_line.run_asbs_segment"]:::probe
+    B3["endpoint probes"]:::probe
+    B4["sentinel probes"]:::probe
+    B5["binary probes"]:::probe
+    B6["interval inference"]:::probe
+    B7["line_intervals.json"]:::artifact
+  end
+
+  subgraph Agent["Agent Boundary"]
+    A0["AgentRuntime.run_json"]:::agent
+    A1["tag verdict only"]:::agent
+    A2["AFFECTED or NOT_AFFECTED"]:::agent
+    A3["No tag plan decisions"]:::agent
+    A4["No GT access"]:::agent
+    A5["No commit-boundary planning"]:::agent
+  end
+
+  subgraph Outputs["Artifacts And Evaluation"]
+    O0["per_tag_verdict.jsonl"]:::artifact
+    O1["per_tag_verdict.csv"]:::artifact
+    O2["artifact_eval.evaluate_step3_output"]:::artifact
+    O3["eval.json"]:::artifact
+    O4["official metrics"]:::artifact
+    O5["ablation metrics"]:::artifact
+  end
+
+  subgraph Buckets["verdict_source buckets"]
+    V0["agent"]:::artifact
+    V1["inferred_interval"]:::artifact
+    V2["inferred_no_affected"]:::artifact
+    V3["inferred_full_line_affected"]:::artifact
+    V4["fixed_segment_clear"]:::artifact
+    V5["aa_conflict_scan"]:::artifact
+    V6["agent_error"]:::artifact
+    V7["unresolved"]:::artifact
+    V8["deferred"]:::artifact
+  end
+
+  subgraph Explicit["Explicit Tags Compatibility"]
+    E0["caller supplied tags"]:::input
+    E1["skip scheduler"]:::plan
+    E2["agent tag verdict"]:::agent
+    E3["explicit_agent mode"]:::artifact
+  end
+
+  subgraph Simulator["Simulator Only Validation"]
+    S0["GT oracle"]:::sim
+    S1["module backed simulator"]:::sim
+    S2["parameter validation"]:::sim
+    S3["strategy evaluation"]:::sim
+    S4["GT only for eval"]:::sim
+    S5["GT never enters planning"]:::sim
+    S6["GT never enters prompt"]:::sim
+  end
+
+  I0 --> P0
+  I1 --> P0
+  I2 --> P3
+  I3 -. "prompt context only" .-> A0
+  P0 --> P1 --> P2 --> P3
+  P3 --> P4
+  P3 --> P5
+  P3 --> P6
+  P3 --> G0
+  I2 --> G0
+  G0 --> G1 --> G2 --> B0
+  CFG --> G1
+  CFG --> G2
+  CFG --> B1
+  CFG --> B2
+  G2 --> G3
+
+  B0 --> B1
+  B0 --> B2
+  B1 --> B3
+  B1 --> B4
+  B2 --> B3
+  B2 --> B4
+  B2 --> B5
+  B3 --> A0
+  B4 --> A0
+  B5 --> A0
+  A0 --> A1 --> A2
+  A0 --> A3
+  A0 --> A4
+  A0 --> A5
+  A2 --> B6
+  B6 --> B7
+  B6 --> O0
+  A2 --> O0
+  O0 --> O1
+  O0 --> O2
+  B7 --> O2
+  I4 -. "evaluation only" .-> O2
+  O2 --> O3
+  O3 --> O4
+  O3 --> O5
+  O2 --> V0
+  O2 --> V1
+  O2 --> V2
+  O2 --> V3
+  O2 --> V4
+  O2 --> V5
+  O2 --> V6
+  O2 --> V7
+  O2 --> V8
+
+  I5 --> E0 --> E1 --> E2 --> A0
+  E2 --> E3 --> O2
+
+  S0 --> S1 --> S2 --> S3
+  S2 -. "locks defaults" .-> CFG
+  S0 --> S4
+  S0 --> S5
+  S0 --> S6
+  S4 -. "final evaluation" .-> O2

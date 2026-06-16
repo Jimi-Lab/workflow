@@ -1,0 +1,137 @@
+[
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:001",
+    "block_type": "text",
+    "text": "LYU et al.: EVALUATING SZZ IMPLEMENTATIONS\n2233",
+    "bbox": [
+      37.58,
+      32.52,
+      551.66,
+      40.3
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:002",
+    "block_type": "text",
+    "text": "Fig. 6.\nInput Provided to ChatGPT for Commit 761e205 in Linux kernel.\nIn practice, we provide the entire function code to ChatGPT, however, space\nconstraints prevent us from including the full screenshot in the paper. The\ncomplete screenshot is available in the replication package.",
+    "bbox": [
+      37.58,
+      213.64,
+      288.66,
+      249.43
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:003",
+    "block_type": "text",
+    "text": "Fig. 7.\nChatGPT’s Output for Commit 761e205 in Linux kernel. If the\ndetails in the ﬁgure are difﬁcult to discern, please refer to our replication\npackage.",
+    "bbox": [
+      37.58,
+      533.49,
+      288.66,
+      560.31
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:004",
+    "block_type": "text",
+    "text": "For the Within-File Detection cases, we follow a two-step\nmethod: (1) We ﬁrst use ctags21 to extract all function names\nin a ﬁle. Subsequently, we pose the Prompt B in Table IX\nto ChatGPT. We provide ChatGPT with the function names\nextracted using ctags, instead of the entire code, because the\nnumber of code tokens in a ﬁle often exceeds the token limit\nset by ChatGPT. (2) We then apply the same method as in the\nFunction-Log Detection category for any correctly identiﬁed\nfunction to ﬁnd the bug-inducing commits.\nFor the Cross-File Detection cases, we follow the three steps\nshown in Fig. 5: (A) The initial step involves identifying the\nﬁle containing the bug-inducing commits. We pose the Prompt",
+    "bbox": [
+      37.58,
+      581.15,
+      288.66,
+      724.15
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:005",
+    "block_type": "text",
+    "text": "21https://ctags.io",
+    "bbox": [
+      45.56,
+      734.04,
+      98.8,
+      743.96
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:006",
+    "block_type": "text",
+    "text": "A in Table IX to ChatGPT. Given that the Linux kernel has\n15,000 ﬁles and limited information is available in the commit\nmessage, ChatGPT might have difﬁculty identifying an exact\nﬁle. We have observed that it could instead return a directory,\ndespite not having been prompted to do so, containing the code\naffected by the bug-inducing commit. Hence, we evaluate Chat-\nGPT’s performance based on the correctness of the identiﬁed\ndirectory and ﬁle. (B) If ChatGPT correctly identiﬁes the ﬁle,\nwe adopt the same method as the ﬁrst step in the Within-File\nDetection category to determine the function. (3) If the correct\nfunction is determined by ChatGPT, we proceed with the same\nmethod as for the Function-Log Detection category to identify\nthe bug-inducing commits.",
+    "bbox": [
+      300.6,
+      63.79,
+      551.66,
+      218.37
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:007",
+    "block_type": "text",
+    "text": "B. Results",
+    "bbox": [
+      300.6,
+      238.29,
+      342.94,
+      249.25
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:008",
+    "block_type": "text",
+    "text": "Since the Function-Blame\nDetection category shares\nsimilar principles with the SZZ algorithm, we adopt the SZZ al-\ngorithm’s evaluation methodology, as detailed in Section IV-B,\nto compute the precision, recall, and F1 for this category.\nIn contrast, the evaluation for the remaining three categories\n(i.e., Function-Log Detection, Within-File Detection, Cross-\nFile Detection) diverges from the evaluation of the Function-\nBlame Detection. Instead of adhering strictly to SZZ-based\nprinciples, for these categories, we focused on assessing the\nnumber of bug-ﬁxing commits that could ﬁnd their bug-\ninducing commits (i.e., Recall) with the assistance of ChatGPT.\nWe also used the git log -L command to identify as many bug-\ninducing commits as possible, aiming to evaluate the potential\nof a git blame based approach augmented with ChatGPT. For\nthe Within-File Detection category, we evaluate three indicators\n(Function, Line of code, and Recall) as returned by ChatGPT.\nFor the Cross-File Detection cases, we evaluate ﬁve indicators:\nDirectory, File, Function, Line of code and Recall.\nThe result of the ChatGPT experiment is shown in Table X.\nFor Function-Blame Detection, ChatGPT exhibits a high recall\nof 0.62, comparable to that of B-SZZ on the complete Linux\ndataset. The precision is, however, only 0.28, because Chat-\nGPT selects from lines of all changed functions, resulting in a\nsubstantially larger selection space, especially given that some\nfunctions span hundreds of lines. For Function-Log Detection,\nthe recall of our ChatGPT method dips to 0.31. Regarding\nWithin-File Detection, ChatGPT successfully predicts the cor-\nrect function in 32 out of 76 cases (42.1%). In 44 instances,\nChatGPT makes an incorrect prediction, and in ten other cases,\nthe prediction fails due to token limitations, no functions, or\nChatGPT’s inability to discern the correct function. Cross-\nFile Detection presents a signiﬁcant challenge as the commit\nmessages often lack sufﬁcient information to identify the ﬁle.\nIn over half the cases, ChatGPT could only return the directory\nof the ﬁle that might contain the bug-inducing commits. How-\never, we found that ChatGPT correctly predicts the directory in\n65% of these cases. Furthermore, it successfully identiﬁes bug-\ninducing commits in 11 cases where the bug-inducing commit\nis not in the ﬁle modiﬁed in the bug-ﬁxing commit. In analyzing\nthe 11 successful cases of Cross-File Detections, we observed\nthat the majority of the pairs of bug-ﬁxing and bug-inducing",
+    "bbox": [
+      300.6,
+      254.71,
+      551.67,
+      744.41
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 15,
+    "block_id": "p08_evaluating_szz_implementations_linux_kernel_2024:block:015:009",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply.",
+    "bbox": [
+      23.3,
+      762.57,
+      570.7,
+      772.18
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

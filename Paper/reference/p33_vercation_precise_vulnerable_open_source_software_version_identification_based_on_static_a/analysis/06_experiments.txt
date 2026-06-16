@@ -1,0 +1,59 @@
+Research Questions:
+- [NEEDS EVIDENCE] RQs not cleanly extracted
+Datasets:
+- evaluation, encompassing 12 commonly used OSS projects, 122 Common Vulnerabilities and Exposures (CVEs), and a total of 1,211 OSS versions.
+- This dataset comprised every patch released through Git with respect to those 122 CVEs.
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- • We curated a dataset including 122 published CVEs con- taining 1,211 versions.
+- This extensive dataset was curated Authorized licensed use limited to: Huazhong University of Science and Technology.
+- across 12 OSS projects and underwent meticulous labeling through a combination of PoC input validation and manual veriﬁcation.
+- • We have implemented a prototype of our approach and assessed its performance using our dataset, achieving the F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+- The source code of V ERCATION and our curated dataset are publicly available at https://github.com/Veronica-L/Vercation.
+Baselines:
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool.
+- The main contributions of this paper are as follows: • Unlike previous efforts that heavily relied on pre-deﬁned patterns of static analysis tools, we present V ERCATION, the ﬁrst framework to integrate the reasoning capability of LLM for vulnerable version identiﬁcation tasks, through the use of a multi-strategy universal prompt engineering.
+- Therefore, in our work, instead of blindly applying LLM as a standalone tool, we ﬁrst use static analysis to extract candidate vulnerability-related codes and then leverage the se- mantic capturing capabilities of LLMs to improve the accuracy of extracted codes.
+- V-SZZ[17] assumes the deletion lines in the security patch as vulnerable codes and the basic idea of it is to pinpoint the earli- est commit introducing the deletion lines as vic.
+- V-SZZ only considers tracing back deleted line (Line 12) and overlooks the real vulnerability behavior, leading to incorrect identiﬁcation of vic.
+- LLMs can grasp contextual code semantics and achieve human-like understanding in code-related tasks, eliminating the reliance on predeﬁned patterns and rules utilized by traditional static analysis and automated tools.
+- V-SZZ [17] identiﬁes code clones before and after such code changes by the edit distance.
+Metrics:
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool.
+- Function timeline from vulne rability introduction to vulnerability ﬁxing.
+- • We have implemented a prototype of our approach and assessed its performance using our dataset, achieving the F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+- They enable developers to revisit speciﬁc points on a particular date or time.
+- An illustrative timeline is presented in Fig.
+- Therefore, in our work, instead of blindly applying LLM as a standalone tool, we ﬁrst use static analysis to extract candidate vulnerability-related codes and then leverage the se- mantic capturing capabilities of LLMs to improve the accuracy of extracted codes.
+Experimental Protocol:
+- We conducted an ablation study using three different LLMs (GPT-4[30], CodeLlama[31], and DeepSeek-V3 [32]) to evaluate their vulnerability compre- hension capabilities.
+- We also evaluated three contrasting LLMs — a commer- cial, closed model (GPT-4) and open models (CodeLlama and DeepSeek-V3) — in our approach and reported that they achieved similar performances in our context when appropriate prompting strategies were applied.
+Implementation Details:
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- • We have implemented a prototype of our approach and assessed its performance using our dataset, achieving the F1 score of 93.1%, improving SOTAs by 8.1% to 108.7%.
+- The source code of V ERCATION and our curated dataset are publicly available at https://github.com/Veronica-L/Vercation.
+- ===== Page 004 ===== CHENG et al.: V ERCATION: PRECISE VULNERABLE OPEN-SOURCE SOFTW ARE VERSION IDENTIFICATION 379 1 diff --git a/libavformat/mxfdec.c b/libavformat/ mxfdec.c @@ -493,11 2 +493,11 @@ static int mxf\_read\_primer\_pack 3 static int 4 mxf_read_primer_pack(void *arg, AVIOContext *pb, 5 int tag, int size, 6 UID uid, int64_t klv_offset) { 7 MXFContext *mxf = arg; 8 int item_num = avio_rb32(pb); 9 int item_len = avio_rb32(pb); 10 if (item_len != 18) { 11 avpriv_request_sample(pb, "Primer pack item length %d", item_len); 12 return AVERROR_PATCHWELCOME; 13 } 14 - if (item_num > 65536) { 15 + if (item_num > 65536 || item_num < 0) { 16 av_log(mxf->fc, AV_LOG_ERROR, "item_num % d is too large\n", item_num); 17 return AVERROR_INVALIDDATA; 18 } 19 if (mxf->local_tags) 20 av_log(mxf->fc, AV_LOG_VERBOSE, "Multiple primer packs\n"); 21 av_free(mxf->local_tags); 22 mxf->local_tags_count = 0; 23 mxf->local_tags = av_calloc(item_num, item_len); 24 if (!mxf->local_tags) 25 return AVERROR(ENOMEM); 26 mxf->local_tags_count = item_num; 27 avio_read(pb, mxf->local_tags, item_num* item_len); 28 return 0; 29 \vspace*{-6pt} Listing 1.
+Hyperparameters / Settings:
+- We also evaluated three contrasting LLMs — a commer- cial, closed model (GPT-4) and open models (CodeLlama and DeepSeek-V3) — in our approach and reported that they achieved similar performances in our context when appropriate prompting strategies were applied.
+- Large Language Model Large Language Models (LLMs) have revolutionized nat- ural language processing and have demonstrated remarkable capabilities in various code-relate d tasks.
+- These models, ex- tensively trained on vast amounts of text and code reposito- ries, can understand and generate human-like text and code.
+Hardware / Environment:
+- [NEEDS EVIDENCE] hardware/environment not cleanly extracted
+Static Reproducibility Materials:
+- Local requested path contains PDF evidence only; no README/config/script/data directory detected for this paper. [NEEDS ARTIFACT]
+Execution Status:
+- [EXECUTION NOT REQUESTED]
+What Is Measured:
+- evaluation, encompassing 12 commonly used OSS projects, 122 Common Vulnerabilities and Exposures (CVEs), and a total of 1,211 OSS versions.
+- This dataset comprised every patch released through Git with respect to those 122 CVEs.
+- On this dataset, V ERCATION demonstrated both higher precision (91.8%) and recall (94.5%) compared to state-of-the-art meth- ods (SOTAs), including V-SZZ [17], V0Finder [16], V1SCAN [27], VERJava [28] and Vision [29].
+- Utilizing the Few-shot and CoT combined strategy, DeepSeek-V3 achieved an F1 score of 93.1%, signiﬁ- cantly improving the F1 score of Joern parser [33] by 92.8%, a commonly-used static analysis tool.
+- More importantly, during the evaluation, we found 202 version errors in the NVD reports.
+- • We curated a dataset including 122 published CVEs con- taining 1,211 versions.
+- This extensive dataset was curated Authorized licensed use limited to: Huazhong University of Science and Technology.
+What Is Not Measured:
+- [NEEDS EVIDENCE]
+Agent Evidence Anchors: raw_extraction/full_text.txt; raw_extraction/section_text/*; raw_extraction/agent_index.json
+Writing Pattern:
+- Frame evaluation by RQs, dataset construction, baselines, then quantitative and case-study evidence.

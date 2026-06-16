@@ -1,0 +1,26 @@
+Approach DS_LINUX DS_GITHUB DS_APACHE Overall
+Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1 Prec. Rec. F1
+LLM4SZZ 0.595 0.584 0.590 0.611 0.460 0.525 0.5370.4120.467 0.590 0.538 0.563
+AgenticSZZ0.669 0.643 0.656 ∗ 0.715 0.713 0.714 ∗ 0.5900.4050.480 0.668 0.617 0.642 ∗
+time remains practical. Compared to RA-SZZ, which requires 78 seconds per case for refactoring
+detection [36], AgenticSZZ is faster while achieving substantially higher accuracy.
+Controlled comparison confirms that improvements mainly stem from the TKG-guided
+paradigm, not merely from recent advances in the underlying LLM.Since AgenticSZZ uses
+DeepSeek-V3.2 while LLM4SZZ employs GPT-4o-mini, one might question whether AgenticSZZ’s
+improvements are due to architectural contributions or simply a more capable LLM. To isolate the
+architectural impact, we conducted a controlled comparison (Table 4) where both approaches use
+DeepSeek-V3.2. LLM4SZZ with DeepSeek achieves comparable F1-scores to the original GPT-4o-
+mini version (e.g., 0.590 vs 0.588 on DS_LINUX), indicating that DeepSeek is at least as capable
+for this task. Comparing against this controlled baseline, AgenticSZZ achieves a 14.0% relative
+improvement in overall F1-score (0.642 vs 0.563), due to gains of 11.2% on DS_LINUX and 36.0% on
+DS_GITHUB. On DS_APACHE, both approaches achieve comparable F1-scores (0.480 vs 0.467),
+consistent with the blame complexity challenges discussed above. The best-vs-best comparison
+is statistically significant (McNemar’s test, 𝑝< 0.001, Cohen’s 𝑔= 0.27, large effect); even our
+worst run outperforms their best (𝑝< 0.001, 𝑔= 0.25), demonstrating that the TKG-guided search
+paradigm, not merely LLM capability or run variance, drives AgenticSZZ’s effectiveness.
+Summary of RQ1
+•AgenticSZZ outperforms all baselines with F1-score improvements up to 26.6%; even its worst run beats
+the best baseline (𝑝<0.001).
+•Controlled comparison confirms improvements stem from the TKG-guided paradigm, not LLM selection.
+Implication:Reframing BIC identification as graph search over a TKG advances the state-of-the-art.
+6.2 RQ2: What is the Contribution of Each AgenticSZZ Component?

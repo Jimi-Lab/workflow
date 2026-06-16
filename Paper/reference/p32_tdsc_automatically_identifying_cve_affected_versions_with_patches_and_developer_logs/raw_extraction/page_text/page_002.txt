@@ -1,0 +1,111 @@
+906 IEEE TRANSACTIONS ON DEPENDABLE AND SECURE COMPUTING, VOL. 21, NO. 2, MARCH/APRIL 2024
+to ﬁnd vulnerabilities that are guarded by complex conditions
+and do not manifest as crashes. The methods based on machine
+learning [22], [23], [24] rely on experts to manually deﬁne
+features and then use learning models to classify code with or
+without vulnerabilities. Due to the coarse code granularity, it
+is difﬁcult to determine the exact location of the vulnerability.
+The methods based on code similarity[20], [25] are difﬁcult to
+detect vulnerabilities that are not caused by code duplication, and
+the programs with similar vulnerable code are not necessarily
+vulnerable, which leads to inaccurate results. For a CVE, we aim
+to determine the boundary (e.g., the ﬁrst and the last vulnerable
+versions) of all vulnerable versions in theversion tree (i.e., a
+tree structure to organize all versions, with the major versions
+in the trunk and minor versions in the branches, introduced in
+Section IV). It is worth noting that we only pay attention to
+the vulnerabilities speciﬁed by CVEs, not all vulnerabilities of a
+version. Therefore, if a CVE vulnerability still exists in a version,
+we call it a vulnerable version.
+We conduct an in-depth large-scale analysis on the open-
+source code of the released versions, and systematically evaluate
+and determine the versions impacted by each CVE. For a given
+CVE, we divide the problem space into three steps. First, we
+determine the last vulnerable version in the version tree. Based
+on our study, we ﬁnd that unpatched code does not necessarily
+have a vulnerability, because it may have been ﬁxed in another
+way (calledrepatching). Second, we determine the last vulnera-
+ble version in each branch of the version tree. Third, some early
+versions may have gone through many updates, which is the
+reason forpartial matching(introduced in SectionII-B) between
+patches and source code. Accordingly, we design methods to
+identify the partial matching source code and provide more
+reliable results for the vulnerabilities. Especially, we use both
+patches and git logs to justify the ﬁrst version of the vulnerability.
+Finally, our work will not only put forward a new idea to
+justify theKnown Affected Software Conﬁgurationsof the NVD,
+but also reveal the special behaviors in patching vulnerable
+code.
+Contributions. Based on the developer logs and patches,
+our tool is dedicated to automatically generate a report with
+justiﬁcations to correct the Known Affected Software Conﬁg-
+urations of the NVD. Our work provides several contributions.
+First, our method builds all the software versions into a version
+tree according to their commit dependence. We can leverage
+the version tree to improve the accuracy and efﬁciency of our
+tool. By contrast, previous tools check each software version
+separately, which is hard to verify the detection results when they
+conﬂict with each other. Second, we propose a general method
+using patches and developer log information to verify which
+versions are really vulnerable and further determine the version
+number boundaries of the CVE vulnerabilities in the version
+tree, because developer logs provide more reliable evidence than
+patches only. The phenomena of repatching and partial matching
+are discovered and countermeasures are proposed. Finally, we
+rectiﬁed 11, 827 incorrect reports of Linux Kernel, and con-
+ﬁrmed that 94 patched versions lacked corresponding committed
+records in the changelogs. Our method can be applied for other
+open source software (e.g. Firefox, OpenSSL). In addition,
+we compare our tool to two very representative vulnerability
+detection tools using a number of versions randomly selected
+from ﬁve widely used open-source projects as the testing dataset.
+Our results show that these tools could not achieve high detection
+accuracy while our tool achieved 94.3% precision and 95.6%
+recall. Our work not only reports the incorrect vulnerability
+information of the NVD, but also provides important insights
+on such data sources for future vulnerability detection.
+II. BACKGROUND
+We ﬁrst introduce the background on security vulnerability
+reporting mechanisms, and then describe several basic require-
+ments for our tool.
+A. Vulnerability Reporting
+CVE and CVE-ID. CVE (Common Vulnerability Enumer-
+ation) is a list of records for publicly known cybersecurity
+vulnerabilities. Launched by MITRE in 1999 as a community
+effort, today it is used in many cybersecurity products and
+services from around the world. Each CVE record contains
+an identiﬁcation number (CVE-ID) (e.g., “CVE-2021-3564”),
+a description, at least one public reference[26]. When people
+ﬁnd a new vulnerability, they can request and obtain a unique
+CVE-ID from a CVE Numbering Authority (CNA)[27].
+NVD. NVD (National Vulnerability Database), launched by
+NIST (National Institute of Standards and Technology)[28],
+is a repository of standard vulnerability management data
+represented using the Secure Content Automation Protocol
+(SCAP) [29]. Built upon and fully synchronized with the CVE
+record List[26], the NVD in addition provides enhanced struc-
+tural information for each record such as ﬁx information, severity
+scores, and impact ratings in its vulnerability detail pages. After
+the initial vulnerability report, the information of the NVD may
+be manually updated[14]. For instance, for a new CVE, security
+patches may not be available in the time of releasing the CVE,
+but later on the links to the security patches can be added to its
+NVD page.
+Known Affected Software Conﬁgurations.Each vulnerability
+in the NVD has a vulnerability detail page, which contains
+a section calledKnown Affected Software Conﬁgurations(see
+Fig. 1(a)). It is used to show which software or combinations
+of software are considered vulnerable at the time of analysis.
+Corresponding to a given CVE-ID, it reports a list of versions
+impacted by the vulnerable source code. The NVD uses the
+Common Platform Enumeration (CPE) 2.3 speciﬁcation when
+creating these applicability statements and the matching CPE
+URI[s]. Applicability statements are a way to communicate
+which products are vulnerable in a relatively ﬂexible syntax[30].
+This was designed primarily for machines to process and thus is
+not easy for human readers to understand.
+B. Basic Requirements
+Our tool relies on both security patches and developer logs
+to provide evidence of the vulnerability of a version, so that we
+assume that security patches and developer logs are correct and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore.  Restrictions apply.

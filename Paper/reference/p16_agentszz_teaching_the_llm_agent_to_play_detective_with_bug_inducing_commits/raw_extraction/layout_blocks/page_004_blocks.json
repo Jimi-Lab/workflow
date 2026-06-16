@@ -1,0 +1,317 @@
+[
+  {
+    "page": 4,
+    "block_id": "page_004:block_001",
+    "block_type": "text",
+    "text": "Preprint, Under Submission, Arxiv Lyu et al.",
+    "bbox": [
+      53.79800033569336,
+      61.119380950927734,
+      558.2012939453125,
+      69.2159652709961
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_002",
+    "block_type": "text",
+    "text": "Table 1: Task-specific tools provided to the AgentSZZ agent. Parameters marked with * are required. These tools are de- signed to cover the key operations involved in tracing bug- inducing commits.",
+    "bbox": [
+      53.50199890136719,
+      82.26506042480469,
+      295.6475830078125,
+      127.17498779296875
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_003",
+    "block_type": "text",
+    "text": "Tool Parameters",
+    "bbox": [
+      59.709999084472656,
+      141.61534118652344,
+      158.5392608642578,
+      152.31121826171875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_004",
+    "block_type": "text",
+    "text": "git_show commit* , file_filter , stat_only , context_lines git_blame file_path* , commit , line_start , line_end git_log_s search_string* , path , after , before git_log_func function_name* , file_path* , after , before git_grep search_string* , commit , path",
+    "bbox": [
+      59.709999084472656,
+      155.2076416015625,
+      288.1329040527344,
+      206.07333374023438
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_005",
+    "block_type": "text",
+    "text": "bound for all subsequent search operations 2 . Finally, fix informa- tion, tool descriptions, domain knowledge, and search constraints are assembled into the initial context for the LLM agent 3 . ReAct Investigation Loop. The agent then enters a multi-turn investigation loop following the ReAct paradigm [ 48 ]. This iter- ative observe–reason–act cycle enables adaptive exploration of the repository, with observations and intermediate reasoning ac- cumulated across turns. We set a maximum of 15 turns, following prior agent-based approaches [ 22 , 37 , 45 ]. Given the initial con- text, the agent first analyzes the available information and plans the next action based on domain knowledge 4 . It then invokes one of the task-specific tools to interact with the repository and gather observations 5 . The tool output is subsequently processed by the context compression module to reduce token consumption",
+    "bbox": [
+      53.79800033569336,
+      224.0377960205078,
+      295.56195068359375,
+      378.8953552246094
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_006",
+    "block_type": "text",
+    "text": "6 . Based on the compressed observations, the agent evaluates candidate commits according to domain knowledge and updates its belief about the BIC 7 . This process repeats until the agent identifies a BIC candidate with sufficient evidence or reaches the turn limit, allowing it to iteratively refine its search and adapt its strategy when initial approaches prove unfruitful. Output. Once the agent identifies a BIC candidate or reaches the turn limit, it produces a structured output containing the predicted BIC hash, confidence level, and supporting reasoning. AgentSZZ then parses this output 8 and normalizes the commit hash 9 . The extracted hash is sanitized to remove non-hexadecimal characters and verified against the repository using git rev-parse . If the full hash cannot be resolved (e.g., due to hallucination), If no valid commit can be resolved, the prediction is discarded.",
+    "bbox": [
+      53.79800033569336,
+      377.4627990722656,
+      294.047119140625,
+      532.3203735351562
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_007",
+    "block_type": "text",
+    "text": "3.3 Task-Specific Tools",
+    "bbox": [
+      53.79800033569336,
+      540.1211547851562,
+      173.16537475585938,
+      554.7611694335938
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_008",
+    "block_type": "text",
+    "text": "Table 1 summarizes the five tools provided to the agent. Instead of exposing raw git commands, we design a task-specific interface that constrains the agent’s action space to operations relevant to bug-inducing commit identification. Tool Abstraction. An unrestricted git interface exposes hun- dreds of subcommands and flag combinations, many of which are ir- relevant to bug-inducing commit identification. We distill this space into five tools, each supporting a distinct operation in the investi- gation process (Section 3.1). git_blame traces line-level ownership to identify the commit that last modified a given line. git_show re- trieves the commit message and diff for semantic classification (e.g., distinguishing refactoring from bug inducing). git_log_s (pickaxe search) and git_log_func (function-level history) support tracing code origins across file renames and structural changes. git_grep",
+    "bbox": [
+      53.52899932861328,
+      554.7947998046875,
+      295.5628967285156,
+      709.6513671875
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_009",
+    "block_type": "text",
+    "text": "AgentSZZ Prompt",
+    "bbox": [
+      413.3330993652344,
+      86.31932830810547,
+      467.1148986816406,
+      94.16863250732422
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_010",
+    "block_type": "text",
+    "text": "## Tools",
+    "bbox": [
+      337.0245361328125,
+      110.58971405029297,
+      363.3630065917969,
+      118.43901824951172
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_011",
+    "block_type": "text",
+    "text": "## Workflow",
+    "bbox": [
+      336.4569091796875,
+      173.46263122558594,
+      376.5103759765625,
+      181.3119354248047
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_012",
+    "block_type": "text",
+    "text": "## Tool Rules",
+    "bbox": [
+      335.7887878417969,
+      265.7320556640625,
+      377.5766296386719,
+      273.58135986328125
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_013",
+    "block_type": "text",
+    "text": "You are an expert at identifying Bug-Introducing Commits (BICs) in the software repositories. Given a fix commit, find the commit that originally introduced the bug.",
+    "bbox": [
+      337.02459716796875,
+      97.67532348632812,
+      544.6303100585938,
+      110.17456817626953
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_014",
+    "block_type": "text",
+    "text": "### Step 1: git_blame at fix~1 <Trace the changed lines to their last modifier> ### Step 2: Evaluate Blame Results <Classify: refactor → penetrate | introduction → BICambiguous → counterfactual test> ### Step 3: Report <Confirm causal link, output BIC with evidence> <r> BIC: <full_commit_hash> confidence: <high|medium|low> type: <introduction|omission|cross_file|refactor_penetration> reasoning: <brief explanation> </r> (The full workflow prompt is available in our replication package.)",
+    "bbox": [
+      336.2353210449219,
+      181.26177978515625,
+      546.0112915039062,
+      263.9569091796875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_015",
+    "block_type": "text",
+    "text": "- git_log_s: include a path when possible; broaden only if empty. Use the fix commit date as the `before` upper bound — the BIC must predate the fix. - git_show on large commits: use file_filter. - Do not git_show the same commit more than twice. - Timeout →retry with narrower parameters. - file_filter returns \"no changes\" →file was at a different path in that commit. Try git_show WITHOUT file_filter to see the actual paths, or blame at commit~1.",
+    "bbox": [
+      335.5297546386719,
+      274.47265625,
+      546.1752319335938,
+      315.74072265625
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_016",
+    "block_type": "text",
+    "text": "1. **git_show(commit, context_lines, stat_only, file_filter)** — View commit message",
+    "bbox": [
+      336.78839111328125,
+      118.28424072265625,
+      546.12841796875,
+      125.02973175048828
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_017",
+    "block_type": "text",
+    "text": "and diff. Use file_filter for one file's changes in large commits. 2. **git_blame(file_path, commit, line_start, line_end)** — Show which commit last modified each line. 3. **git_log_s(search_string, path, after, before, use_regex, max_commits)** — Search commits by added/removed string (-S) or diff pattern (-G). 4. **git_log_func(function_name, file_path, after, before, max_commits)** — Track function body change history. 5. **git_grep(search_string, commit, path)** — Search codebase at a commit snapshot.",
+    "bbox": [
+      335.5297546386719,
+      124.03802490234375,
+      547.3213500976562,
+      171.05982971191406
+    ],
+    "reading_order": 17,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_018",
+    "block_type": "text",
+    "text": "Figure 2: Prompt for AgentSZZ, encoding domain knowl- edge for Bug-Inducing Commit (BIC) investigation.",
+    "bbox": [
+      317.9549865722656,
+      330.6020812988281,
+      559.8047485351562,
+      353.593994140625
+    ],
+    "reading_order": 18,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_019",
+    "block_type": "text",
+    "text": "searches the codebase at a specific revision to locate definitions, call sites, and cross-file references. All five tools wrap standard Git commands ( git blame , git show , git log -S , git log -L , and git grep ), but are exposed as function-calling schemas via the API tools parameter, restricting the agent to invoking only these predefined operations with schema-conforming arguments. Scoped Parameters. Each tool exposes a focused set of pa- rameters that constrain its output scope, enabling more targeted queries. git_blame supports line_start and line_end to focus on modified lines, while git_show provides a file_filter to re- strict diff output to specific files. The search tools ( git_log_s , git_log_func ) support temporal scoping via date parameters, al- lowing exploration within relevant history. git_grep accepts a commit parameter to search the codebase at a specific revision, and a path filter to narrow results to relevant directories. These param- eters remain optional, allowing the agent to apply them based on context while preserving flexibility within a bounded search space.",
+    "bbox": [
+      317.6409912109375,
+      375.7198181152344,
+      559.72119140625,
+      563.453369140625
+    ],
+    "reading_order": 19,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_020",
+    "block_type": "text",
+    "text": "3.4 Domain Knowledge",
+    "bbox": [
+      317.9549865722656,
+      572.9981689453125,
+      440.3660583496094,
+      587.63818359375
+    ],
+    "reading_order": 20,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 4,
+    "block_id": "page_004:block_021",
+    "block_type": "text",
+    "text": "The agent’s investigation is guided by a structured execution prompt that encodes domain knowledge distilled from our design process (Section 3.1) and existing literature. The prompt of AgentSZZ (Fig. 2) consists of three components: a task description, tool spec- ifications (Section 3.3), and domain knowledge that defines both high-level investigation guidance and operational rules. textbfInvestigation Workflow. The domain knowledge encodes a three-step investigation strategy as high-level guidance, while the agent retains full autonomy over tool selection, invocation order, and query parameters at each step. Step 1 (Entry point selection). The domain knowledge recommends starting with git_blame on",
+    "bbox": [
+      317.6860046386719,
+      587.6707763671875,
+      559.7312622070312,
+      709.6513671875
+    ],
+    "reading_order": 21,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

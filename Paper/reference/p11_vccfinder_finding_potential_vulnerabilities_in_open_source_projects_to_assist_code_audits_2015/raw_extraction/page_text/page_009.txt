@@ -1,0 +1,122 @@
+5.1 Case Study
+The previous section shows the precision of our approach
+for the diﬀerent levels of recall. In practice, developers can
+simply decide how many commits they can aﬀord (time-
+and cost-wise) to review and VCCFinder will improve their
+chances of finding vulnerabilities. For the sake of comparison
+with Flawfinder, we now set VCCFinder’s recall to the same
+as that of Flawfinder (i.e. 0.24 cf. Table 4) and discuss
+some examples of the VCCs which would have been flagged
+by VCCFinder if it had been run from 2011 to 2014 6. In
+these four years, VCCFinder would only have flagged 89
+out of 79688 commits for manual review compared to 5,513
+commits flagged by Flawfinder. We believe this is a very
+manageable amount of code reviews to ask reviewers to do
+for a high return. Additionally, projects can increase the
+number of commits to review at any time. In the following,
+we present an excerpt of the vulnerabilities that VCCFinder
+found, when set at the very conservative level of Flawfinder’s
+recall. We also discuss which features our classifier used to
+spot the VCCs.
+CVE-2012-2119.
+Commit 97bc3633be includes a buﬀer overflow in the mac-
+vtap device driver in the Linux kernel before 3.4.5, when run-
+ning in certain configurations, allows privileged KVM guest
+users to cause a denial of service (crash) via a long descrip-
+tor with a long vector length 7. Considering metadata, our
+SVM detects this commit because of the edited file’s high
+code churn, and because the author made few contributions
+to the Kernel in combination with the fact the the developer
+used sockets.
+CVE-2013-0862.
+FFmpeg commit 69254f4628 introduces multiple integer
+overflows in the process
+frame obj function in libavcodec /
+sanm.c in FFmpeg before 1.1.2 that allow remote attackers
+to have an unspecified impact via crafted image dimensions
+in LucasArts Smush video data, which triggers an out-of-
+bounds array access 8. The SVM detected that the author
+contributed little to the project before as well as that the
+commit inserted a large chunk of code at once.
+CVE-2014-1438.
+In commit 1361b83a13, the restore
+fpu checking function
+in arch/x86/include/asm/fpu-internal.h in the Linux ker-
+nel before 3.12.8 on the AMD K7 and K8 platforms does
+not clear pending exceptions before proceeding to an EMMS
+instruction, which allows local users to cause a denial of
+service (task kill) or possibly gain privileges via a crafted
+application.9 The SVM detected a high amount of excep-
+tions, a high number of changed code, inline ASM code, and
+variables containing user input such as __input and user.
+6As previously mentioned we use the years 2011-2014 as the
+test dataset, since we have ground truth data on which to
+base the discussion.
+7http://cve.mitre.org/cgi-bin/cvename.cgi?name=
+CVE-2012-2119
+8http://cve.mitre.org/cgi-bin/cvename.cgi?name=
+CVE-2013-0862
+9https://cve.mitre.org/cgi-bin/cvename.cgi?name=
+CVE-2014-1438
+CVE-2014-0148.
+In commit e8d4e5ffdb of Qemu the block driver for Hyper-
+V VHDX Images is vulnerable to infinite loops and other po-
+tential issues when calculating BAT entries. This is due to
+missing bounds checks for block size and logical sector size
+variables10. The SVM found that the patch of the VCC
+included many keywords indicating errorprone byte manip-
+ulation, such as “opaque”, “*bs”, or “bytes”.
+5.2 Flagged Unclassified Commits
+While we discussed the known true positive hits of our
+classifier for the years 2011 to 2014 above, we also have
+36 commits that were flagged as potentially dangerous, for
+which we have no known CVE. These are commits that need
+be checked by code reviewers. We have shared our results
+with several code reviewing teams and will follow responsible
+disclosure in all cases, so we cannot discuss the flagged com-
+mits at this time. However, we can already talk about one
+vulnerability found by VCCFinder in commit d08d7142fd
+of the FFmpeg project, since this vulnerability was fixed in
+commit cca1a42653 before it ever was released. Thus, dis-
+cussing the findings poses no harm to the FFmpeg project.
+Commit d08d7142fd of FFmpeg introduces a new codec
+for Sierra Online audio files and Apple QuickDraw and was
+flagged in the 101 commits, but is not associated with a
+CVE. However, we discovered that in the newly created file
+libavcodec/qdrw.c, starting at line 72, the author does not
+check the size of an integer read from an adversary-supplied
+buﬀer.
+for ( i = 0 ; i <= c o l o r s ; i++) {
+int idx ;
+idx = BE
+16 ( buf ) ; /∗ c o l o r index ∗/
+buf += 2 ;
+a−>p a l e t t e [ idx ∗ 3 + 0 ] = ∗buf++;
+buf++;
+a−>p a l e t t e [ idx ∗ 3 + 1 ] = ∗buf++;
+buf++;
+a−>p a l e t t e [ idx ∗ 3 + 2 ] = ∗buf++;
+buf++;
+}
+The macro BE_16() reads two bytes from the argument
+and returns an unsigned 16 bit integer. This means that an
+adversary controlling buf (e.g. through a malicious video)
+could address 3 ·65535 bytes of memory which will be filled
+by data from buf itself.
+The SVM classified the commit because of raw byte ma-
+nipulation, indicated by uses of “buf” as well as an inexpe-
+rienced committer pushing a large chunk of code at once.
+5.3 Comparison to Flawfinder
+We compare our findings against Flawfinder [34] version
+1.31, a static source code scanner. Flawfinder is a mature
+open-source tool that has been under active development
+since 2001 and fulfills the requirements of being able to pro-
+cess C and C++ code on the level of commits. When given
+a source file, Flawfinder returns lines with suspected vul-
+nerabilities. It oﬀers a short explanation of the finding as
+well as a link to the Common Weakness Enumeration (CVE)
+database.11 For the comparison, we run Flawfinder on each
+10https://bugzilla.redhat.com/show_bug.cgi?id=
+1078212
+11http://cwe.mitre.org/
+434

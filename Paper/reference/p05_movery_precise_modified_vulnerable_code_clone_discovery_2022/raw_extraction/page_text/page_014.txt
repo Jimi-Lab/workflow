@@ -1,0 +1,104 @@
+Use of the oldest vulnerable function. When generating sig-
+natures, MOVERY considers the oldest vulnerable function to
+address internal OSS modifications. In fact,MOVERY can use
+any older version’s vulnerable function whose syntax differs
+from the disclosed vulnerable function; the reason for select-
+ing the oldest one is to cover more internal modifications.
+We introduce the rationale behind considering only the
+common code line between the oldest ( fo) and disclosed vul-
+nerable functions ( fd). Suppose we want to extract essential
+vulnerable code lines (see Section 3.1) from the vulnerable
+functions. Such essential vulnerable code lines can (1) exist
+in both fo and fd, (2) not exist in both fo and fd, or (3) exist
+in either one. Let vo be the oldest vulnerable version, and vd
+be the latest (i.e., disclosed) vulnerable version. Here we can
+make two inferences. First, if the essential vulnerable code
+lines do not exist in both fo and fd, then vo and vd should be
+excluded from the versions affected by vulnerability. Next, if
+the essential vulnerable code lines exist only in fd and not in
+fo, then vo should be left out of the affected versions.
+Based on these inferences, we can conclude that the es-
+sential vulnerable code lines are simultaneously included in
+fo and fd as long as the version information affected by the
+vulnerability includes both vo and vd. In this context, we can
+justify our approach as long as the NVD, which is our data
+source (see Section 4.1), provides correct CPE.
+Vulnerability disclosure. We reported 14 triggerable VCCs
+(e.g., using Proofs-of-Concept), which were discovered in
+the target software such as Git and OpenMVG, and in other
+popular OSS projects such as LibA V and LibGDX, to the
+development teams; it is noteworthy that 10 out of 14 VCCs
+were discovered only in MOVERY and not in previous VCC
+discovery techniques (e.g., [14, 17, 49]).
+(1) Vulnerability confirmed.Nine development teams con-
+firmed our vulnerability reports, of which two of them
+were patched, and another two of them will be resolved.
+(2) Under discussions. For the remaining five cases, we are
+still discussing or waiting for answers (e.g., LibA V and
+OpenMVG), of which one pull request is pending.
+Other VCCs that have not yet been successfully reproduced
+are on hold to report because we can hardly receive a response
+from the development teams even if reported. We will not
+disclose any VCCs until a security patch is applied, and we
+plan to trigger such VCCs with the help of a collaborator or
+refer to the related approaches (e.g., [18, 27]) for triggering a
+propagated vulnerability; if a VCC is successfully reproduced,
+we will immediately report it to the development team.
+Limitations. MOVERY leverages some assumptions that can
+limit its application. First,MOVERY can discover VCCs when
+the source code for the target software is available; if the
+control and data dependencies of functions in a binary can be
+accurately investigated, we expect that the methodology of
+MOVERY may be applied to binary-level VCC discovery.
+Second, NVD may provide incorrect CPEs for some
+CVEs [8,47], which could impair the accuracy of reconstruct-
+ing older vulnerable functions. Although we manually verified
+the CPEs (see Section 4.1), this is inefficient for practical use,
+and if the correct version range (CPEs) of a vulnerability is
+provided, the effectiveness of MOVERY will be improved.
+Third, MOVERY considers vulnerabilities within functions
+and cannot discover VCCs whose patches are out of functions
+(e.g., inter-functional or C preprocessor-dependent vulnera-
+bilities). Because MOVERY considers a function as a basic
+unit, it cannot address C preprocessor-dependent vulnerabili-
+ties, but we are considering addressing inter-functional vul-
+nerabilities by including the correlation information of such
+inter-functions (e.g., inter-function data flows) into signatures.
+Last, even if we set θ to extremes (i.e., 0 and 1), MOVERY
+still produces 4 FNs and 3 FPs; FNs were caused by VCCs
+with similar semantics but syntactically changed code, and
+FPs were produced owing to the syntactically similar func-
+tions with different patches applied (see Section 5.1). If
+MOVERY can handle Type-4 clones and if abstraction is not
+used, such FNs and FPs can be reduced, respectively. How-
+ever, this may rather compromise the scalability and accuracy
+of MOVERY . Therefore, we retain the current MOVERY ap-
+proach, which showed much superior performance than the
+existing approaches, and leave solving FPs and FNs that are
+independent of θ for future work.
+7 Related Work
+In this section, we introduce a number of related techniques.
+Code clone detection techniques. There are numerous tech-
+niques attempting to detect code clones (e.g., [4,10,15,16,24,
+28, 29, 33–36, 41, 42]). However, their concern is not discov-
+ering a vulnerable code clone; because such techniques do
+not consider the vulnerability characteristics, they yield many
+FPs when applied to VCC discovery [17, 49].
+Software composition analysis techniques. Several tech-
+niques attempt to identify OSS components in the target soft-
+ware (e.g., [2, 9, 21, 25, 39, 48, 51, 52]); some of these can
+be applied to discover known vulnerabilities in OSS compo-
+nents. For example, Duan et al. [9] proposed OSSPolice to
+identify 1-day security vulnerabilities from the libraries of an
+Android application. OSSPolice utilized constant features to
+extract the versions of libraries, and determined if vulnerable
+versions were used in the target Android application. Zhan
+et al. [51] proposed ATVHunter to precisely detect versions
+of third-party libraries by using the control flow informa-
+tion of an Android application. Using the identified versions,
+ATVHunter verified whether the target application contained
+known security vulnerabilities. However, if developers back-
+port security patches to the vulnerability or do not reuse the
+vulnerable code, these techniques produce FPs (see Section
+5.3). Hence, they are insufficient to solve our target problem.
+USENIX Association 31st USENIX Security Symposium    3049

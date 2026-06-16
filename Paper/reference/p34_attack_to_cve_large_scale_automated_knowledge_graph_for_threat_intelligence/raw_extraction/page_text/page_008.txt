@@ -1,0 +1,111 @@
+Operationally , this structure accelerates common workﬂows:
+pivoting from techniques to groups for threat hunting and
+reporting; expanding to tools/malware for behavioral detec-
+tions and emulation; and anchoring prevention plans by map-
+ping courses of action to control requirements and relevant
+telemetry . In practice, the technique-centric view becomes a
+repeatable playbook for prioritization, detection engineering,
+and defensive validation—grounded in explicit, queryable re-
+lationships that remain current through automated updates.
+C. Group to W eakness and V ulnerability Mapping
+Our knowledge graph enables automatic extraction of the
+CWE classes and concrete CVE vulnerabilities that any
+given intrusion set is positioned to exploit. Starting from
+an intrusion_set, we traverse intrusion_set →
+attack_pattern ↔ capec ↔ cwe → cve. For each
+attack technique, we preserve provenance (which CAPEC pro-
+duced which CWE) and compute the union of CWE identiﬁers
+per technique. When required, we extend further by one hop to
+enumerate the corresponding CVEs. The summarized outputs
+for two representative groups– Scattered Spider (G1015) and
+V olt T yphoon (G1017)—are shown in T ables III, and IV, with
+corresponding path visualizations in Figs. 10 and 11.
+Scattered Spider (G1015) is a ﬁnancially motivated intrusion
+set notorious for its social-engineering expertise. In September
+2023, the group was behind the MGM Resorts breach, where
+operators successfully tricked a helpdesk employee into reset-
+ting credentials, leading to a multi-day outage that disrupted
+hotel operations and slot machines in Las V egas [20]. Despite
+many of its members reportedly being teenagers, Scattered
+Spider has demonstrated advanced persistence by bypassing
+MF A protections and abusing trust relationships.
+T able III summarizes how Scattered Spider’s techniques
+map through CAPEC patterns to software weaknesses. A
+closer look at the ﬁrst two rows illustrates the dynamics:
+• T1018 (Remote System Discovery) links via CAPEC-292
+to CWE-200 (Exposure of Sensitive Information to an
+Unauthorized Actor), highlighting how adversaries in G1015
+abuse weaknesses in information exposure to enumerate
+networked assets and identify targets for lateral movement.
+• T1083 (File and Directory Discovery) aggregates CAPEC-
+127 and CAPEC-497, yielding a diverse set of CWEs such
+as CWE-732 (Incorrect Permission Assignment), CWE-
+693 (Protection Mechanism Failure), and CWE-425 (Direct
+Request). This breadth shows that Scattered Spider leverages
+multiple ﬁle-system and access-control weaknesses to gain
+insight into system conﬁgurations and stored assets.
+Beyond reconnaissance, techniques such as T1539 (Steal W eb
+Session Cookie) connect through CAPEC-31 to a large family
+of weaknesses, including CWE-311 (Missing Encryption of
+Sensitive Data) and CWE-642 (External Control of Critical
+State Data), indicating the group’s ability to abuse poor
+session and credential protections. Likewise, T1553.002 (Sub-
+vert Code Signing) and T1556.006 (Modify Authentication
+Process) map to critical weaknesses in trust boundaries (e.g.,
+T ABLE III
+A TT&CK T E C H N I QU E S W I T H RE L AT E D CAPEC S A N D CWE S F O R
+IN T RU S I O N SE T - S C AT T E R E D SP I D E R (G1015)
+Attack
+T echnique CAPEC IDs CWE IDs
+T1018 292 200
+T1083 127, 497 732, 693, 425, 424, 288, 285, 276, 200
+T1217 169 200
+T1539 31 642, 602, 565, 539, 472, 384, 315, 311,
+302, 20, 113
+T1552.001 191 798
+T1552.004 485, 474 330, 522
+T1553.002 206, 68 732, 328, 325, 1326
+T1556.006 578 284
+CWE-284: Improper Access Control), underscoring Scattered
+Spider’s focus on authentication and persistence mechanisms.
+V olt T yphoon (G1017) is a Chinese state-sponsored threat
+group disclosed in 2023 for its long-term inﬁltration of U.S.
+critical infrastructure networks, including telecommunications,
+energy , transportation, and water systems [21]. The group
+is distinguished not by immediate data theft but by “pre-
+positioning” — maintaining covert access and deploying mal-
+ware in ways that could enable sabotage during a U.S.–China
+conﬂict. Intrusions have even been discovered on Guam, a
+strategic U.S. territory in the Paciﬁc, raising concerns about
+operational resilience in crisis scenarios.
+T able IV presents V olt T yphoon’s mappings through
+CAPEC patterns to CWEs. One technique stands out:
+• T1005 (Data from Local System) connects through CAPECs
+37, 204, 545, 647 to an extensive set of CWEs, includ-
+ing CWE-1239 (Improper Zeroization), CWE-1258 (Sensi-
+tive Information Uncleared Before Release), and CWE-311
+(Missing Encryption of Sensitive Data). This large mapping
+demonstrates that V olt T yphoon’s ability to retrieve sensi-
+tive artifacts from local systems is rooted in wide-ranging
+systemic failures in data handling and conﬁdentiality .
+• T1078 (V alid Accounts) maps via CAPEC-560 to CWEs
+such as CWE-262 (Not Using Password Aging), CWE-
+263 (Password Aging with Insufﬁcient Complexity), and
+CWE-654 (Reliance on a Single Factor), underscoring the
+group’s reliance on credential abuse and insufﬁcient account
+protection as a persistence vector.
+Other reconnaissance-oriented techniques—including T1007
+(System Service Discovery), T1016 (System Network Con-
+ﬁguration Discovery), and T1018 (Remote System Discov-
+ery)—again concentrate on CWE-200 (Information Exposure),
+mirroring patterns observed with Scattered Spider. Meanwhile,
+techniques such as T1083 (File and Directory Discovery) and
+T1505.003 (W eb Shell) connect to broader CWE sets (e.g.,
+CWE-732, CWE-287, CWE-553), illustrating V olt T yphoon’s
+use of misconﬁgured permissions and inadequate service con-
+trols to deepen operational footholds.
+Beyond the CWE-level mappings, extending one additional
+hop in the graph yields the concrete CVE vulnerabilities
+associated with each intrusion set. For example, in the cases of
+G1015 and G1017, the resulting mappings are visualized in
+Figs. 12 and 13, where the diagrams displayed with fewer

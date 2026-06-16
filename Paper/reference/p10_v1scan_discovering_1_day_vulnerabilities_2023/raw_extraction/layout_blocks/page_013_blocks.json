@@ -1,0 +1,137 @@
+[
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:001",
+    "block_type": "text",
+    "text": "quired. We reported two vulnerabilities to the LibGDX team\nin March 2022. They confirmed our report and immediately\napplied the security patches to their codebase.\nV1SCAN also detected vulnerabilities in other software,\nincluding OpenMVG, FreeBSD, and Disque. We reported\nthe vulnerabilities to the respective development teams; the\nFreeBSD team responded that they would fix the vulnerability\nin the subsequent versions. Patch requests are currently pend-\ning for the four cases, despite our multiple reports. Nonethe-\nless, we observed that V1SCAN could be effectively used for\nvulnerability detection in real-world software programs.",
+    "bbox": [
+      53.75,
+      72.76,
+      295.78,
+      204.31
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:002",
+    "block_type": "text",
+    "text": "Limitations. V1SCAN makes several assumptions that limit\nits application.\nFirst, V1SCAN can be applied only when the source code\nof the target program is available.\nSecond, although V1SCAN outperformed the existing ap-\nproaches, it may fail to detect several vulnerabilities. A typical\nexample other than those introduced in Section 5.1 is the vul-\nnerability in which CPE is incorrectly provided and, at the\nsame time, reused with significant code changes. To address\nthis problem, we can devise a CPE verification technique\n(e.g., [6,8,35]) or apply a more relaxed code-based approach.\nHowever, the former is beyond the scope of this paper, and par-\nticular caution is needed, as the latter may produce more FPs.\nAdditionally, while V1SCAN can handle the syntax diversity\nof vulnerable codes, it may not detect propagated vulnerable\nfunctions that do not contain the code lines deleted in the\npatch. This is a result of our decision to avoid potential FPs\n(Section 5.1), but it may result in the reporting of several FNs.\nThird, V1SCAN may not be able to filter code vulnerabil-\nities resolved by security patches applied by the developers\nthemselves. To solve this problem, we are considering apply-\ning semantic analysis to vulnerable and patched codes.\nFinally, the accuracy of V1SCAN can be affected by the\nperformance of external tools. For example, CENTRIS can\nincorrectly identify components, causing V1SCAN to produce\nFPs. In addition, FPs and FNs may be generated owing to the\nselected function parser and LSH algorithm (see Section 5.1).\nIf this becomes an issue, V1SCAN can be plugged into other\ntools to enhance the vulnerability discovery accuracy.",
+    "bbox": [
+      53.64,
+      207.91,
+      295.87,
+      555.01
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:003",
+    "block_type": "text",
+    "text": "7\nRelated work",
+    "bbox": [
+      54.0,
+      568.38,
+      140.54,
+      583.93
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:004",
+    "block_type": "text",
+    "text": "Software composition analysis. Several approaches have\nattempted to detect third-party OSS components reused in\ntarget programs (e.g., [2, 9, 17, 20, 28, 36, 40, 41]); some of\nthese can be used to detect vulnerabilities. Woo et al. [36] pre-\nsented CENTRIS to identify the modified OSS components in\na target program. It significantly reduces false alarms in com-\nponent identification by considering only the unique parts of\nthe OSS through code segmentation. Duan et al. [9] proposed\nOSSPolice to identify 1-day vulnerabilities from the third-\nparty libraries of an Android application. It utilizes constant\nfeatures to extract library versions, and determines whether",
+    "bbox": [
+      54.0,
+      590.55,
+      295.78,
+      722.47
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:005",
+    "block_type": "text",
+    "text": "vulnerable versions were used in the target application. Zhan\net al. [40] proposed ATVHunter to precisely detect versions of\nthird-party libraries using the control flow graph of the appli-\ncation. Based on the identified versions, they verified whether\nthe target application contained known vulnerabilities.\nHowever, their goal was to precisely identify the compo-\nnents, and they did not fully consider OSS modifications for\nvulnerability detection. Therefore, they may produce many\nfalse alarms in our problem situations (see Section 5.1).",
+    "bbox": [
+      317.63,
+      72.76,
+      559.66,
+      180.4
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:006",
+    "block_type": "text",
+    "text": "Vulnerable code detection. Several approaches have at-\ntempted to discover vulnerable code in target programs (e.g.,\n[3, 12, 14, 34, 37]). Jang et al. [12] proposed ReDeBug, a\ntoken-level vulnerable code clone detection approach that\nuses a sliding window technique. Kim et al. [14] presented\nVUDDY, a function-level vulnerable code clone detection ap-\nproach that can scalably detect 1-day vulnerabilities. Bowman\net al. [3] proposed VGRAPH, a code property graph based\nvulnerable code detection approach that is robust to code\nmodification. Xiao et al. [37] presented MVP, a recurring\nvulnerability detection approach, which can discover vulner-\nable code that recurs with different syntax. Woo et al. [34]\nproposed MOVERY, an approach that can precisely detect\nmodified vulnerable code clones.\nAlthough their goals are similar to ours, they did not con-\nsider vulnerable code whose code has changed significantly\nowing to the modified OSS reuse, which led to the production\nof false negatives when applied to our target problem. Also,\nthey cannot counteract vulnerabilities that exist outside of the\nselected granularity (see Section 5.1 and Section 6). Other\napproaches have attempted to detect vulnerabilities based on\nlearning algorithms (e.g., [18,19]). These approaches can be\napplied to discover general vulnerable code; however, they\nare not applicable for detecting 1-day vulnerabilities.",
+    "bbox": [
+      317.52,
+      183.99,
+      559.66,
+      471.33
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:007",
+    "block_type": "text",
+    "text": "Code clone detection. Many approaches attempted to detect\ncode clones (e.g., [4,13,24–27,31]). However, as verified in\nthe previous studies (e.g., [14,37]), they generate numerous\nfalse alarms when applied to detect vulnerable code. Hence,\nthey cannot be directly applied to solving our target issue.",
+    "bbox": [
+      317.88,
+      474.92,
+      559.25,
+      535.1
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:008",
+    "block_type": "text",
+    "text": "8\nConclusion",
+    "bbox": [
+      317.88,
+      552.46,
+      392.95,
+      568.01
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "partial"
+  },
+  {
+    "page": 13,
+    "block_id": "p10_v1scan_discovering_1_day_vulnerabilities_2023:block:013:009",
+    "block_type": "text",
+    "text": "Detecting known security vulnerabilities in third-party OSS\ncomponents is the first step toward achieving secure software.\nIn this regard, we presented V1SCAN, which is a precise ap-\nproach for detecting 1-day vulnerabilities from modified OSS\ncomponents in a target program. V1SCAN significantly out-\nperformed existing approaches in terms of 1-day vulnerability\ndiscovery accuracy by consolidating version- and code-based\napproaches, along with the reused code classification and\nvulnerable code classification techniques. Equipped with the\nvulnerability detection results of V1SCAN, developers can\nmitigate the potential risks imposed by modified third-party\nOSS reuse, rendering a safer software ecosystem.",
+    "bbox": [
+      317.63,
+      578.99,
+      559.75,
+      722.5
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "partial"
+  }
+]

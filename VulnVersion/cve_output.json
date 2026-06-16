@@ -1,0 +1,384 @@
+{
+  "schema_version": "vet_case_review.v1",
+  "cve_id": "CVE-2021-39212",
+  "repo": "ImageMagick",
+  "fix_commits": [
+    "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+    "01faddbe2711a4156180c4a92837e2f23683cc68"
+  ],
+  "patch_type": "mixed",
+  "deterministic_seed": "unknown_requires_manual_review",
+  "review_status": "reviewed",
+  "vet_archetype": "added_guard",
+  "root_cause_summary": "ImageMagick failed to enforce the module-domain policy (policy.xml: <policy domain=\"module\" rights=\"none\" pattern=\"...\"/>) in three code paths responsible for loading and registering image coders. (1) RegisterStaticModules() in MagickCore/static.c had zero policy authorization before invoking register_module() for each built-in coder, so all static modules including Postscript (PS/EPI/EPS/EPSF/EPSI) were registered unconditionally at startup regardless of policy.xml restrictions. (2) RegisterStaticModule() used rights=ReadPolicyRights — a single-right check that only verified Read authorization, but a module policy with rights=\"none\" should block both Read and Write. This single-right check was insufficient to prevent module registration when the admin intended to deny all access. (3) OpenModule() in MagickCore/module.c used the same insufficient rights=ReadPolicyRights, allowing dynamic module loading even under a \"none\" module policy. The consequence: Postscript files could be read and written even when explicitly excluded by a <policy domain=\"module\" rights=\"none\" pattern=\"PS\" /> directive.",
+  "fix_summary": "Commit 35893e7ca (\"Added missing policy checks in RegisterStaticModules\") added the missing IsRightsAuthorized guard to RegisterStaticModules() and changed RegisterStaticModule()'s rights from ReadPolicyRights to AllPolicyRights (an intermediate/overbroad step). Commit 01faddbe2 (\"Use the correct rights\") corrected all three functions: OpenModule(), RegisterStaticModule(), and RegisterStaticModules() to use rights=ReadPolicyRights|WritePolicyRights instead of AllPolicyRights or ReadPolicyRights; it also added proper PolicyRights variable declaration and initialization in RegisterStaticModules(). The final fixed state across both commits is: every module registration/loading path checks IsRightsAuthorized(ModulePolicyDomain, ReadPolicyRights|WritePolicyRights, module_name) before allowing the module to register or load.",
+  "theta": {
+    "Scope": {
+      "files": [
+        "MagickCore/module.c",
+        "MagickCore/static.c"
+      ],
+      "functions": [
+        "OpenModule",
+        "RegisterStaticModule",
+        "RegisterStaticModules"
+      ],
+      "components": [
+        "Module policy enforcement subsystem"
+      ],
+      "source_refs": [
+        {
+          "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/static.c:git_snapshot:283-303",
+          "kind": "git_snapshot",
+          "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+          "file_path": "MagickCore/static.c",
+          "function_context": "RegisterStaticModules",
+          "line_start": 283,
+          "line_end": 303,
+          "snippet": "MagickExport void RegisterStaticModules(void)\n{\n  size_t extent;\n  ssize_t i;\n  extent=sizeof(MagickModules)/sizeof(MagickModules[0]);\n  for (i=0; i < (ssize_t) extent; i++)\n  {\n    if (MagickModules[i].registered == MagickFalse)\n      {\n        (void) (MagickModules[i].register_module)();\n        MagickModules[i].registered=MagickTrue;\n      }\n  }\n}",
+          "strength_hint": "certificate_candidate"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/static.c:git_snapshot:240-249",
+          "kind": "git_snapshot",
+          "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+          "file_path": "MagickCore/static.c",
+          "function_context": "RegisterStaticModule",
+          "line_start": 240,
+          "line_end": 249,
+          "snippet": "  p=GetCoderInfo(module,exception);\n  if (p != (CoderInfo *) NULL)\n    (void) CopyMagickString(module_name,p->name,MagickPathExtent);\n  rights=ReadPolicyRights;\n  if (IsRightsAuthorized(ModulePolicyDomain,rights,module_name) == MagickFalse)\n    {\n      errno=EPERM;\n      ...",
+          "strength_hint": "certificate_candidate"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/module.c:git_snapshot:1255-1262",
+          "kind": "git_snapshot",
+          "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+          "file_path": "MagickCore/module.c",
+          "function_context": "OpenModule",
+          "line_start": 1255,
+          "line_end": 1262,
+          "snippet": "  p=GetCoderInfo(module,exception);\n  if (p != (CoderInfo *) NULL)\n    (void) CopyMagickString(module_name,p->name,MagickPathExtent);\n  rights=ReadPolicyRights;\n  if (IsRightsAuthorized(ModulePolicyDomain,rights,module_name) == MagickFalse)\n    {\n      errno=EPERM;\n      ...",
+          "strength_hint": "certificate_candidate"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:01faddbe2711:MagickCore/static.c:git_diff:4001-4008",
+          "kind": "git_diff",
+          "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+          "file_path": "MagickCore/static.c",
+          "function_context": "RegisterStaticModule",
+          "line_start": 240,
+          "line_end": 246,
+          "snippet": "-  rights=AllPolicyRights;\n+  rights=ReadPolicyRights|WritePolicyRights;",
+          "strength_hint": "priority"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:01faddbe2711:MagickCore/module.c:git_diff:3004-3005",
+          "kind": "git_diff",
+          "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+          "file_path": "MagickCore/module.c",
+          "function_context": "OpenModule",
+          "line_start": 1258,
+          "line_end": 1258,
+          "snippet": "-  rights=AllPolicyRights;\n+  rights=ReadPolicyRights|WritePolicyRights;",
+          "strength_hint": "priority"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:35893e7cad78:MagickCore/static.c:git_diff:1004-1005",
+          "kind": "git_diff",
+          "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+          "file_path": "MagickCore/static.c",
+          "function_context": "RegisterStaticModule",
+          "line_start": 243,
+          "line_end": 243,
+          "snippet": "-  rights=ReadPolicyRights;\n+  rights=AllPolicyRights;",
+          "strength_hint": "priority"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:35893e7cad78:MagickCore/static.c:git_diff:2004-2006",
+          "kind": "git_diff",
+          "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+          "file_path": "MagickCore/static.c",
+          "function_context": "RegisterStaticModules",
+          "line_start": 297,
+          "line_end": 299,
+          "snippet": "+        if (IsRightsAuthorized(ModulePolicyDomain,AllPolicyRights,\n+              MagickModules[i].module) == MagickFalse)\n+          continue;",
+          "strength_hint": "certificate_candidate"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:35893e7cad78:commit_message",
+          "kind": "commit_message",
+          "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+          "file_path": "",
+          "function_context": "",
+          "line_start": null,
+          "line_end": null,
+          "snippet": "Added missing policy checks in RegisterStaticModules.",
+          "strength_hint": "context_only"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:01faddbe2711:commit_message",
+          "kind": "commit_message",
+          "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+          "file_path": "",
+          "function_context": "",
+          "line_start": null,
+          "line_end": null,
+          "snippet": "Use the correct rights.",
+          "strength_hint": "context_only"
+        }
+      ]
+    },
+    "VulnerableCondition": {
+      "necessary_conditions": [
+        "Administrator configures policy.xml with <policy domain=\"module\" rights=\"none\" pattern=\"...\"/> to restrict a coder module",
+        "The restricted coder exists as a static built-in module (coders-list.h) or as a dynamically loadable module",
+        "ImageMagick startup calls RegisterStaticModules(), or runtime calls RegisterStaticModule()/OpenModule() for the restricted coder"
+      ],
+      "vulnerable_code_patterns": [
+        "RegisterStaticModules() iterates MagickModules[] array and calls register_module() for each unregistered module without any IsRightsAuthorized(ModulePolicyDomain, ...) guard",
+        "RegisterStaticModule() uses rights=ReadPolicyRights instead of rights=ReadPolicyRights|WritePolicyRights in the IsRightsAuthorized call, only checking Read authorization when both Read and Write should be verified",
+        "OpenModule() uses rights=ReadPolicyRights instead of rights=ReadPolicyRights|WritePolicyRights in the IsRightsAuthorized call, same single-right insufficiency"
+      ],
+      "negative_evidence": []
+    },
+    "FixEvidence": {
+      "fix_code_patterns": [
+        "IsRightsAuthorized(ModulePolicyDomain, ReadPolicyRights|WritePolicyRights, module_name) guard added before register_module() call in RegisterStaticModules()",
+        "rights=ReadPolicyRights|WritePolicyRights replaces rights=ReadPolicyRights (or intermediate AllPolicyRights) in RegisterStaticModule()",
+        "rights=ReadPolicyRights|WritePolicyRights replaces rights=AllPolicyRights (or original ReadPolicyRights) in OpenModule()",
+        "PolicyRights variable declaration and initialization added to RegisterStaticModules()"
+      ],
+      "added_guards": [
+        "if (IsRightsAuthorized(ModulePolicyDomain,rights,MagickModules[i].module) == MagickFalse) continue;  // in RegisterStaticModules()",
+        "if (IsRightsAuthorized(ModulePolicyDomain,rights,module_name) == MagickFalse) { errno=EPERM; ... }  // rights corrected from ReadPolicyRights to ReadPolicyRights|WritePolicyRights in RegisterStaticModule()",
+        "if (IsRightsAuthorized(ModulePolicyDomain,rights,module_name) == MagickFalse) { errno=EPERM; ... }  // rights corrected from AllPolicyRights to ReadPolicyRights|WritePolicyRights in OpenModule()"
+      ],
+      "removed_vulnerable_logic": [
+        "rights=ReadPolicyRights removed from RegisterStaticModule() (parent of 35893e7ca)",
+        "AllPolicyRights removed as rights value in RegisterStaticModules() guard (01faddbe2)",
+        "rights=AllPolicyRights removed from OpenModule() (01faddbe2)"
+      ],
+      "semantic_change": "Module policy enforcement was added to RegisterStaticModules() and corrected in RegisterStaticModule() and OpenModule() to check both ReadPolicyRights and WritePolicyRights against the ModulePolicyDomain. This ensures that a <policy domain=\"module\" rights=\"none\"/> restriction blocks all module registration and loading, not just Read operations."
+    },
+    "Guards": {
+      "preconditions": [
+        "User has configured policy.xml with module-domain restrictions",
+        "IsRightsAuthorized function must be reachable (requires policy.h inclusion)"
+      ],
+      "configuration_guards": [
+        "ModulePolicyDomain is the policy domain checked by IsRightsAuthorized",
+        "ReadPolicyRights|WritePolicyRights are the rights bits that must be authorized for the module to load"
+      ],
+      "version_or_feature_guards": [
+        "MAGICKCORE_BUILD_MODULES: when defined, dynamic modules are used instead of static MagickModules[] array. The static.c path (RegisterStaticModules) is only used when MAGICKCORE_BUILD_MODULES is NOT defined.",
+        "OpenModule() is always compiled regardless of MAGICKCORE_BUILD_MODULES"
+      ]
+    },
+    "CertificatePolicy": {
+      "cert_absent_allowed": true,
+      "cert_fixed_allowed": true,
+      "hard_certificate_candidates": [
+        {
+          "candidate": "RegisterStaticModules without IsRightsAuthorized guard on MagickModules[i].register_module()",
+          "type": "ABSENT",
+          "scope": "function",
+          "evidence": "d2a2f1ca5917:MagickCore/static.c:283-303",
+          "tag_check_hint": "git grep -F 'IsRightsAuthorized' <tag> -- MagickCore/static.c | grep 'RegisterStaticModules'"
+        },
+        {
+          "candidate": "rights=ReadPolicyRights in RegisterStaticModule before IsRightsAuthorized call",
+          "type": "VULNERABLE",
+          "scope": "line",
+          "evidence": "d2a2f1ca5917:MagickCore/static.c:243",
+          "tag_check_hint": "git grep -n 'rights=ReadPolicyRights' <tag> -- MagickCore/static.c"
+        },
+        {
+          "candidate": "rights=ReadPolicyRights in OpenModule before IsRightsAuthorized call",
+          "type": "VULNERABLE",
+          "scope": "line",
+          "evidence": "d2a2f1ca5917:MagickCore/module.c:1258",
+          "tag_check_hint": "git grep -n 'rights=ReadPolicyRights' <tag> -- MagickCore/module.c"
+        },
+        {
+          "candidate": "rights=ReadPolicyRights|WritePolicyRights in IsRightsAuthorized(ModulePolicyDomain,...) in all three functions",
+          "type": "FIXED",
+          "scope": "line",
+          "evidence": "01faddbe2711:MagickCore/static.c:243, MagickCore/module.c:1258",
+          "tag_check_hint": "git grep -n 'ReadPolicyRights|WritePolicyRights' <tag> -- MagickCore/static.c MagickCore/module.c"
+        }
+      ],
+      "admission_requirements": [
+        "For NOT_AFFECTED: must show ModulePolicyDomain authorization check exists with rights covering both Read and Write in all three functions (OpenModule, RegisterStaticModule, RegisterStaticModules)",
+        "For FIXED: must show rights=ReadPolicyRights|WritePolicyRights (or equivalent covering both) in IsRightsAuthorized(ModulePolicyDomain, ...)",
+        "For AFFECTED: must show either no IsRightsAuthorized guard in RegisterStaticModules, OR rights=ReadPolicyRights alone (without WritePolicyRights) in RegisterStaticModule/OpenModule"
+      ],
+      "priority_only_evidence": [
+        {
+          "source_ref": "src:CVE-2021-39212:35893e7cad78:MagickCore/static.c:git_diff:2004-2006",
+          "reason": "commit 1 added guard using AllPolicyRights (intermediate state, still not fully correct)"
+        },
+        {
+          "source_ref": "src:CVE-2021-39212:35893e7cad78:commit_message",
+          "reason": "commit message confirms 'missing policy checks' in RegisterStaticModules"
+        }
+      ],
+      "forbidden_hard_certificates": [
+        "Touching MagickCore/static.c or MagickCore/module.c alone (file-touched-only)",
+        "Token 'IsRightsAuthorized' in any file without ModulePolicyDomain context",
+        "Token 'ModulePolicyDomain' without verifying rights value (ReadPolicyRights vs ReadPolicyRights|WritePolicyRights)",
+        "Token 'ReadPolicyRights' alone without checking it appears in a policy-domain authorization context",
+        "Function name 'RegisterStaticModule' without inspecting the rights value used in its policy check"
+      ],
+      "reason": "cert_absent_allowed=true because the absence of the IsRightsAuthorized guard in RegisterStaticModules is directly observable and confirmable via git grep. cert_fixed_allowed=true because the presence of rights=ReadPolicyRights|WritePolicyRights in the correct functions is a high-specificity fix token. Hard certificate candidates are concrete line-level patterns. Forbidden hard certificates guard against lazy evidence (file-touched, generic-function-name, or partial-token matches that fail to distinguish the vulnerable vs fixed state)."
+    }
+  },
+  "step3_usable_evidence": {
+    "file_patterns": [
+      "MagickCore/static.c",
+      "MagickCore/module.c"
+    ],
+    "function_patterns": [
+      "RegisterStaticModule",
+      "RegisterStaticModules",
+      "OpenModule"
+    ],
+    "vulnerable_tokens": [
+      "rights=ReadPolicyRights",
+      "rights=AllPolicyRights",
+      "MagickModules[i].registered == MagickFalse) (void) (MagickModules[i].register_module)"
+    ],
+    "fix_tokens": [
+      "ReadPolicyRights|WritePolicyRights",
+      "IsRightsAuthorized(ModulePolicyDomain,rights,MagickModules[i].module)",
+      "IsRightsAuthorized(ModulePolicyDomain,rights,module_name)"
+    ],
+    "grep_patterns": [
+      "IsRightsAuthorized\\(ModulePolicyDomain",
+      "rights=ReadPolicyRights",
+      "ReadPolicyRights\\|WritePolicyRights",
+      "RegisterStaticModule",
+      "RegisterStaticModules",
+      "OpenModule"
+    ],
+    "line_risk_signals": [
+      {
+        "signal": "RegisterStaticModules() calls register_module() without IsRightsAuthorized guard",
+        "evidence_type": "sequence",
+        "scope": "function",
+        "strength": "high",
+        "source_refs": [
+          {
+            "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/static.c:283-303",
+            "kind": "git_snapshot",
+            "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+            "file_path": "MagickCore/static.c",
+            "line_start": 283,
+            "line_end": 303
+          }
+        ]
+      },
+      {
+        "signal": "rights=ReadPolicyRights (single right, missing WritePolicyRights) in RegisterStaticModule",
+        "evidence_type": "token",
+        "scope": "line",
+        "strength": "high",
+        "source_refs": [
+          {
+            "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/static.c:243",
+            "kind": "git_snapshot",
+            "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+            "file_path": "MagickCore/static.c",
+            "line_start": 243,
+            "line_end": 243
+          }
+        ]
+      },
+      {
+        "signal": "rights=ReadPolicyRights (single right, missing WritePolicyRights) in OpenModule",
+        "evidence_type": "token",
+        "scope": "line",
+        "strength": "high",
+        "source_refs": [
+          {
+            "source_ref": "src:CVE-2021-39212:d2a2f1ca5917:MagickCore/module.c:1258",
+            "kind": "git_snapshot",
+            "commit": "d2a2f1ca5917cfbdfa188b0a8a534061659db2cb",
+            "file_path": "MagickCore/module.c",
+            "line_start": 1258,
+            "line_end": 1258
+          }
+        ]
+      },
+      {
+        "signal": "Fix: IsRightsAuthorized(ModulePolicyDomain,rights,...) with rights=ReadPolicyRights|WritePolicyRights covers both read and write",
+        "evidence_type": "guard",
+        "scope": "family",
+        "strength": "high",
+        "source_refs": [
+          {
+            "source_ref": "src:CVE-2021-39212:01faddbe2711:MagickCore/static.c:git_diff:4004-4005",
+            "kind": "git_diff",
+            "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+            "file_path": "MagickCore/static.c",
+            "line_start": 243,
+            "line_end": 243
+          },
+          {
+            "source_ref": "src:CVE-2021-39212:01faddbe2711:MagickCore/module.c:git_diff:3004-3005",
+            "kind": "git_diff",
+            "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+            "file_path": "MagickCore/module.c",
+            "line_start": 1258,
+            "line_end": 1258
+          },
+          {
+            "source_ref": "src:CVE-2021-39212:01faddbe2711:MagickCore/static.c:git_diff:5016-5017",
+            "kind": "git_diff",
+            "commit": "01faddbe2711a4156180c4a92837e2f23683cc68",
+            "file_path": "MagickCore/static.c",
+            "line_start": 301,
+            "line_end": 301
+          }
+        ]
+      },
+      {
+        "signal": "Fix: Missing policy guard added to RegisterStaticModules()",
+        "evidence_type": "guard",
+        "scope": "function",
+        "strength": "high",
+        "source_refs": [
+          {
+            "source_ref": "src:CVE-2021-39212:35893e7cad78:MagickCore/static.c:git_diff:2004-2006",
+            "kind": "git_diff",
+            "commit": "35893e7cad78ce461fcaffa56076c11700ba5e4e",
+            "file_path": "MagickCore/static.c",
+            "line_start": 297,
+            "line_end": 299
+          }
+        ]
+      },
+      {
+        "signal": "CWE-362 (Race Condition) does not align with patch evidence; no concurrent access pattern exists in the vulnerable or fixed code",
+        "evidence_type": "history",
+        "scope": "repo",
+        "strength": "medium",
+        "source_refs": []
+      }
+    ]
+  },
+  "uncertainty": [
+    "CWE-362 (Race Condition) appears misassigned: the vulnerability exhibits no concurrent-execution or time-of-check-time-of-use pattern. The primary mechanism is missing/insufficient authorization (CWE-862/CWE-863). However, CWE-668 (Exposure of Resource to Wrong Sphere) correctly captures that the PS module is exposed to use when policy forbids it. CWE assignment is preserved as-is from case input but the race condition aspect has zero evidence in the patches.",
+    "The exact behavior of IsRightsAuthorized() with single-right vs multi-right arguments is not confirmed from available evidence. The fix assumes rights=ReadPolicyRights|WritePolicyRights is the correct dual-right check. If IsRightsAuthorized uses a bitset AND semantics ('are ALL requested rights granted?'), then the original rights=ReadPolicyRights should have failed for a 'none' policy just as ReadPolicyRights|WritePolicyRights would. The fact that the vulnerability existed despite having rights=ReadPolicyRights suggests the function may use different semantics, or the check was circumvented entirely through the RegisterStaticModules() path which had no guard at all.",
+    "Intermediate commits between 35893e7ca and 01faddbe2 (b344d1f10, 6920157d9, 8fa069797) were not inspected. These may contain additional context about why AllPolicyRights was introduced and then reverted to Read|Write."
+  ],
+  "agent_trace_id": "CVE-2021-39212-P1-vet-review-001",
+  "evidence_paths": [
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\fix_evidence\\35893e7cad78\\show_patch_only.txt",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\fix_evidence\\35893e7cad78\\commit_message.txt",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\fix_evidence\\01faddbe2711\\show_patch_only.txt",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\fix_evidence\\01faddbe2711\\commit_message.txt",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\output\\chunk_semantics.jsonl",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\output\\semantic_regions.jsonl",
+    "tests\\vet_taxonomy_corpus\\work\\ImageMagick\\CVE-2021-39212\\step1\\output\\step1_quality_report.json"
+  ]
+}

@@ -1,0 +1,97 @@
+focused research is required in order to better understand the
+impact of fuzzing in improving the security of codebases and
+its impact on vulnerability lifetimes.
+Overall, fuzzing old code seems to still produce re-
+sults even for “extensively tested” targets. Further
+research is needed to understand and quantify the im-
+pact of fuzzing and its relation to lifetimes.
+7 Threats to validity
+Dataset. The data in vulnerability databases often experience
+bias from several sources [7].
+– Completeness. Although the NVD is one of the largest col-
+lections of software vulnerabilities, it can not be considered
+complete, since many vulnerabilities may never get a CVE.
+Further research is required to investigate the lifetime of those
+vulnerabilities. Furthermore, although we strove to map as
+many CVEs to their fixing commits as possible, our approach
+is not able to identify a fixing commit for every single CVE
+affecting a program. However, the dataset we gathered is big
+and complete enough to be representative, and we do not
+expect our results on vulnerability lifetimes and their charac-
+teristics to be significantly influenced by some missing data
+points.
+– Correctness. Entries in the NVD are manually curated and
+analyzed, but might still include errors. Additionally, mistakes
+in the commit message when including the bug ID or a CVE-
+ID can lead to incorrect mappings. We corrected these errors
+during our data cleaning process, however, some errors may
+have evaded detection. We expect these to be few and to not
+affect our general observations.
+– Generalization. Although we do not claim validity of our
+results for other projects, apart from the 11 we included in
+our dataset, we believe that the selected projects are a large
+representative sample and the insights gained from our results
+are, to an extent, of general significance.
+Independence. Some of our arguments in the Results section
+rely on the implied assumption that vulnerability lifetimes
+are independent. It has been shown that some vulnerability
+discovery events can be dependent [29], either due to a new
+class of vulnerabilities being discovered, a new tool being
+made available, or a new area of code coming under scrutiny.
+These dependencies manifest themselves as small bursts in
+the vulnerability discovery rate and are a particular problem
+to vulnerability discovery models that try to model the time
+between discoveries. It is difficult to imagine (let alone test)
+how such dependencies would affect the lifetimes of vulner-
+abilities, especially in a large and diverse dataset like ours.
+Also, our empirical results do not indicate the existence of any
+kind of dependency regarding vulnerability lifetimes. There-
+fore, we consider the independence of vulnerability lifetimes
+to be a reasonable assumption. Some points in the Discus-
+sion section also imply an assumption of independence of
+discovery events. Again, small bursts of discoveries may exist
+due to dependent discoveries, however they do not affect the
+arguments being made, which describe large-scale behaviors.
+Heuristic error. Our main findings are consistent over dif-
+ferent projects and over time. Therefore, we do not believe
+the error of our lifetime-estimation heuristic (as discussed in
+Section 4.2) to affect their validity.
+8 Conclusion
+In this paper we studied the lifetimes of vulnerabilities. A
+vulnerability’s lifetime is the amount of time it remains in
+the codebase of a software project before it is discovered and
+fixed. Via a rigorous process we showed that it is possible to
+accurately compute the metric (lifetime) automatically when
+enough data points are available, via a heuristic code analysis
+technique. Our technique is of general relevance and can be
+used to study lifetimes of bugs and vulnerabilities for a wide
+variety of software. We also showed that measurements using
+the metric can have theoretical and practical implications.
+Thus, we believe vulnerability lifetime to be a promising
+software security metric.
+Further research is required to better understand how the
+metric can be used to quantify the impact of automated tools
+on the security of codebases, as well as how vulnerabilities
+not assigned CVEs affect the results of the measurement.
+Moreover, further investigation of the theoretical implications
+of the metric w.r.t. vulnerability discovery models and soft-
+ware reliability models in general, could provide interesting
+insights.
+Acknowledgments
+We would like to thank our shepherd Zhiyun Qian and the
+anonymous reviewers for helping us significantly improve the
+paper. This work has been co-funded by the German Federal
+Ministry of Education and Research and the Hessen State
+Ministry for Higher Education, Research and the Arts within
+their joint support of the National Research Center for Applied
+Cybersecurity ATHENE.
+References
+[1] Nikolaos Alexopoulos, Sheikh Mahbub Habib, Steffen
+Schulz, and Max Mühlhäuser. The tip of the iceberg:
+On the merits of finding security bugs. ACM Trans. Priv.
+Secur., 24(1), September 2020.
+[2] Omar H. Alhazmi and Yashwant K. Malaiya. Modeling
+the vulnerability discovery process. In 16th Interna-
+tional Symposium on Software Reliability Engineering
+(ISSRE 2005), 8-11 November 2005, Chicago, IL, USA,
+pages 129–138. IEEE Computer Society, 2005.

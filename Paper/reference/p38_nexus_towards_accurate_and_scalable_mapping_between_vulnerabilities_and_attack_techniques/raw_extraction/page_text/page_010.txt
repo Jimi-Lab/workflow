@@ -1,0 +1,80 @@
+Step
+(or Sub-steps)
+Micro Average Macro Average CVE
+Coverage
+TTP
+CoveragePrecision Recall F1-score Precision Recall F1-score
+Ground Truth Building 80.33% 78.46% 79.38% 66.96% 62.48% 64.64% 92,632 141
+Attack Pattern Extraction 98.47% 98.38% 98.42% 97.68% 97.24% 97.46% 92,632 141
+Label Adjustment 92.70% 92.56% 92.63% 90.43% 89.37% 89.90% 92,632 208
+CVE Sample Augmentation 97.85% 98.02% 97.94% 98.25% 98.65% 98.45% 210,357 208
+TABLE VI: Impact of training-ﬂow steps and sub-steps on mapping performance and coverage.
+(a) Training and validation loss
+for Ground Truth Building.
+(b) Ground Truth Building: Preci-
+sion, Recall, and F1-score.
+(c) Training and validation loss
+for Attack Pattern Extraction.
+(d) Attack Pattern Extraction: Pre-
+cision, Recall, and F1-score.
+(e) Training and validation loss
+for Label Adjustment.
+(f) Label Adjustment: Precision,
+Recall, and F1-score.
+Fig. 16: Fine-tuning dynamics of RoBERTa-Large after apply-
+ing different training-ﬂow steps.
+(a) Training and validation loss
+over epochs.
+(b) Validation Precision, Recall,
+and F1-score over epochs.
+(c) TP, FP, and FN rates for pos-
+itive and negative classes.
+(d) Precision, Recall and F1-score
+for positive and negative classes.
+Fig. 17: Training dynamics and evaluation metrics of the
+SecureBERT-based APD model.
+ﬁner-grained assignments. CVE Sample Augmentation results
+are shown in Figure 14a–14b.
+1) Attack Pattern Extraction Analysis: To evaluate the
+effectiveness of the Attack Pattern Detector (APD) model, we
+ﬁne-tune six LLM variants on a labeled dataset of 3,000 sam-
+Model Precision Recall F1-score
+BERT-Base-Uncased [41] 93.07% 93.07% 93.07%
+BERT-Large-Uncased [56] 92.51% 92.27% 92.39%
+RoBERTa-Base [42] 94.92% 94.67% 94.79%
+RoBERTa-Large [57] 95.20% 95.20% 95.20%
+SecureBERT [43] 95.99% 95.73% 95.86%
+SecureBERT-Plus [58] 94.13% 94.13% 94.13%
+TABLE VII: Performance comparison of different LLMs ﬁne-
+tuned for attack pattern detection.
+(a) TTP coverage before and after
+label adjustment.
+(b) CVE coverage before and af-
+ter augmentation.
+Fig. 18: Enhanced CVE and TTP coverage achieved through
+the application of the Dataset Enhancement step.
+ples containing both positive and negative instances. Table VII
+presents the results. All models achieve high performance,
+with SecureBERT attaining the highest F1-score (95.86%). As
+APD is a binary classiﬁer, most models report similar precision
+and recall, with slight differences arising when a model misses
+a label. These results suggest that using cybersecurity-adapted
+models improves attack pattern detection accuracy.
+Figure 17 summarizes the SecureBERT-based APD model.
+Figure 17a and 17b show decreasing losses and improving
+validation metrics, conﬁrming stable ﬁne-tuning. Figure 17c
+and 17d report high TPRs (95%+) and low FPR/FNR; despite
+slightly lower negative precision, the model reliably detects
+attack patterns. Additional epoch results are in Appendix B.
+2) Label Adjustment Analysis:Figure 18a shows TTP cov-
+erage improvements across MITRE ATT&CK Tactics after
+Label Adjustment. Initially, 13 of 14 tactics were supported;
+Exﬁltration was later added via one relevant TTP. The to-
+tal TTP count rose from 141 to 208, with some mapped
+to multiple tactics, explaining higher bar totals. Green bars
+highlight gains, especially in Execution, Defense Evasion,
+and Command and Control (C&C). Further generative model
+evaluation details are in Appendix C.
+Cost Requirement. This process requires↑6.9M GPT calls
+(↑3.66B tokens; $607 total (in USD);↑530 tokens per re-
+10

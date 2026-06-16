@@ -1,0 +1,78 @@
+5 Discussion
+We discuss directions for future work motivated by our findings.
+While these directions are beyond the scope of this paper, we hope
+they inspire other researchers to explore them. We cover research
+on identifying bug-introducing commits (SZZ research), root cause
+understanding, bug detection, and program repair.
+5.1 SZZ Research
+Closing the Gap.Our results represent a substantial step toward
+solving the problem of identifying bug-introducing commits from
+fix commits. Simple-SZZ-Agent achieves up to 0.86 F1-score on the
+Linux kernel dataset, compared to 0.62 for the previous state of the
+art. Still, the problem is not fully solved. Our error analysis (§4.3.3)
+revealed that of the 13 failures, 4 occur because the bug-introducing
+commit is not in the candidate set, 3 are due to incorrect agent
+analysis, 2 are near misses, 3 involve questionable ground truth
+labels, and 1 we could not categorize. These failure modes point to
+two main areas for improvement.
+First, the incorrect analyses and near misses (5 cases total) sug-
+gest that the agent’s reasoning about which commit introduced a
+bug can still be improved. Our results in §4.3.4 show that differ-
+ent model and agent combinations yield meaningful performance
+differences, indicating that continued model improvements are a
+promising avenue.
+Second, the 4 cases where the bug-introducing commit is not
+in the candidate set reveal a limitation of the current candidate
+collection strategy: Simple-SZZ-Agent only searches the commit
+histories of files modified by the fix, so when the bug was introduced
+in a different file, the correct commit is never considered. How to
+expand the candidate set beyond the files touched by the fix without
+introducing prohibitive infrastructure costs is an open question
+that we leave for future work.
+5.2 Root Cause Understanding
+Our analysis in §4.3.2 revealed that agents compress information
+about a bug into short greppable patterns that locate its introducing
+changes. This compression itself may have value beyond identifying
+the bug-introducing commit: it captures, in a concise form, what
+made the code buggy.
+A practitioner who knows how to fix a bug does not always
+understand how it was introduced. The patterns the agent derives
+and the bug-introducing changes it identifies could help provide this
+understanding. Our context ablation (§3.3.4) showed that the agent
+achieves 0.73 F1-score with only the diff and no commit message,
+demonstrating that it can extract the essential characteristics of
+a bug from code changes alone. Whether these patterns can be
+used to generate useful explanations of how a bug was introduced—
+especially when the fix commit message is uninformative—is an
+open question for future work.
+
+===== Page 010 =====
+Preprint, Under Submission, arXiv Risse et al.
+5.3 Bug Detection
+Risse et al. [20] raised two open questions in bug detection research:
+(i) what amount of context is sufficient to decide whether a given
+code unit is buggy, and (ii) how should this context be collected? Our
+findings suggest a possible direction for (ii): the grep-based search
+strategy could serve as an automatic context collection mechanism,
+where an agent uses targeted searches to gather relevant code
+from across a repository to assemble the context necessary for
+bug detection. Whether this strategy transfers effectively to bug
+detection remains to be investigated.
+Beyond context collection, the patterns that agents derive from
+fix commits could help in bug variant detection. If the agent can
+compress knowledge about a bug into a short pattern to find the
+commit that introduced it, a generalized version of the pattern
+might identify commits that introduced similar bugs elsewhere in
+the codebase or in other projects. We leave the exploration of this
+direction for future work.
+5.4 Program Repair
+In program repair, the goal is to generate fixes for bugs. Our ap-
+proach currently operates after a fix has already been written: it
+takes the fix commit as input and traces back to the bug-introducing
+commit. An open question is whether the bug-introducing commit
+can also be identified from the outputs of bug oracles instead of
+fix commits—for example, from crash reports of a fuzzer, failing
+unit tests, or alerts from monitoring software. If so, agents could
+provide the bug-introducing changes as context for generating the
+fix itself, enabling agents to both locate and fix bugs. We leave this
+question for future work.

@@ -1,0 +1,107 @@
+AgentSZZ: Teaching the LLM Agent to Play Detective with Bug-Inducing Commits Preprint, Under Submission, Arxiv
+strong LLMs struggle with. This confirms that structured tools are
+the most critical component ofAgentSZZ.
+Domain knowledge consistently improves recall.Remov-
+ing domain knowledge leads to consistent recall drops across all
+datasets, with the largest decrease observed on Apache (−13.0%),
+where commits are larger and more complex. On GitHub-C, remov-
+ing domain knowledge slightly increases precision (0.830→0.889)
+but reduces recall, resulting in a marginal F1 increase (0.815→0.828),
+while all other cases show an F1 decrease. Overall, domain knowl-
+edge promotes broader exploration—occasionally introducing false
+positives but consistently improving recall—while generalizing
+across both C and Java.
+Context compression improves efficiency with minimal
+impact on effectiveness.Disabling compression has limited im-
+pact on effectiveness, with F1 changes within ±2% on the three
+larger datasets. In contrast, its impact on efficiency is substantial:
+token consumption decreases by 33.6% (52,237→34,657) and cost
+by 35.7% ($0.014→$0.009). This highlights the importance of com-
+pression for practical deployment. We focus on the three larger
+datasets due to higher variance in GitHub-J.
+Figure 4 shows the distribution of tool usage across investigation
+turns. Most cases are resolved within 4–6 turns, with git_show
+and git_blame accounting for approximately 40% and 18% of tool
+calls, respectively. Early turns are dominated by git_blame, while
+git_show peaks during candidate inspection. In later turns, the
+agent increasingly relies on broader search tools (git_log_s and
+git_grep), reflecting a transition from local blame to global search
+when initial evidence is insufficient. git_log_func is used spar-
+ingly as a fallback for function-level tracing. Exploratory tools
+(git_grep, git_log_s) appear more frequently in harder scenar-
+ios (e.g., omission, refactor-penetration, cross-file cases), where
+they serve as escalation mechanisms for cross-file and semantic
+tracing. git_log_func plays a minor role as a specialized fallback.
+Answers to RQ3: Designed Tools are indispensable, with F1
+dropping to near zero without them. Domain knowledge im-
+proves recall, while context compression reduces token con-
+sumption by over 30% with minimal impact on effectiveness.
+5.4 RQ4. Challenging Scenarios
+To evaluateAgentSZZin challenging scenarios, we focus on bug-
+fixing commits categorized as cross-file and ghost cases (Table 4).
+Following Lyu et al. [23], a case is defined as cross-file if none of
+its bug-inducing commits appear in the history of files modified by
+the fix (via git log), and as a ghost case if the bug-fixing commit
+contains no deleted or modified lines.
+The results show that our approach significantly outperforms
+LLM4SZZ in both cross-file and ghost commit scenarios. For cross-
+file cases,AgentSZZachieves recall of 18.60%, 24.24%, and 42.72%
+on Apache, GitHub, and Linux, respectively, corresponding to im-
+provements of 100.0%, 300.0%, and 160.1%.
+LLM4SZZ can handle a small number of cross-file cases, but its
+success mainly stems from indirect coverage rather than explicit
+cross-file reasoning. Its pipeline remains centered on a single fix-
+side file, where buggy statements are extracted and traced within
+the same file history. As a result, it only succeeds when sufficient
+local signals remain (e.g., due to file renaming or residual context
+in the patch). In contrast,AgentSZZis not restricted to a single
+file history. Starting from a git_blame→git_show backbone, it
+can escalate to git_grep and git_log_s to bridge symbol-level,
+statement-level, and cross-file relationships, enabling reliable tran-
+sitions from the fix location to the true origin.
+A similar pattern explains the gap on ghost commits. LLM4SZZ
+relies on explicit line-level signals from the fixing patch to recover
+candidate commits. When no lines are deleted or modified, this sig-
+nal becomes unavailable, significantly weakening the pipeline. By
+contrast,AgentSZZleverages broader context, semantic reasoning,
+and tool-assisted exploration to identify the bug-inducing commit
+even without direct line-level evidence, making it substantially
+more robust in ghost scenarios.
+Answers to RQ4: Our approach significantly outperforms
+LLM4SZZ in challenging scenarios, improving recall by up to
+300% on cross-file cases and 60% on ghost commits.
+6 Discussion
+6.1 Failure Analysis
+We conduct a qualitative error analysis on a sample of 50 incor-
+rect cases from Apache, GitHub, and Linux. The dominant failure
+mode is misattribution among plausible related commits. Specif-
+ically, 24/50 errors are local semantic misattributions, where the
+agent identifies a nearby plausible commit but fails to trace back to
+the earliest bug-inducing commit, and 11/50 stop at later related
+commits (e.g., propagation, follow-up, or refactoring steps).
+Cross-file localization misses account for 5/50 cases, indicating
+limited pivoting beyond the fix-side file history in some instances.
+Empty-output failures are less frequent (8/50) but involve substan-
+tially longer trajectories, suggesting continued exploration without
+successful convergence. Notably, 40/50 errors are assigned high
+confidence, indicating that the remaining challenge lies in precise
+historical attribution rather than repository exploration.
+These patterns are illustrated by representative cases. In an
+Apache case,3 the agent remained anchored to the fix-side file
+history and selected a plausible blame-linked commit instead of
+the true cross-file origin. In a GitHub case 4https://github.com/
+sebastiaanschool/sebastiaanschool-Android/commit/2454879bfb the
+agent chose a highly relevant but later related commit rather than
+the earliest introducing one. In a Linux ghost commit case,5 weak
+fix-side signals led to a high-confidence but non-earliest attribution.
+6.2 Threats to Validity
+Internal Validity.LLMs may produce non-deterministic outputs
+even with temperature set to 0, potentially affecting reproducibility.
+We mitigate this by running each experiment three times and re-
+porting average results. The domain knowledge in our prompt was
+derived from 50 Linux kernel cases. Although results show strong
+cross-dataset and cross-language generalizability, the prompt may
+encode Linux-specific patterns that are less relevant to other projects.
+3https://github.com/apache/accumulo/commit/a2c2d38aa
+4,
+5https://github.com/torvalds/linux/commit/7ecb37f62fe5

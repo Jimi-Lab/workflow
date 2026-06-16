@@ -1,0 +1,152 @@
+[
+  {
+    "page": 5,
+    "block_id": "page_005:block_001",
+    "block_type": "text",
+    "text": "HE et al.: AUTOMATICALLY IDENTIFYING CVE AFFECTED VERSIONS WITH PATCHES AND DEVELOPER LOGS 909",
+    "bbox": [
+      37.90800094604492,
+      32.560523986816406,
+      552.0032348632812,
+      40.343284606933594
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_003",
+    "block_type": "text",
+    "text": "Fig. 3. Overview of our approach with three major steps numbered from 1 to 3.",
+    "bbox": [
+      37.90800094604492,
+      315.2918701171875,
+      297.6288757324219,
+      324.1864929199219
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_004",
+    "block_type": "text",
+    "text": "version of each version branch and (R3) to determine the ﬁrst vulnerable version. To ensure the accuracy of the results, in this step, we need address some special problems, such as solving the vulnerability reappearance problem, using developer logs to detect whether there are vulnerabilities in the partial matching source code. Finally, we compare the vulnerable version set of our tool against the vulnerable version set accoding to the NVD, and report the error rate of the NVD set. Among them, if there is a CVE vulnerability in a certain version but not reported in the NVD, it is a false negative case. If a certain version has no CVE vulnerability but is reported in the NVD, it is a false positive case.",
+    "bbox": [
+      37.90800094604492,
+      338.7565002441406,
+      288.9794006347656,
+      481.3840637207031
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_005",
+    "block_type": "text",
+    "text": "A. Build Version Tree and Acquire Committed Version Set",
+    "bbox": [
+      37.90800094604492,
+      501.5105285644531,
+      269.912109375,
+      512.4693603515625
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_006",
+    "block_type": "text",
+    "text": "Software versions are published in git as tags. Every tag",
+    "bbox": [
+      47.870601654052734,
+      518.2994384765625,
+      288.96051025390625,
+      529.417724609375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_007",
+    "block_type": "text",
+    "text": "has its commit log in which parent commits are recorded. We can build the version tree by recursively traversing from the commit logs of versions to its parent and grand parent commit logs. However, there is a common protocol to arrange versions. Taking the Linux operating system as an example, the team publicly announced the types of versions on the Linux kernel ofﬁcial website, including main branch version (Mainline), sta- ble version and long-term version. The main branch version is the starting point version of each vertical branch in the version tree, which introduces all new functions based on the previous main branch version. From the main branch version, new stable versions are released later one by one, which form the trunk of the version tree. Based on this protocol, we can build the version tree for Linux kernel by digits in its version. Next we brieﬂy introduce a few notations about the version tree and give an example. We refer to the overall structure of the software release versions as a version tree , with the ﬁrst version as the root node V root . Fig. 4 shows an example version tree with version 1.0",
+    "bbox": [
+      37.90800094604492,
+      530.2515869140625,
+      288.9833679199219,
+      745.6714477539062
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_009",
+    "block_type": "text",
+    "text": "Fig. 4. Version tree: structural model of source code release versions. A red",
+    "bbox": [
+      300.92401123046875,
+      458.0948791503906,
+      552.002197265625,
+      466.989501953125
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_010",
+    "block_type": "text",
+    "text": "triangular node represents a vulnerable version, a red triangular node in green dotted circle represents a known unpatched version, a blue node represents a version with unknown status. R 1 , R 2 , R 3 indicate the three directions in which we are looking for other vulnerable versions.",
+    "bbox": [
+      300.92401123046875,
+      467.058837890625,
+      551.99560546875,
+      502.8544616699219
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_011",
+    "block_type": "text",
+    "text": "as V root . In the version tree, nodes, V i.j , with two digit version numbers (e.g., versions 2.6 and 4.0) are called major versions , and nodes V i.j.k with three digit version numbers (e.g., versions 3.3.5 and 5.0.4) are called minor versions , and they are located in the branches of the corresponding major versions. For the version branch of V i.j , we refer to the end of the branch (i.e., its largest minor version) as V i.j.E (e.g., version 3.3.22 in Fig. 4 ). In addition, we use V i.j.k to denote a vulnerable version, and V i.j.U is the last (or upto) vulnerable version in the branch of V i.j . We also use V i.j.k ( E ) (‘E’ means “excluding”) to denote the vulnerable version immediately before V i.j.k , where V i.j.k is not vulnerable (i.e., patched). Finally, for each reported vulnera- bility (CVE-ID), we use V from and V upto to denote its ﬁrst and last vulnerable versions in the entire version tree, respectively. Speciﬁcally, as shown in Fig. 4 , for a given CVE-ID, we will search the other vulnerable versions in the version tree in three directions R 1 , R 2 , R 3 . R 1 is the direction (process) to ﬁnd the ﬁrst vulnerable version V from , R 2 is to ﬁnd the last vulnerable",
+    "bbox": [
+      300.92401123046875,
+      530.2495727539062,
+      551.991943359375,
+      746.099853515625
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 5,
+    "block_id": "page_005:block_012",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 15,2026 at 04:05:42 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]

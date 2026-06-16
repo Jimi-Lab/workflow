@@ -1,0 +1,116 @@
+384 IEEE TRANSACTIONS ON SOFTW ARE ENGINEERING, VOL. 52, NO. 2, FEBRUARY 2026
+TABLE II
+GROUND-TRUTH DATASET OVERVIEW
+IDX Name #Version #CVE Domain
+1 Binutils 157 18 Programming tools
+2 cJSON 48 3 JSON parser
+3 FFmpeg 405 31 Multimedia processing
+4 Jasper 99 12 Image coding toolkit
+5 Libarchive 51 10 Streaming processing
+6 Libcaca 7 3 Graphics library
+7 Liblouis 69 6 Braille translator
+8 Libming 14 9 Flash library
+9 Libtiff 78 7 Image tools
+10 Libxml2 233 12 XML toolkit
+11 OpenJPEG 25 8 Image codec
+12 Pcre2 25 3 Regular expression engine
+Total - 1,211 122 -
+4) The OSS must have a certain number of versions for compre-
+hensive analysis. Based on the selection criteria, we established
+a dataset comprising 122 publicly disclosed CVEs associated
+with public PoC and patches, spanning 12 prevalent OSS, as
+detailed in Table II. The published date of these CVEs from
+2016 to 2025. Meanwhile, the co llected vulnerabilities cover
+13 common CWE types. Some vulnerabilities are classiﬁed
+into multiple CWEs. For example, CVE-2023-1579 belongs to
+both CWE-119 (Improper Restriction of Operations within the
+Bounds of a Memory Buffer) and CWE-787 (Out-of-bounds
+Write). Among the dataset, vulnerabilities belonging to CWE-
+787 (Out-of-bounds Write) are the most numerous, accounting
+for 20.27%.
+Patches. We acquired security patches by crawlingvfc from the
+OSS Git repositories. In total, thevfcs cover 2,287 modiﬁcation
+lines containing 1,532 insertion lines and 755 deletion lines.
+Among these, 289 lines are unrelated to vulnerability (e.g.,
+modiﬁcations in the ChangeLog ﬁle). On average, each vfc has
+21.8 modiﬁcation lines. The number of added lines signiﬁcantly
+exceeds that of deleted lines, underscoring t he critical impor-
+tance of incorporating additional code into the analysis process.
+Among these, 10.3% are large vfcs (the number of modiﬁca-
+tion lines exceeding 50). Notably, 79 vfcs (64.75%) contain
+both code insertion and deletion, 29 vfcs exclusively insertions
+(23.77%), and 15 vfcs solely involve deletions (12.30%).
+Verifying & Labeling. We apply the following process to
+systematically label the ground-truth dataset:
+(i) The ﬁxed version can be determined through the ofﬁcial
+release of vfcs. We conﬁrm whether versions following
+the ﬁxed version are vulnerable by checking if they con-
+tain the patch code.
+(ii) For the remaining version, we obtained the public PoC
+of each vulnerability from the Git issues or by referring
+to OSS sites.
+(iii) To validate the PoC on each corresponding OSS version,
+we establish the dependent environment for each OSS
+version and compile the libraries.
+(iv) During the PoC input testing process for each vulnerabil-
+ity, we analyze the trigger ing conditions and dangerous
+behaviors of the vulnerability and label the statements
+that trigger the vulnerability as S
+trigger. For versions
+where the PoC cannot trigger th e vulnerability (as some
+PoCs are only applicable to certain speciﬁc versions), we
+check whether the version contains Strigger to label the
+version.
+In our experimental setup, we took 10 days to build the software
+and version pool. Then we took 30 days to build the ground-
+truth dataset, including the time taken to establish the dependent
+environment for each software version, as well as the time to
+perform vulnerability veriﬁcation and labeling.
+B. Baseline and Metrics
+Baseline. For the vulnerable version identiﬁcation task, we
+selected the NVD [52], along with SOTAs: SZZ-based methods
+(AG-SZZ [53],B - S Z Z[54],V - S Z Z[17]) and clone-based meth-
+ods (V0Finder [16], V1SCAN [27], VERJava [28] and Vision
+[29]) for accuracy comparison. We gathered the vulnerable
+version range of each CVE from CPE to evaluate the NVD’s
+accuracy.
+The basic idea of SZZ algorithms is to backtrack the commit
+history to locate the earliest commit that introduces the dele-
+tion lines removed by security patches. We use different SZZ
+algorithms to identify the vic, with the versions between the vic
+and the vfc considered vulnerable. Since these algorithms trace
+deleted lines individually, ins tances may arise where multiple
+vic are identiﬁed, and in such cases, we select the earliest one
+as the detection outcome.
+V0Finder, V1SCAN, VERJava, and Vision are clone-based
+methods. We use their techniques to detect code clone for each
+version and identify the affected versions of the vulnerabilities
+in the ground-truth dataset. Because VERJava and Vision are
+applied in Java, we modiﬁed the code to make them compatible
+with C/C++.
+For V
+ERCATION, we selected thresholds ϑ1 =0.9, ϑ2 =
+0.8 and ϑ3 =0.7 (related experiments are introduced in Sec-
+tion V-C). In terms of the performance of vulnerability code
+extraction, we compared the differences between combining
+various LLMs (GPT-4, CodeLlama-13B, DeepSeek-V3) and
+using the static analysis tool Joern parser [33] alone.
+Metrics. To evaluate the accuracy, we employ the follow-
+ing three metrics, i.e., true positives ( TP ), false positives
+(FP ), false negatives ( FN), precision (
+#TP
+#TP +#FP ), recall
+( #TP
+#TP +#FN ) and F1-score ( 2∗precision∗recall
+precision+recall ), to measure the
+accuracy of the above methodologies. These metrics are also
+used in previous studies to evaluate the technique’s performance
+[9], [17]. Because of signiﬁcant differences in the version count
+for distinct OSS, we compute the precision and recall for each
+OSS and report the average of precisions and recalls ﬁnally.
+C. Implementation Details
+We utilized Joern [33] for program slicing and developed
+Python scripts to extract control and data dependencies, out-
+putting the sliced statement s as dangerous ﬂows . We explored
+three LLM models, GPT-4 [30], CodeLlama-13B [31], and
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore.  Restrictions apply.

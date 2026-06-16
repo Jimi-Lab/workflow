@@ -1,0 +1,34 @@
+Page: 17
+Repair Needed: [NEEDS FIGURE EXTRACTION]
+
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2235
+Fig. 8.
+Comparative Outputs for the Same Input Across Different Models:
+GPT-4, CodeT5+, and CodeGen2.0.
+After using the same prompt with CodeT5+ and CodeGen2.0,
+we found that neither model provided a reasonable answer
+based on the bug-ﬁxing commit. For instance, when querying
+CodeT5+ about Cross-File Detections, where the bug-inducing
+commit is not in the same ﬁle as the bug-ﬁxing commit, we
+sought to identify which ﬁle in the Linux kernel might be
+responsible. Unlike GPT-4, which typically suggests potential
+ﬁlenames or directories, CodeT5+ and CodeGen2.0 returned
+a nonsensical sentence. For example, as shown in Fig. 8, all
+Fig. 9.
+Example of Failure Reason: Mapping Ghost.
+three models were prompted to identify which Linux kernel
+ﬁle might be the cause of the bug-ﬁxing commit 1e45d043 (as
+illustrated in Fig. 8(a)). GPT-4 correctly identiﬁed the potential
+directories related to the bug-inducing commit, and its response
+is displayed in Fig. 8(b). In contrast, CodeT5+ repeated re-
+sponded with “#PF error: [normal kernel read fault]” (Fig. 8(c)),
+a sentence from the bug-ﬁxing commit itself, offering no insight
+into the ﬁlename. CodeGen2.0’s response was also off target,
+returning unrelated license content, as detailed in Fig. 8(d).
+Similarly, with Function-Blame Detections, when attempting
+to use prompts to have CodeT5+ or CodeGen2.0 pinpoint the
+problematic line, both failed to specify a line, instead generating
+an extensive amount of code.
+Our results demonstrate a signiﬁcant limitation in the ca-
+pabilities of current models, 

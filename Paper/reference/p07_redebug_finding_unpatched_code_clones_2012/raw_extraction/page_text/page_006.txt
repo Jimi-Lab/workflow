@@ -1,0 +1,107 @@
+A standard approach for comparing all N ﬁles requires that
+we compare ﬁle 1 to ﬁle 2 through N, ﬁle 2 to ﬁle 3 through
+N, and so on with a total of N(N−1)
+2
+comparisons.
+In order to make pairwise comparisons cheap, we need
+to implement the Jaccard SIMILARITY set-wise similarity
+comparisons efﬁciently. Most standard libraries implement
+the Jaccard index directly as a set operation on set data con-
+tainer classes, e.g., as done in SimMetrics [4]. The problem
+is that set data structures are L1/L2 cache inefﬁcient.
+ReDeBug uses bitvectors in order to speed up pair-wise
+comparisons. The idea is that the bitvector operation well-
+approximates a true Jaccard based upon the original sets.
+However, the Bloom ﬁlters we described above are designed
+for set membership, not calculating the Jaccard. Jang et al.
+noticed that as the number of hash functions used in a Bloom
+ﬁlter grows, so does the error in the approximation [22]. The
+solution is to use a single hash function when creating the
+bitvectors for SIMILARITY, not multiple hash functions. A
+single hash function approach is called feature hashing. Jang
+et al. [22] show that feature hashing well approximates the
+true Jaccard in both theory and practice (e.g., within 99.99%
+of the true value with proper parameter selection); we adopt
+their technique in ReDeBug. A side beneﬁt is that a single
+hash is faster than multiple hashes used in typical Bloom
+ﬁlter operations.
+ReDeBug encodes all elements in a bitvector using fea-
+ture hashing. ReDeBug then calculates the distance using
+SIMILARITYbv instead of Equation 2,
+SIMILARITYbv(va, vb) = S(va ∧vb)
+S(va ∨vb)
+where vi is the bitvector representation of the feature set for
+ﬁle i and S(·) counts the number of set bits.
+The complete system for computing similarity for OS-
+distributions becomes:
+1) Obtain all source code. For Debian and Ubuntu, this
+is done with apt. For SourceForge, we crawled all
+Subversion, CVS and Git directories.
+2) For each ﬁle, normalize and tokenize as described in
+§ II-A.
+3) For each n-length token sequence i, compute h(i) = d
+and set the d’th bit in the respective ﬁle bitvector m.
+4) Compute SIMILARITYbv between each pair of bitvec-
+tors.
+The result is a pairwise similarity measurement between
+ﬁles. In a development environment we would only return
+those with a similarity greater than θ.
+Similarity at different granularities: The source ﬁle level
+provides a relatively coarse granularity of measurement
+between code bases. ReDeBug can extract functions from
+ﬁles, and compute similarity based upon functions using
+the same algorithm. ReDeBug can also calculate the total
+fraction of unique n-tokens. The total fraction of n-tokens
+suggests the number of unique code fragments found. In our
+evaluation, we measure both for our data sets (§ III-H).
+D. Similarity vs. Bug Finding
+The algorithm for ﬁnding bugs is similar to that for
+similarity detection, with a few exceptions. First, we pre-
+process the source to build a database. Patches are queried
+against the database while every pair of ﬁles is compared
+when computing similarity. The advantage of this is that the
+time to build a database and to query bugs increases only
+linearly as we have more ﬁles and patches. The time for
+similarity detection quadratically goes up with more ﬁles
+due to N 2 comparisons.
+The second difference is that we use Bloom ﬁlters for un-
+patched code clone detection, while we used feature hashing
+for similarity detection. We originally wanted a system that
+used a single algorithm. While conceptually more elegant,
+such a design wasn’t optimal in either scenario. For example,
+if we had based our similarity metric on Bloom ﬁlters with
+multiple hash functions, we would have a larger error rate
+than with feature hashing due to extra collisions from the
+extra hash functions. If we had used feature hashing instead
+of Bloom ﬁlters, we would again have lower accuracy when
+performing set membership tests. While this may seem like a
+subtle difference, previous theoretical and empirical analysis
+also back up the difference between feature hashing and
+Bloom ﬁlters [22, 29].
+Luckily, the internals of implementing both feature hash-
+ing and Bloom ﬁlters is almost identical. In one case we use
+a single hash function and have a distance metric interface,
+and in the other we use multiple hash functions and export
+a set membership interface.
+III. IMPLEMENTATION & EVALUATION
+A. Implementation
+ReDeBug is implemented in about 1000 lines of C
+code and 250 lines of Python. Normalization is mod-
+ularized within the Python code. We use the QuickLZ
+library [3] to perform compression/decompression while
+setting QLZ_COMPRESSION_LEVEL to 3 for faster decom-
+pression speed.
+B. Unpatched Code Clone Detection Experimental Setup
+System Environment: We performed all experiments to
+ﬁnd unpatched code clones (both building and querying the
+database) on a desktop machine running Linux 2.6.38 (3.4
+GHz Intel Core i7 CPU, 8GB memory, 256 GB SSD drive).
+We utilized 8 threads to build a DB and to query bugs.
+Dataset: We collected our source code dataset twice: early
+in 2011 and late in 2011. We ﬁrst collected our Early 2011
+Dataset (Σ1) in January/March 2011: all source packages for
+Debian 5.0 Lenny and Ubuntu 10.10 Maverick, as well as
+all public SourceForge C/C++ projects using version control
+systems such as Subversion, CVS and Git, and the Linux
+53
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 

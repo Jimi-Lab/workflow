@@ -1,0 +1,62 @@
+LYU et al.: EVALUATING SZZ IMPLEMENTATIONS
+2235
+Fig. 8.
+Comparative Outputs for the Same Input Across Different Models:
+GPT-4, CodeT5+, and CodeGen2.0.
+After using the same prompt with CodeT5+ and CodeGen2.0,
+we found that neither model provided a reasonable answer
+based on the bug-ﬁxing commit. For instance, when querying
+CodeT5+ about Cross-File Detections, where the bug-inducing
+commit is not in the same ﬁle as the bug-ﬁxing commit, we
+sought to identify which ﬁle in the Linux kernel might be
+responsible. Unlike GPT-4, which typically suggests potential
+ﬁlenames or directories, CodeT5+ and CodeGen2.0 returned
+a nonsensical sentence. For example, as shown in Fig. 8, all
+Fig. 9.
+Example of Failure Reason: Mapping Ghost.
+three models were prompted to identify which Linux kernel
+ﬁle might be the cause of the bug-ﬁxing commit 1e45d043 (as
+illustrated in Fig. 8(a)). GPT-4 correctly identiﬁed the potential
+directories related to the bug-inducing commit, and its response
+is displayed in Fig. 8(b). In contrast, CodeT5+ repeated re-
+sponded with “#PF error: [normal kernel read fault]” (Fig. 8(c)),
+a sentence from the bug-ﬁxing commit itself, offering no insight
+into the ﬁlename. CodeGen2.0’s response was also off target,
+returning unrelated license content, as detailed in Fig. 8(d).
+Similarly, with Function-Blame Detections, when attempting
+to use prompts to have CodeT5+ or CodeGen2.0 pinpoint the
+problematic line, both failed to specify a line, instead generating
+an extensive amount of code.
+Our results demonstrate a signiﬁcant limitation in the ca-
+pabilities of current models, such as CodeT5+ and CodeGen,
+to offer precise, context-relevant assistance in identifying bug-
+inducing commits, particularly in complex scenarios involving
+cross-ﬁle analysis and speciﬁc line identiﬁcation within large
+codebases like the Linux kernel. It also motivates the need for
+developing more sophisticated LLMs, incorporating instruction
+tuning and domain knowledge, to improve performance in de-
+tecting bug-inducing commits, possibly even surpassing GPT-
+4’s capabilities.
+VIII. DISCUSSION
+Although we categorized the failures of SZZ algorithms
+based on their location (i.e., function-log, within-ﬁle, or cross-
+ﬁle detection) in Section VI-C, we did not explore the reasons
+behind these failures, which could lead to improvements in the
+SZZ algorithm. In this section, we give a brief discussion based
+on our qualitative analysis.
+(1) Mapping Ghost: This category of cases are similar to the
+Remove Mapping Ghost situation, where the lines removed in
+the bug-ﬁxing commit do not directly assist in identifying the
+bug-inducing commit. However, they are crucial for resolving
+the bug. For instance, as shown in Fig. 9, in the bug-ﬁxing
+commit 5e154df,25 the ﬁx creates a wrapper that causes the
+original function to be called via a function pointer (line 1818-
+1821). Thus, it is necessary to change the name of the original
+function (line 1655), and this is an integral part of the bug ﬁx.
+However, the removed line in line 1655, while crucial for the
+bug-ﬁx, does not assist in identifying the bug-inducing commit.
+The core issue lies in the absence of a functionality rather than
+a defect in the existing functionality.
+25https://github.com/torvalds/linux/commit/5e154dfb4f9995096aa6d342df7
+5040ae802c17e
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:34:02 UTC from IEEE Xplore.  Restrictions apply. 

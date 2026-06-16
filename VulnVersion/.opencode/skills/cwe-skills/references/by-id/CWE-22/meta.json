@@ -1,0 +1,283 @@
+{
+  "cwe_id": "CWE-22",
+  "name": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')",
+  "abstraction": "Base",
+  "status": "Stable",
+  "description": "The product uses external input to construct a pathname that is intended to identify a file or directory that is located underneath a restricted parent directory, but the product does not properly neutralize special elements within the pathname that can cause the pathname to resolve to a location that is outside of the restricted directory.",
+  "extended_description": "Many file operations are intended to take place within a restricted directory. By using special elements such as \"..\" and \"/\" separators, attackers can escape outside of the restricted location to access files or directories that are elsewhere on the system. One of the most common special elements is the \"../\" sequence, which in most modern operating systems is interpreted as the parent directory of the current location. This is referred to as relative path traversal. Path traversal also covers the use of absolute pathnames such as \"/usr/local/bin\" to access unexpected files. This is referred to as absolute path traversal.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-706",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Use of Incorrectly-Resolved Name or Reference"
+      },
+      {
+        "cwe_id": "CWE-706",
+        "nature": "ChildOf",
+        "view_id": "1003",
+        "ordinal": "Primary",
+        "name": "Use of Incorrectly-Resolved Name or Reference"
+      }
+    ],
+    "children": [],
+    "peers": [
+      {
+        "cwe_id": "CWE-668",
+        "nature": "CanPrecede",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Exposure of Resource to Wrong Sphere"
+      }
+    ]
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "AI/ML"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Implementation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "This CWE entry might have children that would be more appropriate."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product uses external input to construct a pathname that is intended to identify a file or directory that is located underneath a restricted parent directory, but the product does not properly neutralize special...",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Implementation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "directory",
+      "restricted",
+      "traversal",
+      "pathname"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "directory",
+      "restricted",
+      "traversal",
+      "pathname",
+      "path",
+      "elements",
+      "location",
+      "special"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "The following code could be for a social networking application in which each user's profile information is stored in a separate file. All files are stored in...",
+        "snippet": "my $dataPath = \"/users/cwe/profiles\"; my $username = param(\"user\"); my $profilePath = $dataPath . \"/\" . $username; open(my $fh, \"<\", $profilePath) || ExitError(\"profile read error: $profilePath\"); print \"<ul>\\n\"; while..."
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "In the example below, the path to a dictionary file is read from a system property and used to initialize a File object.",
+        "snippet": "String filename = System.getProperty(\"com.domain.application.dictionaryFile\"); File dictionaryFile = new File(filename);"
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "The following code takes untrusted input and uses a regular expression to filter \"../\" from the input. It then appends this result to the /home/user/ directory...",
+        "snippet": "my $Username = GetUntrustedInput(); $Username =~ s/\\.\\.\\///; my $filename = \"/home/user/\" . $Username; ReadAndSendFile($filename);"
+      },
+      {
+        "language": "Java",
+        "nature": "Bad",
+        "summary": "The following code attempts to validate a given input path by checking it against an allowlist and once validated delete the given file. In this specific case,...",
+        "snippet": "String path = getInputPath(); if (path.startsWith(\"/safe_dir/\")) { File f = new File(path); f.delete() }"
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "HTML",
+        "nature": "Good",
+        "summary": "The following code demonstrates the unrestricted upload of a file with a Java servlet and a path traversal vulnerability. The action attribute of an HTML form...",
+        "snippet": "<form action=\"FileUploadServlet\" method=\"post\" enctype=\"multipart/form-data\"> Choose a file to upload: <input type=\"file\" name=\"filename\"/> <br/> <input type=\"submit\" name=\"submit\" value=\"Submit\"/> </form>"
+      },
+      {
+        "language": "Python",
+        "nature": "Good",
+        "summary": "This script intends to read a user-supplied file from the current directory. The user inputs the relative path to the file and the script uses Python's...",
+        "snippet": "import os import sys def main(): filename = sys.argv[1] path = os.path.normpath(f\"{os.getcwd()}{os.sep}{filename}\") if path.startswith(\"/home/cwe/documents/\"): try: with open(path, 'r') as f: file_data = f.read() except..."
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2024-37032",
+        "description": "Large language model (LLM) management tool does not validate the format of a digest value (CWE-1287) from a private, untrusted model registry, enabling relative path traversal (CWE-23), a.k.a. Probllama",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-37032"
+      },
+      {
+        "reference": "CVE-2024-4315",
+        "description": "Chain: API for text generation using Large Language Models (LLMs) does not include the \"\\\" Windows folder separator in its denylist (CWE-184) when attempting to prevent Local File Inclusion via path traversal (CWE-22),...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-4315"
+      },
+      {
+        "reference": "CVE-2024-0520",
+        "description": "Product for managing datasets for AI model training and evaluation allows both relative (CWE-23) and absolute (CWE-36) path traversal to overwrite files via the Content-Disposition header",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2024-0520"
+      },
+      {
+        "reference": "CVE-2022-45918",
+        "description": "Chain: a learning management tool debugger uses external input to locate previous session logs (CWE-73) and does not properly validate the given path (CWE-20), allowing for filesystem path traversal using \"../\"...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-45918"
+      },
+      {
+        "reference": "CVE-2019-20916",
+        "description": "Python package manager does not correctly restrict the filename specified in a Content-Disposition header, allowing arbitrary file read using path traversal sequences such as \"../\"",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2019-20916"
+      },
+      {
+        "reference": "CVE-2022-31503",
+        "description": "Python package constructs filenames using an unsafe os.path.join call on untrusted input, allowing absolute path traversal because os.path.join resets the pathname to an absolute path that is specified as part of the...",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-31503"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

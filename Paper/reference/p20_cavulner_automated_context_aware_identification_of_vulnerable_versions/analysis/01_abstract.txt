@@ -1,0 +1,48 @@
+Problem:
+- For instance, a report [6] by Black Duck reveals that 86% of codebases contain components with known vulnerabilities.
+- The number of known software vulnerabilities has been increasing rapidly in recent years, which extensively influenced the ecosystem.
+- To manage this growing threat, organizations such as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate critical information on disclosed vulnerabilities, to support the wide usage of software supply chain tools like Software Composition Analysis (SCA), to assess potential risks.
+- In this case, SCA tools rely heavily on the accuracy of vulnerability data, especially the correct vulnerable versions, for automated mappings of security risks in downstream user projects.
+- However, multiple studies [9, 16, 33, 42] have shown that these vulnerability records often contain inconsistencies or errors, which can seriously mislead maintenance decisions.
+Gap:
+- However, multiple studies [9, 16, 33, 42] have shown that these vulnerability records often contain inconsistencies or errors, which can seriously mislead maintenance decisions.
+Core Idea:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- Furthermore, with the recent and rapid emergence of powerful large language models, a growing body of recent studies has actively explored their potential integration into and enhancement of traditional SZZ-based workflows.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- Given the success of SZZ in the bug localization domain, it has subsequently been adapted for vulnerability analysis, particularly in identifying vulnerability-inducing commits and inferring vulnerability-affecting version ranges.
+- One notable and direct adaptation of this methodology is exemplified by V-SZZ [9], which operates by attempting to systematically trace backwards from a known vulnerability-fixing commit in order to identify and pinpoint the specific earlier commit that originally introduced the security flaw, primarily through the analysis of lines of code that were deleted within the fix patch.
+- More importantly, despite the shared conceptual basis, there are fundamental differences between bugs and vulnerabilities that are often not well accounted for in these approaches.
+Method:
+- methodology significantly enhance the original method by addressing common issues such as noise, inaccurate line mapping, and commit granularity.
+- Furthermore, with the recent and rapid emergence of powerful large language models, a growing body of recent studies has actively explored their potential integration into and enhancement of traditional SZZ-based workflows.
+- introduced LLM4SZZ [ 43], which leverages the semantic capabilities of language models to more accurately detect bug-inducing commits based on patch content and commit messages.
+- Given the success of SZZ in the bug localization domain, it has subsequently been adapted for vulnerability analysis, particularly in identifying vulnerability-inducing commits and inferring vulnerability-affecting version ranges.
+- One notable and direct adaptation of this methodology is exemplified by V-SZZ [9], which operates by attempting to systematically trace backwards from a known vulnerability-fixing commit in order to identify and pinpoint the specific earlier commit that originally introduced the security flaw, primarily through the analysis of lines of code that were deleted within the fix patch.
+- More importantly, despite the shared conceptual basis, there are fundamental differences between bugs and vulnerabilities that are often not well accounted for in these approaches.
+Evaluation Setup:
+- 4 Evaluation Our implementation leverages the LangChain framework [3] for systematic pipeline construction.
+- All experiments are conducted on a machine equipped with an AMD EPYC 9654 CPU, 32 GB of RAM, and running Ubuntu 20.04.
+- We systematically evaluate CaVulner by addressing the following three research questions (RQs): RQ1.
+- We leveraged the dataset compiled by Ponta et al.
+- This dataset was also utilized in the studies by V-SZZ [9] and VERJava [42].
+- The dataset of V-SZZ covered various types of vulnerabilities.
+- The CVEs in the VERJava dataset span a broad period of each project’s lifecycle, represent various vulnerability types, and involve patches of varying sizes.
+Main Results:
+- As shown in Table 1, it resulted in a corpus of 176 CVEs across 43 distinct Java projects and encompassing all 8,730 versions, including popular projects such as jackson-databind [19], liferay- portal [29], jenkins [22], struts [7], tomcat [8], spring-framework [40] and spring-security [41].
+- Comparison with baselines at the CVE level (GT: Ground Truth) Project GT V-SZZ VERJava LLM4SZZ CaVulner True False Accuracy True False Accuracy True False Accuracy True False Accuracy jackson-databind 62 0 62 0.00% 0 62 0.00% 0 62 0.00% 42 20 67.74% liferay-portal 18 8 10 44.44% 1 17 5.56% 6 12 33.33% 10 8 55.56% jenkins 17 3 14 17.65% 4 13 23.53% 3 14 17.65% 12 5 70.59% struts 14 9 5 64.29% 9 5 64.29% 8 6 57.14% 13 1 92.86% tomcat 7 4 3 57.14% 3 4 42.86% 6 1 85.71% 6 1 85.71% spring-framework 7 4 3 57.14% 3 4 42.86% 5 2 71.43% 6 1 85.71% spring-security 3 2 1 66.67% 1 2 33.33% 2 1 66.67% 3 0 100.00% other 48 36 12 75.00% 15 33 31.25% 29 19 60.42% 37 11 77.08% Total 176 66 110 37.50% 36 140 20.45% 59 117 33.52% 129 47 73.30% further verified and refined the fix commit datasets for both V-SZZ and VERJava based on GitHub issues and official project websites.
+- As a result, we obtained a total of 273 fix commits.
+Contribution Wording:
+- Use as a structural pattern only: problem gap -> method object -> evaluation claim -> contribution list.
+Limitations or Scope Boundaries:
+- However, they heavily rely on the lines of changes in fix commits to trace the introduction of vulnerable code, while vulnerable code may not always be covered in fix commit diffs [36].
+- The severity of these limitations was highlighted by the latest comprehensive empirical study [13] on this topic.
+- The first stage focuses on coarse-grained localization by narrowing down candidate methods based on fix commit change patterns, such as whether a method contains only deletions, only additions, or both, and by incorporating relevant vulnerability information from CVE descriptions and CWE classifications.
+- On average, the LLM cost per vulnerability is only around $0.06.
+- To manage this growing threat, organizations such as the National Vulnerability Database (NVD) [ 31] and GitHub Advisory Database [ 2] curate critical information on disclosed vulnerabilities, to support the wide usage of software supply chain tools like Software Composition Analysis (SCA), to assess potential risks.
+Reusable Writing Pattern:
+- Define a security maintenance pain point, name the evidence source, then position the method as a way to improve precision/coverage over prior SZZ/version-validation workflows.
+Relevance to Our Paper:
+- Relevant for framing affected versions, vulnerability validation, SZZ/agent baselines, and evidence requirements.
+Do Not Borrow:
+- Do not copy numeric claims or dataset claims until tables and references are repaired. [NEEDS TABLE REPAIR], [NEEDS FIGURE EXTRACTION], [NEEDS LAYOUT BLOCK EXTRACTION], [NEEDS CITATION VERIFICATION], [EXECUTION NOT REQUESTED]

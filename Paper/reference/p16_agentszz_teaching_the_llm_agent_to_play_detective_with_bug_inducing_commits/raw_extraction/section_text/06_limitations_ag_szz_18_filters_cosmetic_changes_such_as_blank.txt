@@ -1,0 +1,16 @@
+limitations. AG-SZZ [18] filters cosmetic changes such as blank
+lines and comments, and introduces annotation graphs to track
+line origins more precisely across revisions. MA-SZZ [10] extends
+this by excluding meta-changes (e.g., branch merges and property
+changes) that do not alter program behavior. RA-SZZ [24] further
+detects and filters refactoring operations using RefDiff [ 32] and
+Refactoring Miner [38], though this capability is limited to Java.
+When multiple candidates remain, R-SZZ and L-SZZ [ 12] apply
+simple heuristics, selecting the most recent commit or the one with
+the most changed lines, respectively.
+More recent work shifts from heuristic filtering to learned or
+model-based ranking. Neural-SZZ [35] embeds changed lines using
+CodeBERT [14] and ranks candidates via a heterogeneous graph
+attention network, capturing semantic relationships beyond rule-
+based methods. LLM4SZZ [ 36] further leverages LLMs to assess
+blame candidates with expanded context, achieving state-of-the-art

@@ -1,0 +1,466 @@
+1:/*
+2: * This file is part of FFmpeg.
+3: *
+4: * FFmpeg is free software; you can redistribute it and/or
+5: * modify it under the terms of the GNU Lesser General Public
+6: * License as published by the Free Software Foundation; either
+7: * version 2.1 of the License, or (at your option) any later version.
+8: *
+9: * FFmpeg is distributed in the hope that it will be useful,
+10: * but WITHOUT ANY WARRANTY; without even the implied warranty of
+11: * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+12: * Lesser General Public License for more details.
+13: *
+14: * You should have received a copy of the GNU Lesser General Public
+15: * License along with FFmpeg; if not, write to the Free Software
+16: * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+17: */
+18:
+19:#include "cbs.h"
+20:#include "cbs_internal.h"
+21:#include "cbs_jpeg.h"
+22:
+23:
+24:#define HEADER(name) do { \
+25:        ff_cbs_trace_header(ctx, name); \
+26:    } while (0)
+27:
+28:#define CHECK(call) do { \
+29:        err = (call); \
+30:        if (err < 0) \
+31:            return err; \
+32:    } while (0)
+33:
+34:#define SUBSCRIPTS(subs, ...) (subs > 0 ? ((int[subs + 1]){ subs, __VA_ARGS__ }) : NULL)
+35:
+36:#define u(width, name, range_min, range_max) \
+37:    xu(width, name, range_min, range_max, 0, )
+38:#define us(width, name, sub, range_min, range_max) \
+39:    xu(width, name, range_min, range_max, 1, sub)
+40:
+41:
+42:#define READ
+43:#define READWRITE read
+44:#define RWContext GetBitContext
+45:#define FUNC(name) cbs_jpeg_read_ ## name
+46:
+47:#define xu(width, name, range_min, range_max, subs, ...) do { \
+48:        uint32_t value; \
+49:        CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
+50:                                   SUBSCRIPTS(subs, __VA_ARGS__), \
+51:                                   &value, range_min, range_max)); \
+52:        current->name = value; \
+53:    } while (0)
+54:
+55:#include "cbs_jpeg_syntax_template.c"
+56:
+57:#undef READ
+58:#undef READWRITE
+59:#undef RWContext
+60:#undef FUNC
+61:#undef xu
+62:
+63:#define WRITE
+64:#define READWRITE write
+65:#define RWContext PutBitContext
+66:#define FUNC(name) cbs_jpeg_write_ ## name
+67:
+68:#define xu(width, name, range_min, range_max, subs, ...) do { \
+69:        uint32_t value = current->name; \
+70:        CHECK(ff_cbs_write_unsigned(ctx, rw, width, #name, \
+71:                                    SUBSCRIPTS(subs, __VA_ARGS__), \
+72:                                    value, range_min, range_max)); \
+73:    } while (0)
+74:
+75:
+76:#include "cbs_jpeg_syntax_template.c"
+77:
+78:#undef WRITE
+79:#undef READWRITE
+80:#undef RWContext
+81:#undef FUNC
+82:#undef xu
+83:
+84:
+85:static void cbs_jpeg_free_application_data(void *opaque, uint8_t *content)
+86:{
+87:    JPEGRawApplicationData *ad = (JPEGRawApplicationData*)content;
+88:    av_buffer_unref(&ad->Ap_ref);
+89:    av_freep(&content);
+90:}
+91:
+92:static void cbs_jpeg_free_comment(void *opaque, uint8_t *content)
+93:{
+94:    JPEGRawComment *comment = (JPEGRawComment*)content;
+95:    av_buffer_unref(&comment->Cm_ref);
+96:    av_freep(&content);
+97:}
+98:
+99:static void cbs_jpeg_free_scan(void *opaque, uint8_t *content)
+100:{
+101:    JPEGRawScan *scan = (JPEGRawScan*)content;
+102:    av_buffer_unref(&scan->data_ref);
+103:    av_freep(&content);
+104:}
+105:
+106:static int cbs_jpeg_split_fragment(CodedBitstreamContext *ctx,
+107:                                   CodedBitstreamFragment *frag,
+108:                                   int header)
+109:{
+110:    AVBufferRef *data_ref;
+111:    uint8_t *data;
+112:    size_t data_size;
+113:    int start, end, marker, next_start, next_marker;
+114:    int err, i, j, length;
+115:
+116:    if (frag->data_size < 4) {
+117:        // Definitely too short to be meaningful.
+118:        return AVERROR_INVALIDDATA;
+119:    }
+120:
+121:    for (i = 0; i + 1 < frag->data_size && frag->data[i] != 0xff; i++);
+122:    if (i > 0) {
+123:        av_log(ctx->log_ctx, AV_LOG_WARNING, "Discarding %d bytes at "
+124:               "beginning of image.\n", i);
+125:    }
+126:    for (++i; i + 1 < frag->data_size && frag->data[i] == 0xff; i++);
+127:    if (i + 1 >= frag->data_size && frag->data[i]) {
+128:        av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid JPEG image: "
+129:               "no SOI marker found.\n");
+130:        return AVERROR_INVALIDDATA;
+131:    }
+132:    marker = frag->data[i];
+133:    if (marker != JPEG_MARKER_SOI) {
+134:        av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid JPEG image: first "
+135:               "marker is %02x, should be SOI.\n", marker);
+136:        return AVERROR_INVALIDDATA;
+137:    }
+138:    for (++i; i + 1 < frag->data_size && frag->data[i] == 0xff; i++);
+139:    if (i + 1 >= frag->data_size) {
+140:        av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid JPEG image: "
+141:               "no image content found.\n");
+142:        return AVERROR_INVALIDDATA;
+143:    }
+144:    marker = frag->data[i];
+145:    start  = i + 1;
+146:
+147:    do {
+148:        if (marker == JPEG_MARKER_EOI) {
+149:            break;
+150:        } else if (marker == JPEG_MARKER_SOS) {
+151:            next_marker = -1;
+152:            end = start;
+153:            for (i = start; i + 1 < frag->data_size; i++) {
+154:                if (frag->data[i] != 0xff)
+155:                    continue;
+156:                end = i;
+157:                for (++i; i + 1 < frag->data_size &&
+158:                          frag->data[i] == 0xff; i++);
+159:                if (i + 1 < frag->data_size) {
+160:                    if (frag->data[i] == 0x00)
+161:                        continue;
+162:                    next_marker = frag->data[i];
+163:                    next_start  = i + 1;
+164:                }
+165:                break;
+166:            }
+167:        } else {
+168:            i = start;
+169:            if (i + 2 > frag->data_size) {
+170:                av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid JPEG image: "
+171:                       "truncated at %02x marker.\n", marker);
+172:                return AVERROR_INVALIDDATA;
+173:            }
+174:            length = AV_RB16(frag->data + i);
+175:            if (i + length > frag->data_size) {
+176:                av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid JPEG image: "
+177:                       "truncated at %02x marker segment.\n", marker);
+178:                return AVERROR_INVALIDDATA;
+179:            }
+180:            end = start + length;
+181:
+182:            i = end;
+183:            if (frag->data[i] != 0xff) {
+184:                next_marker = -1;
+185:            } else {
+186:                for (++i; i + 1 < frag->data_size &&
+187:                          frag->data[i] == 0xff; i++);
+188:                if (i + 1 >= frag->data_size) {
+189:                    next_marker = -1;
+190:                } else {
+191:                    next_marker = frag->data[i];
+192:                    next_start  = i + 1;
+193:                }
+194:            }
+195:        }
+196:
+197:        if (marker == JPEG_MARKER_SOS) {
+198:            length = AV_RB16(frag->data + start);
+199:
+200:            if (length > end - start)
+201:                return AVERROR_INVALIDDATA;
+202:
+203:            data_ref = NULL;
+204:            data     = av_malloc(end - start +
+205:                                 AV_INPUT_BUFFER_PADDING_SIZE);
+206:            if (!data)
+207:                return AVERROR(ENOMEM);
+208:
+209:            memcpy(data, frag->data + start, length);
+210:            for (i = start + length, j = length; i < end; i++, j++) {
+211:                if (frag->data[i] == 0xff) {
+212:                    while (frag->data[i] == 0xff)
+213:                        ++i;
+214:                    data[j] = 0xff;
+215:                } else {
+216:                    data[j] = frag->data[i];
+217:                }
+218:            }
+219:            data_size = j;
+220:
+221:            memset(data + data_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+222:
+223:        } else {
+224:            data      = frag->data + start;
+225:            data_size = end - start;
+226:            data_ref  = frag->data_ref;
+227:        }
+228:
+229:        err = ff_cbs_append_unit_data(frag, marker,
+230:                                      data, data_size, data_ref);
+231:        if (err < 0)
+232:            return err;
+233:
+234:        marker = next_marker;
+235:        start  = next_start;
+236:    } while (next_marker != -1);
+237:
+238:    return 0;
+239:}
+240:
+241:static int cbs_jpeg_read_unit(CodedBitstreamContext *ctx,
+242:                              CodedBitstreamUnit *unit)
+243:{
+244:    GetBitContext gbc;
+245:    int err;
+246:
+247:    err = init_get_bits(&gbc, unit->data, 8 * unit->data_size);
+248:    if (err < 0)
+249:        return err;
+250:
+251:    if (unit->type >= JPEG_MARKER_SOF0 &&
+252:        unit->type <= JPEG_MARKER_SOF3) {
+253:        err = ff_cbs_alloc_unit_content(unit,
+254:                                        sizeof(JPEGRawFrameHeader),
+255:                                        NULL);
+256:        if (err < 0)
+257:            return err;
+258:
+259:        err = cbs_jpeg_read_frame_header(ctx, &gbc, unit->content);
+260:        if (err < 0)
+261:            return err;
+262:
+263:    } else if (unit->type >= JPEG_MARKER_APPN &&
+264:               unit->type <= JPEG_MARKER_APPN + 15) {
+265:        err = ff_cbs_alloc_unit_content(unit,
+266:                                        sizeof(JPEGRawApplicationData),
+267:                                        &cbs_jpeg_free_application_data);
+268:        if (err < 0)
+269:            return err;
+270:
+271:        err = cbs_jpeg_read_application_data(ctx, &gbc, unit->content);
+272:        if (err < 0)
+273:            return err;
+274:
+275:    } else if (unit->type == JPEG_MARKER_SOS) {
+276:        JPEGRawScan *scan;
+277:        int pos;
+278:
+279:        err = ff_cbs_alloc_unit_content(unit,
+280:                                        sizeof(JPEGRawScan),
+281:                                        &cbs_jpeg_free_scan);
+282:        if (err < 0)
+283:            return err;
+284:        scan = unit->content;
+285:
+286:        err = cbs_jpeg_read_scan_header(ctx, &gbc, &scan->header);
+287:        if (err < 0)
+288:            return err;
+289:
+290:        pos = get_bits_count(&gbc);
+291:        av_assert0(pos % 8 == 0);
+292:        if (pos > 0) {
+293:            scan->data_size = unit->data_size - pos / 8;
+294:            scan->data_ref  = av_buffer_ref(unit->data_ref);
+295:            if (!scan->data_ref)
+296:                return AVERROR(ENOMEM);
+297:            scan->data = unit->data + pos / 8;
+298:        }
+299:
+300:    } else {
+301:        switch (unit->type) {
+302:#define SEGMENT(marker, type, func, free) \
+303:        case JPEG_MARKER_ ## marker: \
+304:            { \
+305:                err = ff_cbs_alloc_unit_content(unit, \
+306:                                                sizeof(type), free); \
+307:                if (err < 0) \
+308:                    return err; \
+309:                err = cbs_jpeg_read_ ## func(ctx, &gbc, unit->content); \
+310:                if (err < 0) \
+311:                    return err; \
+312:            } \
+313:            break
+314:            SEGMENT(DQT, JPEGRawQuantisationTableSpecification, dqt, NULL);
+315:            SEGMENT(DHT, JPEGRawHuffmanTableSpecification,      dht, NULL);
+316:            SEGMENT(COM, JPEGRawComment,  comment, &cbs_jpeg_free_comment);
+317:#undef SEGMENT
+318:        default:
+319:            return AVERROR(ENOSYS);
+320:        }
+321:    }
+322:
+323:    return 0;
+324:}
+325:
+326:static int cbs_jpeg_write_scan(CodedBitstreamContext *ctx,
+327:                               CodedBitstreamUnit *unit,
+328:                               PutBitContext *pbc)
+329:{
+330:    JPEGRawScan *scan = unit->content;
+331:    int err;
+332:
+333:    err = cbs_jpeg_write_scan_header(ctx, pbc, &scan->header);
+334:    if (err < 0)
+335:        return err;
+336:
+337:    if (scan->data) {
+338:        if (scan->data_size * 8 > put_bits_left(pbc))
+339:            return AVERROR(ENOSPC);
+340:
+341:        av_assert0(put_bits_count(pbc) % 8 == 0);
+342:
+343:        flush_put_bits(pbc);
+344:
+345:        memcpy(put_bits_ptr(pbc), scan->data, scan->data_size);
+346:        skip_put_bytes(pbc, scan->data_size);
+347:    }
+348:
+349:    return 0;
+350:}
+351:
+352:static int cbs_jpeg_write_segment(CodedBitstreamContext *ctx,
+353:                                  CodedBitstreamUnit *unit,
+354:                                  PutBitContext *pbc)
+355:{
+356:    int err;
+357:
+358:    if (unit->type >= JPEG_MARKER_SOF0 &&
+359:        unit->type <= JPEG_MARKER_SOF3) {
+360:        err = cbs_jpeg_write_frame_header(ctx, pbc, unit->content);
+361:    } else if (unit->type >= JPEG_MARKER_APPN &&
+362:               unit->type <= JPEG_MARKER_APPN + 15) {
+363:        err = cbs_jpeg_write_application_data(ctx, pbc, unit->content);
+364:    } else {
+365:        switch (unit->type) {
+366:#define SEGMENT(marker, func) \
+367:            case JPEG_MARKER_ ## marker: \
+368:                err = cbs_jpeg_write_ ## func(ctx, pbc, unit->content); \
+369:                break;
+370:            SEGMENT(DQT, dqt);
+371:            SEGMENT(DHT, dht);
+372:            SEGMENT(COM, comment);
+373:        default:
+374:            return AVERROR_PATCHWELCOME;
+375:        }
+376:    }
+377:
+378:    return err;
+379:}
+380:
+381:static int cbs_jpeg_write_unit(CodedBitstreamContext *ctx,
+382:                               CodedBitstreamUnit *unit,
+383:                               PutBitContext *pbc)
+384:{
+385:    if (unit->type == JPEG_MARKER_SOS)
+386:        return cbs_jpeg_write_scan   (ctx, unit, pbc);
+387:    else
+388:        return cbs_jpeg_write_segment(ctx, unit, pbc);
+389:}
+390:
+391:static int cbs_jpeg_assemble_fragment(CodedBitstreamContext *ctx,
+392:                                       CodedBitstreamFragment *frag)
+393:{
+394:    const CodedBitstreamUnit *unit;
+395:    uint8_t *data;
+396:    size_t size, dp, sp;
+397:    int i;
+398:
+399:    size = 4; // SOI + EOI.
+400:    for (i = 0; i < frag->nb_units; i++) {
+401:        unit = &frag->units[i];
+402:        size += 2 + unit->data_size;
+403:        if (unit->type == JPEG_MARKER_SOS) {
+404:            for (sp = 0; sp < unit->data_size; sp++) {
+405:                if (unit->data[sp] == 0xff)
+406:                    ++size;
+407:            }
+408:        }
+409:    }
+410:
+411:    frag->data_ref = av_buffer_alloc(size + AV_INPUT_BUFFER_PADDING_SIZE);
+412:    if (!frag->data_ref)
+413:        return AVERROR(ENOMEM);
+414:    data = frag->data_ref->data;
+415:
+416:    dp = 0;
+417:
+418:    data[dp++] = 0xff;
+419:    data[dp++] = JPEG_MARKER_SOI;
+420:
+421:    for (i = 0; i < frag->nb_units; i++) {
+422:        unit = &frag->units[i];
+423:
+424:        data[dp++] = 0xff;
+425:        data[dp++] = unit->type;
+426:
+427:        if (unit->type != JPEG_MARKER_SOS) {
+428:            memcpy(data + dp, unit->data, unit->data_size);
+429:            dp += unit->data_size;
+430:        } else {
+431:            sp = AV_RB16(unit->data);
+432:            av_assert0(sp <= unit->data_size);
+433:            memcpy(data + dp, unit->data, sp);
+434:            dp += sp;
+435:
+436:            for (; sp < unit->data_size; sp++) {
+437:                if (unit->data[sp] == 0xff) {
+438:                    data[dp++] = 0xff;
+439:                    data[dp++] = 0x00;
+440:                } else {
+441:                    data[dp++] = unit->data[sp];
+442:                }
+443:            }
+444:        }
+445:    }
+446:
+447:    data[dp++] = 0xff;
+448:    data[dp++] = JPEG_MARKER_EOI;
+449:
+450:    av_assert0(dp == size);
+451:
+452:    memset(data + size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+453:    frag->data      = data;
+454:    frag->data_size = size;
+455:
+456:    return 0;
+457:}
+458:
+459:const CodedBitstreamType ff_cbs_type_jpeg = {
+460:    .codec_id          = AV_CODEC_ID_MJPEG,
+461:
+462:    .split_fragment    = &cbs_jpeg_split_fragment,
+463:    .read_unit         = &cbs_jpeg_read_unit,
+464:    .write_unit        = &cbs_jpeg_write_unit,
+465:    .assemble_fragment = &cbs_jpeg_assemble_fragment,
+466:};

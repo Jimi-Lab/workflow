@@ -1,0 +1,107 @@
+in the target program by detecting code clones between the
+vulnerability database and the program.
+Here, we can determine which vulnerability VUDDY is
+capable of discovering. As illustrated in Fig. 5(a), if setK
+is the set of every known vulnerability, thenK ⊂ V where
+V is the set consisting of all vulnerabilities. Naturally, we
+can regard U, the set of unknown vulnerabilities, andK as
+being disjoint, so that K ∪ U = V and K ∩ U = φ.I fa
+clone detector C only considers exact (Type-1) clones, then
+the coverage ofC is K. However, by the use of our abstraction
+strategy, the coverage of an abstract clone detectorˆC can also
+cover vulnerabilities inK′ as depicted in Fig. 5(b), which is
+a set of abstract vulnerabilities. This means that VUDDY can
+detect known vulnerabilities, as well as variants of the known
+vulnerabilities, which are inK′, where|K′∩U| >0. K′∩U is
+the set of unknown code clones discovered by VUDDY . The
+examples are provided in subsection IX-C.
+.8
+9
+(a) K and U are disjoint
+8
+9
+8.͛
+(b) K′ and U intersect
+Fig. 5: Relationship between known, unknown and variants of
+known vulnerabilities.
+VI. I MPLEMENTA TION
+We implemented VUDDY2 in Python 2.7.11, and the robust
+parser with the ANTLR parser generator 4.5.3 [35]. In this
+section, we discuss issues related to the implementation.
+A. Generating a robust parser
+One intuitive approach for obtaining functions from a
+program and analyzing their syntax is to use a compiler.
+However, the use of parsers integrated in compilers is evidently
+restricted to the occasions when a working build environment
+is available. In addition, even if we succeed to replicate the
+working environment, the source code may not be complete
+or may contain syntax errors, which blights the whole parsing
+procedure [36], [37]. Thus, we ensure that our method is
+feasible and sufﬁciently general to be used in practice by
+generating and utilizing a robust parser for C/C++ based on
+the concept of fuzzy parsing with the utilization of island
+grammars [38], [39]. This parser does not require a build
+environment or header information, which means it is able to
+parse an individual ﬁle, and does not fail when it encounters
+syntactic errors during parsing. Even when a broken or partial
+code is given, it parses as much as it understands.
+B. Selection of hash function
+Any hash function can be used for ﬁngerprint generation.
+However, we impose three constraints that need to be con-
+sidered in order to maximize the scalability and speed of
+2Our implementation is available at https://iotcube.net/
+our approach. First, to prevent two or more different and
+irrelevant functions from having the same hash value, it is
+necessary to avoid hash collision as much as possible. Second,
+building the smallest possible ﬁngerprint dictionary requires
+us to choose a hash function that produces the fewest possible
+bits of hash values. Third, to minimize the hashing time, the
+chosen function needs to be fast, and its implementation well-
+optimized. For VUDDY , we selected the MD5 hash algorithm,
+which completed hashing 20 million randomly generated al-
+phanumeric strings with their size ranging from 51 to 1,000
+bytes, in only 15 seconds without collision. Non-cryptographic
+hash algorithms such as CityHash [40], MurmurHash [41], and
+SpookyHash [42] were also considered, but they required a
+similar amount of time for the experiment. Thus, we decided
+to adopt MD5 which is provided as a built-in method of
+the Python Hashlib package, rather than taking unidentiﬁed
+risks by using third party hash libraries. Although we are
+aware that the MD5 hash algorithm suffers from cryptographic
+weaknesses [43], two facts make MD5 sufﬁcient: Our use of
+MD5 is not for cryptography; and VUDDY is designed such
+that hash collision occurs only when two different functions
+have identical lengths. Note that we exclude the use of fuzzy
+hash algorithms, which produce similar hash values for similar
+plaintexts, as distinguishing slightly modiﬁed clones from
+semantically changed code presents another problem.
+C. Dictionary implementation
+The ﬁngerprint dictionary is a crucial data structure in the
+implementation of VUDDY because it dramatically reduces
+the search space of possible clones and thus expedites the
+whole process. As previously stated, a dictionary is an asso-
+ciative container that maps keys to values. We chose to use
+the built-in dictionary data structure of Python, with which the
+average time complexity isO(1)for theinoperation to check
+the existence of an element among the keys of a dictionary,
+regardless of the number of elements.
+VII. E V ALUA TION
+We proceed to evaluate the efﬁcacy and effectiveness of
+VUDDY in two aspects: scalability and accuracy, by compar-
+ing VUDDY with other state-of-the-art techniques.
+A. Experimental setup and dataset
+System environment:We evaluated the execution and detec-
+tion performance of VUDDY by conducting experiments on a
+machine running Ubuntu 16.04, with a 2.40 GHz Intel Zeon
+processor, 32 GB RAM, and 6 TB HDD.
+Dataset: We collected our target C/C++ programs from
+GitHub. These programs had at least one star and were pushed
+at least during the period from January 1st, 2016 to July
+28, 2016. Repositories that are starred (i.e., bookmarked by
+GitHub users) are popular and inﬂuential repositories. The
+existence of a push record during the ﬁrst half of 2016 implies
+that the repository is active. The repository cloning process
+required 7 weeks to ﬁnish, gathering 25,253 Git repositories
+which satisfy the aforementioned two conditions. In addition
+602
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:36:49 UTC from IEEE Xplore.  Restrictions apply. 

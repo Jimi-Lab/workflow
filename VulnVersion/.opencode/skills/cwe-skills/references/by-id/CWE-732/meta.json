@@ -1,0 +1,282 @@
+{
+  "cwe_id": "CWE-732",
+  "name": "Incorrect Permission Assignment for Critical Resource",
+  "abstraction": "Class",
+  "status": "Draft",
+  "description": "The product specifies permissions for a security-critical resource in a way that allows that resource to be read or modified by unintended actors.",
+  "extended_description": "When a resource is given a permission setting that provides access to a wider range of actors than required, it could lead to the exposure of sensitive information, or the modification of that resource by unintended parties. This is especially dangerous when the resource is related to program configuration, execution, or sensitive user data. For example, consider a misconfigured storage account for the cloud that can be read or written by a public or anonymous user.",
+  "relationships": {
+    "parents": [
+      {
+        "cwe_id": "CWE-285",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": "Primary",
+        "name": "Improper Authorization"
+      },
+      {
+        "cwe_id": "CWE-668",
+        "nature": "ChildOf",
+        "view_id": "1000",
+        "ordinal": null,
+        "name": "Exposure of Resource to Wrong Sphere"
+      }
+    ],
+    "children": [],
+    "peers": []
+  },
+  "applicable_platforms": {
+    "languages": [
+      "Not Language-Specific"
+    ],
+    "technologies": [
+      "Not Technology-Specific",
+      "Cloud Computing"
+    ],
+    "architectures": [],
+    "paradigms": []
+  },
+  "introduction_phases": [
+    "Architecture and Design",
+    "Implementation",
+    "Installation",
+    "Operation"
+  ],
+  "likelihood_of_exploit": "High",
+  "mapping": {
+    "usage": "Allowed-with-Review",
+    "fit": "",
+    "rationale": "While the name itself indicates an assignment of permissions for resources, this is often misused for vulnerabilities in which \"permissions\" are not checked, which is an \"authorization\" weakness (CWE-285 or descendants) within CWE's model [REF-1287]."
+  },
+  "mechanism": {
+    "root_cause_summary": "The product specifies permissions for a security-critical resource in a way that allows that resource to be read or modified by unintended actors.",
+    "typical_preconditions": [
+      "untrusted or insufficiently validated state reaches sensitive operation",
+      "Architecture and Design",
+      "Implementation",
+      "Installation",
+      "Operation"
+    ],
+    "typical_sources": [
+      "untrusted or insufficiently validated state reaches sensitive operation"
+    ],
+    "typical_sinks": [
+      "security-relevant operation"
+    ],
+    "typical_fix_actions": [
+      "add explicit validation",
+      "constrain state before sink",
+      "fail closed on invalid condition"
+    ],
+    "negative_nonfix_signals": [
+      "comment-only change",
+      "rename-only change",
+      "logging-only change",
+      "style refactor without changing the sensitive path"
+    ]
+  },
+  "code_signals": {
+    "vuln_search_patterns": [
+      "security-sensitive sink without sufficient guard",
+      "permission",
+      "unintended",
+      "actors",
+      "read"
+    ],
+    "fix_search_patterns": [
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ],
+    "guard_patterns": [
+      "same logical object and same sink context"
+    ],
+    "dangerous_generic_tokens": [
+      "size",
+      "len",
+      "length",
+      "count",
+      "index",
+      "idx",
+      "buf",
+      "data",
+      "value",
+      "ptr"
+    ],
+    "preferred_distinctive_tokens": [
+      "permission",
+      "unintended",
+      "actors",
+      "read",
+      "user",
+      "security-critical",
+      "configuration",
+      "misconfigured"
+    ]
+  },
+  "predicate_priors": {
+    "preferred_scope": [
+      "function",
+      "anchor_window"
+    ],
+    "good_predicate_kinds": [
+      "ordered_tokens",
+      "proximity",
+      "token_all"
+    ],
+    "discouraged_predicate_kinds": [
+      "token_any"
+    ],
+    "recommended_guard_templates": [
+      "same logical object and same sink context"
+    ],
+    "recommended_predicate_templates": [
+      "security-sensitive sink without sufficient guard",
+      "explicit validation before sink",
+      "reject invalid state",
+      "safe helper/wrapper"
+    ]
+  },
+  "stage_hints": {
+    "stage1": {
+      "goal": "Classify patch chunks by how directly they repair the CWE root cause.",
+      "must_focus": [
+        "direct change to vulnerable sink or validation site",
+        "changes that alter boundary, lifecycle, policy, or authorization relation",
+        "supporting helper or error-propagation logic needed by the main fix"
+      ],
+      "must_avoid": [
+        "comment-only or naming-only changes",
+        "generic logging changes without security semantics",
+        "refactors unrelated to the sensitive sink/path"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "explicit validation before sink",
+        "reject invalid state"
+      ]
+    },
+    "stage2": {
+      "goal": "Construct discriminative root cause, anchor, predicates, and guards.",
+      "must_focus": [
+        "anchor at the sink or dominant validation block",
+        "prefer predicates that encode relations, not lone generic tokens",
+        "choose function-local or anchor-window scope whenever possible"
+      ],
+      "must_avoid": [
+        "whole-repo unscoped token matches",
+        "predicates that rely on generic names alone",
+        "anchors in wrappers that lack the core vulnerability mechanism"
+      ],
+      "recommended_queries": [
+        "security-sensitive sink without sufficient guard",
+        "same logical object and same sink context"
+      ]
+    },
+    "stage3": {
+      "goal": "Verify whether the target tag still exhibits the vulnerable relation or already contains the fix relation.",
+      "must_focus": [
+        "whether the sensitive sink/path still exists",
+        "whether the fix relation is locally present in the same code region",
+        "whether anchor relocation is required before concluding absence"
+      ],
+      "must_avoid": [
+        "declaring NOT_AFFECTED from generic token absence alone",
+        "assuming refactor/rename means vulnerability removal",
+        "using broad token matches as final evidence"
+      ],
+      "recommended_queries": [
+        "explicit validation before sink",
+        "reject invalid state",
+        "security-sensitive sink without sufficient guard"
+      ]
+    }
+  },
+  "examples": {
+    "bad_examples": [
+      {
+        "language": "C",
+        "nature": "Bad",
+        "summary": "The following code sets the umask of the process to 0 before creating a file and writing \"Hello world\" into the file.",
+        "snippet": "#define OUTFILE \"hello.out\" umask(0); FILE *out; /* Ignore link following (CWE-59) for brevity */ out = fopen(OUTFILE, \"w\"); if (out) { fprintf(out, \"hello world!\\n\"); fclose(out); }"
+      },
+      {
+        "language": "PHP",
+        "nature": "Bad",
+        "summary": "This code creates a home directory for a new user, and makes that user the owner of the directory. If the new directory cannot be owned by the user, the...",
+        "snippet": "function createUserDir($username){ $path = '/home/'.$username; if(!mkdir($path)){ return false; } if(!chown($path,$username)){ rmdir($path); return false; } return true; }"
+      },
+      {
+        "language": "Perl",
+        "nature": "Bad",
+        "summary": "The following code snippet might be used as a monitor to periodically record whether a web site is alive. To ensure that the file can always be modified, the...",
+        "snippet": "$fileName = \"secretFile.out\"; if (-e $fileName) { chmod 0777, $fileName; } my $outFH; if (! open($outFH, \">>$fileName\")) { ExitError(\"Couldn't append to $fileName: $!\"); } my $dateString = FormatCurrentTime(); my..."
+      },
+      {
+        "language": "Go",
+        "nature": "Bad",
+        "summary": "This program creates and reads from an admin file to determine privilege information.",
+        "snippet": "const adminFile = \"/etc/admin-users\" func createAdminFileIfNotExists() error { file, err := os.Create(adminFile) if err != nil { return err } return nil } func changeModeOfAdminFile() error { fileMode :=..."
+      }
+    ],
+    "good_examples": [
+      {
+        "language": "Shell",
+        "nature": "Good",
+        "summary": "The following Azure command updates the settings for a storage account:",
+        "snippet": "az storage account update --name <storage-account> --resource-group <resource-group> --allow-blob-public-access false"
+      },
+      {
+        "language": "Shell",
+        "nature": "Good",
+        "summary": "The following Google Cloud Storage command gets the settings for a storage account named 'BUCKET_NAME':",
+        "snippet": "gsutil iam ch -d allUsers gs://BUCKET_NAME gsutil iam ch -d allAuthenticatedUsers gs://BUCKET_NAME"
+      }
+    ],
+    "observed_examples": [
+      {
+        "reference": "CVE-2022-29527",
+        "description": "Go application for cloud management creates a world-writable sudoers file that allows local attackers to inject sudo rules and escalate privileges to root by winning a race condition.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2022-29527"
+      },
+      {
+        "reference": "CVE-2009-3482",
+        "description": "Anti-virus product sets insecure \"Everyone: Full Control\" permissions for files under the \"Program Files\" folder, allowing attackers to replace executables with Trojan horses.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-3482"
+      },
+      {
+        "reference": "CVE-2009-3897",
+        "description": "Product creates directories with 0777 permissions at installation, allowing users to gain privileges and access a socket used for authentication.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-3897"
+      },
+      {
+        "reference": "CVE-2009-3489",
+        "description": "Photo editor installs a service with an insecure security descriptor, allowing users to stop or start the service, or execute commands as SYSTEM.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-3489"
+      },
+      {
+        "reference": "CVE-2020-15708",
+        "description": "socket created with insecure permissions",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2020-15708"
+      },
+      {
+        "reference": "CVE-2009-3289",
+        "description": "Library function copies a file to a new target and uses the source file's permissions for the target, which is incorrect when the source file is a symbolic link, which typically has 0777 permissions.",
+        "link": "https://www.cve.org/CVERecord?id=CVE-2009-3289"
+      }
+    ]
+  },
+  "repo_notes": {},
+  "evolution": {
+    "usage_count": 0,
+    "success_count": 0,
+    "fp_lessons": [],
+    "fn_lessons": [],
+    "last_updated": null
+  },
+  "metadata": {
+    "source_xml": "CWE-2000.xml",
+    "catalog_version": "4.19.1",
+    "generated_at": "2026-04-15T14:30:34.543593+00:00"
+  }
+}

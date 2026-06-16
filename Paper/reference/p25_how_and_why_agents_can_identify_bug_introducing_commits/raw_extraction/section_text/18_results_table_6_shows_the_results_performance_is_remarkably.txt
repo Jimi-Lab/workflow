@@ -1,0 +1,38 @@
+Results.Table 6 shows the results. Performance is remarkably
+stable across thresholds, ranging from 0.76 to 0.82 F1-score. Higher
+thresholds reduce cost ($0.68 at threshold 8 vs. $0.33 at ∞) because
+fewer binary search steps are needed. The∞threshold—which skips
+binary search entirely and always uses direct selection—achieves
+the best F1-score (0.82) at the lowest cost ($0.33).
+Finding 4 (Most Surprising):Skipping binary search entirely
+and always using direct candidate selection yields the best F1-score
+(0.82) at the lowest cost. The agent can identify the bug-introducing
+commit from a large candidate set in a single step, without iterative
+narrowing. This observation led us to question whether binary
+search is necessary at all, and motivated the development of a
+drastically simplified approach: Simple-SZZ-Agent (§4).
+4 Part 2: Simple-SZZ-Agent
+Our experiment on varying the commit selection threshold (RQ2e,
+§3.3.6) revealed that skipping binary search entirely and always
+using direct candidate selection yields the best performance at the
+
+===== Page 006 =====
+Preprint, Under Submission, arXiv Risse et al.
+Fix Commit
+Get Files
+Modified by
+Fix Commit
+Collect File
+Commit
+Histories
+Candidate
+Commits
+Commit
+Identifier BICs
+Direct Commit Selection
+Input Process Agent Call Output
+Figure 2: Simple-SZZ-Agent: The fix commit’s file histories are collected into a single candidate set. An agent with access to
+developer tools directly selects the bug-introducing commit, without SZZ-based filtering or binary search.
+Table 7: RQ3: Comparison of SZZ-Agent and Simple-SZZ-Agent for bug-introducing commit identification. Best results per
+dataset in bold.
+DS_LINUX DS_GITHUB-c DS_GITHUB-j

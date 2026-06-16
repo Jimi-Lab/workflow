@@ -1,0 +1,119 @@
+Prevalent version identification. We then need to identify
+the version of each reused component. However, precise iden-
+tification of the version to which reused modified OSS com-
+ponents belong is challenging (see Section 2.3). Therefore,
+V1SCAN is designed such that it is not critically affected by
+the correctness of the identified versions.
+Our approach is to first roughly detect vulnerabilities and
+then refine the results. In particular, we define the prevalent
+version of the OSS component as the version to which the
+functions contained in the reused OSS codebase most closely
+correspond. To identify the prevalent version, V1SCAN first
+compares all functions in the target program with those in
+every version of the OSS component. V1SCAN extracts the
+OSS functions that are exactly included in the target program,
+and then verifies the versions to which each extracted function
+belongs. The most frequently identified version is designated
+the prevalent version of the OSS component.
+Reused code classification. Next, V1SCAN classifies func-
+tions reused in OSS components based on the reused code
+classification defined in Section 2.2. Because we consider
+the function unit in the version-based approach, V1SCAN
+classifies reused OSS functions based on code modifications.
+When an OSS is reused in the target program, the functions
+in the original OSS can be in one of three states: (1) exactly
+reused, (2) changed, or (3) unused. Subsequently, V1SCAN
+examines the state of all the functions included in the preva-
+lent version of the OSS component. We consider the function
+relationships defined in Section 3.1.
+• Exactly reused functions. If a function in the prevalent
+version is identical to a certain function in the target
+program, it is considered reused in the target program.
+• Changed functions. If a function f ′ that exists in the
+target program is similar to function f in the prevalent
+version, f is considered a changed function.
+• Unused functions. Among all functions in the prevalent
+version, those that did not belong to the exactly reused
+or changed were included in the unused group.
+The changed functions were further classified according
+to the version to which they belonged. To this end, V1SCAN
+compares f ′ with all functions in every version of the OSS.
+If f ′ belongs to any other version of the OSS and is not the
+prevalent version, f ′ is stored in the group under the name of
+the associated version. In contrast, if f ′ does not belong to
+any version of the OSS, it is stored in the “none” group. OSS
+functions that do not belong to the prevalent version but are
+contained in the target program, as detected in the prevalent
+version identification, are also included in the changed group
+with their respective version names.
+Figure 3 depicts the procedure to classify reused code com-
+pared with OSS identification in existing version-based ap-
+proaches. V1SCAN stores the hash value of each function
+obtained by applying the LSH algorithm (see Section 3.1).
+OSS name, 
+version
+Target program
+OSS
+OSS name = {
+exactly reused : [ f1 ,  f2 ,  … ],
+changed
+: {
+version i
+: [ f3′,  … ], …
+none 
+: [ f5′,  … ]},
+unused
+: [ f6 ,  … ]
+}
+(a) OSS identification in existing
+version-based approaches
+(b) Reused code classification in V1SCAN
+Target program
+OSS
+fi: a function in the prevalent version
+f ′
+i : a function in the target program similar to fi.
+Figure 3: Illustration of the differences between reused code
+classification and OSS identification in existing approaches.
+3.2.2
+Improved code-based approach
+Vulnerable code classification. To increase the vulnerability
+detection scope, V1SCAN classifies the code locations where
+vulnerabilities exist, and then takes an effective vulnerability
+detection approach for each location. We considered the fol-
+lowing four code locations (see Section 2.2): 1 function, 2
+structure, 3 macro, and 4 (global and class) variable.
+Code extraction. Subsequently, V1SCAN extracts the code
+lines belonging to the location in the target program. In fact,
+extracting functions, structures, macros, and variables from
+the target program can easily be performed using an exist-
+ing C/C++ parser (e.g., [5]). For more accurate vulnerability
+detection, V1SCAN further classifies the four locations into
+two groups based on the syntactic similarity: (functions and
+structures) and (macros and variables). Functions and struc-
+tures have in common that multiple code lines are enclosed in
+curly braces, while macros and variables generally consist of
+only one or two code lines. V1SCAN extracts (1) LSH hash
+values (see Section 3.1) and (2) source code lines from all
+functions and structures in every C/C++ source file in the tar-
+get program. We consider both hash values and lines of code
+to reduce false positives in vulnerability discovery (details
+are introduced in Section 3.3.2). For macros and variables,
+V1SCAN extracts only the corresponding source code lines.
+3.3
+Detection phase (P2)
+V1SCAN detects propagated vulnerabilities in the target pro-
+gram, using improved version- and code-based approaches.
+3.3.1
+Improved version-based approach
+Vulnerability detection. V1SCAN detects vulnerabilities in
+the target program by using the prevalent version. We used
+CPE [21] to construct a CPE database that maps the CVEs
+to the affected OSS versions (see Section 4.3). By leveraging
+the CPE database, V1SCAN identifies the CVE vulnerabilities
+included in the prevalent version of the OSS component. For
+example, the CPE of the Heartbleed vulnerability (CVE-2014-
+0160) specifies that the vulnerability exists in OpenSSL 1.0.1
+to 1.0.1f. If OpenSSL is reused in the target program and
+its prevalent version is between 1.0.1 and 1.0.1f, V1SCAN
+determines that this vulnerability exists in the target program.

@@ -1,0 +1,86 @@
+T ABLE II
+MA P P I N G O F T H E TO P 25 S O F T WA R E CWE S TO A TT&CK T E C H N I QU E S V I A CAPEC, L I M I T E D TO CWE S W I T H A V A I L A B L E M A P P I N G S .
+CWE ID A TT&CK T echniques
+20 (Improper Input
+V alidation)
+T1539 (Steal W eb Session Cookie); T1036.001 (Invalid Code Signature); T1027 (Obfuscated Files or Information);
+T1562.003 (Impair Command History Logging)
+94 (Improper Control of
+Generation of Code (’Code
+Injection’))
+T1027.006 (HTML Smuggling)
+200 (Exposure of Sensitive
+Information to an
+Unauthorized Actor)
+T1057 (Process Discovery); T1087 (Account Discovery); T1124 (System Time Discovery); T1018 (Remote System
+Discovery); T1135 (Network Share Discovery); T1007 (System Service Discovery); T1046 (Network Service
+Discovery); T1033 (System Owner/User Discovery); T1069 (Permission Groups Discovery); T1120 (Peripheral
+Device Discovery); T1082 (System Information Discovery); T1083 (File and Directory Discovery); T1134.001 (T oken
+Impersonation/Theft); T1217 (Browser Information Discovery); T1562.003 (Impair Command History Logging);
+T1016 (System Network Conﬁguration Discovery); T1111 (Multi-Factor Authentication Interception); T1036.005
+(Match Legitimate Resource Name or Location)
+269 (Improper Privilege
+Management)
+T1548 (Abuse Elevation Control Mechanism)
+287 (Improper
+Authentication)
+T1505.003 (W eb Shell); T1040 (Network Snifﬁng); T1557 (Adversary-in-the-Middle); T1134 (Access T oken
+Manipulation); T1185 (Browser Session Hijacking); T1548 (Abuse Elevation Control Mechanism)
+400 (Uncontrolled
+Resource Consumption)
+T1499 (Endpoint Denial of Service)
+434 (Unrestricted Upload
+of File with Dangerous T ype)
+T1574.010 (Services File Permissions W eakness)
+798 (Use of Hard-coded
+Credentials)
+T1078.001 (Default Accounts); T1552.001 (Credentials In Files)
+862 (Missing Authorization) T1211 (Exploitation for Defense Evasion)
+data components). Because all A TT&CK object types are
+represented as distinct node labels with native relationships
+in Neo4j, technique-centric queries become straightforward:
+starting from a single technique, analysts can pivot outward
+to who uses it, how it is executed, what to monitor, and
+how to mitigate—without manual cross-referencing. This de-
+sign supports both forward (technique →entities) and reverse
+(entities→technique) traversals, enabling explainable paths
+that tie behaviors to controls and evidence.
+As shown in Fig. 8, a Cypher query can directly extract all
+entities connected to a given A TT&CK technique, spanning
+mitigations, data components, groups, malware, tools, and
+campaigns. These results can then be rendered as a graph
+structure (Fig. 9), providing analysts with an immediate view
+of how the technique relates to both adversary behaviors and
+defensive measures.
+WITH "T1110.001" AS ap_id
+MATCH (a:attack_pattern {external_id: ap_id})
+MATCH p = (a)-[
+:malware_to_attack_pattern
+|course_of_action_to_attack_pattern
+|data_component_to_attack_pattern
+|intrusion_set_to_attack_pattern
+|campaign_to_attack_pattern
+|tool_to_attack_pattern
+*1..1]-(n)
+RETURN p
+LIMIT 100;
+Fig. 8. Cypher Query to obtain the one-hop neighborhood around a given
+A TT&CK technique (”T1110.001”), paths from the technique to connected
+mitigation, data components, groups, malware, tools, and campaigns.
+Applied to a concrete technique (e.g., T1110.001) the
+one-hop neighborhood already yields actionable context: the
+graph links the technique to mitigations (Account Use Poli-
+cies, Multi-factor Authentication, Password Policies, Update
+Software), to detection-relevant telemetry via data components
+(Application Log Content, User Account Authentication), to
+adversary groups (intrusion sets APT28 and APT29), and to
+concrete capabilities observed in the wild, including malware
+(China Chopper, Emotet, HermeticWizard, Lucifer, P .A.S.
+W ebshell, Pony , SpeakUp, Xbash) and tools (CrackMapExec).
+By modeling these entities as nodes and typed edges, the
+graph contextualizes a single technique within an integrated
+framework that captures adversaries ( who), capabilities ( with
+what), relevant telemetry ( where to look), and mitigations ( how
+to respond ).
+Fig. 9. V isualizing A TT&CK “T1110.001” mapped to its respective Groups
+(in blue), Mitigations (in brown), and T ools (in pink).

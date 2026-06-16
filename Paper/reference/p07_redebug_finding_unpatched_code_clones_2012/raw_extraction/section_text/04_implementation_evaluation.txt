@@ -1,0 +1,879 @@
+# III. IMPLEMENTATION & EVALUATION
+
+A. Implementation
+ReDeBug is implemented in about 1000 lines of C
+code and 250 lines of Python. Normalization is mod-
+ularized within the Python code. We use the QuickLZ
+library [3] to perform compression/decompression while
+setting QLZ_COMPRESSION_LEVEL to 3 for faster decom-
+pression speed.
+B. Unpatched Code Clone Detection Experimental Setup
+System Environment: We performed all experiments to
+ﬁnd unpatched code clones (both building and querying the
+database) on a desktop machine running Linux 2.6.38 (3.4
+GHz Intel Core i7 CPU, 8GB memory, 256 GB SSD drive).
+We utilized 8 threads to build a DB and to query bugs.
+Dataset: We collected our source code dataset twice: early
+in 2011 and late in 2011. We ﬁrst collected our Early 2011
+Dataset (Σ1) in January/March 2011: all source packages for
+Debian 5.0 Lenny and Ubuntu 10.10 Maverick, as well as
+all public SourceForge C/C++ projects using version control
+systems such as Subversion, CVS and Git, and the Linux
+53
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 007 =====
+Distributions
+Lines of Code
+Date
+Collected
+Early
+2011
+(Σ1)
+Debian Lenny
+257,796,235
+Jan. 2011
+Ubuntu Maverick
+245,237,215
+Mar. 2011
+Linux Kernel 2.6.37.4
+8,968,871
+Mar. 2011
+SourceForge (C/C++)
+922,424,743
+Mar. 2011
+Late
+2011
+(Σ2)
+Debian Squeeze
+348,754,939
+Nov. 2011
+Ubuntu Oneiric
+397,399,865
+Nov. 2011
+Total
+2,180,581,868
+-
+Table I: Source Dataset
+Dataset
+# ﬁles
+# diffs
+Date Released
+Patches before 2011 (δ1)
+274
+1,079
+2001∼2010
+Patches in 2011 (δ2)
+102
+555
+2011
+Total
+376
+1,634
+-
+Table II: Security-related Patch Dataset
+kernel v2.6.37.4. In the SourceForge data set we removed
+identiﬁable non-active code branches such as branches
+and tags directories. In November 2011, we prepared our
+Late 2011 Dataset (Σ2): all source packages for Debian
+6.0 Squeeze and Ubuntu 11.10 Oneiric. Table I shows the
+detailed breakup of the dataset. The data set consists of a
+large number of projects written in a wealth of languages
+including C, C++, Java, Shell, Perl, Python, Ruby, and PHP.
+In order to ﬁnd notable bugs, we collected security-related
+patches from the Debian/Ubuntu security advisory which
+has the links to the corresponding packages and patch-
+es/diffs. We performed our experiments on 376 security-
+related patches consisting of 1,634 diffs. We only included
+the patches whose related CVE numbers are recognizable
+by the patch ﬁle names. As described in Table II, we
+downloaded security-related patches released before 2011
+(δ1) which were available at the time of collecting Σ1,
+and patches released in 2011 (δ2) which were distributed
+between Σ1 and Σ2.
+In
+the
+original
+source
+packages
+for
+Debian
+and
+Ubuntu there are a number of existing patches (e.g.,
+debian/patches/) that can be applied during a build;
+we applied these patches as well. As a result, the packages
+were patched current up to security advisories on the down-
+load date. Since we downloaded the SourceForge packages
+via revision control systems, we assume all patches were
+already applied.
+The experiments show the number of duplicate buggy
+code segments that are still likely vulnerable. We have
+veriﬁed the presence of all reported unpatched code clones,
+i.e., clones of the exact same buggy code, to conﬁrm
+the ReDeBug implementation is correct. We discuss this
+measurement in § III-F.
+ 0
+ 5
+ 10
+ 15
+ 20
+ 25
+9.0M
+245M
+258M
+349M
+397M
+922M
+Time to build a database (hours)
+                    Lines of Code
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 3: Time to build a database with various sizes of
+dataset
+Distributions
+DB Size
+Projects #
+Files #
+Debian Lenny
+6.0GB
+10,699
+1,155,594
+Ubuntu Maverick
+5.6GB
+11,237
+1,067,579
+Linux Kernel 2.6.37.4
+344MB
+-
+57,653
+SourceForge (C/C++)
+29GB
+30,437
+5,574,905
+Debian Squeeze
+8.2GB
+14,977
+1,586,325
+Ubuntu Oneiric
+9.8GB
+18,240
+1,892,911
+Table III: Size of created databases
+Default Parameters: The default context in a diff ﬁle
+is 3 lines of code. Unless otherwise noted, we set n = 4.
+n = 4 when the amount of context c = 3 guarantees that
+every reported duplicate had at least one changed line along
+with surrounding context. In all experiments for unpatched
+code clones we set θ = 1, e.g., with the default parameters
+all n-tokens from the original buggy code segment needed
+to be found in an unpatched copy to report a bug. m is
+the size of a Bloom ﬁlter and N is the number of n-tokens
+to be hashed into a Bloom ﬁlter. ReDeBug used 256KB-
+sized Bloom ﬁlters where the m/N ratio was always at least
+greater than 32. ReDeBug took advantage of 3 fast hash
+functions: djb2, sdbm, and jenkins [6].
+C. Performance
+We ran ReDeBug to create the database for each source
+code dataset. Figure 3 shows the database build time. The
+database build for Ubuntu Maverick and Debian Lenny both
+took about 6 hours. The database build for SourceForge took
+about 23.3 hours. This is the end-to-end time including the
+time to read in ﬁles, normalize, tokenize, put into the Bloom
+ﬁlter, and to store on disk for all source code written in a
+variety of languages, e.g., C/C++, Java, Shell, Perl, Python,
+54
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 008 =====
+ 0
+ 0.5
+ 1
+ 1.5
+ 2
+ 2.5
+ 3
+ 3.5
+ 4
+57K
+1M
+   1.1M
+1.6M
+ 1.9M
+5.6M
+Time to query bugs (minutes)
+The number of source files in a DB
+Linux Kernel
+Ubuntu Maverick
+Debian Lenny
+Debian Squeeze
+Ubuntu Oneiric
+Source Forge
+Figure 4: Time to query 1,634 bugs to various sizes of DBs
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 0
+ 200
+ 400
+ 600
+ 800
+ 1000
+ 1200
+ 1400
+ 1600
+Time to query bugs (minutes)
+The number of queried bugs
+Figure 5: Time to query with various number of bugs against
+the entire DB
+Ruby, and PHP. The experiments suggest that the time to
+build a database linearly increases as the size of the source
+code increases. Once ReDeBug has built the initial database,
+incremental update is quickly done by adding/changing only
+the relevant parts of the database.
+The resulting database sizes and the number of projects
+and ﬁles in databases are described in Table III. As a
+reference point, Debian Lenny required 282GB to store
+1,155,594 ﬁles without compression, but only 6.0GB with
+compression in ReDeBug. The large compression factor is
+due to the sparseness of the Bloom ﬁlters.
+Figure 4 depicts the time to query 1,634 security-related
+patches (δ1 and δ2) to each database. As the size of a
+database (the number of ﬁles in a database) grew, the time to
+query bugs increased linearly. Though there was an overhead
+to recover compressed Bloom ﬁlters to perform the set
+membership test, the querying time was fast, e.g., 0.04
+second per bug against about 1 million source ﬁles in the
+case of Debian Lenny.
+Figure 5 shows the time it took to compare a varying
+number of bugs against the whole database including Σ1
+and Σ2. The query time has a very gentle upward slope.
+The results suggest querying even a large number of patches
+should take only a few minutes. For example, it took
+about 6 minutes 21 seconds to query 15 diffs, and this
+time increased only slightly to 7 minutes 46 seconds for
+1,634 diffs.
+Together these 3 graphs show that ReDeBug is highly
+scalable, and it can be applied to ﬁnd unpatched code copies
+in day-to-day development. The time it takes us to perform
+all operations increases linearly with the size of the database,
+and grows very slowly with the number of diffs.
+D. Security-Related Bugs
+1) {δ1 & δ2 } →Σ1: When security-related bugs are
+ﬁxed in the original projects, all the relevant code clones
+should also be corrected. In practice, unfortunately, code
+reuse among open source projects is usually ad-hoc, which
+makes it difﬁcult to update all relevant projects when the
+patch is released. An attacker may be able to easily identify
+the same known vulnerabilities (δ1 and δ2) in other projects
+(Σ1) that are not patched yet.
+We queried δ1 and δ2 to Σ1 to measure how many
+unpatched code clones are detected, which approximates
+how many (potentially) vulnerable projects an attacker may
+be able to spot when a patch becomes available. The total
+number of unpatched code clones in Σ1 for δ1 and δ2 was
+12,791 using the default parameters of n = 4 and c = 3.
+The number of matches to each dataset in Σ1 is shown in
+Figure 6. The old stable, but still supported, Debian Lenny
+and Ubuntu Maverick have 1,482 and 1,058 unpatched code
+clones, respectively.
+2) {δ1 & δ2 } →Σ2: We measured how many unpatched
+code clones are identiﬁed for δ1 and δ2 in Σ2 consisting of
+the latest versions of Debian Squeeze and Ubuntu Oneiric.
+This evaluation demonstrates roughly how responsive the
+new version of an OS is to previously released security-
+related patches. Σ2 still has 1,991 unpatched code clones for
+δ1; furthermore, 764 unpatched code clones are reported for
+δ2, which indicates that unpatched code clones are recurring
+in OS distributions.
+3) δ1 →Σ1 vs. δ1 →Σ2: We compared 1,838 unpatched
+code clones in Σ1 and 1,991 unpatched code clones in Σ2 for
+δ1; and we found that 1,379 unpatched code clones have per-
+sisted. Table IV shows the number of unpatched code clones
+identiﬁed from different years’ patches. It is interesting to
+note that security vulnerabilities that were patched over a
+decade ago (from 2001) still have 21 unpatched code clones
+present in Σ1. Even Σ2 still have 496 unpatched code clones
+from 2006 patches. This result demonstrates that unpatched
+code clones persist in modern distributions.
+55
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 009 =====
+ 0
+ 1000
+ 2000
+ 3000
+ 4000
+ 5000
+ 6000
+ 7000
+ 8000
+ 9000
+Debian
+Lenny
+Ubuntu
+Maverick
+Linux
+Kernel
+2.6.37.4
+Source
+Forge
+Debian
+Squeeze
+Ubuntu
+Oneiric
+The number of unpatched code clones
+δ1
+δ2
+1,141
+697
+3
+8,711
+1,048
+943
+341
+361
+0
+1,537
+484
+280
+Figure 6: The number of unpatched code clones in Σ1 and
+Σ2
+2001
+2006
+2007
+2008
+2009
+2010
+2011
+Lenny
+2
+109
+76
+88
+565
+301
+341
+Maverick
+0
+161
+35
+62
+248
+191
+361
+Kernel
+0
+0
+0
+0
+1
+2
+0
+SrcForge
+19
+1162
+227
+746
+3845
+2712
+1537
+Squeeze
+0
+264
+46
+77
+379
+282
+484
+Oneiric
+0
+232
+45
+73
+341
+252
+280
+Total
+21
+1928
+429
+1046
+5379
+3740
+3003
+Table IV: Unpatched code clones in each distribution from
+different years’ patches
+E. The Identiﬁed Unpatched Code Clones
+Figure 7 depicts the distribution of how often we found
+clones for patches. The maximum was 386 unpatched code
+clones of the patch shown in Listing 1, with most patches
+having less than 50 respective unpatched code clones. This
+result demonstrates that there are potentially many vulner-
+able code clones for each new patch, motivating the need
+to implement unpatched code clone detection as part of the
+developer lifecycle.
+Table V shows the number of identiﬁed unpatched code
+clones with various sizes of n. When n increases from 4
+to 7, ReDeBug hashes every 7 consecutive tokens and each
+match represents an exact matching of 7 sequential tokens.
+Overall, this represents a larger number of tokens exactly
+matched, which yields a more conservative metric for “real”
+bugs (see § IV for a discussion).
+As we increased n, the total number of unpatched code
+clones ReDeBug found decreased. Note that as n increases,
+the total number of diffs we queried decreased. The reason
+is that some diffs had fewer than n tokens in total. Overall,
+ 0
+ 50
+ 100
+ 150
+ 200
+ 250
+ 300
+ 0
+ 50
+ 100
+ 150
+ 200
+ 250
+ 300
+ 350
+ 400
+The number of patches
+The number of identified unpatched code clones
+Figure 7: The identiﬁed unpatched code clones per patch
+The size of n
+n = 4
+n = 5
+n = 7
+# of queried diffs
+1,634
+1,248
+503
+Un-
+patched
+code
+clones
+Debian Lenny
+1,482
+1,013
+309
+Ubuntu Maverick
+1,058
+736
+251
+Linux Kernel 2.6.37.4
+3
+2
+0
+SourceForge (C/C++)
+10,248
+6,211
+2,130
+Debian Squeeze
+1,532
+1,061
+391
+Ubuntu Oneiric
+1,223
+828
+293
+Total
+15,546
+9,851
+3,374
+Table V: Unpatched code clones with various n for δ1 and
+δ2
+in the most conservative experiment, ReDeBug identiﬁed
+3,374 unique unpatched code copies that likely constitute
+real bugs.
+F. Code Clone Detection Errors
+A key question is, what is the false detection rate of Re-
+DeBug? There are several ways to answer this. One popular
+metric is the accuracy of the matching process. In ReDeBug,
+this is the Bloom ﬁlter tests. The Bloom ﬁlter tests have no
+false negatives, but may have false positives. We performed
+an exact match test on the 15,599 unpatched code clones
+initially reported, of which 15,546 were conﬁrmed. Thus,
+overall we had a 0.3% false positive rate in the Bloom ﬁlters.
+Our post-processing system removes this source of errors
+from the ﬁnal output.
+In several cases, such as the one shown in Listing 2,
+the vulnerability was found in dead code, which is not
+included at build time. This vulnerability can lead to an
+integer overﬂow that allows denial of service [15].
+56
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 010 =====
+es = -1;
+N = 1;
+do {
++
+if (N >= 2*1024*1024) RETURN(←
+BZ_DATA_ERROR);
+if (nextSym == BZ_RUNA) es = es + (0+1) *←
+N; else
+if (nextSym == BZ_RUNB) es = es + (1+1) *←
+N;
+N = N * 2;
+Listing 2: CVE-2010-0405
+We matched the above code to libcompress-bzip2-perl. How-
+ever, the package maintainers stated that the matched code
+was not an actual vulnerability since it was dead code.
+At the post-processing step, we eliminated such dead
+code which was not included at build time. We measured
+the number of code clones in non-dead code for the 1,354
+reported unpatched code clones from 149 Debian Squeeze
+packages. 831 out of 1,354 (61%) unpatched code clones
+are conﬁrmed as non-dead code, which likely represent
+real vulnerabilities. Dead code may still be a problem that
+should be ﬁxed: the accompanied library code may be used
+depending on users’ necessity by ﬂipping compilation ﬂags,
+and the vulnerability would still likely exist. Nonetheless, we
+now do post-processing to remove dead code for compiled
+code from our results.
+Note that in the overall system, these errors are ultimately
+removed, and would never be shown or affect the end user.
+G. Examples of Security-Related Bugs
+In order to evaluate the practical impact of ReDeBug, we
+reported 1,532 unpatched code clones identiﬁed in Debian
+Squeeze packages to the Debian security team and develop-
+ers. So far 145 real bugs have been conﬁrmed by developers
+either in email or by issuing a patch. In this section, we show
+several examples of the real bugs we found.
+Qemu is a processor emulator that can be used as a hosted
+virtual machine monitor. Various bugs, such as the one in
+Listing 3, which allows root access on the host machine [13],
+have been ﬁxed over the past few years. These include CVE-
+2008-0928 and CVE-2010-2784.
+int len, i, shift, ret;
+QCowHeader header;
+-
+ret = bdrv_file_open(&s->hd, filename, flags)←
+;
++
+ret = bdrv_file_open(&s->hd, filename, flags ←
+| BDRV_O_AUTOGROW);
+if (ret < 0)
+return ret;
+if (bdrv_pread(s->hd, 0, &header, sizeof(←
+header)) != sizeof(header))
+Listing 3: CVE-2008-0928
+These patches were not applied to the derivative package
+xen-qemu, the Xen version of Qemu. When contacted,
+Debian and upstream developers conﬁrmed the presence of
+real bugs and indicated that ﬁxing these bugs was necessary.
+The patch in Listing 4 was issued to ﬁx a vulnerability in
+rsyslog, a Linux and Unix system logger. This vulnerability
+involved sending a specially crafted log message that leads
+to denial of service [18].
+i = 0;
+- while(lenMsg > 0 && *p2parse != ’:’ && *←
+p2parse != ’ ’ && i < CONF_TAG_MAXSIZE) {
++ while(lenMsg > 0 && *p2parse != ’:’ && *←
+p2parse != ’ ’ && i < CONF_TAG_MAXSIZE - 2) ←
+{
+bufParseTAG[i++] = *p2parse++;
+--lenMsg;
+Listing 4: CVE-2011-3200
+This patch was not applied to the Debian package rsyslog-
+gssapi, a version of rsyslog with plugins that allowed rsyslog
+to write and receive GSSAPI encrypted logging messages.
+The package maintainers when contacted decided to ﬁx the
+vulnerability by issuing an update.
+The patch below was issued to ﬁx a heap based buffer
+overﬂow vulnerability in the Paint Shop Pro plugin in GIMP
+2.6.11 [17].
+-
+if (code >= max_code)
++
+if (code == max_code)
+{
+-
+*sp++ = firstcode;
++
+if (sp < &(stack[STACK_SIZE]))
++
+*sp++ = firstcode;
+code = oldcode;
+}
+-
+while (code >= clear_code)
++
+while (code >= clear_code && sp < &(stack←
+[STACK_SIZE]))
+{
+*sp++ = table[1][code];
+if (code == table[0][code])
+Listing 5: CVE-2011-1782
+When contacted, the developers of Deutex, a Debian package
+used to manipulate ﬁles for various games, indicated that this
+was likely a real vulnerability.
+The following patch was issued to ﬁx an integer overﬂow
+in PHP before 5.3.6 which could lead to a denial of service
+and possibly information leak [16]. This patch was not
+employed to the Debian PHP package. After contacted, the
+package maintainer issued a patch to ﬁx the bug.
+- if (start + count > shmop->size || count < 0) ←
+{
++ if (count < 0 || start > (INT_MAX - count) || ←
+start + count > shmop->size) {
+php_error_docref(NULL TSRMLS_CC, E_WARNING, ←
+"count is out of range");
+RETURN_FALSE;
+Listing 6: CVE-2011-1092
+57
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 011 =====
+Listing 7 shows a recent patch for CVE-2011-3145, which
+was successfully patched in an Ubuntu Oneiric package,
+but not in a Debian Squeeze package. This patch ﬁxed
+an incorrect /etc/mtab ownership error in the ecryptfs-
+utils package, which might cause to unmount arbitrary
+location [27].
+if (setreuid(uid, uid) < 0) {
+perror("setreuid");
+}
++
+if (setregid(gid, gid) < 0) {
++
+perror("setregid");
++
+}
+goto fail;
+}
+} else {
+Listing 7: CVE-2011-3145
+After we contacted the developers, the same patch applied
+to the Ubuntu Oneiric package was issued for the Debian
+Squeeze package to ﬁx the vulnerability.
+Listing 8 shows a security patch applied to the Ubuntu
+Oneiric apache2 package to ﬁx the vulnerability where
+remote attackers can send requests to intranet servers with
+a well-crafted URI [19]. The same patch was applied to the
+Debian Squeeze package to ﬁx the bug after we reported it.
+ap_parse_uri(r, uri);
++/* RFC 2616:
++ *
+Request-URI
+= "*" | absoluteURI | ←
+abs_path | authority
++ *
++ * authority is a special case for CONNECT.
+If←
+the request is not
++ * using CONNECT, and the parsed URI does not ←
+have scheme, and
++ * it does not begin with ’/’, and it is not ←
+’*’, then, fail
++ * and give a 400 response. */
++if (r->method_number != M_CONNECT
++ && !r->parsed_uri.scheme
++ && uri[0] != ’/’
++ && !(uri[0] == ’*’ && uri[1] == ’\0’)) {
++ ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
++
+"invalid request-URI %s", uri);
++ r->args = NULL;
++ r->hostname = NULL;
++ r->status = HTTP_BAD_REQUEST;
++ r->uri = apr_pstrdup(r->pool, uri);
++}
++
+if (ll[0]) {
+r->assbackwards = 0;
+pro = ll;
+Listing 8: CVE-2011-3368
+In § I, we motivated the need to handle many languages.
+Here, we show a non-C example in Ruby. Listing 9 shows a
+security patch for the puppet package to ﬁx the vulnerability
+where an attacker can impersonate a master by exploiting
+a non-default certdnsnames option when generating
+certiﬁcates [20]. After we reported this bug, the package
+maintainer ﬁxed the vulnerability by issuing a security patch.
+# Sign a given certificate request.
+-def sign(hostname, cert_type = :server, ←
+self_signing_csr = nil)
++def sign(hostname, allow_dns_alt_names = false,←
+self_signing_csr = nil)
+# This is a self-signed certificate
+if self_signing_csr
++
+# # This is a self-signed certificate, ←
+which is for the CA.
+Since this
++
+# # forces the certificate to be self-←
+signed, anyone who manages to trick
++
+# # the system into going through this path←
+gets a certificate they could
++
+# # generate anyway.
+There should be no ←
+security risk from that.
+csr = self_signing_csr
++
+cert_type = :ca
+issuer = csr.content
+else
++
+allow_dns_alt_names = true if hostname == ←
+Puppet[:certname].downcase
+unless csr = Puppet::SSL::←
+CertificateRequest.find(hostname)
+raise ArgumentError, "Could not find ←
+certificate request for #{hostname}"
+end
++
++
+cert_type = :server
+issuer = host.certificate.content
++
++
+# Make sure that the CSR conforms to our ←
+internal signing policies.
++
+# This will raise if the CSR doesn’t ←
+conform, but just in case...
++
+check_internal_signing_policies(hostname, ←
+csr, allow_dns_alt_names) or
++
+raise CertificateSigningError.new(←
+hostname), "CSR had an unknown failure ←
+checking internal signing policies, will not←
+sign!"
+end
+cert = Puppet::SSL::Certificate.new(hostname)
+-
+cert.content = Puppet::SSL::←
+CertificateFactory.new(cert_type, csr.←
+content, issuer, next_serial).result
++
+cert.content = Puppet::SSL::←
+CertificateFactory.
++
+build(cert_type, csr, issuer, next_serial)
+cert.content.sign(host.key.content, OpenSSL::←
+Digest::SHA1.new)
+Listing 9: CVE-2011-3872
+H. Copied Similarity Metrics
+In order to understand the overall amount of code dupli-
+cation, we also ran a large scale experiment to measure the
+similarity within the entire Debian Lenny source base. These
+experiments required the pairwise computations discussed
+in § II-C. We ran these experiments on an SGI UV 1000
+cc-NUMA shared-memory system consisting of 256 blades.
+Each blade has 2 Intel Xeon X7560 (Nehalem) eight-core
+processors and 128 Gbytes of local memory [2].
+58
+Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on December 11,2025 at 08:35:49 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+===== PAGE 012 =====
+ 100000
+ 1e+06
+ 1e+07
+ 1e+08
+ 1e+09
+ 1e+10
+ 1e+11
+ 1e+12
+ 1e+13
+0.0-0.1
+0.1-0.2
+0.2-0.3
+0.3-0.4
+0.4-0.5
+0.5-0.6
+0.6-0.7
+0.7-0.8
+0.8-0.9
+0.9-1.0
+The number of function pairs
+Similarity among functions
+Figure 8: Similarity among functions
+For non-C/C++ code we normalized as described in § II-C.
+For C/C++ code, we also did experiments where we roughly
+identiﬁed functions within C/C++ ﬁles using the following
+Perl regular expression:
+/ˆ
+\w+?\s[ˆ;]*? \( [ˆ;]*?\)\s*({ ←
+(?:[ˆ{}]++|(?1))*})/xgsm
+The regex isn’t perfect to recognize all functions since that
+would require a complete parser. However, in our experience
+it is sufﬁcient and allowed us to provide an estimate of
+similarity and code clones at the function level.
+We identiﬁed 3,230,554 functions containing at least
+4 tokens. We split identiﬁed functions into two groups
+based upon the function size. “The small-sized” group had
+3,144,998 functions which had less than 114 tokens. “The
+large-sized” group had 85,556 functions. Overall, we mea-
+sured pair-wise distance in each group using SIMILARITYbv,
+which required 4,949,164,509,293 pairwise comparisons.
+For the small-sized group, we used 32 byte bit vectors.
+Total bitvector generation time was 6 min using 32 CPUs.
+It took 19 min to compare every pair of the group using
+512 CPUs. For the large-sized group, we used 8 KB bit
+vectors. Generation time was 14 minutes on 32 CPUs. Pair-
+wise comparisons took 5 min 30sec using 512 CPUs.
+Figure 8 shows the distribution of function pairs based
+upon their similarity. Most of the function pairs had very
+low similarity below 0.1, which is natural in that different
+packages would be expected to have different functionality.
+However, surprisingly, 694,883,223 pairs of functions had
+more than 0.5 similarity. Among them, 172,360,750 pairs
+were more than 90% similar. This result clearly shows a
+signiﬁcant amount of code copying.
+While performing our experiments, we noticed that the
+SourceForge dataset had more code clones. With Source-
+ 0
+ 10
+ 20
+ 30
+ 40
+ 50
+ 60
+0-10%
+10-20%
+20-30%
+30-40%
+40-50%
+50-60%
+60-70%
+70-80%
+80-90%
+90-100%
+Percentage of files in SourceForge
+Fraction of shared n-grams
+Figure 9: Fraction of shared n-grams
+Forge projects, we normalized and tokenized each ﬁle and
+calculated the total fraction of shared n-tokens in each ﬁle.
+As shown in Figure 9, more than 50% of ﬁles shared more
+than 90% of n-tokens with other ﬁles. Note that 100% of
+shared n-tokens in a ﬁle does not necessarily mean it is
+copied from another ﬁle as a whole. This could also happen
+when a ﬁle consists of small fractions from multiple ﬁles.
+On the contrary, about 30% of ﬁles were almost unique (0-
+10% shared tokens) while 50% of the ﬁles shared more than
+90% of all tokens. This shows that code cloning is active
+and alive within the SourceForge community.

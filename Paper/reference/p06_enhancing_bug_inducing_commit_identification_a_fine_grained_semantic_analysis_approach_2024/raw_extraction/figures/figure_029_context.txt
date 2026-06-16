@@ -1,0 +1,22 @@
+-inducing
+commits. This issue is particularly prevalent when the buggy
+statements contain many short statements.
+Fig. 13. An example to show the effectiveness of program slicing.
+Failing to point out buggy statements correctly. Another
+main reason for the failure is that our method fails to point out
+buggy statements correctly. This issue is responsible for most of
+the remaining failing cases. F or instance, while the added line
+may influence the variable’s data flow, analyzing the affected
+variable’s data flow may not yield correct results.
+Consider the commit 072b30642f9[39], illustrated in Fig.12.
+This commit introduces a new code line at line 2, highlighted in
+green, impacting the data flow of the variabledrv. Our method,
+accordingly, compares its data flow with the previous version
+and identifies lines 1 and 3 as buggy statements. However,
+tracing back these unmodified lines does not lead us to the bug-
+inducing commit, resulting in the failure of our method in this
+scenario.
+After carefully analyzing the bug-fixing commit and the bug-
+inducing commit, we find that the bug occurs because the
+bug-inducing commit attempts to introduce a new function
+in the program but forgets to use it

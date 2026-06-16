@@ -1,0 +1,44 @@
+rvice attack ( i.e., CVE-2014-5461). Listing 3
+shows the patch snippet applied in Lua v5.2.3. We confirmed
+that Redis3, which reused vulnerable Lua with code modifica-
+tions, backported the security patch for CVE-2014-5461 in
+September 2020 (see Listing 4).
+Specifically, we noted that the patch applied in Redis was
+different from that applied in the Lua repository. This is be-
+cause Redis reused an old version of Lua (v5.1.5) where the
+syntax of the vulnerable function is different from what is
+disclosed, it was infeasible for the Redis team to apply the
+patch for CVE-2014-5461 as it was (e.g., line #12 of Listing 3
+did not exist in the reused code parts of Lua within Redis),
+and thus they followed the patch suggested on the official bug
+tracker of Lua4.
+2https://github.com/lua/lua
+3https://github.com/redis/redis
+4http://www.lua.org/bugs.html#5.2.2-1
+fo
+ fd
+ fp
+INPUT
+OUTPUT
+INPUT
+OUTPUT
+Figure 2: High-level overview of the workflow of M OVERY .
+This case highlights the need to discover VCCs that were
+propagated with the syntax of older versions, which may
+not contain the code lines deleted from security patches.
+MOVERY makes this possible by collating vulnerable func-
+tions between the oldest and the disclosed vulnerable ver-
+sions (see Section 3). However, existing VCC discovery tech-
+niques [14, 17, 49] fail to discover such a VCC when vul-
+nerable lines they defined (e.g., in this case, line #12 in List-
+ing 3) are not contained in the VCC. In contrast, existing SCA
+techniques [9, 48] misinterpret that Redis still contains the
+vulnerability because a vulnerable version of Lua (i.e., v5.1.5)
+is reused in Redis, despite the Redis team has backported the
+security patch.
+3 Methodology of M OVERY
+In this section, we describe the methodology of MOVERY .
+MOVERY comprises the following two phases: signature gen-
+eration phase (P1) and VCC discovery phase (P2). In P1,
+MOVERY uses techniques called function collation and core
+line extractionto 

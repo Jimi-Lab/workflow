@@ -1,0 +1,22 @@
+Method Deep Analysis
+
+Core idea:
+The paper frames cyber threat intelligence as fragmented across vulnerability, weakness, attack-pattern, and adversary-behavior repositories. It proposes an automated knowledge-graph pipeline that ingests CVE/CVSS from NVD, MITRE CWE, CAPEC, and ATT&CK and materializes their cross-source relationships in Neo4j for traversal and analysis.
+
+Pipeline from paper:
+1. Ingestion and normalization: collect CVE, CWE, CAPEC, and ATT&CK data, including identifiers, descriptions, hierarchy, cross-references, temporal metadata, and STIX relationship objects.
+2. Graph materialization: create typed nodes such as CVE, CWE, CAPEC, attack pattern, malware, tool, tactic, intrusion set, course of action, and data source, then materialize inter- and intra-source edges.
+3. Multi-hop analysis: traverse CVE -> CWE -> CAPEC -> ATT&CK and reverse ATT&CK -> CAPEC -> CWE -> CVE paths.
+4. Use cases: top-software-CWE to ATT&CK mapping, technique-centric context, group-to-weakness/vulnerability traversal, and bounded hierarchical expansion.
+
+Local artifact relationship:
+The adjacent attack_to_cve-master artifact provides a related but narrower mapping methodology: Exploitation Technique, Primary Impact, and Secondary Impact. It also provides a CSV with CVE-to-technique fields. This supports the vocabulary of CVE-to-ATT&CK mapping, but it is not the paper's full automated Neo4j KG pipeline source. [NEEDS ARTIFACT]
+
+Design pattern useful for VulnVersion:
+- Cross-taxonomy graph paths: the paper's CVE -> CWE -> CAPEC -> ATT&CK pattern can inspire VulnVersion's CVE -> patch commit -> code entity -> release/tag -> affected-version judgment path.
+- Bidirectional traversal: useful for agents that need both forward evidence expansion from a CVE and backward justification from a claimed affected version.
+- Hierarchical expansion: bounded parent/child or precedence expansion is analogous to searching release branches, backports, forks, renamed functions, or related packages without unconstrained graph explosion.
+
+Not transferable:
+- The method maps CVEs to adversary techniques, not concrete affected software versions.
+- Neo4j graph traversal and CTI entity counts cannot be treated as evidence of version-range correctness. [NEEDS EXPERIMENT]

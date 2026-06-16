@@ -1,0 +1,44 @@
+Approach Blame Ancestor Blameless Total
+Blame-only 1,076 0 0 1,076
+Blame-fallback 1,076 0 114 1,190
+TKG-only 980 0 104 1,084
+Agent-only 1,077 1 112 1,190
+LLM4SZZ 1,016 35 123 1,174
+AgenticSZZ1,20919180 1,408
+TKG-only on all datasets, confirming that intelligent reasoning over a focused candidate set is more
+effective than deterministic ranking over an expanded set. The full pipeline combines the TKG’s
+structured exploration with the agent’s intelligent navigation, achieving the best performance
+across all datasets.
+Category-level analysis reveals the strengths of LLM4SZZ vs. AgenticSZZ.Table 6 and
+Figure 5 break down the true positives of each approach by BIC category. AgenticSZZ achieves
+the highest total number of true positives (1,408) through substantial gains in Blame (+193 over
+LLM4SZZ) and Blameless (+57) categories. The Venn diagrams reveal that the two approaches are
+largely complementary in the Blame category (998 shared successes, but AgenticSZZ uniquely solves
+211 cases vs. LLM4SZZ’s 18), while they solve completely different cases in the Ancestor category (no
+overlap). Interestingly, LLM4SZZ’s context expansion finds more Ancestor-category BICs (35 vs. 19),
+suggesting that expanding context around modified lines, while aimed to improve the identification
+of blameless cases, actually is more efficient in finding Ancestor cases. In contrast, AgenticSZZ’s
+superior reasoning enabled it to correctly identify 193 more Blame BICs than LLM4SZZ. This
+indicates that intelligent candidate selection matters more than search space expansion for the
+majority of cases.
+The TKG-agent synergy reflects an exploration-exploitation trade-off [ 33].The TKG
+expands the frontier of possible solutions by encoding temporal and code-level relationships,
+while the agent exploits semantic understanding to select among them. Neither component alone is
+sufficient: expansion without intelligence introduces noise, while intelligence without expansion hits
+a coverage ceiling. This complementary design suggests that future work could explore integrating
+search-based software engineering techniques [13] to further optimize the navigation strategy.
+, Vol. 1, No. 1, Article . Publication date: February 2026.
+
+===== Page 017 =====
+Beyond Blame: Rethinking SZZ with Knowledge Graph Search 17
+211 18998
+(a) Blame
+19 35 (b) Ancestor
+68 11112 (c) Blameless
+Fig. 5. True positives overlap by BIC category. Green: AgenticSZZ only; Orange: LLM4SZZ only.
+Summary of RQ2
+•Both TKG and agent components are necessary for optimal performance.
+•Category-level analysis (Table 6) shows how AgenticSZZ’s gains over LLM4SZZ come from better
+Blame (+193) and Blameless (+57) identification, while LLM4SZZ finds more Ancestor-category BICs.
+Implication:The TKG-agent synergy reflects an exploration-exploitation trade-off: expansion without
+intelligent selection introduces noise, while reasoning without expanded search hits a coverage ceiling.

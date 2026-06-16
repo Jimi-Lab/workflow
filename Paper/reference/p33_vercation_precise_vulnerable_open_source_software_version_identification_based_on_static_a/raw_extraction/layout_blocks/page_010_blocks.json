@@ -1,0 +1,242 @@
+[
+  {
+    "page": 10,
+    "block_id": "page_010:block_001",
+    "block_type": "text",
+    "text": "CHENG et al.: V ERCATION : PRECISE VULNERABLE OPEN-SOURCE SOFTWARE VERSION IDENTIFICATION 385",
+    "bbox": [
+      37.58399963378906,
+      32.515296936035156,
+      551.68359375,
+      40.298301696777344
+    ],
+    "reading_order": 1,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_002",
+    "block_type": "text",
+    "text": "DeepSeek-V3 [32] for vulnerable code extraction. We use the public API developed by OpenAI to perform the experiment in GPT-4. The API version is GPT-4-0613 published in 2023. CodeLlama was created through further ﬁne-tuning of Llama 2 on speciﬁc code datasets. We selected the 13B parameter model ( codellama/CodeLlama-13b-hf ) from the CodeLlama model series. The API of DeepSeek-V3 was published in July 2024. We set the temperature parameter to 1.0. To account for the stochastic nature of LLM outputs, we generate 10 inde- pendent responses for each CVE [55] . We employ a majority voting strategy where statements appearing in ≥ 6 out of 10 runs are included in the ﬁnal vulnerable statement set for eval- uation. The maximum size of tokens is 1,024. We deployed the Codellama model on our server with four NVIDIA RTX A5000 GPUs. Similar to GPT-4, the temperature parameter is set to 1.0, and the maximum size of tokens is set to 1,024. Subsequently, we apply weight allocation strategies to extract vulnerable statements using Python scripts. For threshold se- lection, we used θ 1 = 0.9, θ 2 = 0.8 and θ 3 = 0.7 based on grid search optimization described in our sensitivity analysis. In the code change detection, we utilize the Clang 10.0.0 tool for function expansion (inline optimization) and AST generation of C/C ++ code. Speciﬁcally, we use the -fsyntax-only option to perform syntax checking without actual compilation. We then develop Python scripts to achieve AST normalization and similarity comparison. Overall, we constructed our system with 6K LoC in Python.",
+    "bbox": [
+      37.5830078125,
+      63.788265228271484,
+      288.6953430175781,
+      385.74053955078125
+    ],
+    "reading_order": 2,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_003",
+    "block_type": "text",
+    "text": "V. E VALUATION",
+    "bbox": [
+      129.92398071289062,
+      397.9138488769531,
+      196.31259155273438,
+      409.0321044921875
+    ],
+    "reading_order": 3,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_004",
+    "block_type": "text",
+    "text": "In this section, we evaluate the performance of the proposed V ERCATION by answering the following research questions (RQs). • RQ1. Overall Effectiveness: How does the overall per- formance of V ERCATION compare against state-of-the-art vulnerable version identiﬁcation methods? • RQ2. Architectural Contribution: How do the key ar- chitectural choices in V ERCATION —the use of an LLM, static analysis, and statement weighting—contribute to its performance? • RQ3. Component Robustness: How accurate and robust is V ERCATION ’s statement-level code clone detection? • RQ4. Real-World Application: What are the effects of applying V ERCATION in the real world scenarios?",
+    "bbox": [
+      37.58385467529297,
+      415.8414001464844,
+      288.6978454589844,
+      582.3809204101562
+    ],
+    "reading_order": 4,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_005",
+    "block_type": "text",
+    "text": "A. RQ1: Overall Effectiveness",
+    "bbox": [
+      37.584861755371094,
+      596.9449462890625,
+      161.8065185546875,
+      607.90380859375
+    ],
+    "reading_order": 5,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_006",
+    "block_type": "text",
+    "text": "We ﬁrst compare V ERCATION against the NVD and SOTA methods. Table III shows the vulnerable version identiﬁcation results of NVD, SZZ algorithms, V0Finder, V1SCAN, VER- Java, Vision, and V ERCATION . Note that some CVEs do not provide vulnerable versions in NVD, such as CVE-2021-30499 [56] . SZZ algorithms cannot work on the vfc s containing solely added lines (i.e., 11 cases), so we exclude these cases in ap- proaches using the SZZ algorithm. 1) Comparison with NVD: The NVD achieves a precision of 66.8% and a recall of 41.8%. False positives often occur because NVD may broadly ﬂag all versions preceding a patch as",
+    "bbox": [
+      37.584228515625,
+      613.724365234375,
+      288.6966552734375,
+      744.3995361328125
+    ],
+    "reading_order": 6,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_007",
+    "block_type": "text",
+    "text": "TABLE III C OMPARISON W ITH NVD D ATABASE AND SOTA W ORKS",
+    "bbox": [
+      331.4700622558594,
+      65.57765197753906,
+      520.7847900390625,
+      83.44530487060547
+    ],
+    "reading_order": 7,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_008",
+    "block_type": "text",
+    "text": "Type Methods Precision Recall F1 Score",
+    "bbox": [
+      313.24530029296875,
+      95.18974304199219,
+      539.0222778320312,
+      104.37926483154297
+    ],
+    "reading_order": 8,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_009",
+    "block_type": "text",
+    "text": "- NVD Database 0.668 0.418 0.514",
+    "bbox": [
+      313.24530029296875,
+      109.65962219238281,
+      532.6333618164062,
+      118.55425262451172
+    ],
+    "reading_order": 9,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_010",
+    "block_type": "text",
+    "text": "SZZ Algorithm",
+    "bbox": [
+      313.24517822265625,
+      128.31666564941406,
+      346.45660400390625,
+      146.17529296875
+    ],
+    "reading_order": 10,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_011",
+    "block_type": "text",
+    "text": "AG-SZZ [59] 0.372 0.625 0.466 B-SZZ [54] 0.378 0.543 0.446 V-SZZ [17] 0.756 0.851 0.801",
+    "bbox": [
+      370.6203308105469,
+      123.83509826660156,
+      532.6235961914062,
+      150.65771484375
+    ],
+    "reading_order": 11,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_012",
+    "block_type": "text",
+    "text": "Clone-based Approach",
+    "bbox": [
+      313.24530029296875,
+      164.90162658691406,
+      353.0894470214844,
+      182.76025390625
+    ],
+    "reading_order": 12,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_013",
+    "block_type": "text",
+    "text": "V0Finder [16] 0.829 0.745 0.785 V1SCAN [27] 0.863 0.724 0.788 VERJava [28] 0.891 0.247 0.386 Vision [29] 0.842 0.881 0.861",
+    "bbox": [
+      370.6195983886719,
+      155.9376983642578,
+      532.6221313476562,
+      191.7330322265625
+    ],
+    "reading_order": 13,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_014",
+    "block_type": "text",
+    "text": "- V ERCATION 0.918 0.945 0.931",
+    "bbox": [
+      313.24530029296875,
+      196.7097625732422,
+      532.6231079101562,
+      205.8992919921875
+    ],
+    "reading_order": 14,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_015",
+    "block_type": "text",
+    "text": "vulnerable without speciﬁc analysis. This situation exists in 18 CVEs (15%) of the ground truth. For instance, security experts found a buffer overﬂow risk exists in Libtiff 4.4.0 , but NVD simply reported the versions of Libtiff < 4.4.0 were exposed in vulnerability. In reality, the vulnerable version range is Libtiff < 4.4.0 and ≥ 4.0.0. The reason for low recall in NVD can be summarized into two types: (i) NVD only reported the version in which vulner- abilities were found. For example, CVE-2017-14152 [57] was found in OpenJPEG 2.2.0, then NVD reported the affected version was only 2.2.0, whereas the real vulnerable version range was 2.2.0-2.2.1. The problem exists in 57 CVEs (47%) of the ground truth. (ii) Some vulnerabilities are not ﬁxed promptly after disclosure but are addressed after several versions have been released. These vulnerable versions can be overlooked if NVD does not update the version information. For example, CVE-2021-33815 [58] was discovered in FFmpeg 4.4 but was ﬁxed in version 5.0. Due to the lack of timely tracking of the ﬁx information, NVD overlooked the vulnerable versions 4.4.1-4.4.4. 2) Comparison with SZZ-based Methods: The basic idea of SZZ algorithms is to backtrack the commit history to locate the earliest commit that introduces the deletion lines removed by patches. Regarding F1-score, V ERCATION improves the best- performing baseline V-SZZ by 16.2%. And the difference be- tween the F1 of B-SZZ and AG-SZZ is small (0.446 vs. 0.466). We afﬁrmed that there are two main causes of false alarms in these approaches: (i) The line mapping algorithm based on edit distance does not consider the behavior of the source code. As shown in Listing 2 , The deleted lines were encapsulated within the added functions, and in fact, they have the same behavior. Line mapping algorithms failed in these cases, unable to identify the true vic. (ii) The SZZ algorithm treats each deleted line as an inde- pendent origin for backtracking, resulting in multiple vic being identiﬁed. For example, the security patch of CVE- 2020-35965 [60] from FFmpeg has 5 deleted lines. The true vulnerability logic lies in the lack of checking the size of ymax before executing the memset zero operation, potentially resulting in out-of-bounds writes to memory. Our method utilizes a weighted allocation approach to",
+    "bbox": [
+      300.5982666015625,
+      243.12237548828125,
+      551.66796875,
+      744.4009399414062
+    ],
+    "reading_order": 15,
+    "column_guess": null,
+    "confidence": "medium"
+  },
+  {
+    "page": 10,
+    "block_id": "page_010:block_016",
+    "block_type": "text",
+    "text": "Authorized licensed use limited to: Huazhong University of Science and Technology. Downloaded on April 22,2026 at 06:45:34 UTC from IEEE Xplore. Restrictions apply.",
+    "bbox": [
+      32.43851089477539,
+      762.5669555664062,
+      561.5616455078125,
+      772.1849975585938
+    ],
+    "reading_order": 16,
+    "column_guess": null,
+    "confidence": "medium"
+  }
+]
