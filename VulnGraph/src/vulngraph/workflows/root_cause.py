@@ -9,6 +9,7 @@ from typing import Any
 
 from vulngraph.agent_backends import AgentResponse, RootCauseBackend
 from vulngraph.agent_io import parse_root_cause_output
+from vulngraph.agent_io.model_view_contract import build_root_cause_model_view
 from vulngraph.agent_io.root_cause_contract import lint_root_cause_contract
 from vulngraph.agent_io.root_cause_schema import RootCauseAgentOutputV2, root_cause_agent_output_schema
 from vulngraph.services import VulnGraphClient
@@ -39,10 +40,12 @@ class RootCauseWorkflow:
     packet = self.client.build_root_cause_packet(cve_id, mode="production")
     evidence_trace = collect_git_evidence(cve_id, packet, repo_root=self.repo_root, timeout_s=self.timeout_s)
     prompt = render_root_cause_prompt_v2(cve_id, packet, evidence_trace)
+    model_view = build_root_cause_model_view(cve_id, packet, evidence_trace)
     context = {
       "cve_id": cve_id,
-      "packet": packet,
-      "evidence_trace": _prompt_trace(evidence_trace),
+      "model_view": model_view,
+      "packet_artifact": "root_cause_packet.json",
+      "evidence_trace_artifact": "evidence_trace.json",
       "system_prompt": _prompt_template(),
     }
 
@@ -228,10 +231,10 @@ def run_root_cause_batch(
 
 
 def render_root_cause_prompt_v2(cve_id: str, packet: dict[str, Any], evidence_trace: dict[str, Any]) -> str:
+  model_view = build_root_cause_model_view(cve_id, packet, evidence_trace)
   prompt = _prompt_template()
   prompt += "\n\nCVE_ID:\n" + cve_id
-  prompt += "\n\nROOT_CAUSE_PACKET:\n" + json.dumps(packet, ensure_ascii=False, indent=2)
-  prompt += "\n\nWRAPPER_GIT_EVIDENCE_TRACE:\n" + json.dumps(_prompt_trace(evidence_trace), ensure_ascii=False, indent=2)
+  prompt += "\n\nROOT_CAUSE_MODEL_VIEW:\n" + json.dumps(model_view, ensure_ascii=False, indent=2)
   prompt += "\n\nOUTPUT_JSON_SCHEMA:\n" + json.dumps(root_cause_agent_output_schema(), ensure_ascii=False, indent=2)
   return prompt
 

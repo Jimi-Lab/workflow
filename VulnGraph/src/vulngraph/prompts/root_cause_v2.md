@@ -5,15 +5,15 @@ Task: extract the code-level root cause for exactly one CVE.
 Hard boundaries:
 - Do not judge affected versions, target tags, BIC, or affected ranges.
 - Use CVE/CWE/CAPEC only as context, never as root-cause proof.
-- The trusted evidence channel is the wrapper-provided `git_observations` list.
+- The trusted evidence channel is the wrapper-provided EVIDENCE_INVENTORY in ROOT_CAUSE_MODEL_VIEW.
 - Do not claim you ran commands. Commands are collected by the wrapper, not by you.
 - Every RootCauseHypothesis must reference at least one wrapper-owned `git_observation_refs` id.
-- Every required CodeAnchor must be patch-bound: copy exact `fix_commit_id` and exact matching `patch_hunk_id` from ROOT_CAUSE_PACKET / EVIDENCE_INVENTORY.
+- Every required CodeAnchor must be patch-bound: select exact `fix_commit_id` and exact matching `patch_hunk_id` from ROOT_CAUSE_MODEL_VIEW / EVIDENCE_INVENTORY.
 - Every VulnerablePredicate and FixPredicate must reference at least one required CodeAnchor through `anchor_ids`.
 - RootCauseHypothesis, CodeAnchor, VulnerablePredicate, and FixPredicate must share at least one trusted GitObservation id.
 - A referenced GuardCondition or NegativeCondition must also bind to a required CodeAnchor and share a trusted GitObservation with both the anchor and hypothesis.
 - Every CodeAnchor must include `path`. Copy `path` exactly from the selected PatchHunk or evidence inventory entry. Do not derive it by parsing `patch_hunk_id`.
-- Copy `function_id` only when the selected PatchHunk exposes that exact ChangedFunction in ROOT_CAUSE_PACKET. Its `function` must exactly match the ChangedFunction `symbol`.
+- Copy `function_id` only when the selected PatchHunk exposes that exact ChangedFunction in ROOT_CAUSE_MODEL_VIEW. Its `function` must exactly match the ChangedFunction `symbol`.
 - If you output `function`, you must also output the corresponding `function_id`.
 - If a PatchHunk has no reliable ChangedFunction mapping, omit both `function_id` and `function`; never infer either one from the diff hunk header.
 - When the packet contains multiple FixCommit nodes, emit one CodeAnchor for every FixCommit in the selected `fix_set_id`; each one must be patch-bound, even when commits are equivalent backports or cherry-picks.
@@ -21,7 +21,7 @@ Hard boundaries:
 - Return JSON only or fenced JSON. Do not include natural-language explanation outside the JSON.
 
 Evidence inventory rules:
-- Use only IDs that appear in ROOT_CAUSE_PACKET or WRAPPER_GIT_EVIDENCE_TRACE.evidence_inventory.
+- Use only IDs that appear in ROOT_CAUSE_MODEL_VIEW or ROOT_CAUSE_MODEL_VIEW.evidence_inventory.
 - Copy `fix_commit_id`, `patch_hunk_id`, and `git_observation_refs` exactly. Do not invent IDs.
 - If both a canonical field and compatibility alias are emitted, their values must be identical (`id`, anchor aliases, predicate text aliases, function aliases, and line range aliases).
 - Evidence strength:

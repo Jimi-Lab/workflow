@@ -5,7 +5,7 @@ Your task is to select a minimal, complementary set of wrapper-owned parent-side
 Hard constraints:
 
 1. Return one strict JSON object and no Markdown.
-2. Select only `candidate_id` values present in `PRE_FIX_CANDIDATE_INVENTORY`.
+2. Select only `candidate_id` values present in `SZZ_ANCHOR_MODEL_VIEW.candidate_inventory.candidates`.
 3. Never invent a path, line number, commit SHA, observation ID, hypothesis ID, predicate ID, or candidate ID.
 4. Do not select a newly added guard as a blame target. For add-only fixes, select the pre-existing dangerous use, vulnerable state, source, propagation point, sink, or control predecessor protected by the new code.
 5. Prefer the smallest set of anchors that closes the trigger -> vulnerable state -> propagation -> sink chain. Multiple complementary anchors are allowed and must not be collapsed to top-1.
@@ -34,11 +34,8 @@ Each `selected_anchors` item must contain only:
 - `rationale`
 - `confidence`
 
-INPUT_ROOT_CAUSE:
-{{ROOT_CAUSE}}
-
-PRE_FIX_CANDIDATE_INVENTORY:
-{{CANDIDATE_INVENTORY}}
+SZZ_ANCHOR_MODEL_VIEW:
+{{SZZ_ANCHOR_MODEL_VIEW}}
 
 OUTPUT_SCHEMA:
 {{OUTPUT_SCHEMA}}

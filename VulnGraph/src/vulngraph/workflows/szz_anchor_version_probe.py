@@ -6,6 +6,7 @@ import re
 import statistics
 import subprocess
 import time
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -258,13 +259,17 @@ def rank_candidate_commits(
   )
 
 
-def choose_oracle_candidate(results: list[CandidateVersionResult]) -> dict[str, Any]:
+def choose_oracle_candidate(
+  results: list[CandidateVersionResult],
+  *,
+  ground_truth: set[str] | None = None,
+) -> dict[str, Any]:
   if not results:
     return {
       "oracle_best_candidate_commit": "",
       "diagnostic_only": True,
       "predicted_tags": [],
-      "metrics": set_metrics(set(), set()),
+      "metrics": set_metrics(set(), ground_truth or set()),
     }
   best = max(
     results,
@@ -491,6 +496,9 @@ def run_szz_anchor_version_probe(
     raw_candidates = [
       item for item in _read_list(case_dir / "candidate_commits.json") if item.get("lifecycle") == "raw_candidate"
     ]
+    candidate_modes = _candidate_generation_modes(raw_candidates)
+    evidence_levels = _candidate_evidence_levels(raw_candidates)
+    candidate_lane = _candidate_lane(candidate_modes)
     resolved = _read_list(case_dir / "resolved_pre_fix_anchors.json")
     ingestion = _read_json_default(case_dir / "ingestion_result.json", {})
     all_tags = list(case_schema.get("all_tags") or [])
@@ -542,8 +550,8 @@ def run_szz_anchor_version_probe(
       release_tags=set(release_tags),
       universe_name="release_tag_universe",
     )
-    all_rank = _ranking_payload(all_results, ranked, gt)
-    release_rank = _ranking_payload(release_results, ranked, gt)
+    all_rank = _ranking_payload(all_results, ranked, gt, universe_name="diagnostic_all_tags")
+    release_rank = _ranking_payload(release_results, ranked, gt, universe_name="release_tag_universe")
     top1_release = release_rank["top1"]
     topk_release = release_rank["topk"]
     oracle_release = release_rank["oracle"]
@@ -634,6 +642,9 @@ def run_szz_anchor_version_probe(
         "schema_ok": bool(case_schema.get("ok")),
         "anchor_count": len(resolved),
         "candidate_commit_count": len(raw_candidates),
+        "candidate_generation_modes": ";".join(candidate_modes),
+        "evidence_levels": ";".join(evidence_levels),
+        "candidate_lane": candidate_lane,
         "parse_status": ingestion.get("parse_status", ""),
         "contract_ok": ingestion.get("contract_ok", ""),
         "blame_status": ingestion.get("blame_status", ""),
@@ -731,16 +742,18 @@ def _ranking_payload(
   results: list[CandidateVersionResult],
   ranked_candidates: list[dict[str, Any]],
   gt: set[str],
+  *,
+  universe_name: str,
 ) -> dict[str, Any]:
   top1_candidate = ranked_candidates[0] if ranked_candidates else None
   top1_result = _result_for_candidate(results, top1_candidate)
   topk_candidates = ranked_candidates[:3]
   topk_prediction = _union_predictions(results, topk_candidates)
   topk_metrics = set_metrics(topk_prediction, gt)
-  oracle = choose_oracle_candidate(results)
+  oracle = choose_oracle_candidate(results, ground_truth=gt)
   return {
     "top1_candidate_commit": top1_candidate.get("commit_sha") if top1_candidate else "",
-    "top1": top1_result.to_dict() if top1_result else _empty_candidate_result().to_dict(),
+    "top1": top1_result.to_dict() if top1_result else _empty_candidate_result(gt, universe_name=universe_name).to_dict(),
     "topk_k": 3,
     "topk_candidate_commits": [str(item.get("commit_sha") or "") for item in topk_candidates],
     "topk": {
@@ -771,6 +784,9 @@ def _summary_from_rows(
     "anchors_total": sum(int(row["anchor_count"]) for row in rows),
     "candidates_total": sum(int(row["candidate_commit_count"]) for row in rows),
     "cases_with_candidate_commits": sum(1 for row in rows if int(row["candidate_commit_count"]) > 0),
+    "candidate_generation_mode_distribution": _semicolon_distribution(rows, "candidate_generation_modes"),
+    "evidence_level_distribution": _semicolon_distribution(rows, "evidence_levels"),
+    "candidate_lane_distribution": dict(sorted(Counter(str(row.get("candidate_lane") or "none") for row in rows).items())),
     "primary_universe": "release_tag_universe",
     "release_evaluation_universe_metrics": {
       "top1": release_top1,
@@ -785,6 +801,14 @@ def _summary_from_rows(
       "oracle": all_oracle,
       "top1_exact_match_count": sum(1 for row in rows if row["diagnostic_all_top1_exact_match"] is True),
       "oracle_exact_match_count": sum(1 for row in rows if row["diagnostic_all_oracle_exact_match"] is True),
+    },
+    "release_metric_groups": {
+      "all_case": _release_group_metrics(rows),
+      "strong_only": _release_group_metrics([row for row in rows if row.get("candidate_lane") == "strong_only"]),
+      "fallback_only": _release_group_metrics([row for row in rows if row.get("candidate_lane") == "fallback_only"]),
+      "strong_plus_fallback": _release_group_metrics(
+        [row for row in rows if row.get("candidate_lane") in {"strong_only", "fallback_only", "mixed"}]
+      ),
     },
     "top1_macro_precision": release_top1["precision"],
     "top1_macro_recall": release_top1["recall"],
@@ -844,6 +868,59 @@ def _macro(rows: list[dict[str, Any]], prefix: str) -> dict[str, float]:
     "recall": statistics.mean(float(row[f"{prefix}_recall"]) for row in rows),
     "f1": statistics.mean(float(row[f"{prefix}_f1"]) for row in rows),
   }
+
+
+def _release_group_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+  return {
+    "cases_total": len(rows),
+    "top1": _macro(rows, "release_top1"),
+    "topk": _macro(rows, "release_topk"),
+    "oracle": _macro(rows, "release_oracle"),
+    "top1_exact_match_count": sum(1 for row in rows if row["release_top1_exact_match"] is True),
+    "topk_exact_match_count": sum(1 for row in rows if row["release_topk_exact_match"] is True),
+    "oracle_exact_match_count": sum(1 for row in rows if row["release_oracle_exact_match"] is True),
+  }
+
+
+def _candidate_generation_modes(candidates: list[dict[str, Any]]) -> list[str]:
+  values = {
+    str(item.get("candidate_generation_mode") or "legacy_raw_candidate")
+    for item in candidates
+    if item.get("lifecycle") == "raw_candidate"
+  }
+  return sorted(values)
+
+
+def _candidate_evidence_levels(candidates: list[dict[str, Any]]) -> list[str]:
+  values = {
+    str(item.get("evidence_level") or "unknown")
+    for item in candidates
+    if item.get("lifecycle") == "raw_candidate"
+  }
+  return sorted(values)
+
+
+def _candidate_lane(candidate_modes: list[str]) -> str:
+  if not candidate_modes:
+    return "none"
+  has_strong = "strong_model_anchor" in candidate_modes or "legacy_raw_candidate" in candidate_modes
+  has_fallback = any(mode.startswith("fallback_") for mode in candidate_modes)
+  if has_strong and has_fallback:
+    return "mixed"
+  if has_strong:
+    return "strong_only"
+  if has_fallback:
+    return "fallback_only"
+  return "unknown"
+
+
+def _semicolon_distribution(rows: list[dict[str, Any]], key: str) -> dict[str, int]:
+  counter: Counter[str] = Counter()
+  for row in rows:
+    raw = str(row.get(key) or "")
+    for value in [item for item in raw.split(";") if item]:
+      counter[value] += 1
+  return dict(sorted(counter.items()))
 
 
 def _candidate_rank_key(
@@ -951,12 +1028,16 @@ def _union_predictions(
   return output
 
 
-def _empty_candidate_result() -> CandidateVersionResult:
+def _empty_candidate_result(
+  ground_truth: set[str] | None = None,
+  *,
+  universe_name: str = "release_tag_universe",
+) -> CandidateVersionResult:
   return CandidateVersionResult(
     commit_sha="",
-    universe_name="release_tag_universe",
+    universe_name=universe_name,
     predicted_tags=set(),
-    metrics=set_metrics(set(), set()),
+    metrics=set_metrics(set(), ground_truth or set()),
     unknown_tags=[],
     false_positive_taxonomy={},
   )

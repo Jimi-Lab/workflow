@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from vulngraph.agent_backends.base import RootCauseBackend
+from vulngraph.agent_io.model_view_contract import build_szz_anchor_model_view
 from vulngraph.agent_io.szz_handoff_contract import validate_szz_handoff
 from vulngraph.agent_io.szz_handoff_schema import (
   PreFixCandidateInventoryV1,
@@ -619,14 +620,18 @@ def _render_handoff_prompt(
 ) -> str:
   template_path = Path(__file__).resolve().parents[1] / "prompts" / "szz_anchor_v1.md"
   template = template_path.read_text(encoding="utf-8")
-  model_inventory = _selection_inventory(
+  compact_inventory = _selection_inventory(
     inventory,
     root_cause,
     top_k_per_patch_family=top_k_per_patch_family,
   )
+  model_view = build_szz_anchor_model_view(
+    root_cause,
+    compact_inventory,
+    top_k_per_patch_family=top_k_per_patch_family,
+  )
   return (
-    template.replace("{{ROOT_CAUSE}}", json.dumps(root_cause, ensure_ascii=False, separators=(",", ":")))
-    .replace("{{CANDIDATE_INVENTORY}}", json.dumps(model_inventory, ensure_ascii=False, separators=(",", ":")))
+    template.replace("{{SZZ_ANCHOR_MODEL_VIEW}}", json.dumps(model_view, ensure_ascii=False, separators=(",", ":")))
     .replace("{{OUTPUT_SCHEMA}}", json.dumps(RootCauseSzzHandoffV1.model_json_schema(), ensure_ascii=False, indent=2))
   )
 

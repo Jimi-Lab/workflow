@@ -85,6 +85,17 @@ def test_oracle_upper_bound_is_marked_diagnostic() -> None:
   assert oracle["predicted_tags"] == ["v2"]
 
 
+def test_empty_oracle_candidate_scores_zero_against_non_empty_ground_truth() -> None:
+  oracle = choose_oracle_candidate([], ground_truth={"v1"})
+
+  assert oracle["oracle_best_candidate_commit"] == ""
+  assert oracle["predicted_tags"] == []
+  assert oracle["metrics"]["precision"] == 0.0
+  assert oracle["metrics"]["recall"] == 0.0
+  assert oracle["metrics"]["f1"] == 0.0
+  assert oracle["metrics"]["exact_match"] is False
+
+
 def test_direct_reachability_conversion_uses_candidate_and_direct_fix_reachability() -> None:
   class FakeRunner(DirectReachabilityRunner):
     def is_ancestor(self, ancestor: str, descendant: str) -> str:
@@ -239,6 +250,12 @@ def test_probe_outputs_release_and_all_tag_metrics_without_forbidden_prediction_
   assert '"dominant_requires_manual_review_cases"' in serialized
   assert '"non_release_tag_noise_cases"' not in serialized
   assert '"ground_truth_affected_versions"' in serialized
+  per_cve_rows = (out_dir / "per_cve_version_probe.csv").read_text(encoding="utf-8")
+  assert ",0.0,0.0,0.0,False," in per_cve_rows
+  assert summary["release_evaluation_universe_metrics"]["top1"]["f1"] == 0.0
+  assert summary["release_evaluation_universe_metrics"]["oracle"]["f1"] == 0.0
+  assert summary["release_evaluation_universe_metrics"]["top1_exact_match_count"] == 0
+  assert summary["release_evaluation_universe_metrics"]["oracle_exact_match_count"] == 0
 
 
 def test_all_tags_and_release_universe_metrics_are_reported_separately(tmp_path: Path) -> None:
@@ -293,3 +310,82 @@ def test_all_tags_and_release_universe_metrics_are_reported_separately(tmp_path:
   assert summary["release_evaluation_universe_metrics"]["top1"]["precision"] == 1.0
   tag_diagnostics = json.loads((out_dir / "tag_universe_diagnostics.json").read_text(encoding="utf-8"))
   assert tag_diagnostics["repos"]["repo"]["universe_used_for_primary_metrics"] == "release_tag_universe"
+
+
+def test_probe_reports_strong_and_fallback_metric_groups(tmp_path: Path) -> None:
+  class FakeRunner(DirectReachabilityRunner):
+    def tags_containing(self, commit_sha: str) -> set[str] | None:
+      if commit_sha == "strong":
+        return {"v1.0.0"}
+      if commit_sha == "fallback":
+        return {"v2.0.0"}
+      if commit_sha == "fix":
+        return set()
+      return set()
+
+  dataset = tmp_path / "dataset.json"
+  repo_root = tmp_path / "repos"
+  anchor_run = tmp_path / "anchor-run"
+  out_dir = tmp_path / "out"
+  repo_root.mkdir()
+  (repo_root / "repo").mkdir()
+  anchor_run.mkdir()
+  anchor_run.joinpath("summary.json").write_text(
+    json.dumps({"results": [{"cve_id": "CVE-S"}, {"cve_id": "CVE-F"}]}),
+    encoding="utf-8",
+  )
+  dataset.write_text(
+    json.dumps(
+      {
+        "CVE-S": {"repo": "repo", "fixing_commits": [["fix"]], "affected_version": ["v1.0.0"]},
+        "CVE-F": {"repo": "repo", "fixing_commits": [["fix"]], "affected_version": ["v2.0.0"]},
+      }
+    ),
+    encoding="utf-8",
+  )
+  for cve_id, commit, mode, evidence in [
+    ("CVE-S", "strong", "strong_model_anchor", "strong"),
+    ("CVE-F", "fallback", "fallback_inventory_anchor", "fallback"),
+  ]:
+    case_dir = anchor_run / cve_id
+    case_dir.mkdir()
+    case_dir.joinpath("candidate_commits.json").write_text(
+      json.dumps(
+        [
+          {
+            "commit_sha": commit,
+            "lifecycle": "raw_candidate",
+            "candidate_generation_mode": mode,
+            "evidence_level": evidence,
+            "roles": ["dangerous_use"],
+            "selection_modes": ["modified_old_side"],
+            "line_provenance": [{"fix_commit_sha": "fix", "committer_time": 10}],
+          }
+        ]
+      ),
+      encoding="utf-8",
+    )
+    case_dir.joinpath("resolved_pre_fix_anchors.json").write_text("[]", encoding="utf-8")
+    case_dir.joinpath("blame_trace.json").write_text(json.dumps({}), encoding="utf-8")
+    case_dir.joinpath("ingestion_result.json").write_text(json.dumps({}), encoding="utf-8")
+
+  summary = run_szz_anchor_version_probe(
+    anchor_run=anchor_run,
+    dataset=dataset,
+    repo_root=repo_root,
+    out_dir=out_dir,
+    git_runner=FakeRunner(tags_by_repo={repo_root / "repo": ["v1.0.0", "v2.0.0"]}),
+  )
+
+  assert summary["candidate_generation_mode_distribution"] == {
+    "fallback_inventory_anchor": 1,
+    "strong_model_anchor": 1,
+  }
+  assert summary["evidence_level_distribution"] == {"fallback": 1, "strong": 1}
+  assert summary["candidate_lane_distribution"] == {"fallback_only": 1, "strong_only": 1}
+  assert summary["release_metric_groups"]["strong_only"]["cases_total"] == 1
+  assert summary["release_metric_groups"]["fallback_only"]["cases_total"] == 1
+  assert summary["release_metric_groups"]["strong_plus_fallback"]["cases_total"] == 2
+  rows = (out_dir / "per_cve_version_probe.csv").read_text(encoding="utf-8")
+  assert "candidate_generation_modes" in rows
+  assert "fallback_inventory_anchor" in rows
