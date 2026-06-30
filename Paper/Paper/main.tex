@@ -19,14 +19,14 @@
 
 \begin{document}
 
-\title{From Patch to Affected Releases: Predicate-Guided Vulnerability-State Verification across Software Versions}
+\title{VulnVersion: Graph-Augmented Evidence-Constrained History Reconstruction for Vulnerability-Affected Version Identification}
 
 \author{Anonymous Authors}
 
 \maketitle
 
 \begin{abstract}
-Identifying which released versions are affected by a disclosed vulnerability is essential for vulnerability management, dependency maintenance, and downstream risk assessment. Existing approaches often infer affected version ranges from advisory text, fixing commits, or vulnerability-inducing commits, but such interval-based reasoning is fragile under backports, release-branch divergence, refactorings, partial fixes, and vulnerability-preserving code movement. This paper formulates CVE affected-version identification as release-level vulnerability-state verification. Given a CVE fixing commit and a repository's release history, our key insight is that each release tag should be classified by verifying whether the root-cause vulnerability predicate still holds in that release, rather than by its position in a commit interval. We present VulnVersion, a predicate-guided approach that extracts root-cause anchors and vulnerability/fix predicates from patches, collects repository-local evidence across release tags, and produces tag-level vulnerability states through evidence aggregation and constrained LLM-assisted semantic judgment. We evaluate VulnVersion on a public benchmark for vulnerability-affected version identification and compare it against advisory-based, commit-range, SZZ-style, patch-similarity, and LLM-only baselines.
+Identifying which released versions are affected by a disclosed vulnerability is essential for vulnerability management, dependency maintenance, and downstream risk assessment. Existing approaches often infer affected version ranges from advisory text, fixing commits, or vulnerability-inducing commits, but such interval-based reasoning is fragile under backports, release-branch divergence, refactorings, partial fixes, and vulnerability-preserving code movement. This paper formulates CVE affected-version identification as evidence-constrained history reconstruction over Git history. Given a CVE fixing commit and a repository's release history, our key insight is to reconstruct vulnerability-relevant history events and boundary events, propagate vulnerability state through the Git DAG, and project the resulting states to release tags. We present VulnVersion, a graph-backed approach that extracts root-cause anchors and vulnerability/fix predicates from patches, reconstructs branch-specific vulnerability state, and predicts the affected released-version set through Git-DAG-based state propagation. We evaluate VulnVersion on a public benchmark for vulnerability-affected version identification and compare it against advisory-based, commit-range, SZZ-style, patch-similarity, and LLM-only baselines.
 \end{abstract}
 
 \begin{IEEEkeywords}

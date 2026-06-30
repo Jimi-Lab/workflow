@@ -1,0 +1,185 @@
+<style>
+  .overview-wrap { background:#eef2f6; padding:18px; border-radius:14px; overflow:auto; }
+  .overview-wrap svg { width:100%; min-width:1420px; height:auto; display:block; background:white; border-radius:10px; box-shadow:0 4px 18px rgba(31,41,55,.10); }
+  .review-actions { display:flex; gap:14px; margin-top:18px; }
+  .review-actions .option { flex:1; }
+</style>
+
+<h2>Complete VulnGraph Overview — Single Integrated Figure</h2>
+<p class="subtitle">One canvas containing the full pipeline, the shared 9-repo Git graph, all three novelties, evidence ownership, branch-state propagation, and the final output.</p>
+
+<div class="overview-wrap">
+<svg viewBox="0 0 1800 980" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VulnGraph complete method overview">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#556270"/></marker>
+    <marker id="blueArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2878B5"/></marker>
+    <marker id="greenArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#178B69"/></marker>
+    <marker id="orangeArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#D57A20"/></marker>
+    <filter id="shadow"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.12"/></filter>
+    <style>
+      .title{font:700 27px Arial,sans-serif;fill:#17212b}.subtitle{font:400 14px Arial,sans-serif;fill:#52606d}
+      .section{font:700 18px Arial,sans-serif;fill:#17212b}.stage{font:700 16px Arial,sans-serif;fill:#17212b}
+      .body{font:400 13px Arial,sans-serif;fill:#344050}.small{font:400 11.5px Arial,sans-serif;fill:#52606d}
+      .micro{font:400 10.5px Arial,sans-serif;fill:#596775}.pill{font:700 11px Arial,sans-serif;fill:white;letter-spacing:.3px}
+      .box{fill:white;stroke:#cbd5df;stroke-width:1.3;rx:8}.soft{stroke-width:1.5;rx:12}
+      .flow{fill:none;stroke:#556270;stroke-width:2.2;marker-end:url(#arrow)}
+      .dashed{fill:none;stroke:#748392;stroke-width:1.7;stroke-dasharray:7 5;marker-end:url(#arrow)}
+      .feedback{fill:none;stroke:#D57A20;stroke-width:2.2;stroke-dasharray:8 5;marker-end:url(#orangeArrow)}
+      .query{fill:none;stroke:#2878B5;stroke-width:1.6;stroke-dasharray:5 4;marker-end:url(#blueArrow)}
+    </style>
+  </defs>
+
+  <rect width="1800" height="980" fill="#ffffff"/>
+  <text x="45" y="45" class="title">VulnGraph: Evidence-Grounded Affected-Version Identification over Software History</text>
+  <text x="45" y="70" class="subtitle">Semantic agents identify and validate vulnerability-relevant events; deterministic Git graphs propagate their states to official releases.</text>
+
+  <!-- Novelty 2 span -->
+  <rect x="415" y="91" width="1120" height="34" rx="17" fill="#178B69"/>
+  <text x="975" y="113" text-anchor="middle" class="pill">NOVELTY 2 · EVIDENCE-CONSTRAINED BRANCH-SPECIFIC VULNERABILITY-STATE RECONSTRUCTION</text>
+
+  <!-- Input -->
+  <rect x="40" y="210" width="205" height="475" class="soft" fill="#f4f6f8" stroke="#7d8995" filter="url(#shadow)"/>
+  <text x="142" y="243" text-anchor="middle" class="section">Per-CVE Input</text>
+  <rect x="62" y="268" width="161" height="68" class="box"/><text x="142" y="294" text-anchor="middle" class="stage">CVE Metadata</text><text x="142" y="315" text-anchor="middle" class="small">description · CWE</text>
+  <rect x="62" y="350" width="161" height="75" class="box"/><text x="142" y="378" text-anchor="middle" class="stage">Fix Evidence</text><text x="142" y="399" text-anchor="middle" class="small">fix set · patch hunks</text>
+  <rect x="62" y="439" width="161" height="75" class="box"/><text x="142" y="467" text-anchor="middle" class="stage">Repository</text><text x="142" y="488" text-anchor="middle" class="small">snapshot · refs · tags</text>
+  <rect x="62" y="528" width="161" height="111" rx="8" fill="#e8f0f7" stroke="#8aa8bf"/>
+  <text x="142" y="552" text-anchor="middle" class="stage">Wrapper Seed</text>
+  <text x="142" y="574" text-anchor="middle" class="small">paths · SHAs · lines</text>
+  <text x="142" y="593" text-anchor="middle" class="small">patch observations</text>
+  <text x="142" y="612" text-anchor="middle" class="small">initial candidate IDs</text>
+  <path d="M245 448 H282" class="flow"/>
+
+  <!-- Shared Git graph substrate -->
+  <rect x="285" y="142" width="1470" height="115" class="soft" fill="#edf3f8" stroke="#7394ae" filter="url(#shadow)"/>
+  <text x="315" y="172" class="section">Shared 9-Repository Git Graph Index</text>
+  <text x="315" y="193" class="small">Built once per repository · Git object database remains the source of truth · reused by every CVE</text>
+  <rect x="650" y="160" width="270" height="72" rx="8" fill="white" stroke="#8ba6bb"/>
+  <text x="785" y="185" text-anchor="middle" class="stage">Commit DAG · Fact Layer</text>
+  <text x="785" y="206" text-anchor="middle" class="small">parents · merges · refs · changed paths</text>
+  <text x="785" y="222" text-anchor="middle" class="small">patch-id · ancestry · equivalent commits</text>
+  <rect x="950" y="160" width="250" height="72" rx="8" fill="white" stroke="#8ba6bb"/>
+  <text x="1075" y="185" text-anchor="middle" class="stage">Release DAG · Derived View</text>
+  <text x="1075" y="206" text-anchor="middle" class="small">peeled release tags · ancestry partial order</text>
+  <text x="1075" y="222" text-anchor="middle" class="small">branch/release-line projection</text>
+  <rect x="1230" y="160" width="490" height="72" rx="8" fill="white" stroke="#8ba6bb"/>
+  <text x="1475" y="184" text-anchor="middle" class="stage">Read-Only Query Services</text>
+  <text x="1475" y="205" text-anchor="middle" class="small">show · grep · blame · log -L/-S/-G · merge-base · refs</text>
+  <text x="1475" y="222" text-anchor="middle" class="small">rename/move/copy · merge parents · backport/equivalence</text>
+
+  <!-- Stage 1 -->
+  <rect x="285" y="300" width="315" height="365" class="soft" fill="#eaf4fd" stroke="#2878B5" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="305" y="281" width="276" height="33" rx="16" fill="#2878B5"/><text x="443" y="303" text-anchor="middle" class="pill">NOVELTY 1 · ATTACKER-CONDITION GUIDANCE</text>
+  <text x="442" y="340" text-anchor="middle" class="section">1 · Root Cause Agent</text>
+  <text x="442" y="364" text-anchor="middle" class="small">Semantic reasoning + controlled repository exploration</text>
+  <rect x="308" y="385" width="269" height="106" class="box"/>
+  <text x="442" y="408" text-anchor="middle" class="stage">Attacker-Condition Model</text>
+  <text x="442" y="432" text-anchor="middle" class="body">attacker input → entry/trigger</text>
+  <text x="442" y="452" text-anchor="middle" class="body">preconditions → vulnerable operation/sink</text>
+  <text x="442" y="472" text-anchor="middle" class="body">state transition → security impact</text>
+  <rect x="308" y="508" width="269" height="72" class="box"/>
+  <text x="442" y="532" text-anchor="middle" class="stage">Evidence Registration</text>
+  <text x="442" y="553" text-anchor="middle" class="small">Agent Git result → wrapper validation</text>
+  <text x="442" y="570" text-anchor="middle" class="small">→ stable GitObservation ID + provenance</text>
+  <rect x="308" y="597" width="269" height="48" rx="8" fill="#d7eafb" stroke="#80add0"/>
+  <text x="442" y="618" text-anchor="middle" class="stage">Outputs</text>
+  <text x="442" y="637" text-anchor="middle" class="small">RootCause · Vuln/Fix Predicates · Pre-fix Anchors</text>
+
+  <!-- Stage 2 -->
+  <rect x="630" y="300" width="360" height="365" class="soft" fill="#eaf7f1" stroke="#178B69" stroke-width="2" filter="url(#shadow)"/>
+  <text x="810" y="340" text-anchor="middle" class="section">2 · Evidence-Constrained SZZ</text>
+  <text x="810" y="364" text-anchor="middle" class="small">Anchor admission + adaptive history reconstruction</text>
+  <rect x="653" y="385" width="314" height="72" class="box"/>
+  <text x="810" y="408" text-anchor="middle" class="stage">Verified Anchor Registry</text>
+  <text x="810" y="430" text-anchor="middle" class="small">wrapper candidates + Agent-proposed locations</text>
+  <text x="810" y="447" text-anchor="middle" class="small">resolve revision/path/line/hash → candidate_id</text>
+  <rect x="653" y="474" width="314" height="112" class="box"/>
+  <text x="810" y="497" text-anchor="middle" class="stage">Adaptive Git History Search</text>
+  <text x="810" y="520" text-anchor="middle" class="body">blame · -w · -M/-C · recursive blame</text>
+  <text x="810" y="541" text-anchor="middle" class="body">log -L · log -S/-G · path/rename tracing</text>
+  <text x="810" y="562" text-anchor="middle" class="body">merge parents · patch-id · backport lineage</text>
+  <rect x="653" y="603" width="314" height="42" rx="8" fill="#d9efe5" stroke="#75b99f"/>
+  <text x="810" y="628" text-anchor="middle" class="stage">Candidate History Events + Before/After Evidence</text>
+
+  <!-- Stage 3 -->
+  <rect x="1020" y="300" width="300" height="365" class="soft" fill="#f2edfa" stroke="#7A59A5" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1170" y="340" text-anchor="middle" class="section">3 · Judge Agent</text>
+  <text x="1170" y="364" text-anchor="middle" class="small">Independent evidence-backed event validation</text>
+  <rect x="1043" y="385" width="254" height="163" class="box"/>
+  <text x="1170" y="409" text-anchor="middle" class="stage">Event Classification</text>
+  <text x="1060" y="434" class="body">• vulnerability introduction</text>
+  <text x="1060" y="455" class="body">• prerequisite introduction</text>
+  <text x="1060" y="476" class="body">• refactor / move / unrelated</text>
+  <text x="1060" y="497" class="body">• partial / complete fix</text>
+  <text x="1060" y="518" class="body">• regression / reintroduction</text>
+  <text x="1060" y="539" class="body">• uncertain / censored</text>
+  <rect x="1043" y="565" width="254" height="80" rx="8" fill="#e8def5" stroke="#aa91c7"/>
+  <text x="1170" y="589" text-anchor="middle" class="stage">Branch-Specific Boundary</text>
+  <text x="1170" y="611" text-anchor="middle" class="small">validated event set · fix families</text>
+  <text x="1170" y="629" text-anchor="middle" class="small">confidence · conflicts · uncertainty</text>
+
+  <!-- Stage 4 -->
+  <rect x="1350" y="300" width="405" height="365" class="soft" fill="#eef7f7" stroke="#337D82" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1552" y="340" text-anchor="middle" class="section">4 · Git-DAG State Engine</text>
+  <text x="1552" y="364" text-anchor="middle" class="small">Deterministic branch propagation and release projection</text>
+  <rect x="1373" y="385" width="359" height="112" class="box"/>
+  <text x="1552" y="408" text-anchor="middle" class="stage">Vulnerability-State Propagation</text>
+  <text x="1552" y="431" text-anchor="middle" class="body">prerequisites + introductions activate state</text>
+  <text x="1552" y="452" text-anchor="middle" class="body">fix/backport/equivalent events deactivate state</text>
+  <text x="1552" y="473" text-anchor="middle" class="body">merge conflicts / reintroduction → explicit uncertainty</text>
+  <rect x="1373" y="514" width="359" height="61" class="box"/>
+  <text x="1552" y="539" text-anchor="middle" class="stage">Release Tag Projection</text>
+  <text x="1552" y="560" text-anchor="middle" class="small">official release tag → peeled commit → propagated state</text>
+  <rect x="1373" y="593" width="359" height="52" rx="8" fill="#dceeee" stroke="#76a9ac"/>
+  <text x="1552" y="616" text-anchor="middle" class="stage">AffectedVersionPrediction</text>
+  <text x="1552" y="635" text-anchor="middle" class="small">affected_versions · evidence · uncertainty</text>
+
+  <!-- Main arrows -->
+  <path d="M600 500 H630" class="flow"/>
+  <path d="M990 500 H1020" class="flow"/>
+  <path d="M1320 500 H1350" class="flow"/>
+  <!-- shared graph query arrows -->
+  <path d="M440 257 V295" class="query"/><path d="M810 257 V295" class="query"/><path d="M1170 257 V295" class="query"/><path d="M1550 257 V295" class="query"/>
+
+  <!-- Evidence invariant -->
+  <rect x="285" y="686" width="1470" height="43" rx="8" fill="#263746"/>
+  <text x="1020" y="712" text-anchor="middle" class="pill">EVIDENCE INVARIANT · every semantic claim and selected event cites a validated observation/candidate ID; no free-form path, line, or SHA invention</text>
+
+  <!-- Novelty 3 memory layer -->
+  <rect x="285" y="758" width="1470" height="161" class="soft" fill="#fff4e4" stroke="#D57A20" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="310" y="741" width="420" height="34" rx="17" fill="#D57A20"/>
+  <text x="520" y="763" text-anchor="middle" class="pill">NOVELTY 3 · GRAPH-BACKED CONTINUAL ADAPTATION</text>
+  <text x="315" y="800" class="stage">Chronology-Safe Evidence & Decision Graph</text>
+  <rect x="315" y="817" width="470" height="73" class="box"/>
+  <text x="550" y="840" text-anchor="middle" class="body">CVE · CWE · repo · attack/root-cause/patch patterns</text>
+  <text x="550" y="861" text-anchor="middle" class="body">anchors · event verdicts · failures · reviewed outcomes</text>
+  <text x="550" y="881" text-anchor="middle" class="small">append-only provenance · temporal cutoff · no future-label leakage</text>
+  <rect x="825" y="817" width="430" height="73" class="box"/>
+  <text x="1040" y="840" text-anchor="middle" class="stage">Prior Retrieval & Calibration</text>
+  <text x="1040" y="862" text-anchor="middle" class="body">same repo / CWE / attack / root-cause / patch pattern</text>
+  <text x="1040" y="882" text-anchor="middle" class="small">search ordering · anchor/event priors · abstention support</text>
+  <rect x="1295" y="817" width="430" height="73" class="box"/>
+  <text x="1510" y="840" text-anchor="middle" class="stage">Reviewed Feedback</text>
+  <text x="1510" y="862" text-anchor="middle" class="body">accepted evidence · corrected failures · negative transfer</text>
+  <text x="1510" y="882" text-anchor="middle" class="small">updates future cases, never rewrites Git facts</text>
+  <path d="M1040 817 C1040 735 445 755 445 667" class="feedback"/>
+  <path d="M1120 817 C1120 730 810 752 810 667" class="feedback"/>
+  <path d="M1200 817 C1200 735 1170 750 1170 667" class="feedback"/>
+  <path d="M1510 665 V817" class="feedback"/>
+
+  <!-- Legend -->
+  <rect x="40" y="758" width="205" height="161" class="soft" fill="#f7f8fa" stroke="#b8c1ca"/>
+  <text x="142" y="790" text-anchor="middle" class="stage">Visual Semantics</text>
+  <rect x="62" y="811" width="17" height="17" rx="3" fill="#eaf4fd" stroke="#2878B5"/><text x="89" y="824" class="small">Semantic Agent</text>
+  <rect x="62" y="842" width="17" height="17" rx="3" fill="#eef7f7" stroke="#337D82"/><text x="89" y="855" class="small">Deterministic Git</text>
+  <rect x="62" y="873" width="17" height="17" rx="3" fill="#fff4e4" stroke="#D57A20"/><text x="89" y="886" class="small">Adaptive Graph Memory</text>
+  <path d="M62 903 H82" class="dashed"/><text x="89" y="908" class="small">query / feedback</text>
+
+  <text x="900" y="956" text-anchor="middle" class="micro">Ground truth is isolated to evaluation and never enters Root Cause, SZZ, Judge, state propagation, or adaptive priors.</text>
+</svg>
+</div>
+
+<div class="review-actions">
+  <div class="option" data-choice="approve_structure" onclick="toggleSelect(this)"><div class="letter">✓</div><div class="content"><h3>Structure is correct</h3><p>Keep this complete architecture and proceed to publication styling.</p></div></div>
+  <div class="option" data-choice="revise_structure" onclick="toggleSelect(this)"><div class="letter">↺</div><div class="content"><h3>Revise structure</h3><p>The content or relationships still need changes before styling.</p></div></div>
+</div>

@@ -24,7 +24,7 @@ We follow the metric structure extracted from the baseline and related papers:
   \item \textbf{CVE-level Accuracy:} the fraction of CVEs for which the predicted affected-version set exactly equals the ground truth set.
   \item \textbf{CVE-level No-Miss Ratio:} the fraction of CVEs for which all ground-truth affected versions are included in the prediction.
   \item \textbf{Version-level Precision/Recall/F1:} flattened version-level metrics over all CVE-version pairs.
-  \item \textbf{Resource metrics:} average time, input tokens, output tokens, total tokens, cost, agent calls, probe tags, and execution failure rate for \toolname \need{NEEDS EXPERIMENT}.
+\item \textbf{Resource metrics:} average time, input tokens, output tokens, total tokens, cost, agent calls, candidate boundary events, and execution failure rate for \toolname \need{NEEDS EXPERIMENT}.
   \item \textbf{Manual-workload and lower-bound metrics:} if complete FN validation is infeasible for some cases, we will report conservative lower-bound recall and manual inspection counts, following the evaluation style of developer-log based affected-version work~\cite{tdsc2024}.
 \end{itemize}
 
@@ -36,11 +36,11 @@ We follow the metric structure extracted from the baseline and related papers:
 
 \textbf{RQ2: Robustness across patch and repository conditions.} How does performance vary across add-only, delete-only, mixed patches, single-file and multi-file patches, and single-branch versus multi-branch settings? Subset definitions will follow the benchmark where available. Result table: \need{NEEDS EXPERIMENT}.
 
-\textbf{RQ3: Contribution of each \toolname stage.} What is the effect of patch-family filtering, root-cause evidence extraction, release-line planning, and agent tag verdicts? Planned ablations include disabling Step1 filtering, replacing Step2 VET with raw touched-code evidence, replacing repository-aware line planning with simpler tag ordering, and replacing agent verdicts with deterministic matching. Result table: \need{NEEDS EXPERIMENT}.
+\textbf{RQ3: Contribution of each \toolname stage.} What is the effect of patch-family filtering, root-cause evidence extraction, boundary-event judgment, and Git-DAG state propagation? Planned ablations include disabling Step1 filtering, replacing Step2 VET with raw touched-code evidence, replacing repository-aware release projection with simpler tag ordering, and replacing boundary-event judgment with deterministic matching. Result table: \need{NEEDS EXPERIMENT}.
 
-\textbf{RQ4: Cost and failure analysis.} What is the runtime, token cost, and failure rate of \toolname? Which cases fail because of patch noise, root-cause extraction error, release-line planning error, tag-verdict error, timeout, or missing artifacts? Result table: \need{NEEDS EXPERIMENT}.
+\textbf{RQ4: Cost and failure analysis.} What is the runtime, token cost, and failure rate of \toolname? Which cases fail because of patch noise, root-cause extraction error, boundary-event judgment error, release projection error, timeout, or missing artifacts? Result table: \need{NEEDS EXPERIMENT}.
 
-\textbf{RQ5: Agent behavior and evidence use.} When \toolname invokes an agent, which evidence sources and tool calls drive the verdicts, and how do candidate-set size, token usage, and cost correlate with success? This RQ is inspired by recent agentic SZZ analyses that report tool calls, tokens, cost, and behavior distributions~\cite{agentszz2026,howwhyagents2026}. Result table: \need{NEEDS EXPERIMENT}.
+\textbf{RQ5: Agent behavior and evidence use.} When \toolname invokes an agent, which evidence sources and tool calls drive semantic judgments, and how do candidate-set size, token usage, and cost correlate with success? This RQ is inspired by recent agentic SZZ analyses that report tool calls, tokens, cost, and behavior distributions~\cite{agentszz2026,howwhyagents2026}. Result table: \need{NEEDS EXPERIMENT}.
 
 \subsection{Pilot Status}
 

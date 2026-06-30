@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import shutil
 import time
@@ -8,7 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from vulngraph.agent_backends.base import AgentResponse
-from vulngraph.agent_io.judge_boundary_contract import lint_judge_boundary_output_v1, scan_forbidden_boundary_fields
+from vulngraph.agent_io.judge_boundary_contract import (
+  derive_boundary_views,
+  lint_judge_boundary_output_v1,
+  scan_forbidden_boundary_fields,
+)
 from vulngraph.agent_io.judge_boundary_schema import parse_judge_boundary_output_v1
 from vulngraph.workflows.judge_v0 import build_judge_input_v0
 
@@ -38,9 +43,6 @@ class FixtureJudgeBoundaryBackend:
   def generate(self, prompt: str, context: dict[str, Any]) -> AgentResponse:
     boundary_input = context.get("boundary_input") if isinstance(context.get("boundary_input"), dict) else {}
     judgments = []
-    selected = []
-    rejected = []
-    uncertainty = []
     for index, candidate in enumerate(boundary_input.get("candidate_set", []) or []):
       candidate_id = str(candidate.get("candidate_id") or "")
       sha = str(candidate.get("candidate_commit_sha") or "")
@@ -48,15 +50,12 @@ class FixtureJudgeBoundaryBackend:
       if index == 0 and not conflict:
         decision = "selected"
         role = "introduction"
-        selected.append({"candidate_id": candidate_id, "candidate_commit_sha": sha, "boundary_role": role, "evidence_refs": list(candidate.get("evidence_refs") or [])[:2]})
       elif conflict:
         decision = "uncertain"
-        role = "uncertain_boundary"
-        uncertainty.append({"candidate_id": candidate_id, "reason": "conflicting SZZ risk remains unresolved"})
+        role = "introduction"
       else:
         decision = "rejected"
         role = "refactor_noise"
-        rejected.append({"candidate_id": candidate_id, "reason": "lower ranked duplicate boundary candidate"})
       judgments.append(
         {
           "candidate_id": candidate_id,
@@ -69,12 +68,9 @@ class FixtureJudgeBoundaryBackend:
         }
       )
     payload = {
-      "schema_version": "judge_boundary_output_v1",
+      "schema_version": "judge_boundary_output_v1_1",
       "cve_id": str(boundary_input.get("cve_id") or context.get("cve_id") or ""),
       "candidate_judgments": judgments,
-      "selected_boundary_events": selected,
-      "uncertainty": uncertainty,
-      "rejected_candidates": rejected,
     }
     return AgentResponse(
       raw_text=json.dumps(payload, ensure_ascii=False, indent=2),
@@ -115,18 +111,28 @@ def build_judge_boundary_input_v1(
         "evidence_refs_used": item.get("evidence_refs_used", []),
       }
     )
+  dataset_records = _read_json(Path(dataset))
+  record = dataset_records.get(cve_id, {}) if isinstance(dataset_records.get(cve_id, {}), dict) else {}
+  candidate_set, boundary_groups, fix_groups = _annotate_boundary_and_fix_groups(
+    cve_id=cve_id,
+    candidates=base.get("candidate_set", []),
+    record=record,
+    judge_packet_root=Path(judge_packet_root),
+  )
   boundary_input = {
-    "schema_version": "judge_boundary_input_v1",
+    "schema_version": "judge_boundary_input_v1_1",
     "cve_id": cve_id,
     "cve_context": base.get("cve_context", {}),
     "root_cause_context": base.get("root_cause_context", {}),
-    "candidate_set": base.get("candidate_set", []),
+    "candidate_set": candidate_set,
+    "boundary_groups": boundary_groups,
+    "fix_groups": fix_groups,
     "szz_evidence_cards": base.get("szz_evidence_cards", []),
     "judge_v0_rankings": rankings,
     "judge_v0_contract_ok": bool(v0_result.get("contract_ok", False)),
     "release_reachability_summary": {
       item.get("candidate_id", ""): (card.get("release_reachability_summary") or {})
-      for item, card in zip(base.get("candidate_set", []) or [], base.get("szz_evidence_cards", []) or [])
+      for item, card in zip(candidate_set, base.get("szz_evidence_cards", []) or [])
       if item.get("candidate_id")
     },
     "forbidden": base.get("forbidden", []),
@@ -212,7 +218,7 @@ def run_judge_boundary_v1_for_cve(
     {
       "cve_id": cve_id,
       "boundary_input": boundary_input,
-      "system_prompt": "You are VulnGraph Judge Boundary Agent v1. Return strict JSON only.",
+      "system_prompt": "You are VulnGraph Judge Boundary Agent v1.1. Return strict JSON only.",
     },
   )
   parse_result, contract, contract_dict = _parse_and_lint(response, boundary_input)
@@ -232,8 +238,8 @@ def run_judge_boundary_v1_for_cve(
       repair_prompt,
       {
         "cve_id": cve_id,
-        "boundary_input": _repair_context(boundary_input),
-        "system_prompt": "Repair the previous VulnGraph Judge Boundary v1 JSON only. Return strict JSON only.",
+        "boundary_input": boundary_input,
+        "system_prompt": "Re-evaluate the VulnGraph Judge Boundary v1.1 output using the complete original evidence. Return strict JSON only.",
       },
     )
     (out_path / "raw_response.repair.txt").write_text(response.raw_text, encoding="utf-8")
@@ -246,7 +252,9 @@ def run_judge_boundary_v1_for_cve(
     _write_json(out_path / "parse_error.json", {"status": response.status, "error": response.error or (parse_result.error if parse_result else "backend_failed")})
   contract_dict = contract.to_dict() if contract else {"ok": False, "errors": [response.error or "parse_failed"], "taxonomy": {"parse_failed": 1}}
   _write_json(out_path / "judge_boundary_contract_lint.json", contract_dict)
-  result = _result(cve_id, boundary_input, response, parse_result, contract_dict, retry_used=retry_used)
+  views = derive_boundary_views(parse_result.data, boundary_input) if contract_dict.get("ok") and parse_result and parse_result.data else {"selected_boundary_events": [], "rejected_candidates": [], "uncertain_candidates": []}
+  _write_json(out_path / "derived_boundary_views.json", views)
+  result = _result(cve_id, boundary_input, response, parse_result, contract_dict, views=views, retry_used=retry_used)
   _write_json(out_path / "judge_boundary_result.json", result)
   return result
 
@@ -266,6 +274,7 @@ def _result(
   parse_result: Any,
   contract: dict[str, Any],
   *,
+  views: dict[str, list[dict[str, Any]]],
   retry_used: bool,
 ) -> dict[str, Any]:
   parsed = parse_result.data if parse_result and parse_result.ok else {}
@@ -277,9 +286,10 @@ def _result(
     "parse_status": parse_result.format if parse_result and parse_result.ok else ("empty" if parse_result and parse_result.empty else "parse_error" if response.status == "ok" else response.status),
     "contract_ok": bool(contract.get("ok")),
     "candidate_count": len(boundary_input.get("candidate_set", []) or []),
-    "selected_boundary_event_count": len(parsed.get("selected_boundary_events", []) or []) if isinstance(parsed, dict) else 0,
-    "rejected_count": len(parsed.get("rejected_candidates", []) or []) if isinstance(parsed, dict) else 0,
-    "uncertain_count": sum(1 for item in parsed.get("candidate_judgments", []) or [] if item.get("decision") == "uncertain") if isinstance(parsed, dict) else 0,
+    "selected_boundary_event_count": len(views["selected_boundary_events"]),
+    "rejected_count": len(views["rejected_candidates"]),
+    "uncertain_count": len(views["uncertain_candidates"]),
+    "derived_boundary_views": views,
     "prompt_bytes": len(json.dumps(boundary_input, ensure_ascii=False).encode("utf-8")),
     "raw_response_bytes": len(response.raw_text.encode("utf-8")),
     "retry_used": retry_used,
@@ -292,7 +302,7 @@ def _result(
 def _summary(results: list[dict[str, Any]], *, duration_s: float) -> dict[str, Any]:
   return {
     "cases_total": len(results),
-    "parse_ok_count": sum(1 for item in results if item.get("parse_status") in {"json", "fenced_json"}),
+    "parse_ok_count": sum(1 for item in results if item.get("parse_status") in {"json", "fenced_json", "deterministic_repair_json"}),
     "contract_ok_count": sum(1 for item in results if item.get("contract_ok")),
     "backend_failed_count": sum(1 for item in results if item.get("status") == "failed"),
     "repair_retry_count": sum(1 for item in results if item.get("retry_used")),
@@ -304,6 +314,142 @@ def _summary(results: list[dict[str, Any]], *, duration_s: float) -> dict[str, A
     "results": results,
   }
 
+
+
+def _annotate_boundary_and_fix_groups(
+  *,
+  cve_id: str,
+  candidates: list[dict[str, Any]],
+  record: dict[str, Any],
+  judge_packet_root: Path,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+  repo = str(record.get("repo") or "")
+  fix_sets = _dataset_fix_sets(cve_id, record.get("fixing_commits"))
+  sha_to_set = {
+    sha: fix_set["fix_set_id"]
+    for fix_set in fix_sets
+    for sha in fix_set["fix_commit_shas"]
+  }
+  inventory_families = _load_inventory_fix_families(judge_packet_root, cve_id)
+  family_by_sha = {
+    sha: family_id
+    for family_id, shas in inventory_families.items()
+    for sha in shas
+  }
+  for candidate in candidates:
+    fix_sha = _fix_sha(str(candidate.get("fix_commit_id") or ""))
+    family_id = str(candidate.get("patch_family_id") or "")
+    if fix_sha and family_id:
+      family_by_sha.setdefault(fix_sha, family_id)
+      inventory_families.setdefault(family_id, [])
+      if fix_sha not in inventory_families[family_id]:
+        inventory_families[family_id].append(fix_sha)
+
+  fix_group_id_by_set = {
+    item["fix_set_id"]: f"fix-group:{cve_id}:{index}"
+    for index, item in enumerate(fix_sets, start=1)
+  }
+  fix_groups = []
+  for fix_set in fix_sets:
+    families: dict[str, list[str]] = {}
+    for sha in fix_set["fix_commit_shas"]:
+      family_id = family_by_sha.get(sha) or f"patch-family:unmapped:{sha}"
+      families.setdefault(family_id, []).append(sha)
+    fix_groups.append(
+      {
+        "fix_group_id": fix_group_id_by_set[fix_set["fix_set_id"]],
+        "fix_set_id": fix_set["fix_set_id"],
+        "completion_semantics": "all_patch_families",
+        "patch_families": [
+          {
+            "patch_family_id": family_id,
+            "member_semantics": "any_equivalent_commit",
+            "fix_commit_shas": sorted(shas),
+          }
+          for family_id, shas in sorted(families.items())
+        ],
+        "source": "dataset_fix_set_plus_wrapper_patch_family",
+      }
+    )
+
+  annotated: list[dict[str, Any]] = []
+  groups: dict[tuple[str, str], dict[str, Any]] = {}
+  for raw in candidates:
+    candidate = dict(raw)
+    fix_sha = _fix_sha(str(candidate.get("fix_commit_id") or ""))
+    fix_set_id = sha_to_set.get(fix_sha, "")
+    candidate["fix_set_id"] = fix_set_id
+    bindings = sorted({
+      str(item)
+      for item in candidate.get("root_cause_binding_refs", []) or []
+      if str(item).strip()
+    }) or ["unbound"]
+    boundary_group_ids = []
+    for binding in bindings:
+      digest = hashlib.sha256(f"{cve_id}|{fix_set_id}|{binding}".encode("utf-8")).hexdigest()[:16]
+      group_id = f"boundary-group:{cve_id}:{digest}"
+      boundary_group_ids.append(group_id)
+      key = (fix_set_id, binding)
+      group = groups.setdefault(
+        key,
+        {
+          "boundary_group_id": group_id,
+          "fix_set_id": fix_set_id,
+          "fix_group_id": fix_group_id_by_set.get(fix_set_id, ""),
+          "root_cause_hypothesis_ids": [] if binding == "unbound" else [binding],
+          "candidate_ids": [],
+          "activation_semantics": "any_activator_and_all_prerequisites",
+          "source": "wrapper_candidate_binding",
+        },
+      )
+      group["candidate_ids"].append(str(candidate.get("candidate_id") or ""))
+    candidate["boundary_group_ids"] = boundary_group_ids
+    annotated.append(candidate)
+
+  boundary_groups = []
+  for group in groups.values():
+    group["candidate_ids"] = sorted(set(group["candidate_ids"]))
+    boundary_groups.append(group)
+  boundary_groups.sort(key=lambda item: item["boundary_group_id"])
+  return annotated, boundary_groups, fix_groups
+
+
+def _dataset_fix_sets(cve_id: str, value: Any) -> list[dict[str, Any]]:
+  output = []
+  if not isinstance(value, list):
+    return output
+  for index, group in enumerate(value, start=1):
+    commits = group if isinstance(group, list) else [group]
+    shas = [str(item).strip() for item in commits if str(item).strip()]
+    if shas:
+      output.append({"fix_set_id": f"{cve_id}:fix-set:{index}", "fix_commit_shas": shas})
+  return output
+
+
+def _load_inventory_fix_families(judge_packet_root: Path, cve_id: str) -> dict[str, list[str]]:
+  manifest = _read_json_default(judge_packet_root / "provenance_manifest.json", {})
+  value = str(manifest.get("anchor_artifact") or "")
+  if not value:
+    return {}
+  root = Path(value)
+  if not root.is_absolute():
+    root = Path.cwd() / root
+  inventory = _read_json_default(root / cve_id / "candidate_inventory.json", {})
+  return {
+    str(family_id): sorted({str(sha) for sha in shas if str(sha).strip()})
+    for family_id, shas in (inventory.get("fix_families") or {}).items()
+    if isinstance(shas, list)
+  }
+
+
+def _fix_sha(fix_commit_id: str) -> str:
+  return fix_commit_id.rsplit(":", 1)[-1] if ":" in fix_commit_id else fix_commit_id
+
+
+def _read_json_default(path: Path, default: dict[str, Any]) -> dict[str, Any]:
+  if not path.exists():
+    return default
+  return _read_json(path)
 
 def _find_v0_json(root: Path, cve_id: str, filename: str) -> dict[str, Any]:
   candidates = [
@@ -337,9 +483,9 @@ def _summary_row(result: dict[str, Any]) -> dict[str, Any]:
 
 def _render_report(summary: dict[str, Any], results: list[dict[str, Any]]) -> str:
   lines = [
-    "# VulnGraph Judge Boundary v1",
+    "# VulnGraph Judge Boundary v1.1",
     "",
-    "Boundary v1 validates raw candidate boundary events for deterministic conversion. It does not output BIC or affected versions.",
+    "Boundary v1.1 validates raw candidate boundary events for deterministic conversion. It does not output BIC or affected versions.",
     "",
     f"- cases_total: {summary['cases_total']}",
     f"- parse_ok_count: {summary['parse_ok_count']}",
@@ -364,59 +510,42 @@ def _repair_prompt(
   parse_result: Any,
   contract_dict: dict[str, Any],
 ) -> str:
-  allowed_candidates = _repair_context(boundary_input)["candidate_set"]
   repair_request = {
-    "task": "repair_judge_boundary_output_v1_json",
+    "task": "re_evaluate_judge_boundary_output_v1_1",
     "cve_id": cve_id,
     "rules": [
       "Return one strict JSON object only.",
-      "Use only candidate_id and candidate_commit_sha from allowed_candidates.",
-      "Use only evidence refs listed for that candidate.",
-      "Account for every allowed candidate exactly once in candidate_judgments.",
-      "Do not output correct_bic, ground_truth, affected_versions, bic, paths, lines, or new SHAs.",
-      "For conflict-risk candidates, either mark decision uncertain with boundary_role uncertain_boundary, or provide evidence-backed reasoning_short explaining the conflict.",
+      "Use only candidate_id and candidate_commit_sha from boundary_input.candidate_set.",
+      "Use only wrapper-owned evidence refs exposed by the complete boundary input.",
+      "Account for every input candidate exactly once in candidate_judgments.",
+      "selected requires introduction, activation, or prerequisite.",
+      "rejected requires fix_series_noise, refactor_noise, or equivalent_fix_noise.",
+      "uncertain is a decision; uncertain_boundary is not a boundary_role.",
+      "Do not output selected_boundary_events, rejected_candidates, uncertainty, group IDs, paths, lines, or new SHAs.",
+      "Do not output correct_bic, ground_truth, affected_versions, or bic.",
     ],
     "parse_error": parse_result.error if parse_result and not parse_result.ok else "",
     "contract_errors": contract_dict.get("errors", []),
     "contract_taxonomy": contract_dict.get("taxonomy", {}),
-    "allowed_candidates": allowed_candidates,
-    "previous_response_excerpt": raw_response[:4000],
+    "previous_response": raw_response,
+    "boundary_input": boundary_input,
     "required_schema": {
-      "schema_version": "judge_boundary_output_v1",
+      "schema_version": "judge_boundary_output_v1_1",
       "cve_id": cve_id,
       "candidate_judgments": [
         {
-          "candidate_id": "from allowed_candidates",
-          "candidate_commit_sha": "matching SHA from allowed_candidates",
-          "boundary_role": "introduction|activation|prerequisite|fix_series_noise|refactor_noise|equivalent_fix_noise|uncertain_boundary",
+          "candidate_id": "from boundary_input.candidate_set",
+          "candidate_commit_sha": "matching wrapper-owned SHA",
+          "boundary_role": "introduction|activation|prerequisite|fix_series_noise|refactor_noise|equivalent_fix_noise",
           "decision": "selected|rejected|uncertain",
           "confidence": "low|medium|high",
-          "evidence_refs": ["from candidate evidence_refs"],
+          "evidence_refs": ["wrapper-owned evidence refs"],
           "reasoning_short": "brief evidence-backed reason",
         }
       ],
-      "selected_boundary_events": [],
-      "uncertainty": [],
-      "rejected_candidates": [],
     },
   }
   return json.dumps(repair_request, ensure_ascii=False, indent=2)
-
-
-def _repair_context(boundary_input: dict[str, Any]) -> dict[str, Any]:
-  candidate_set = []
-  for candidate in boundary_input.get("candidate_set", []) or []:
-    candidate_set.append(
-      {
-        "candidate_id": candidate.get("candidate_id", ""),
-        "candidate_commit_sha": candidate.get("candidate_commit_sha", ""),
-        "evidence_refs": candidate.get("evidence_refs", []),
-        "risk_flags": candidate.get("risk_flags", []),
-        "candidate_source": candidate.get("candidate_source", ""),
-        "evidence_level": candidate.get("evidence_level", ""),
-      }
-    )
-  return {"cve_id": boundary_input.get("cve_id", ""), "candidate_set": candidate_set}
 
 
 def _read_json(path: Path) -> dict[str, Any]:

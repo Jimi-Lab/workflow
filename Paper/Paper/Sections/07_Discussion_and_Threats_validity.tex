@@ -3,7 +3,7 @@
 
 \textbf{Construct validity.} The affected-version task has both exact-set and partial-version aspects. We therefore use CVE-level Accuracy, CVE-level No-Miss Ratio, and version-level precision/recall/F1 rather than relying on a single metric. Resource metrics such as tokens and cost must be reported separately because an agent-based method can trade accuracy for runtime or API cost.
 
-\textbf{Internal validity.} \toolname depends on correct patch-family filtering, root-cause evidence extraction, release-line modeling, and tag verdicts. Errors in any stage can propagate to the final affected-version set. The planned ablations in RQ3 are necessary before attributing improvements to a specific component. Current method details and results remain \need{NEEDS EXPERIMENT}.
+\textbf{Internal validity.} \toolname depends on correct patch-family filtering, root-cause evidence extraction, boundary-event judgment, and Git-DAG state propagation. Errors in any stage can propagate to the final affected-version set. The planned ablations in RQ3 are necessary before attributing improvements to a specific component. Current method details and results remain \need{NEEDS EXPERIMENT}.
 
 \textbf{External validity.} The primary dataset is C/C++ focused and covers nine open-source projects. Results may not transfer directly to ecosystems with different release practices, package managers, or vulnerability disclosure conventions. We will avoid claims about other languages until additional datasets are evaluated.
 
@@ -11,6 +11,6 @@
 
 \textbf{Citation and table validity.} Several local reference analyses mark table values, figure crops, and citation metadata as requiring repair or verification. Therefore, all exact numeric claims taken from extracted tables must be checked against the original PDFs before submission \need{NEEDS TABLE REPAIR} \need{NEEDS CITATION VERIFICATION}.
 
-\textbf{Agent validity.} If \toolname uses an LLM or agent backend, verdicts may depend on prompt design, context compression, model version, randomness, and tool-output formatting. We will log model/backend information, tokens, cost, latency, failure rate, and replay artifacts where possible. Any claim about agent memory or self-evolution remains out of scope until supported by ablations \need{NEEDS EXPERIMENT}.
+\textbf{Agent validity.} If \toolname uses an LLM or agent backend, semantic judgments may depend on prompt design, context compression, model version, randomness, and tool-output formatting. We will log model/backend information, tokens, cost, latency, failure rate, and replay artifacts where possible. Any claim about agent memory or self-evolution remains out of scope until supported by ablations \need{NEEDS EXPERIMENT}.
 
 \textbf{Ethics and misuse.} Affected-version identification can help defenders prioritize patching, but it can also reveal which deployed versions are likely vulnerable. Prior patch-search work explicitly surfaces this dual-use risk~\cite{redebug2012}. The paper should emphasize defensive use, benchmark-level evaluation, and responsible disclosure if new vulnerable versions are discovered \need{NEEDS EVIDENCE}.

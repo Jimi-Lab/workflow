@@ -3,7 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from vulngraph.agent_io.judge_boundary_contract import lint_judge_boundary_output_v1, scan_forbidden_boundary_fields
+from vulngraph.agent_io.judge_boundary_contract import (
+  derive_boundary_views,
+  lint_judge_boundary_output_v1,
+  scan_forbidden_boundary_fields,
+)
 from vulngraph.agent_io.judge_boundary_schema import parse_judge_boundary_output_v1
 from vulngraph.workflows.judge_boundary_v1 import FixtureJudgeBoundaryBackend, build_judge_boundary_input_v1, run_judge_boundary_v1_batch
 from vulngraph.agent_backends.base import AgentResponse
@@ -115,7 +119,7 @@ def _make_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path, Path]:
 
 def _valid_output() -> dict:
   return {
-    "schema_version": "judge_boundary_output_v1",
+    "schema_version": "judge_boundary_output_v1_1",
     "cve_id": "CVE-BOUNDARY-1",
     "candidate_judgments": [
       {
@@ -128,11 +132,6 @@ def _valid_output() -> dict:
         "reasoning_short": "direct old-side evidence and v0 ranking support this as a boundary event",
       }
     ],
-    "selected_boundary_events": [
-      {"candidate_id": "cand-1", "candidate_commit_sha": _sha("a"), "boundary_role": "introduction", "evidence_refs": ["candidate:cand-1", "szz:cand-1"]}
-    ],
-    "uncertainty": [],
-    "rejected_candidates": [],
   }
 
 
@@ -164,7 +163,16 @@ def test_boundary_contract_rejects_invented_candidate_and_forbidden_fields(tmp_p
   assert scan_forbidden_boundary_fields(output)["ok"] is False
 
 
-def test_boundary_contract_requires_selected_event_evidence_refs(tmp_path: Path) -> None:
+def test_boundary_schema_rejects_model_owned_duplicate_views() -> None:
+  output = _valid_output()
+  output["selected_boundary_events"] = []
+
+  parsed = parse_judge_boundary_output_v1(json.dumps(output))
+
+  assert parsed.ok is False
+
+
+def test_boundary_contract_derives_views_from_candidate_judgments(tmp_path: Path) -> None:
   judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
   packet = build_judge_boundary_input_v1(
     cve_id="CVE-BOUNDARY-1",
@@ -175,12 +183,52 @@ def test_boundary_contract_requires_selected_event_evidence_refs(tmp_path: Path)
     dataset=dataset,
   )
   output = _valid_output()
-  output["selected_boundary_events"][0]["evidence_refs"] = []
+
+  result = lint_judge_boundary_output_v1(output, packet)
+  views = derive_boundary_views(output, packet)
+
+  assert result.ok is True
+  assert [item["candidate_id"] for item in views["selected_boundary_events"]] == ["cand-1"]
+  assert views["rejected_candidates"] == []
+  assert views["uncertain_candidates"] == []
+
+
+def test_boundary_contract_requires_each_input_candidate_exactly_once(tmp_path: Path) -> None:
+  judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
+  packet = build_judge_boundary_input_v1(
+    cve_id="CVE-BOUNDARY-1",
+    judge_packet_root=judge_root,
+    detailed_evidence_root=evidence_root,
+    slimming_root=slimming_root,
+    judge_v0_run=v0_root,
+    dataset=dataset,
+  )
+  output = _valid_output()
+  output["candidate_judgments"].append(dict(output["candidate_judgments"][0]))
 
   result = lint_judge_boundary_output_v1(output, packet)
 
   assert result.ok is False
-  assert "selected_event_without_evidence_refs" in result.taxonomy
+  assert result.taxonomy["candidate_accounted_multiple_times"] == 1
+
+
+def test_boundary_contract_enforces_decision_role_consistency(tmp_path: Path) -> None:
+  judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
+  packet = build_judge_boundary_input_v1(
+    cve_id="CVE-BOUNDARY-1",
+    judge_packet_root=judge_root,
+    detailed_evidence_root=evidence_root,
+    slimming_root=slimming_root,
+    judge_v0_run=v0_root,
+    dataset=dataset,
+  )
+  output = _valid_output()
+  output["candidate_judgments"][0]["boundary_role"] = "refactor_noise"
+
+  result = lint_judge_boundary_output_v1(output, packet)
+
+  assert result.ok is False
+  assert result.taxonomy["decision_role_conflict"] == 1
 
 
 def test_boundary_contract_rejects_selected_conflict_without_explanation(tmp_path: Path) -> None:
@@ -201,6 +249,15 @@ def test_boundary_contract_rejects_selected_conflict_without_explanation(tmp_pat
 
   assert result.ok is False
   assert "conflict_without_uncertainty_or_explanation" in result.taxonomy
+
+
+def test_boundary_parser_repairs_trailing_comma_without_semantic_retry() -> None:
+  raw = json.dumps(_valid_output()).replace("]}", "],}")
+
+  parsed = parse_judge_boundary_output_v1(raw)
+
+  assert parsed.ok is True
+  assert parsed.format == "deterministic_repair_json"
 
 
 def test_boundary_workflow_fixture_writes_accepted_raw_boundary(tmp_path: Path) -> None:
@@ -225,7 +282,7 @@ def test_boundary_workflow_fixture_writes_accepted_raw_boundary(tmp_path: Path) 
   assert scan_forbidden_boundary_fields(result)["ok"] is True
 
 
-def test_boundary_workflow_repair_retry_does_not_need_full_evidence(tmp_path: Path) -> None:
+def test_boundary_workflow_semantic_retry_repeats_full_evidence(tmp_path: Path) -> None:
   judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
 
   class RepairBackend:
@@ -238,7 +295,9 @@ def test_boundary_workflow_repair_retry_does_not_need_full_evidence(tmp_path: Pa
     def generate(self, prompt: str, context: dict) -> AgentResponse:
       self.calls.append(prompt)
       if len(self.calls) == 1:
-        return AgentResponse(raw_text="{", status="ok", backend_name=self.backend_name, backend_type=self.backend_type, usage={"session_id": "first"})
+        invalid = _valid_output()
+        invalid["candidate_judgments"][0]["candidate_commit_sha"] = _sha("b")
+        return AgentResponse(raw_text=json.dumps(invalid), status="ok", backend_name=self.backend_name, backend_type=self.backend_type, usage={"session_id": "first"})
       return AgentResponse(raw_text=json.dumps(_valid_output()), status="ok", backend_name=self.backend_name, backend_type=self.backend_type, usage={"session_id": "repair"})
 
   backend = RepairBackend()
@@ -255,4 +314,63 @@ def test_boundary_workflow_repair_retry_does_not_need_full_evidence(tmp_path: Pa
 
   assert summary["contract_ok_count"] == 1
   assert summary["repair_retry_count"] == 1
-  assert "dangerous_use(ptr)" not in backend.calls[1]
+  assert "dangerous_use(ptr)" in backend.calls[1]
+  assert "root_cause_context" in backend.calls[1]
+  assert "szz_evidence_cards" in backend.calls[1]
+
+
+def test_boundary_workflow_deterministic_syntax_repair_avoids_model_retry(tmp_path: Path) -> None:
+  judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
+
+  class SyntaxBackend:
+    backend_name = "syntax-fixture"
+    backend_type = "fixture"
+
+    def __init__(self) -> None:
+      self.calls = 0
+
+    def generate(self, prompt: str, context: dict) -> AgentResponse:
+      self.calls += 1
+      raw = json.dumps(_valid_output()).replace("]}", "],}")
+      return AgentResponse(raw_text=raw, status="ok", backend_name=self.backend_name, backend_type=self.backend_type)
+
+  backend = SyntaxBackend()
+  summary = run_judge_boundary_v1_batch(
+    cve_ids=["CVE-BOUNDARY-1"],
+    judge_packet_root=judge_root,
+    detailed_evidence_root=evidence_root,
+    slimming_root=slimming_root,
+    judge_v0_run=v0_root,
+    dataset=dataset,
+    out_dir=tmp_path / "out-syntax",
+    backend=backend,
+  )
+
+  assert summary["contract_ok_count"] == 1
+  assert summary["repair_retry_count"] == 0
+  assert backend.calls == 1
+
+
+def test_boundary_input_contains_wrapper_owned_boundary_and_fix_groups(tmp_path: Path) -> None:
+  judge_root, evidence_root, slimming_root, v0_root, dataset = _make_inputs(tmp_path)
+  packet = build_judge_boundary_input_v1(
+    cve_id="CVE-BOUNDARY-1", judge_packet_root=judge_root, detailed_evidence_root=evidence_root,
+    slimming_root=slimming_root, judge_v0_run=v0_root, dataset=dataset,
+  )
+
+  assert packet["schema_version"] == "judge_boundary_input_v1_1"
+  assert packet["candidate_set"][0]["fix_set_id"] == "CVE-BOUNDARY-1:fix-set:1"
+  assert packet["candidate_set"][0]["boundary_group_ids"]
+  assert packet["fix_groups"][0]["completion_semantics"] == "all_patch_families"
+  assert packet["fix_groups"][0]["patch_families"][0]["member_semantics"] == "any_equivalent_commit"
+
+
+def test_boundary_prompt_has_single_model_owned_fact_source() -> None:
+  from vulngraph.workflows.judge_boundary_v1 import PROMPT_PATH
+
+  prompt = PROMPT_PATH.read_text(encoding="utf-8")
+
+  assert "uncertain_boundary" not in prompt
+  assert "\"selected_boundary_events\"" not in prompt
+  assert "\"rejected_candidates\"" not in prompt
+  assert "\"uncertainty\"" not in prompt

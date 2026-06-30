@@ -1,0 +1,67 @@
+<style>
+  .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .card { min-height: 470px; }
+  .diagram { padding: 16px; background: #fbfcfd; min-height: 345px; font-family: Arial, sans-serif; }
+  .pipe { display:flex; align-items:center; gap:5px; margin:8px 0; }
+  .box { flex:1; border:1px solid #cbd5e1; border-radius:7px; padding:7px 5px; text-align:center; background:white; font-size:10px; line-height:1.25; color:#263238; }
+  .arrow { color:#64748b; font-weight:700; font-size:14px; }
+  .band { border-radius:8px; padding:8px; margin:8px 0; font-size:10px; text-align:center; font-weight:600; }
+  .n1 { background:#e5f2ff; border-left:5px solid #2878b5; }
+  .n2 { background:#e7f6ef; border-left:5px solid #198754; }
+  .n3 { background:#fff2dc; border-left:5px solid #d9822b; }
+  .small { font-size:9px; color:#52606d; }
+  .stack { display:grid; gap:7px; }
+  .row { display:grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; align-items:center; gap:3px; }
+  .center-graph { width:150px; height:95px; border-radius:50%; background:#edf4fa; border:2px solid #527da3; display:flex; align-items:center; justify-content:center; text-align:center; margin:12px auto; font-size:11px; font-weight:700; }
+  .loop { border:2px dashed #d9822b; border-radius:12px; padding:8px; margin-top:10px; }
+  @media (max-width: 1050px) { .cards { grid-template-columns:1fr; } }
+</style>
+
+<h2>Which overview structure best fits the ICSE paper?</h2>
+<p class="subtitle">All three show the full pipeline and the three novelties. Choose based on what the reader should understand first.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image diagram">
+      <div class="label">OPTION A · PIPELINE FIRST</div>
+      <div class="pipe"><div class="box">CVE + Fix</div><div class="arrow">→</div><div class="box">Root Cause</div><div class="arrow">→</div><div class="box">SZZ Anchors</div></div>
+      <div class="pipe"><div class="box">History</div><div class="arrow">→</div><div class="box">Judge</div><div class="arrow">→</div><div class="box">Boundary</div></div>
+      <div class="pipe"><div class="box">Git-DAG State</div><div class="arrow">→</div><div class="box">Tag Projection</div><div class="arrow">→</div><div class="box">Affected Versions</div></div>
+      <div class="band n1">N1 · Attacker conditions guide Root Cause</div>
+      <div class="band n2">N2 · Evidence-constrained branch reconstruction</div>
+      <div class="band n3">N3 · Graph-backed continual adaptation ↺</div>
+      <p class="small">Strength: easiest to follow. Risk: novelty looks like annotation around a conventional pipeline.</p>
+    </div>
+    <div class="card-body"><h3>A. Linear Story</h3><p>Reader sees the complete end-to-end method immediately.</p></div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image diagram">
+      <div class="label">OPTION B · THREE-LAYER SYSTEM</div>
+      <div class="band n3">Shared Knowledge & Adaptation Layer<br><span class="small">reviewed outcomes · repo/CWE/pattern priors · provenance</span></div>
+      <div class="band n1">Semantic Reasoning Layer<br><span class="small">attacker input → trigger → prerequisite → sink → impact</span></div>
+      <div class="row">
+        <div class="box">Root Cause<br>+ Anchors</div><div class="arrow">→</div>
+        <div class="box">History Events<br>+ Judge</div><div class="arrow">→</div>
+        <div class="box">Branch Boundary</div>
+      </div>
+      <div class="band n2">Deterministic Git Graph Layer<br><span class="small">Commit DAG · blame/log/path tracing · state propagation · release projection</span></div>
+      <div class="pipe"><div class="box">CVE + Fix + Repo</div><div class="arrow">→</div><div class="box">Affected Versions<br>+ Evidence</div></div>
+      <p class="small">Strength: pipeline and novelty are structurally integrated. Best balance for a full-width ICSE overview.</p>
+    </div>
+    <div class="card-body"><h3>B. Layered Architecture</h3><p>Recommended: separates semantic agents, deterministic Git facts, and adaptive graph memory.</p></div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image diagram">
+      <div class="label">OPTION C · GRAPH FIRST</div>
+      <div class="pipe"><div class="box">CVE + Fix</div><div class="arrow">→</div><div class="box">Attacker-Condition<br>Root Cause</div></div>
+      <div class="center-graph">Shared Commit DAG<br>+ Evidence Graph</div>
+      <div class="pipe"><div class="box">Anchor & History Search</div><div class="arrow">↔</div><div class="box">Event Judge</div></div>
+      <div class="pipe"><div class="box">Branch State Propagation</div><div class="arrow">→</div><div class="box">Release Projection</div></div>
+      <div class="loop">N3 feedback loop: reviewed cases update graph priors ↺</div>
+      <p class="small">Strength: most distinctive visually. Risk: graph may appear to be the main contribution before it is experimentally proven.</p>
+    </div>
+    <div class="card-body"><h3>C. Graph-Centric Loop</h3><p>Emphasizes Graph-backed Self-Evolution and shared repository state.</p></div>
+  </div>
+</div>

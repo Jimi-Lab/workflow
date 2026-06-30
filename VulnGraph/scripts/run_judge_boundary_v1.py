@@ -18,7 +18,7 @@ DEFAULT_DATASET = Path(r"E:\AI\Agent\workflow\VulnVersion\DataSet\BaseDataSet_30
 
 
 def main() -> None:
-  parser = argparse.ArgumentParser(description="Run VulnGraph Judge Boundary Agent v1.")
+  parser = argparse.ArgumentParser(description="Run VulnGraph Judge Boundary Agent v1.1.")
   parser.add_argument("--judge-packet-root", type=Path, default=DEFAULT_JUDGE_PACKET_ROOT)
   parser.add_argument("--detailed-evidence-root", type=Path, default=DEFAULT_DETAILED_EVIDENCE_ROOT)
   parser.add_argument("--slimming-root", type=Path, default=DEFAULT_SLIMMING_ROOT)

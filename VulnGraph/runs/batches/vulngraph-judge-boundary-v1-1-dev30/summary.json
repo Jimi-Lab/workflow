@@ -1,0 +1,1964 @@
+{
+  "cases_total": 30,
+  "parse_ok_count": 30,
+  "contract_ok_count": 30,
+  "backend_failed_count": 0,
+  "repair_retry_count": 0,
+  "selected_boundary_event_count": 22,
+  "rejected_count": 12,
+  "uncertain_count": 27,
+  "lifecycle": "raw_boundary_event_accepted",
+  "duration_s": 1166.031,
+  "results": [
+    {
+      "cve_id": "CVE-2020-10251",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:9dc8ff4c78a029afaeb373ad87410b09da99271b5cbb20a49117b78dc70b374f",
+            "candidate_commit_sha": "f6cad26b6004600b64093c9a135fbc42d49b6806",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:9dc8ff4c78a029afaeb373ad87410b09da99271b5cbb20a49117b78dc70b374f",
+              "szz:pre-fix-line:9dc8ff4c78a029afaeb373ad87410b09da99271b5cbb20a49117b78dc70b374f",
+              "root_cause:pre-fix-line:9dc8ff4c78a029afaeb373ad87410b09da99271b5cbb20a49117b78dc70b374f"
+            ],
+            "reasoning_short": "Control predecessor NULL-check on decode_options is a required precondition enabling the vulnerable path; all SZZ blame variants agree (stable_blame_variants). Ancestor of fix, survives to fix parent, same file touch, root cause predicate binding. Candidate_in_fix_series_hint noted but does not override the clear prerequisite semantics from anchor role and line content. This alone never activates the vulnerability.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-10251:1fcf77d602a4813c"
+            ],
+            "fix_set_id": "CVE-2020-10251:fix-set:1",
+            "patch_family_id": "patch-family:7ee7b75bd394aff1fd7bf9adef66b97c7d057a6e",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:728a74ab58b7480d17c332e5cac1b2d17b1104263727c50cfb0caba41f2ff9a0",
+            "candidate_commit_sha": "8c69a644b1a32dd032541d123d232003f05887f8",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:728a74ab58b7480d17c332e5cac1b2d17b1104263727c50cfb0caba41f2ff9a0",
+              "szz:pre-fix-line:728a74ab58b7480d17c332e5cac1b2d17b1104263727c50cfb0caba41f2ff9a0",
+              "root_cause:pre-fix-line:728a74ab58b7480d17c332e5cac1b2d17b1104263727c50cfb0caba41f2ff9a0"
+            ],
+            "reasoning_short": "Sink anchor calling SetImageExtent; move_copy_blame differs (53004b14d), so introduction origin is ambiguous between this commit and the move source; normal and ignore-whitespace blames agree on 8c69a644. Ancestor of fix, survives to fix parent, same file touch, and root cause predicate binding all support boundary relevance. Release reachability too broad across 72 tags is noted but does not change boundary semantics. Move/copy conflict unresolved, hence uncertain.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-10251:1fcf77d602a4813c"
+            ],
+            "fix_set_id": "CVE-2020-10251:fix-set:1",
+            "patch_family_id": "patch-family:7ee7b75bd394aff1fd7bf9adef66b97c7d057a6e",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 9331,
+      "raw_response_bytes": 2296,
+      "retry_used": false,
+      "session_id": "ses_11fd18f84ffe0F4z6HxJ5w5Dr6",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-10702",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:d9efb639c765ba9e47babe00e87ce06350f7fda86896d01fdce0e17914c77c10",
+            "candidate_commit_sha": "990870b205ddfdba3fd3c1321e6083005ef59d1a",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:d9efb639c765ba9e47babe00e87ce06350f7fda86896d01fdce0e17914c77c10",
+              "szz:pre-fix-line:d9efb639c765ba9e47babe00e87ce06350f7fda86896d01fdce0e17914c77c10",
+              "root_cause:pre-fix-line:d9efb639c765ba9e47babe00e87ce06350f7fda86896d01fdce0e17914c77c10"
+            ],
+            "reasoning_short": "Stable SZZ with all variants agreeing; line survives to fix parent; candidate is ancestor of fix; root cause predicate bound; same file touch; release reachable across 3 lines and 6 tags without overreach; risk flags non_release_tag_noise and release_line_overreach do not undermine strong multi-signal agreement.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-10702:b703a51ade7d8fe0"
+            ],
+            "fix_set_id": "CVE-2020-10702:fix-set:1",
+            "patch_family_id": "patch-family:daf528076df402bd9a37d79f2df1138fbaf36ece",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5724,
+      "raw_response_bytes": 1078,
+      "retry_used": false,
+      "session_id": "ses_11fd0fd56ffeouu4rMjiuGyuRK",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11647",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 3,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:621c3ba57093f96bb40f689abf99bfd08e12935484a28d4425302ddf543e6438",
+            "candidate_commit_sha": "01f7356f85d33567a25e722e6488addd72ff64d4",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:621c3ba57093f96bb40f689abf99bfd08e12935484a28d4425302ddf543e6438",
+              "szz:pre-fix-line:621c3ba57093f96bb40f689abf99bfd08e12935484a28d4425302ddf543e6438",
+              "root_cause:pre-fix-line:621c3ba57093f96bb40f689abf99bfd08e12935484a28d4425302ddf543e6438"
+            ],
+            "reasoning_short": "Data-source function declaration (static int, line ~14074) is a prerequisite providing input to the recursive processing path but does not activate unbounded recursion. Distant from recursion loci (~7972-7990). Stable SZZ blame across all variants but extensive release reachability (370 tags, 21 lines) and release_line_overreach flag reduce boundary specificity to low confidence.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11647:c4702f13d7de6448"
+            ],
+            "fix_set_id": "CVE-2020-11647:fix-set:1",
+            "patch_family_id": "patch-family:971abb7cf5da985d1b94d5512aae4a13c5024eb1",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:1021db2626542faddcf7bd535202532487e758f6a0ae59c25681f489e97f5a88",
+            "candidate_commit_sha": "63e31768817d2cfdbaeba77f73c85f5eb98dd1ff",
+            "boundary_role": "activation",
+            "decision": "uncertain",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:1021db2626542faddcf7bd535202532487e758f6a0ae59c25681f489e97f5a88",
+              "szz:pre-fix-line:1021db2626542faddcf7bd535202532487e758f6a0ae59c25681f489e97f5a88",
+              "root_cause:pre-fix-line:1021db2626542faddcf7bd535202532487e758f6a0ae59c25681f489e97f5a88"
+            ],
+            "reasoning_short": "Control-predecessor while-loop (line 7990) drives repeated entry into fAbstractSyntaxNType, activating the unbounded recursion path. Semantically central to the vulnerability's trigger mechanism. Move-copy SZZ variant disagrees (move_copy_blame=6de0c799, canonical=63e31768), creating blame-origin uncertainty that prevents confident selection despite the clear activation role.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11647:c4702f13d7de6448"
+            ],
+            "fix_set_id": "CVE-2020-11647:fix-set:1",
+            "patch_family_id": "patch-family:971abb7cf5da985d1b94d5512aae4a13c5024eb1",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:963caef4d423e31d032535d30db5320e09ef77a739c2ccdefe5855b706593487",
+            "candidate_commit_sha": "809fb769b4b903c1f1e003dcd24e7ab1b15402e8",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:963caef4d423e31d032535d30db5320e09ef77a739c2ccdefe5855b706593487",
+              "szz:pre-fix-line:963caef4d423e31d032535d30db5320e09ef77a739c2ccdefe5855b706593487",
+              "root_cause:pre-fix-line:963caef4d423e31d032535d30db5320e09ef77a739c2ccdefe5855b706593487"
+            ],
+            "reasoning_short": "Recursion-entry function fAbstractSyntaxNType (line 7972) introduces the self-recursive call structure that creates unbounded recursion. Whitespace-sensitive blame disagreement (normal=59277781, ignore_whitespace=809fb769) and candidate_in_fix_series_hint flag suggest possible fix-series contamination, undermining confidence in this commit as the authentic introduction point.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11647:c4702f13d7de6448"
+            ],
+            "fix_set_id": "CVE-2020-11647:fix-set:1",
+            "patch_family_id": "patch-family:971abb7cf5da985d1b94d5512aae4a13c5024eb1",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 13355,
+      "raw_response_bytes": 3184,
+      "retry_used": false,
+      "session_id": "ses_11fd0d22fffeAh6sxUvHnfAwtZ",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11869",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 2,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:5fd1fd3d1682a5e440f8fd81c8b055b726324cf9a9ccd8c818dd7f70edc60007",
+            "candidate_commit_sha": "584acf34cb05f16e13a46d666196a7583d232616",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:5fd1fd3d1682a5e440f8fd81c8b055b726324cf9a9ccd8c818dd7f70edc60007",
+              "szz:pre-fix-line:5fd1fd3d1682a5e440f8fd81c8b055b726324cf9a9ccd8c818dd7f70edc60007",
+              "root_cause:pre-fix-line:5fd1fd3d1682a5e440f8fd81c8b055b726324cf9a9ccd8c818dd7f70edc60007"
+            ],
+            "reasoning_short": "State declaration of dst_x as signed int, directly bound to root cause predicates VP-1,2,3. SZZ all_same, ancestor of fix, survives to fix parent. risk_flag candidate_in_fix_series_hint acknowledged but SZZ and root cause binding outweigh it.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11869:2fae7dc9b97512f9"
+            ],
+            "fix_set_id": "CVE-2020-11869:fix-set:1",
+            "patch_family_id": "patch-family:34d93ed88f602af1c87bd9d93a0d8c8c13081390",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:c8401b17cc72da4caf175cef6f301f6be4475f2929df123abe8642f843e50966",
+            "candidate_commit_sha": "862b4a291dcf143fdb227e97feb7fd45e6466aca",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:c8401b17cc72da4caf175cef6f301f6be4475f2929df123abe8642f843e50966",
+              "szz:pre-fix-line:c8401b17cc72da4caf175cef6f301f6be4475f2929df123abe8642f843e50966",
+              "root_cause:pre-fix-line:c8401b17cc72da4caf175cef6f301f6be4475f2929df123abe8642f843e50966"
+            ],
+            "reasoning_short": "Dangerous use line computing dst_x += dst_width, bound to VP-5 (validation lack). SZZ all_same, ancestor of fix, survives to fix parent. risk_flags non_release_tag_noise and release_line_overreach present but too_broad=false. This computation is a necessary precondition in the vulnerable path, not the root introduction.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11869:2fae7dc9b97512f9"
+            ],
+            "fix_set_id": "CVE-2020-11869:fix-set:1",
+            "patch_family_id": "patch-family:34d93ed88f602af1c87bd9d93a0d8c8c13081390",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 12458,
+      "raw_response_bytes": 1972,
+      "retry_used": false,
+      "session_id": "ses_11fd01602ffe5rP2MBzs2UPwO3",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11947",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:7a42a2129549b71b7ae52d57c7efa63f5b2429add28c5ea1d2882375aaef5ebe",
+            "candidate_commit_sha": "983924532f61091fd90d1f2fafa4aa938c414dbb",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:7a42a2129549b71b7ae52d57c7efa63f5b2429add28c5ea1d2882375aaef5ebe",
+              "szz:pre-fix-line:7a42a2129549b71b7ae52d57c7efa63f5b2429add28c5ea1d2882375aaef5ebe",
+              "root_cause:pre-fix-line:7a42a2129549b71b7ae52d57c7efa63f5b2429add28c5ea1d2882375aaef5ebe"
+            ],
+            "reasoning_short": "Stable blame across all SZZ variants confirms single introduction commit; candidate is ancestor of fix and line survives to fix parent; dangerous_use anchor on modified old side; root cause predicate bound and same file touch reinforce boundary. Risk flags release_reachability_too_broad (64 tags, 24 lines) and non_release_tag_noise reflect old foundational commit age and non-release tagging, neither contradicts SZZ introduction evidence.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11947:79223b18d6e2797e"
+            ],
+            "fix_set_id": "CVE-2020-11947:fix-set:1",
+            "patch_family_id": "patch-family:4aea01e3050e815edcae6e41c47f64276bff765b",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5644,
+      "raw_response_bytes": 1208,
+      "retry_used": false,
+      "session_id": "ses_11fcf2c6bffeQqH39TFf5KK0wl",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11984",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 2,
+      "rejected_count": 1,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:b84ff9c1c671c0c3e4b8dc7d92e6a218a3c08161feddc92e0a8820193a2c77a1",
+            "candidate_commit_sha": "23394f444cc73d6b01af5a8109f79c156a26607c",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:b84ff9c1c671c0c3e4b8dc7d92e6a218a3c08161feddc92e0a8820193a2c77a1",
+              "szz:pre-fix-line:b84ff9c1c671c0c3e4b8dc7d92e6a218a3c08161feddc92e0a8820193a2c77a1",
+              "root_cause:pre-fix-line:b84ff9c1c671c0c3e4b8dc7d92e6a218a3c08161feddc92e0a8820193a2c77a1"
+            ],
+            "reasoning_short": "Declares pktsize as apr_uint16_t, directly matching root cause predicate VP-1 and fix predicate FP-1. Stable blame with all variants agreeing (variant_agreement=all_same). This is the type declaration prerequisite that enables integer overflow; does not itself trigger overflow but is required for it to occur.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11984:b4261303f95facfb"
+            ],
+            "fix_set_id": "CVE-2020-11984:fix-set:1",
+            "patch_family_id": "patch-family:3e9c8c68fd79db527a4b839a639c3b279753f0bf",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:99b806cf39616c1c0676142bd2bc96cd1d3cc1a99fbfe114fad9c4efd7a1973d",
+            "candidate_commit_sha": "99c59e098103ccf13b833281ec08493e042dfee0",
+            "boundary_role": "activation",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:99b806cf39616c1c0676142bd2bc96cd1d3cc1a99fbfe114fad9c4efd7a1973d",
+              "szz:pre-fix-line:99b806cf39616c1c0676142bd2bc96cd1d3cc1a99fbfe114fad9c4efd7a1973d",
+              "root_cause:pre-fix-line:99b806cf39616c1c0676142bd2bc96cd1d3cc1a99fbfe114fad9c4efd7a1973d"
+            ],
+            "reasoning_short": "Assignment pktsize = headerlen - 4 activates integer overflow when headerlen exceeds apr_uint16_t range. Stable blame (all_same), ancestor of fix, survives to fix parent, 14 reachable release tags. Bound to VP-1 with dangerous_use_role features; non_release_tag_noise flagged but weak.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11984:b4261303f95facfb"
+            ],
+            "fix_set_id": "CVE-2020-11984:fix-set:1",
+            "patch_family_id": "patch-family:8fc00a5e33dded47386e9ebf6fd301f01f062b33",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:ee07dfbbcdcd44a10b6fc69641be54ba4a4b23bc3787b9390e7fff4211e06c42",
+            "candidate_commit_sha": "da54e90ddaa01c02a68fda8dc08004c97cb4aa2b",
+            "boundary_role": "equivalent_fix_noise",
+            "decision": "rejected",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:ee07dfbbcdcd44a10b6fc69641be54ba4a4b23bc3787b9390e7fff4211e06c42",
+              "szz:pre-fix-line:ee07dfbbcdcd44a10b6fc69641be54ba4a4b23bc3787b9390e7fff4211e06c42",
+              "root_cause:pre-fix-line:ee07dfbbcdcd44a10b6fc69641be54ba4a4b23bc3787b9390e7fff4211e06c42"
+            ],
+            "reasoning_short": "Same logical line as candidate 99b806cf (pktsize = headerlen - 4) but from different patch family with whitespace_differs blame: canonical blame resolves to 7a6038c9 not da54e90d. Whitespace sensitivity cannot be resolved; redundant with stable-blame activation candidate. Rejected as equivalent_fix_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11984:b4261303f95facfb"
+            ],
+            "fix_set_id": "CVE-2020-11984:fix-set:1",
+            "patch_family_id": "patch-family:3e9c8c68fd79db527a4b839a639c3b279753f0bf",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "direct_deleted_line"
+          }
+        ],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 16017,
+      "raw_response_bytes": 2953,
+      "retry_used": false,
+      "session_id": "ses_11fceec32ffev8EPRyAQS6maS5",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11985",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:d80b68bdd5474280a125b5d514eea83b5eb5ca6731159bd5d4c3263766e37779",
+            "candidate_commit_sha": "f3f2abdb9eddec36f839ce870a32f6d6916fe49d",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:d80b68bdd5474280a125b5d514eea83b5eb5ca6731159bd5d4c3263766e37779",
+              "szz:pre-fix-line:d80b68bdd5474280a125b5d514eea83b5eb5ca6731159bd5d4c3263766e37779",
+              "root_cause:pre-fix-line:d80b68bdd5474280a125b5d514eea83b5eb5ca6731159bd5d4c3263766e37779"
+            ],
+            "reasoning_short": "State declaration storing c->client_addr in temp_sa establishes prerequisite mechanism for original address preservation before remoteip processing. Unanimous SZZ blame variants (all_same), line survives to fix parent, candidate is ancestor of fix, root-cause predicate vpred:client-addr-root is bound. release_reachability_too_broad (25 tags, 2 release lines) noted but does not contradict SZZ signal; no variant conflicts, merge risk, or non-ancestor evidence present. Confidence medium due to broad reachability.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11985:8aebcc8a9ccbb75a"
+            ],
+            "fix_set_id": "CVE-2020-11985:fix-set:1",
+            "patch_family_id": "patch-family:c761b9a0ec03d2395cdf9348396b7dd304535ce0",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5755,
+      "raw_response_bytes": 1282,
+      "retry_used": false,
+      "session_id": "ses_11fce29ddffeLRhGe1pYOasUms",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-11993",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:0b555d39ec6248d2bf3f4ad935dc2046d9735389a041a44c3bd652dac23ac067",
+            "candidate_commit_sha": "c671673db96e286e2321d5babf05c767cb76a1ef",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0b555d39ec6248d2bf3f4ad935dc2046d9735389a041a44c3bd652dac23ac067",
+              "szz:pre-fix-line:0b555d39ec6248d2bf3f4ad935dc2046d9735389a041a44c3bd652dac23ac067",
+              "root_cause:pre-fix-line:0b555d39ec6248d2bf3f4ad935dc2046d9735389a041a44c3bd652dac23ac067"
+            ],
+            "reasoning_short": "Line unconditionally increments request_headers_added matching predicate vp-CVE-2020-11993-unconditional-header-count; is ancestor of fix and line survives to fix parent. However move_copy_blame diverges to b9eb3fa8b397, candidate_in_fix_series_hint is true, and release reachability is zero — conflicting blame variant and fix-series noise prevent conclusive selection.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-11993:1c2fc75d61a14c35"
+            ],
+            "fix_set_id": "CVE-2020-11993:fix-set:1",
+            "patch_family_id": "patch-family:44c75b044819f6f4c01412966ffcca1e46de9357",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 5947,
+      "raw_response_bytes": 1140,
+      "retry_used": false,
+      "session_id": "ses_11fcdd496ffeGn6SgYQuM6lV21",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-12284",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:0010b4f1922aa4e985d49e5b71d6445084577185ae70002d05f6167acef5cd71",
+            "candidate_commit_sha": "525de2000b018c659c5dd472610305cb2ffb9edc",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0010b4f1922aa4e985d49e5b71d6445084577185ae70002d05f6167acef5cd71",
+              "szz:pre-fix-line:0010b4f1922aa4e985d49e5b71d6445084577185ae70002d05f6167acef5cd71",
+              "root_cause:pre-fix-line:0010b4f1922aa4e985d49e5b71d6445084577185ae70002d05f6167acef5cd71"
+            ],
+            "reasoning_short": "Candidate is ancestor of fix with all SZZ variants agreeing on same commit, line survives to fix parent, same file touch, and missing_guard_target anchor role consistent with introduction. However fallback evidence level, weak root cause binding, add_only_semantic anchor, no model anchor, and non-release tag noise introduce boundary risk. No attacker perspective available to confirm exploit precondition attachment. Stable blame variants rule out move/copy or whitespace conflict; no merge candidate or fix series noise detected. Decision uncertain due to fallback-only evidence quality despite supportive SZZ geometry.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-12284:b1d87d6e5bd5e50c"
+            ],
+            "fix_set_id": "CVE-2020-12284:fix-set:1",
+            "patch_family_id": "patch-family:2f1257ccf171d97dee950e98b2ec16e6ee837d14",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 5964,
+      "raw_response_bytes": 1387,
+      "retry_used": false,
+      "session_id": "ses_11fcd8b9cffekmSQOZf7ok7xIX",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-13164",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 2,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:1bab2ed514c9ecf7c49d4a12e9e85aa5041f7fb63162f0f1f1292b9592711824",
+            "candidate_commit_sha": "354b4b74d08fbafe23c7929f1f68eb4c84df4e2f",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:1bab2ed514c9ecf7c49d4a12e9e85aa5041f7fb63162f0f1f1292b9592711824",
+              "szz:pre-fix-line:1bab2ed514c9ecf7c49d4a12e9e85aa5041f7fb63162f0f1f1292b9592711824",
+              "root_cause:pre-fix-line:1bab2ed514c9ecf7c49d4a12e9e85aa5041f7fb63162f0f1f1292b9592711824"
+            ],
+            "reasoning_short": "Recursive call nfs_full_name_snoop(nns, &len, &name, &pos) is the recursion_entry anchor. SZZ all variants agree on commit 354b4b74, candidate is ancestor of fix, line survives to fix parent. No blame conflicts (all_same), no merge risk (merge_candidate=false). This commit introduced the unchecked recursive call, directly constituting the uncontrolled-recursion vulnerability. Release reachability too_broad is noted but does not undermine boundary evidence.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13164:cdd12826ecfa34ab"
+            ],
+            "fix_set_id": "CVE-2020-13164:fix-set:1",
+            "patch_family_id": "patch-family:705489e4a21db9f468760237918f907ea21e499a",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:f3a7dba184c0dac915bd0d6464ac70e5a34d7b8141277682ad010849855faa1c",
+            "candidate_commit_sha": "c38eb2f027ace5a85007fb67084d2fa927467540",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:f3a7dba184c0dac915bd0d6464ac70e5a34d7b8141277682ad010849855faa1c",
+              "szz:pre-fix-line:f3a7dba184c0dac915bd0d6464ac70e5a34d7b8141277682ad010849855faa1c",
+              "root_cause:pre-fix-line:f3a7dba184c0dac915bd0d6464ac70e5a34d7b8141277682ad010849855faa1c"
+            ],
+            "reasoning_short": "Function signature nfs_full_name_snoop(...) is the control_predecessor anchor. SZZ all variants agree on commit c38eb2f0, candidate is ancestor of fix, line survives to fix parent. Fix predicate fp-1 also touches this line (adding depth parameter). No blame conflicts (all_same), no merge risk. The function definition without depth tracking is a required container for the recursive call but does not itself activate the vulnerability; it is a prerequisite.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13164:cdd12826ecfa34ab"
+            ],
+            "fix_set_id": "CVE-2020-13164:fix-set:1",
+            "patch_family_id": "patch-family:705489e4a21db9f468760237918f907ea21e499a",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 11793,
+      "raw_response_bytes": 2323,
+      "retry_used": false,
+      "session_id": "ses_11fcd4586ffepHDDR0YyPEStMp",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-13904",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 5,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 2,
+      "uncertain_count": 3,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:0212df27dff8436a9635c5c2b67af43e482b17e54c8d835a002e7b64cf3f33f9",
+            "candidate_commit_sha": "84465f2180308a3e998089517e76586563fd6162",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0212df27dff8436a9635c5c2b67af43e482b17e54c8d835a002e7b64cf3f33f9",
+              "szz:pre-fix-line:0212df27dff8436a9635c5c2b67af43e482b17e54c8d835a002e7b64cf3f33f9"
+            ],
+            "reasoning_short": "Trivial structural brace '} else {' deleted as part of fix code reorganization. SZZ blame conflict: candidate_commit_sha 84465f218 disagrees with SZZ canonical_blame 513a431e despite all_same variant agreement, indicating blame origin ambiguity. direct_deleted_line with stable_blame_variants but line text carries no semantic vulnerability content. Release reachability too broad (280 tags). Rejected as refactor_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13904:b89f2a863fc9fa31"
+            ],
+            "fix_set_id": "CVE-2020-13904:fix-set:1",
+            "patch_family_id": "patch-family:65ee2892f76fc5427843a3a42c6a2e28f7265c84",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "direct_deleted_line"
+          },
+          {
+            "candidate_id": "pre-fix-line:0002f876f690452bb4401c02c7e8701cc5f7eb36c88f5eccd0f2b611ddcb2838",
+            "candidate_commit_sha": "cd223e0b4e1371d12d6cbb36bb66afdc40fd6281",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0002f876f690452bb4401c02c7e8701cc5f7eb36c88f5eccd0f2b611ddcb2838",
+              "szz:pre-fix-line:0002f876f690452bb4401c02c7e8701cc5f7eb36c88f5eccd0f2b611ddcb2838"
+            ],
+            "reasoning_short": "Conditional check 'av_strstart(line, \"#\", NULL))' deleted by fix as part of HLS parsing logic restructuring. direct_deleted_line with dangerous_use role but line is a structural parsing conditional, not a vulnerability-introducing construct. SZZ all_same matches candidate commit, stable_blame_variants. broad_candidate_range, release_reachability_too_broad (280 tags), weak_root_cause_binding. Rejected as refactor_noise from fix code reorganization.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13904:b89f2a863fc9fa31"
+            ],
+            "fix_set_id": "CVE-2020-13904:fix-set:1",
+            "patch_family_id": "patch-family:65ee2892f76fc5427843a3a42c6a2e28f7265c84",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "direct_deleted_line"
+          }
+        ],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:02183be7a8cd9b3868eef1d3c1081242f980cf85a5befda2723d4557b9004400",
+            "candidate_commit_sha": "6cc7f1398257d4ffa89f79d52f10b2cabd9ad232",
+            "boundary_role": "activation",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:02183be7a8cd9b3868eef1d3c1081242f980cf85a5befda2723d4557b9004400",
+              "szz:pre-fix-line:02183be7a8cd9b3868eef1d3c1081242f980cf85a5befda2723d4557b9004400",
+              "root_cause:pre-fix-line:02183be7a8cd9b3868eef1d3c1081242f980cf85a5befda2723d4557b9004400"
+            ],
+            "reasoning_short": "Continuation of av_probe_input_buffer call parameters at line 1634, part of same function call as candidate 00df78cb. dangerous_use anchor with modified_old_side indicates fix altered this call site where UAF may manifest during input probing. SZZ all_same with matching commit, stable_blame_variants, line survives to fix parent. Fallback evidence, weak root cause binding, and release_reachability_too_broad (280 tags) preclude selected. Activation is most plausible role but cannot be confirmed without attacker context.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13904:b89f2a863fc9fa31"
+            ],
+            "fix_set_id": "CVE-2020-13904:fix-set:1",
+            "patch_family_id": "patch-family:2720fe8a74a9588fe6c7899da93583de7069a67b",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:00df78cbf490f771e8e032a5947b9d72d89dec748867aff3cbf303b50c622abd",
+            "candidate_commit_sha": "9371d70bad2eab6c95df7d182d08e1cc53c6099a",
+            "boundary_role": "activation",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:00df78cbf490f771e8e032a5947b9d72d89dec748867aff3cbf303b50c622abd",
+              "szz:pre-fix-line:00df78cbf490f771e8e032a5947b9d72d89dec748867aff3cbf303b50c622abd",
+              "root_cause:pre-fix-line:00df78cbf490f771e8e032a5947b9d72d89dec748867aff3cbf303b50c622abd"
+            ],
+            "reasoning_short": "av_probe_input_buffer call with pls->segments[0]->url at line 1633, dangerous_use anchor, modified_old_side. Fix alters this probing call where UAF may manifest when operating on a freed or broken playlist. SZZ all_same matches candidate commit, stable_blame_variants, line survives to fix parent. Fallback evidence, weak root cause binding, broad_candidate_range, release_reachability_too_broad (161 tags) prevent selected. Activation is most plausible role as the call site where freed memory access occurs, but attacker context unavailable.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13904:b89f2a863fc9fa31"
+            ],
+            "fix_set_id": "CVE-2020-13904:fix-set:1",
+            "patch_family_id": "patch-family:2720fe8a74a9588fe6c7899da93583de7069a67b",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:0008c6bffbde88d7382eb138aad9bb4d426b586bac7abdffae88b3c77895a821",
+            "candidate_commit_sha": "4e0860e36305c768c3d97b41d38122e59a18da87",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0008c6bffbde88d7382eb138aad9bb4d426b586bac7abdffae88b3c77895a821",
+              "szz:pre-fix-line:0008c6bffbde88d7382eb138aad9bb4d426b586bac7abdffae88b3c77895a821",
+              "root_cause:pre-fix-line:0008c6bffbde88d7382eb138aad9bb4d426b586bac7abdffae88b3c77895a821"
+            ],
+            "reasoning_short": "pls->broken = 1 sets broken flag without proper guards, missing_guard_target with add_only_semantic_target. Fix adds guards around broken state handling. Setting broken creates necessary precondition for UAF (playlist marked broken then accessed without null checks) but does not itself free memory or dereference freed pointer — actual UAF activation occurs downstream. SZZ all_same matches, stable_blame_variants, release_reachability not too broad (1 tag). Fallback evidence, weak_root_cause_binding, and no attacker context prevent selected.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-13904:b89f2a863fc9fa31"
+            ],
+            "fix_set_id": "CVE-2020-13904:fix-set:1",
+            "patch_family_id": "patch-family:b6ab2dfb79383b15e7bad8ca3a15dd8f81b10bcc",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 22669,
+      "raw_response_bytes": 5615,
+      "retry_used": false,
+      "session_id": "ses_11fcc61c6ffecZCgmQ0dqhlnzC",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-14212",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 3,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:083c7a5c85c1e72eb2e6590d270233a43da76d0b83f315202ad0c070b90c654b",
+            "candidate_commit_sha": "2558e62713ebc5f3ea22c1a28d8e9cf3249badaf",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:083c7a5c85c1e72eb2e6590d270233a43da76d0b83f315202ad0c070b90c654b",
+              "szz:pre-fix-line:083c7a5c85c1e72eb2e6590d270233a43da76d0b83f315202ad0c070b90c654b",
+              "root_cause:pre-fix-line:083c7a5c85c1e72eb2e6590d270233a43da76d0b83f315202ad0c070b90c654b"
+            ],
+            "reasoning_short": "Function declaration dnn_load_layer_depth2space introduced without operands_num parameter, lacking bounds-checking capability. SZZ stable (all_same), survives to fix parent, ancestor of fix. Weak root cause binding and fallback candidate prevent selected decision.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-14212:a7cc2bd7f4745145"
+            ],
+            "fix_set_id": "CVE-2020-14212:fix-set:1",
+            "patch_family_id": "patch-family:1f6ce52f72707cf7a5684d7548987f93e7d9128b",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:0f0923dcbf8a616341a5643f5ba2d4be9e4aae418e9c4a56b79513f732eae792",
+            "candidate_commit_sha": "ffa1561608f513b3a5d3d1568f75126f21bce663",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0f0923dcbf8a616341a5643f5ba2d4be9e4aae418e9c4a56b79513f732eae792",
+              "szz:pre-fix-line:0f0923dcbf8a616341a5643f5ba2d4be9e4aae418e9c4a56b79513f732eae792",
+              "root_cause:pre-fix-line:0f0923dcbf8a616341a5643f5ba2d4be9e4aae418e9c4a56b79513f732eae792"
+            ],
+            "reasoning_short": "Function declaration dnn_load_layer_math_binary introduced without operands_num parameter, lacking bounds-checking capability. SZZ stable (all_same), survives to fix parent, ancestor of fix. Weak root cause binding and fallback candidate prevent selected decision.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-14212:a7cc2bd7f4745145"
+            ],
+            "fix_set_id": "CVE-2020-14212:fix-set:1",
+            "patch_family_id": "patch-family:1f6ce52f72707cf7a5684d7548987f93e7d9128b",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:252da387e044ea8aa58535247c3fc7da29e4876f01637bae180f9b4b68f74b19",
+            "candidate_commit_sha": "f73cc61bf5aa383048979f4de2023877c522f6be",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:252da387e044ea8aa58535247c3fc7da29e4876f01637bae180f9b4b68f74b19",
+              "szz:pre-fix-line:252da387e044ea8aa58535247c3fc7da29e4876f01637bae180f9b4b68f74b19",
+              "root_cause:pre-fix-line:252da387e044ea8aa58535247c3fc7da29e4876f01637bae180f9b4b68f74b19"
+            ],
+            "reasoning_short": "Function definition dnn_load_layer_math_unary introduced without operands_num parameter, lacking bounds-checking capability. SZZ stable (all_same), survives to fix parent, ancestor of fix. Weak root cause binding and fallback candidate prevent selected decision.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-14212:a7cc2bd7f4745145"
+            ],
+            "fix_set_id": "CVE-2020-14212:fix-set:1",
+            "patch_family_id": "patch-family:1f6ce52f72707cf7a5684d7548987f93e7d9128b",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 17048,
+      "raw_response_bytes": 2835,
+      "retry_used": false,
+      "session_id": "ses_11fcb0806ffeXwVPWLzykjHp4L",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-15389",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 3,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:0ea454a1d32a8accab5d75eaacde919394251cbc5ded6ad427ef6039f1f94c88",
+            "candidate_commit_sha": "055d429ae11ad98dfd3dc68d188ec538588d805c",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:0ea454a1d32a8accab5d75eaacde919394251cbc5ded6ad427ef6039f1f94c88",
+              "szz:pre-fix-line:0ea454a1d32a8accab5d75eaacde919394251cbc5ded6ad427ef6039f1f94c88",
+              "root_cause:pre-fix-line:0ea454a1d32a8accab5d75eaacde919394251cbc5ded6ad427ef6039f1f94c88"
+            ],
+            "reasoning_short": "State declaration of l_stream=NULL outside loop is a required precondition for the double-free; without persistent scope the stale-pointer condition cannot arise. Whitespace-sensitive blame conflict (normal_blame≠ignore_whitespace_blame) and non_release_tag_noise prevent high-confidence selection; uncertain decision with prerequisite as most plausible role.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-15389:498214af7863470e"
+            ],
+            "fix_set_id": "CVE-2020-15389:fix-set:1",
+            "patch_family_id": "patch-family:a2a3f092757e5b66181cf24d8570cf13188a93a4",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "direct_deleted_line"
+          },
+          {
+            "candidate_id": "pre-fix-line:f4d42045cc6be879ba8636fb2db25ab344059f1a547ac99372842835a09c1088",
+            "candidate_commit_sha": "028088f5f077b6cc666f8152736398df68ec239b",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:f4d42045cc6be879ba8636fb2db25ab344059f1a547ac99372842835a09c1088",
+              "szz:pre-fix-line:f4d42045cc6be879ba8636fb2db25ab344059f1a547ac99372842835a09c1088",
+              "root_cause:pre-fix-line:f4d42045cc6be879ba8636fb2db25ab344059f1a547ac99372842835a09c1088"
+            ],
+            "reasoning_short": "State declaration of cstr_index=NULL outside loop is a required precondition for the double-free; without persistent scope the stale-pointer condition cannot arise. Whitespace-sensitive blame conflict (normal_blame≠ignore_whitespace_blame) and non_release_tag_noise prevent high-confidence selection; uncertain decision with prerequisite as most plausible role.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-15389:498214af7863470e"
+            ],
+            "fix_set_id": "CVE-2020-15389:fix-set:1",
+            "patch_family_id": "patch-family:a2a3f092757e5b66181cf24d8570cf13188a93a4",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "direct_deleted_line"
+          },
+          {
+            "candidate_id": "pre-fix-line:c9ee81f750531856ab36bc07e48b1459c0467235001c1784bd102942543a1344",
+            "candidate_commit_sha": "27e255fa75b7b9e989de3ec379c9de2b7462983b",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:c9ee81f750531856ab36bc07e48b1459c0467235001c1784bd102942543a1344",
+              "szz:pre-fix-line:c9ee81f750531856ab36bc07e48b1459c0467235001c1784bd102942543a1344",
+              "root_cause:pre-fix-line:c9ee81f750531856ab36bc07e48b1459c0467235001c1784bd102942543a1344"
+            ],
+            "reasoning_short": "State declaration of image=NULL outside loop is a required precondition for the double-free; without persistent scope the stale-pointer condition cannot arise. Whitespace-sensitive blame conflict (normal_blame≠ignore_whitespace_blame) and non_release_tag_noise prevent high-confidence selection; uncertain decision with prerequisite as most plausible role.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-15389:498214af7863470e"
+            ],
+            "fix_set_id": "CVE-2020-15389:fix-set:1",
+            "patch_family_id": "patch-family:a2a3f092757e5b66181cf24d8570cf13188a93a4",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "direct_deleted_line"
+          }
+        ]
+      },
+      "prompt_bytes": 14575,
+      "raw_response_bytes": 3127,
+      "retry_used": false,
+      "session_id": "ses_11fca7312ffe2AcvU5WyFlKKYi",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-15466",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 2,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:075d41e59f9ffab0041bcbb00e782d362b23312935c4c9d9d831f7ff15768d28",
+            "candidate_commit_sha": "babe895d3a0d16346c500e397661c3fc580ee7e6",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:075d41e59f9ffab0041bcbb00e782d362b23312935c4c9d9d831f7ff15768d28",
+              "szz:pre-fix-line:075d41e59f9ffab0041bcbb00e782d362b23312935c4c9d9d831f7ff15768d28",
+              "root_cause:pre-fix-line:075d41e59f9ffab0041bcbb00e782d362b23312935c4c9d9d831f7ff15768d28"
+            ],
+            "reasoning_short": "Event ID range check in CWE-835 loop context; SZZ whitespace conflict (normal blame differs from ignore-whitespace/move-copy blame attributing to babe895d) and fallback evidence prevent confident selection.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-15466:caaf9607d0a1350c"
+            ],
+            "fix_set_id": "CVE-2020-15466:fix-set:1",
+            "patch_family_id": "patch-family:7c9b3f5ba21d60004ecff0be24d9ef8c27c205ff",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:052466e16eaa6922c3ddcaa51b3b9d824fd1ea6a1ec086d6bf79d93c78a4e366",
+            "candidate_commit_sha": "e7e4dc5d98869f91af3e649324d726217b2a8861",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:052466e16eaa6922c3ddcaa51b3b9d824fd1ea6a1ec086d6bf79d93c78a4e366",
+              "szz:pre-fix-line:052466e16eaa6922c3ddcaa51b3b9d824fd1ea6a1ec086d6bf79d93c78a4e366",
+              "root_cause:pre-fix-line:052466e16eaa6922c3ddcaa51b3b9d824fd1ea6a1ec086d6bf79d93c78a4e366"
+            ],
+            "reasoning_short": "Extended block IDs condition is a contextual enabler without direct loop-exit semantics; SZZ whitespace conflict (normal blame differs), fix_series_hint, and fallback evidence make boundary role uncertain.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-15466:caaf9607d0a1350c"
+            ],
+            "fix_set_id": "CVE-2020-15466:fix-set:1",
+            "patch_family_id": "patch-family:7c9b3f5ba21d60004ecff0be24d9ef8c27c205ff",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 9766,
+      "raw_response_bytes": 1804,
+      "retry_used": false,
+      "session_id": "ses_11fc9e76fffeZ0P1ElOHC8kAtZ",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-19667",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 2,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:034e75e76c76cd73060c9c0b927089fe1c98411e30a3326e6e69d7c7ffd4bc7e",
+            "candidate_commit_sha": "e7538ca05d229be42443bb927dbc4c8c8f1fc856",
+            "boundary_role": "fix_series_noise",
+            "decision": "rejected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:034e75e76c76cd73060c9c0b927089fe1c98411e30a3326e6e69d7c7ffd4bc7e",
+              "szz:pre-fix-line:034e75e76c76cd73060c9c0b927089fe1c98411e30a3326e6e69d7c7ffd4bc7e",
+              "root_cause:pre-fix-line:034e75e76c76cd73060c9c0b927089fe1c98411e30a3326e6e69d7c7ffd4bc7e"
+            ],
+            "reasoning_short": "Line is a bare break; statement with no semantic relationship to uninitialized buffer usage. candidate_in_fix_series_hint confirms structural control-flow noise within a fix series. Stable blame but zero relevance to target/symbolic buffer initialization.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-19667:5bd71534057be4a7"
+            ],
+            "fix_set_id": "CVE-2020-19667:fix-set:1",
+            "patch_family_id": "patch-family:933e50e01183ed0d28714dd4ada3cc33bc880981",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:00f200cc2911b4898d26814e52619f1ba44e225718b64f3606fd5502180add4b",
+            "candidate_commit_sha": "3ed852eea50f9d4cd633efb8c2b054b8e33c2530",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:00f200cc2911b4898d26814e52619f1ba44e225718b64f3606fd5502180add4b",
+              "szz:pre-fix-line:00f200cc2911b4898d26814e52619f1ba44e225718b64f3606fd5502180add4b",
+              "root_cause:pre-fix-line:00f200cc2911b4898d26814e52619f1ba44e225718b64f3606fd5502180add4b"
+            ],
+            "reasoning_short": "Line is a closing brace }; whitespace_sensitive_blame confirms the normal blame (dd12db) differs from ignore-whitespace blame (3ed852), indicating a formatting-only change. boundary_marker flag arises from structural block scope, not vulnerability logic. No semantic link to uninitialized buffer initialization.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-19667:5bd71534057be4a7"
+            ],
+            "fix_set_id": "CVE-2020-19667:fix-set:1",
+            "patch_family_id": "patch-family:933e50e01183ed0d28714dd4ada3cc33bc880981",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:081de3e6ddd81bfee38d7f9c661b74aee80046a0ad41ab6fd24c4504e9abc66c",
+            "candidate_commit_sha": "bd45f324084453a2fb279c5c9b5c5c075bce2904",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:081de3e6ddd81bfee38d7f9c661b74aee80046a0ad41ab6fd24c4504e9abc66c",
+              "szz:pre-fix-line:081de3e6ddd81bfee38d7f9c661b74aee80046a0ad41ab6fd24c4504e9abc66c",
+              "root_cause:pre-fix-line:081de3e6ddd81bfee38d7f9c661b74aee80046a0ad41ab6fd24c4504e9abc66c"
+            ],
+            "reasoning_short": "CopyXPMColor processes color data feeding target/symbolic buffers; weak_root_cause_binding and fallback risks prevent confident selection. Line is ancestor of fix and survives to fix parent, but add_only_semantic_anchor and no_model_anchor weaken structural confidence. Plausible prerequisite: color parsing must occur before uninitialized buffer misuse.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-19667:5bd71534057be4a7"
+            ],
+            "fix_set_id": "CVE-2020-19667:fix-set:1",
+            "patch_family_id": "patch-family:933e50e01183ed0d28714dd4ada3cc33bc880981",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 14431,
+      "raw_response_bytes": 2971,
+      "retry_used": false,
+      "session_id": "ses_11fc97fa8ffeGfExzR2r3lpsr4",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-1967",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:e5ecd537cb332ded9cf6af2e2da76689c6d7230c05b896ee3dd7ad5d25ee50af",
+            "candidate_commit_sha": "604ba26560ca71bf8a1c127da96727b5b2b077e1",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:e5ecd537cb332ded9cf6af2e2da76689c6d7230c05b896ee3dd7ad5d25ee50af",
+              "szz:pre-fix-line:e5ecd537cb332ded9cf6af2e2da76689c6d7230c05b896ee3dd7ad5d25ee50af",
+              "root_cause:pre-fix-line:e5ecd537cb332ded9cf6af2e2da76689c6d7230c05b896ee3dd7ad5d25ee50af"
+            ],
+            "reasoning_short": "Line 2133 unconditionally dereferences sigalg->sigandhash without a NULL guard, matching the root cause predicate. All SZZ blame variants (normal, ignore_whitespace, move_copy) converge on commit 604ba265. Line survives to fix parent and is ancestor of fix. No conflicting blame variants, no merge risk. The candidate_in_fix_series_hint flag is noted but does not contradict the stable-blame, root-cause-bound, and ancestor-of-fix evidence chain.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-1967:d63fbdfc2c63cc1c"
+            ],
+            "fix_set_id": "CVE-2020-1967:fix-set:1",
+            "patch_family_id": "patch-family:1e44ef64775a09ce663534955a58fd620499953f",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 7046,
+      "raw_response_bytes": 1210,
+      "retry_used": false,
+      "session_id": "ses_11fc8ffb7ffe8uJ1RZWMjgLbfY",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-1971",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 2,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:00bd2de62bd82111b8d9aa564f281a299d0489ab347831ee2332113017a36302",
+            "candidate_commit_sha": "c7235be6e36c4bef84594aa3b2f0561db84b63d8",
+            "boundary_role": "activation",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:00bd2de62bd82111b8d9aa564f281a299d0489ab347831ee2332113017a36302",
+              "szz:pre-fix-line:00bd2de62bd82111b8d9aa564f281a299d0489ab347831ee2332113017a36302",
+              "root_cause:pre-fix-line:00bd2de62bd82111b8d9aa564f281a299d0489ab347831ee2332113017a36302"
+            ],
+            "reasoning_short": "CWE-476 NULL deref activation: ASN1_TYPE_cmp(a->d.other,b->d.other) triggers deref on potentially-NULL field. SZZ variant_agreement=whitespace_differs: canonical blame (0f113f3) conflicts with whitespace-ignore blame (c7235be), preventing confident commitment to this origin. Root cause binding is fallback-only with weak predicate linkage. Decision uncertain due to unresolvable whitespace-sensitive blame conflict, fallback evidence level, and non-release-tag reachability noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-1971:7cc82dec8f11fe70"
+            ],
+            "fix_set_id": "CVE-2020-1971:fix-set:1",
+            "patch_family_id": "patch-family:5aba395cf9b4b17cf010e9893cfff8f81ee3aa03",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:20ca38752d54921dfd9d5b667710c73e0a360bf310b87cc5cacc4b2dac31dfee",
+            "candidate_commit_sha": "f4cc56f494b3f42642ea3b322e57737da80f889a",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:20ca38752d54921dfd9d5b667710c73e0a360bf310b87cc5cacc4b2dac31dfee",
+              "szz:pre-fix-line:20ca38752d54921dfd9d5b667710c73e0a360bf310b87cc5cacc4b2dac31dfee",
+              "root_cause:pre-fix-line:20ca38752d54921dfd9d5b667710c73e0a360bf310b87cc5cacc4b2dac31dfee"
+            ],
+            "reasoning_short": "Assignment a->d.other=value stores potentially-NULL value as precondition for NULL-deref at line 71; does not itself deref or crash. SZZ variant_agreement=whitespace_differs: canonical blame (0f113f3) conflicts with whitespace-ignore blame (f4cc56f), preventing confident commitment to this origin. Root cause binding is fallback-only with weak predicate linkage. Decision uncertain due to unresolvable whitespace-sensitive blame conflict, fallback evidence level, and non-release-tag reachability noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-1971:7cc82dec8f11fe70"
+            ],
+            "fix_set_id": "CVE-2020-1971:fix-set:1",
+            "patch_family_id": "patch-family:5aba395cf9b4b17cf010e9893cfff8f81ee3aa03",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 9774,
+      "raw_response_bytes": 2387,
+      "retry_used": false,
+      "session_id": "ses_11fc8a431ffeQ3JJdBNW03btoo",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-25663",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 2,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:e2e5da8bf6acfe907fe7a0c0e05b3f1b1de83f5a54c99b5695a3c7cb6a1a7d08",
+            "candidate_commit_sha": "7894d4a8920a7ee8f292b9c9b4bfc7b722bfcb83",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:e2e5da8bf6acfe907fe7a0c0e05b3f1b1de83f5a54c99b5695a3c7cb6a1a7d08",
+              "szz:pre-fix-line:e2e5da8bf6acfe907fe7a0c0e05b3f1b1de83f5a54c99b5695a3c7cb6a1a7d08",
+              "root_cause:pre-fix-line:e2e5da8bf6acfe907fe7a0c0e05b3f1b1de83f5a54c99b5695a3c7cb6a1a7d08"
+            ],
+            "reasoning_short": "Add-only semantic data-source anchor providing pixel data; move/copy blame differs (3ed852eea vs canonical 7894d4a) — conflict unresolved; release reachability too broad (174 tags); bound to fix-predicate fp-1 not vulnerable-predicate vp-1; boundary_candidate_commit flag; does not activate vulnerability independently.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-25663:fd8948064e0e0dac"
+            ],
+            "fix_set_id": "CVE-2020-25663:fix-set:1",
+            "patch_family_id": "patch-family:2de7ca3bff63acd32177e053ae3e07a365c0c39d",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:e5496db617dfc637d8a33f0828d684034b2a3ee166c1673e278e2cd8afee160e",
+            "candidate_commit_sha": "8ed707a93fc4c7b3193dd562f07c4a1cc63cc19d",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:e5496db617dfc637d8a33f0828d684034b2a3ee166c1673e278e2cd8afee160e",
+              "szz:pre-fix-line:e5496db617dfc637d8a33f0828d684034b2a3ee166c1673e278e2cd8afee160e",
+              "root_cause:pre-fix-line:e5496db617dfc637d8a33f0828d684034b2a3ee166c1673e278e2cd8afee160e"
+            ],
+            "reasoning_short": "Direct deleted propagation line ConformPixelInfo; root_cause_predicate_bound to vp-1; line survives to fix parent; direct_old_side_anchor; move/copy blame differs (0c69c477e vs canonical 8ed707a) but normal and whitespace blames agree on canonical — conflict lowers confidence; 12 release tags reachable.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-25663:fd8948064e0e0dac"
+            ],
+            "fix_set_id": "CVE-2020-25663:fix-set:1",
+            "patch_family_id": "patch-family:2de7ca3bff63acd32177e053ae3e07a365c0c39d",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "direct_deleted_line"
+          }
+        ]
+      },
+      "prompt_bytes": 9172,
+      "raw_response_bytes": 2035,
+      "retry_used": false,
+      "session_id": "ses_11fc7e4b9ffeED0ngG7LIpFBnv",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-27814",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:d7eb632d275d1d2c9ca89bbcd4a554e21242df2b178fc4362d74bc10927bb814",
+            "candidate_commit_sha": "649298dcf84b2f20cfe458d887c1591db47372a6",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:d7eb632d275d1d2c9ca89bbcd4a554e21242df2b178fc4362d74bc10927bb814",
+              "szz:pre-fix-line:d7eb632d275d1d2c9ca89bbcd4a554e21242df2b178fc4362d74bc10927bb814",
+              "root_cause:pre-fix-line:d7eb632d275d1d2c9ca89bbcd4a554e21242df2b178fc4362d74bc10927bb814"
+            ],
+            "reasoning_short": "SZZ blame variants agree unanimously on this commit with line surviving to fix parent and ancestor-of-fix relation; however candidate_in_fix_series_hint, fallback_candidate, no_model_anchor, and weak_root_cause_binding flags prevent confident resolution between introduction and fix_series_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-27814:013d7f94aee46c20"
+            ],
+            "fix_set_id": "",
+            "patch_family_id": "patch-family:f404b8331fcf311431dfbb2e110307241c5267e2",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 5859,
+      "raw_response_bytes": 1061,
+      "retry_used": false,
+      "session_id": "ses_11fc75944ffezBfgAsysXsKiyB",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-27823",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:48590a19b78472c3364a2aca591007abb632fac4bf23a30272d3b9b0b7b4390f",
+            "candidate_commit_sha": "563bd8499e63db976ca8358216138647593354bc",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:48590a19b78472c3364a2aca591007abb632fac4bf23a30272d3b9b0b7b4390f",
+              "szz:pre-fix-line:48590a19b78472c3364a2aca591007abb632fac4bf23a30272d3b9b0b7b4390f",
+              "root_cause:pre-fix-line:48590a19b78472c3364a2aca591007abb632fac4bf23a30272d3b9b0b7b4390f"
+            ],
+            "reasoning_short": "Unanimous SZZ blame variants point to candidate commit as ancestor of fix; line survives to fix parent; modified_old_side_anchor confirms candidate lies in pre-fix code; root_cause_predicate_bound ties candidate to vulnerable predicate; no risk flags, merge artifacts, or fix-series noise present. Attacker context unavailable. Confidence medium due to absent structured root cause digest.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-27823:baa1f51dc283d5cc"
+            ],
+            "fix_set_id": "CVE-2020-27823:fix-set:1",
+            "patch_family_id": "patch-family:a6e41f1bd2e7a33109ccf02a9626648e307542d6",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5666,
+      "raw_response_bytes": 1156,
+      "retry_used": false,
+      "session_id": "ses_11fc71933ffeliwTeU66pWTirW",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-8169",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 4,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 3,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:8e9730e8f7ceee3e2ee11166f7b71a4a1aae68ccbdf491823503441ebb088329",
+            "candidate_commit_sha": "46e164069d1a5230e4e64cbd2ff46c46cce056bb",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:8e9730e8f7ceee3e2ee11166f7b71a4a1aae68ccbdf491823503441ebb088329",
+              "szz:pre-fix-line:8e9730e8f7ceee3e2ee11166f7b71a4a1aae68ccbdf491823503441ebb088329",
+              "root_cause:pre-fix-line:8e9730e8f7ceee3e2ee11166f7b71a4a1aae68ccbdf491823503441ebb088329"
+            ],
+            "reasoning_short": "Dangerous_use anchor in lib/url.c at curl_url_set CURLUPART_PASSWORD call; SZZ all_same stable blame, ancestor of fix, survives to fix parent, modified_old_side_anchor, root_cause_predicate_bound, same_file_touch. No conflicting SZZ variants or merge risk. Fallback evidence and weak root cause binding constrain confidence to medium.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8169:1ade54e6803abe92"
+            ],
+            "fix_set_id": "CVE-2020-8169:fix-set:1",
+            "patch_family_id": "patch-family:5df6241393a284e5f94fcf1d870fae3ac2aa3e2c",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:643eb3db2d61659912bcddec13f0645e1b5e6844a86322bc33af72d6a30f3a30",
+            "candidate_commit_sha": "2c5ec339ea67f43ac370ae77636a0f915cc5fbeb",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:643eb3db2d61659912bcddec13f0645e1b5e6844a86322bc33af72d6a30f3a30",
+              "szz:pre-fix-line:643eb3db2d61659912bcddec13f0645e1b5e6844a86322bc33af72d6a30f3a30",
+              "root_cause:pre-fix-line:643eb3db2d61659912bcddec13f0645e1b5e6844a86322bc33af72d6a30f3a30"
+            ],
+            "reasoning_short": "Missing_guard_target anchor in tests/data/Makefile.inc adds test entry listings only; add_only_semantic_anchor risk flag. No vulnerability code, no attacker-controlled path, unrelated to CWE-200 partial password leak. Test infrastructure noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8169:1ade54e6803abe92"
+            ],
+            "fix_set_id": "CVE-2020-8169:fix-set:1",
+            "patch_family_id": "patch-family:5df6241393a284e5f94fcf1d870fae3ac2aa3e2c",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:906b628251015484f85cf328febaf627779f87026263d33f4c36b67ec8dc5c30",
+            "candidate_commit_sha": "a97d826f6de35372563ca47087bd53ce837fe21e",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:906b628251015484f85cf328febaf627779f87026263d33f4c36b67ec8dc5c30",
+              "szz:pre-fix-line:906b628251015484f85cf328febaf627779f87026263d33f4c36b67ec8dc5c30",
+              "root_cause:pre-fix-line:906b628251015484f85cf328febaf627779f87026263d33f4c36b67ec8dc5c30"
+            ],
+            "reasoning_short": "Missing_guard_target anchor in tests/data/Makefile.inc adds test entry listings only; add_only_semantic_anchor risk flag. Narrow release reachability of 1 tag confirms negligible impact. No vulnerability code present.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8169:1ade54e6803abe92"
+            ],
+            "fix_set_id": "CVE-2020-8169:fix-set:1",
+            "patch_family_id": "patch-family:5df6241393a284e5f94fcf1d870fae3ac2aa3e2c",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:269e1702e8672c4ea9eb01355b051829004dbd474472e39d5f952a836d087e30",
+            "candidate_commit_sha": "fb723fd9d1d2c1acb46e7980b4b35a5fb4d7c355",
+            "boundary_role": "fix_series_noise",
+            "decision": "rejected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:269e1702e8672c4ea9eb01355b051829004dbd474472e39d5f952a836d087e30",
+              "szz:pre-fix-line:269e1702e8672c4ea9eb01355b051829004dbd474472e39d5f952a836d087e30",
+              "root_cause:pre-fix-line:269e1702e8672c4ea9eb01355b051829004dbd474472e39d5f952a836d087e30"
+            ],
+            "reasoning_short": "Missing_guard_target anchor in tests/data/Makefile.inc adds test entries; candidate_in_fix_series_hint flagged in both SZZ evidence and risk flags. Test entry addition in prerelease fix-series batch, not vulnerability introduction. Narrow reachability of 3 tags, 2 lines.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8169:1ade54e6803abe92"
+            ],
+            "fix_set_id": "CVE-2020-8169:fix-set:1",
+            "patch_family_id": "patch-family:5df6241393a284e5f94fcf1d870fae3ac2aa3e2c",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 17082,
+      "raw_response_bytes": 3760,
+      "retry_used": false,
+      "session_id": "ses_11fc6df74ffeapf15BpPuKT0on",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-8177",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 2,
+      "rejected_count": 1,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:b30837065bf84538784014f466a543de7fe1f08df70ec0b26c3843aa2f189bfb",
+            "candidate_commit_sha": "6b6ba1dc29857f5eb4c31fed3d63619fea99d5f4",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:b30837065bf84538784014f466a543de7fe1f08df70ec0b26c3843aa2f189bfb",
+              "szz:pre-fix-line:b30837065bf84538784014f466a543de7fe1f08df70ec0b26c3843aa2f189bfb",
+              "root_cause:pre-fix-line:b30837065bf84538784014f466a543de7fe1f08df70ec0b26c3843aa2f189bfb"
+            ],
+            "reasoning_short": "Sink candidate: this commit introduced the rename() call in tool_cb_hdr.c that uses attacker-controlled filename from server headers. All SZZ blame variants agree; line survives to fix parent; candidate is ancestor of fix; binds to vulnerable predicate vp-tool_header_cb-rename; release reachability is narrow (14 tags, too_broad=false). No risk flags.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8177:0edb68672580e08a"
+            ],
+            "fix_set_id": "CVE-2020-8177:fix-set:1",
+            "patch_family_id": "patch-family:3422d26f258168154a80a411b9590af0c7802de9",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          },
+          {
+            "candidate_id": "pre-fix-line:e6d5b2fdecfadb56795131c19678b775c8cc4ba60c9cfc4cc8ae4de1352d9f79",
+            "candidate_commit_sha": "c1c27625c797cfb7b21128484b4990446c1e92d9",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:e6d5b2fdecfadb56795131c19678b775c8cc4ba60c9cfc4cc8ae4de1352d9f79",
+              "szz:pre-fix-line:e6d5b2fdecfadb56795131c19678b775c8cc4ba60c9cfc4cc8ae4de1352d9f79",
+              "root_cause:pre-fix-line:e6d5b2fdecfadb56795131c19678b775c8cc4ba60c9cfc4cc8ae4de1352d9f79"
+            ],
+            "reasoning_short": "Dangerous_use candidate: this commit introduced the if(outs->fopened) guard that gates the rename() sink path. Without this condition present the rename call would not execute, making it a required precondition for the vulnerable code path. Binds to vulnerable predicate vp-tool_header_cb-rename; SZZ variants agree; line survives to fix parent; narrow release reachability (16 tags, too_broad=false). Confidence medium because this is a structural gate, not the vulnerability-introducing operation itself.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8177:0edb68672580e08a"
+            ],
+            "fix_set_id": "CVE-2020-8177:fix-set:1",
+            "patch_family_id": "patch-family:3422d26f258168154a80a411b9590af0c7802de9",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:048c64f98c704e7fac88969987cef5bd99889d6b73054b01b4aefc1a931c6268",
+            "candidate_commit_sha": "4dc8499494dc16bf336c1055f2ae4b78c709c87d",
+            "boundary_role": "fix_series_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:048c64f98c704e7fac88969987cef5bd99889d6b73054b01b4aefc1a931c6268",
+              "szz:pre-fix-line:048c64f98c704e7fac88969987cef5bd99889d6b73054b01b4aefc1a931c6268",
+              "root_cause:pre-fix-line:048c64f98c704e7fac88969987cef5bd99889d6b73054b01b4aefc1a931c6268"
+            ],
+            "reasoning_short": "Control_predecessor candidate in tool_getparam.c, not tool_cb_hdr.c where the vulnerability lives. Does not bind to vulnerable predicate vp-tool_header_cb-rename; binds only to fix predicate fp-getparameter-disallow-combo. Flagged as add_only_semantic_anchor with candidate_in_fix_series_hint=true and release_reachability_too_broad (25 tags, 17 release lines). This is the getparameter function signature, a control predecessor modified in the fix series, not the vulnerability introduction.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8177:0edb68672580e08a"
+            ],
+            "fix_set_id": "CVE-2020-8177:fix-set:1",
+            "patch_family_id": "patch-family:3422d26f258168154a80a411b9590af0c7802de9",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 12755,
+      "raw_response_bytes": 3402,
+      "retry_used": false,
+      "session_id": "ses_11fc5dd6dffezzXxRIKJ6lJb95",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2020-8231",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:58fa8338ad3ea672acd04e48ca778e35489ce37c52567992e431acf7f5bd245a",
+            "candidate_commit_sha": "d021f2e8a0067fc769652f27afec9024c0d02b3d",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:58fa8338ad3ea672acd04e48ca778e35489ce37c52567992e431acf7f5bd245a",
+              "szz:pre-fix-line:58fa8338ad3ea672acd04e48ca778e35489ce37c52567992e431acf7f5bd245a",
+              "root_cause:pre-fix-line:58fa8338ad3ea672acd04e48ca778e35489ce37c52567992e431acf7f5bd245a"
+            ],
+            "reasoning_short": "SZZ all variants agree on commit d021f2e8a; line survives to fix parent and is ancestor of fix. Introduces dereference of lastconnect raw pointer in Curl_getconnectinfo matching pointer-comparison-deref predicate. release_reachability_too_broad reflects early introduction across many releases but does not weaken blame evidence or boundary logic.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8231:c08d6b49f178470d"
+            ],
+            "fix_set_id": "CVE-2020-8231:fix-set:1",
+            "patch_family_id": "patch-family:40df9a97a8230e4cf650cfbb4eb8d64766f4d7f8",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:96e2823d262eba5fab1e424346eba3b286e2e1397a371c9d9f8e0cbfdd8a56b8",
+            "candidate_commit_sha": "07cb27c98e92649e74a312faf976271fa7da609c",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:96e2823d262eba5fab1e424346eba3b286e2e1397a371c9d9f8e0cbfdd8a56b8",
+              "szz:pre-fix-line:96e2823d262eba5fab1e424346eba3b286e2e1397a371c9d9f8e0cbfdd8a56b8",
+              "root_cause:pre-fix-line:96e2823d262eba5fab1e424346eba3b286e2e1397a371c9d9f8e0cbfdd8a56b8"
+            ],
+            "reasoning_short": "Whitespace-sensitive blame conflict: canonical and normal blame point to 575e885db, only ignore-whitespace blame resolves to candidate 07cb27c. candidate_in_fix_series_hint further suggests this commit may belong to an iterative fix chain rather than the original introduction. Line assigns conn pointer to lastconnect matching lastconnect-raw-pointer predicate, but conflicting blame variants cannot be resolved to confirm this commit as the definitive introduction.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2020-8231:c08d6b49f178470d"
+            ],
+            "fix_set_id": "CVE-2020-8231:fix-set:1",
+            "patch_family_id": "patch-family:40df9a97a8230e4cf650cfbb4eb8d64766f4d7f8",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ]
+      },
+      "prompt_bytes": 15655,
+      "raw_response_bytes": 2218,
+      "retry_used": false,
+      "session_id": "ses_11fc55170ffeRJ4Gliiui24g5J",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2021-23840",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:debd1476a8733e471f1ac18a39b3bc3d857b18e3e3a4498fca42bb40cc9b5b96",
+            "candidate_commit_sha": "fa75ee1aecda0da96216440aa4ea91d4a17e8244",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:debd1476a8733e471f1ac18a39b3bc3d857b18e3e3a4498fca42bb40cc9b5b96",
+              "szz:pre-fix-line:debd1476a8733e471f1ac18a39b3bc3d857b18e3e3a4498fca42bb40cc9b5b96",
+              "root_cause:pre-fix-line:debd1476a8733e471f1ac18a39b3bc3d857b18e3e3a4498fca42bb40cc9b5b96"
+            ],
+            "reasoning_short": "EVP_EncryptUpdate signature with int*outl parameter introduces vulnerable interface bound to no-overflow-guard-encdec-update predicate. SZZ all_same, ancestor_of_fix, survives_to_fix_parent with no conflicting blame variants. Release reachability narrow (8 tags, 1 line). non_release_tag_noise and release_line_overreach flags acknowledged but do not undermine boundary role given concentrated reachability.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2021-23840:73cadaca755f6262"
+            ],
+            "fix_set_id": "CVE-2021-23840:fix-set:1",
+            "patch_family_id": "patch-family:e82d081c5ac49e764ed954f23ebb25c63a638794",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:ebba0450a4420aa94dd1a116f5b2cf4d4a68f8679d99fd59bd2521815f52fa69",
+            "candidate_commit_sha": "be06a9348d83187071270a29aabfe10cc3904f85",
+            "boundary_role": "introduction",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:ebba0450a4420aa94dd1a116f5b2cf4d4a68f8679d99fd59bd2521815f52fa69",
+              "szz:pre-fix-line:ebba0450a4420aa94dd1a116f5b2cf4d4a68f8679d99fd59bd2521815f52fa69",
+              "root_cause:pre-fix-line:ebba0450a4420aa94dd1a116f5b2cf4d4a68f8679d99fd59bd2521815f52fa69"
+            ],
+            "reasoning_short": "EVP_DecryptUpdate signature declaration bound to no-overflow-guard-decrypt-update predicate. SZZ all_same, ancestor_of_fix, survives_to_fix_parent with no conflicting blame variants. However release_reachability_too_broad (198 tags across 10 release lines) introduces substantial uncertainty about boundary precision; the commit touches far too many release lines to isolate this as a clean introduction event.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2021-23840:73cadaca755f6262"
+            ],
+            "fix_set_id": "CVE-2021-23840:fix-set:1",
+            "patch_family_id": "patch-family:e82d081c5ac49e764ed954f23ebb25c63a638794",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 9570,
+      "raw_response_bytes": 2352,
+      "retry_used": false,
+      "session_id": "ses_11fc48e89ffeJvNPvtBISQBorz",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0171",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:52235be9052926d5b94e7f55f55e32e0c17921d981700ee274243ff893d35de0",
+            "candidate_commit_sha": "8931a454aea03bab21b3b8fcdc94f674eebd1c5d",
+            "boundary_role": "prerequisite",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:52235be9052926d5b94e7f55f55e32e0c17921d981700ee274243ff893d35de0",
+              "szz:pre-fix-line:52235be9052926d5b94e7f55f55e32e0c17921d981700ee274243ff893d35de0",
+              "root_cause:pre-fix-line:52235be9052926d5b94e7f55f55e32e0c17921d981700ee274243ff893d35de0"
+            ],
+            "reasoning_short": "Control predecessor if (locked) gate in kvm_mmu_notifier_invalidate_range_start with modified_old_side anchor and stable blame variants across all SZZ modes. Gates the MMU notifier path through which SEV guest memory reclamation notifications flow; generic KVM infrastructure prerequisite that enables the vulnerable code path but does not itself introduce the SEV cache-flush omission.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0171:8ffe64dadae3caa6"
+            ],
+            "fix_set_id": "CVE-2022-0171:fix-set:1",
+            "patch_family_id": "patch-family:4fc3234465fe437858e7bd316f157c8659583062",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:b13d524ddf813defb48dfae202509c87bd59025fbfc6fda94372ff406e57f23c",
+            "candidate_commit_sha": "f922bd9bf33bd5a8c6694927f010f32127810fbf",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:b13d524ddf813defb48dfae202509c87bd59025fbfc6fda94372ff406e57f23c",
+              "szz:pre-fix-line:b13d524ddf813defb48dfae202509c87bd59025fbfc6fda94372ff406e57f23c",
+              "root_cause:pre-fix-line:b13d524ddf813defb48dfae202509c87bd59025fbfc6fda94372ff406e57f23c"
+            ],
+            "reasoning_short": "Function declaration of kvm_mmu_notifier_invalidate_range_start selected via context_fallback with add_only_semantic_anchor. Move/copy blame diverges (93065ac753e4 vs canonical f922bd9b), creating ancestry uncertainty. Structural prerequisite providing the MMU notifier callback entry point but no direct role in SEV cache-flush vulnerability introduction.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0171:8ffe64dadae3caa6"
+            ],
+            "fix_set_id": "CVE-2022-0171:fix-set:1",
+            "patch_family_id": "patch-family:4fc3234465fe437858e7bd316f157c8659583062",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "context_fallback"
+          }
+        ]
+      },
+      "prompt_bytes": 10599,
+      "raw_response_bytes": 2148,
+      "retry_used": false,
+      "session_id": "ses_11fc3a180ffeywCunqINUCMcfK",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0185",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:b28ae8cb98ddc3442c651c162b27ed04e9bbf0bcf6f699cfa08714fa7d86eb21",
+            "candidate_commit_sha": "3e1aeb00e6d132efc151dacc062b38269bc9eccc",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:b28ae8cb98ddc3442c651c162b27ed04e9bbf0bcf6f699cfa08714fa7d86eb21",
+              "szz:pre-fix-line:b28ae8cb98ddc3442c651c162b27ed04e9bbf0bcf6f699cfa08714fa7d86eb21",
+              "root_cause:pre-fix-line:b28ae8cb98ddc3442c651c162b27ed04e9bbf0bcf6f699cfa08714fa7d86eb21"
+            ],
+            "reasoning_short": "All SZZ variants agree on commit 3e1aeb00e6d132; line survives to fix parent; candidate is ancestor of fix with same_file_touch and root_cause_predicate_bound; dangerous_use anchor role in modified_old_side_anchor mode. Risk flag non_release_tag_noise addressed: commit not itself a release tag but reachable from 16 release tags (not too broad), confirming deployment. No conflicting blame variants, no merge candidate, no fix-series hint, no boundary marker. Robust evidence supports introduction boundary.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0185:80841a8011a73cb4"
+            ],
+            "fix_set_id": "CVE-2022-0185:fix-set:1",
+            "patch_family_id": "patch-family:e5daa8ad9dbb10e99424dde458b1fbd5583662e7",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5540,
+      "raw_response_bytes": 1272,
+      "retry_used": false,
+      "session_id": "ses_11fc28fe6ffe4ibqAKV0xnFcwP",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0264",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:299ba5d48f2d8f0d72c08699698bb952e37af9beaae5a0595dfed6d33f770dc5",
+            "candidate_commit_sha": "37086bfdc737ea6f66bf68dcf16757004d68e1e1",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:299ba5d48f2d8f0d72c08699698bb952e37af9beaae5a0595dfed6d33f770dc5",
+              "szz:pre-fix-line:299ba5d48f2d8f0d72c08699698bb952e37af9beaae5a0595dfed6d33f770dc5",
+              "root_cause:pre-fix-line:299ba5d48f2d8f0d72c08699698bb952e37af9beaae5a0595dfed6d33f770dc5"
+            ],
+            "reasoning_short": "SZZ all_same variant agreement with stable_blame_variants; candidate is ancestor of fix and line survives to fix_parent; root_cause_predicate_bound and modified_old_side_anchor on dangerous_use; release reachability covers 4 tags without too_broad flag. No conflicting blame, merge, or non-ancestor risk. non_release_tag_noise does not contradict boundary evidence.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0264:f0e1aa64128f2da4"
+            ],
+            "fix_set_id": "CVE-2022-0264:fix-set:1",
+            "patch_family_id": "patch-family:70cfe6dc57ca83ca84d82fd0e6500c2e483cf6aa",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5596,
+      "raw_response_bytes": 1129,
+      "retry_used": false,
+      "session_id": "ses_11fc209feffexRSR2p4CAayB5o",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0286",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 2,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 1,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:dff6626881878dc79797acc5156a658866f3a5cb26c680ed33f6cd6b0f79cc34",
+            "candidate_commit_sha": "bdfd2d1fa79acd03e18d1683419572f3682b39fd",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "high",
+            "evidence_refs": [
+              "candidate:pre-fix-line:dff6626881878dc79797acc5156a658866f3a5cb26c680ed33f6cd6b0f79cc34",
+              "szz:pre-fix-line:dff6626881878dc79797acc5156a658866f3a5cb26c680ed33f6cd6b0f79cc34",
+              "root_cause:pre-fix-line:dff6626881878dc79797acc5156a658866f3a5cb26c680ed33f6cd6b0f79cc34"
+            ],
+            "reasoning_short": "Sink line xs->xso.real_dev = slave->dev; dereferences slave->dev without null check. SZZ all_same with stable blame variants (canonical=normal=ignore_whitespace=move_copy=bdfd2d1fa). Candidate is ancestor of fix, line survives to fix parent, root-cause predicate bound. No move/copy or whitespace conflict. This commit introduced the vulnerable dereference operation that crashes when slave is null.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0286:b6c1f2bd3c60089b"
+            ],
+            "fix_set_id": "CVE-2022-0286:fix-set:1",
+            "patch_family_id": "patch-family:044eff6fd004b8acceaf424f9a04c6a8b8ab3282",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": [
+          {
+            "candidate_id": "pre-fix-line:af8b4b45936c1599fd89b400eccbde6e926114aa81693d29af78daadbf63726c",
+            "candidate_commit_sha": "f548a476268d621846bb0146af861bb56250ae37",
+            "boundary_role": "prerequisite",
+            "decision": "uncertain",
+            "confidence": "low",
+            "evidence_refs": [
+              "candidate:pre-fix-line:af8b4b45936c1599fd89b400eccbde6e926114aa81693d29af78daadbf63726c",
+              "szz:pre-fix-line:af8b4b45936c1599fd89b400eccbde6e926114aa81693d29af78daadbf63726c",
+              "root_cause:pre-fix-line:af8b4b45936c1599fd89b400eccbde6e926114aa81693d29af78daadbf63726c"
+            ],
+            "reasoning_short": "Data-source line slave = rcu_dereference(bond->curr_active_slave); reads potentially null pointer into slave, enabling the later unchecked dereference. SZZ variant_agreement=move_copy_differs: canonical/normal/ignore_whitespace blame commit f548a476, but move_copy_blame points to 278b20837511776dc9d5f6ee1c7fabd5479838bb. This move/copy conflict prevents resolving whether the line was truly introduced or moved. Classified as prerequisite (required precondition, does not activate vulnerability by itself) but decision=uncertain due to unresolved blame ambiguity.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0286:b6c1f2bd3c60089b"
+            ],
+            "fix_set_id": "CVE-2022-0286:fix-set:1",
+            "patch_family_id": "patch-family:044eff6fd004b8acceaf424f9a04c6a8b8ab3282",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ]
+      },
+      "prompt_bytes": 10357,
+      "raw_response_bytes": 2368,
+      "retry_used": false,
+      "session_id": "ses_11fc1b784ffeXwB22uIEcHchKk",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0322",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 1,
+      "selected_boundary_event_count": 1,
+      "rejected_count": 0,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [
+          {
+            "candidate_id": "pre-fix-line:f14a25fb1b360c1ba225183da1499b5f60aa4dce90ea9637a4bb3ba375d13817",
+            "candidate_commit_sha": "cc16f00f6529aa2378f2b949a6f68e9dc6dec363",
+            "boundary_role": "introduction",
+            "decision": "selected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:f14a25fb1b360c1ba225183da1499b5f60aa4dce90ea9637a4bb3ba375d13817",
+              "szz:pre-fix-line:f14a25fb1b360c1ba225183da1499b5f60aa4dce90ea9637a4bb3ba375d13817",
+              "root_cause:pre-fix-line:f14a25fb1b360c1ba225183da1499b5f60aa4dce90ea9637a4bb3ba375d13817"
+            ],
+            "reasoning_short": "Line sctp_make_reconf(asoc, outlen + inlen) directly embodies vulnerable predicate unpadded-length-sum and root cause missing-sctp-pad4-per-component. SZZ all variants agree (all_same), line survives to fix parent, candidate is ancestor of fix, stable_blame_variants confirmed. No conflicting blame variants, no merge/move/whitespace sensitivity, no non-ancestor issues. Risk flags non_release_tag_noise and release_reachability_too_broad concern release scoping not boundary correctness and do not undermine code-level introduction evidence.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0322:c9df833f3e38f8e5"
+            ],
+            "fix_set_id": "CVE-2022-0322:fix-set:1",
+            "patch_family_id": "patch-family:2885f259faf41281b2e1862bd21b4f4ab5f2b25d",
+            "candidate_source": "strong",
+            "candidate_selection_mode": "modified_old_side"
+          }
+        ],
+        "rejected_candidates": [],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 5885,
+      "raw_response_bytes": 1308,
+      "retry_used": false,
+      "session_id": "ses_11fc13760ffeT9p0Mxs1iw5L2W",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    },
+    {
+      "cve_id": "CVE-2022-0433",
+      "backend_name": "opencode",
+      "backend_type": "opencode",
+      "status": "ok",
+      "parse_status": "fenced_json",
+      "contract_ok": true,
+      "candidate_count": 3,
+      "selected_boundary_event_count": 0,
+      "rejected_count": 3,
+      "uncertain_count": 0,
+      "derived_boundary_views": {
+        "selected_boundary_events": [],
+        "rejected_candidates": [
+          {
+            "candidate_id": "pre-fix-line:067e73b6f984b0d5a90040a63bd2c96b143208e29d529248245859929f7c41f4",
+            "candidate_commit_sha": "6fdc348006fe2c8f0765f6eecf2e3cbab06c60b5",
+            "boundary_role": "fix_series_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:067e73b6f984b0d5a90040a63bd2c96b143208e29d529248245859929f7c41f4",
+              "szz:pre-fix-line:067e73b6f984b0d5a90040a63bd2c96b143208e29d529248245859929f7c41f4"
+            ],
+            "reasoning_short": "SZz candidate_in_fix_series_hint=true means commit is in same patch series as fix. Although candidate_is_ancestor_of_fix=true and line_survives_to_fix_parent=true, fix-series membership overrides: vulnerability introduced and fixed in same development cycle. SZZ blame variants all_same confirm no move/copy or whitespace ambiguity. Rejected as fix_series_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0433:ef95ea4c5e7882dc"
+            ],
+            "fix_set_id": "CVE-2022-0433:fix-set:1",
+            "patch_family_id": "patch-family:3e09dfa624d24bd03b3c3df778a4c3d8b5076679",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:146d81a418a5df907c55d2699a0b5b7421b12e8c5677bfd198743ab28195f05f",
+            "candidate_commit_sha": "ad10c381d133d9f786564bff4b223be1372f6c2a",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:146d81a418a5df907c55d2699a0b5b7421b12e8c5677bfd198743ab28195f05f",
+              "szz:pre-fix-line:146d81a418a5df907c55d2699a0b5b7421b12e8c5677bfd198743ab28195f05f",
+              "root_cause:pre-fix-line:146d81a418a5df907c55d2699a0b5b7421b12e8c5677bfd198743ab28195f05f"
+            ],
+            "reasoning_short": "Candidate line is closing brace '}' with broad_candidate_range flag. Structural delimiter carries no vulnerability semantics. SZZ blame variants all_same with no move/copy conflict. Non-ancestor evidence not present; candidate_is_ancestor_of_fix=true but line text is structural noise. Rejected as refactor_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0433:ef95ea4c5e7882dc"
+            ],
+            "fix_set_id": "CVE-2022-0433:fix-set:1",
+            "patch_family_id": "patch-family:3e09dfa624d24bd03b3c3df778a4c3d8b5076679",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          },
+          {
+            "candidate_id": "pre-fix-line:26d53c22a80e985e5b0f12919831a0f917c1b3979429c092461bb3521d4e215a",
+            "candidate_commit_sha": "9330986c03006ab1d33d243b7cfe598a7a3c1baa",
+            "boundary_role": "refactor_noise",
+            "decision": "rejected",
+            "confidence": "medium",
+            "evidence_refs": [
+              "candidate:pre-fix-line:26d53c22a80e985e5b0f12919831a0f917c1b3979429c092461bb3521d4e215a",
+              "szz:pre-fix-line:26d53c22a80e985e5b0f12919831a0f917c1b3979429c092461bb3521d4e215a",
+              "root_cause:pre-fix-line:26d53c22a80e985e5b0f12919831a0f917c1b3979429c092461bb3521d4e215a"
+            ],
+            "reasoning_short": "Candidate line is opening brace '{' with broad_candidate_range flag. Structural delimiter carries no vulnerability semantics. SZZ blame variants all_same with no move/copy conflict. candidate_is_ancestor_of_fix=true but non-ancestor evidence absent and line text is structural noise. Rejected as refactor_noise.",
+            "boundary_group_ids": [
+              "boundary-group:CVE-2022-0433:ef95ea4c5e7882dc"
+            ],
+            "fix_set_id": "CVE-2022-0433:fix-set:1",
+            "patch_family_id": "patch-family:3e09dfa624d24bd03b3c3df778a4c3d8b5076679",
+            "candidate_source": "fallback",
+            "candidate_selection_mode": "add_only_semantic_target"
+          }
+        ],
+        "uncertain_candidates": []
+      },
+      "prompt_bytes": 13390,
+      "raw_response_bytes": 2944,
+      "retry_used": false,
+      "session_id": "ses_11fc0ae75ffeCEVu4orQ0RU71Z",
+      "contract_taxonomy": {},
+      "lifecycle": "raw_boundary_event_accepted"
+    }
+  ],
+  "provider_id": "deepseek",
+  "model_id": "deepseek-v4-pro",
+  "base_url": "http://127.0.0.1:4096"
+}

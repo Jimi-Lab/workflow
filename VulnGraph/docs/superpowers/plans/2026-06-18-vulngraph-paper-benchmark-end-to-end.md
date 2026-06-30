@@ -269,3 +269,4 @@ python scripts\run_vulngraph_affected_versions.py `
 
 - Migration of bulky raw prompts, complete Git traces, and every intermediate audit artifact into Neo4j. The stable semantic graph and graph-backed adaptation required by Phase 6 are not deferred.
 - Online learning from unreviewed predictions. The paper experiment permits only chronology-safe adaptation from provenance-tracked evidence and reviewed outcomes.
+

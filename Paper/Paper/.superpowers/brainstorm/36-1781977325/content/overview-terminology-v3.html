@@ -1,0 +1,107 @@
+<style>
+  .paper-figure{background:#fff;border:1px solid #d9e0e7;border-radius:10px;padding:20px;box-shadow:0 4px 16px rgba(30,45,60,.08);min-width:1380px;font-family:Arial,sans-serif;color:#1f2d38}
+  .canvas-scroll{overflow:auto;background:#eef2f6;padding:16px;border-radius:12px}
+  .fig-title{font-size:23px;font-weight:700;margin:0 0 4px}.fig-sub{font-size:12px;color:#5b6873;margin-bottom:14px}
+  .repo-index{display:grid;grid-template-columns:250px 1fr 1fr 1.35fr;gap:10px;align-items:center;background:#edf3f8;border:1.5px solid #7696ad;border-radius:10px;padding:11px 14px;margin-left:188px}
+  .repo-head{font-size:15px;font-weight:700}.repo-note{font-size:10.5px;color:#596875;margin-top:3px}
+  .mini{background:#fff;border:1px solid #aebfcd;border-radius:7px;padding:9px;text-align:center;font-size:11px;line-height:1.35}.mini b{font-size:12px}
+  .novelty-span{margin:10px 0 8px 188px;background:#167f65;color:#fff;text-align:center;border-radius:15px;padding:5px;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .main-row{display:grid;grid-template-columns:170px 1fr 30px 1.12fr 30px .98fr 30px 1.12fr 30px 185px;align-items:stretch;gap:0}
+  .input,.output,.stage{border-radius:10px;padding:13px;min-height:355px;box-sizing:border-box}
+  .input{background:#f5f7f9;border:1.5px solid #8c98a3}.output{background:#eef7f7;border:1.8px solid #3d858a}
+  .stage{position:relative;border:1.8px solid;box-shadow:0 2px 7px rgba(30,45,60,.07)}
+  .s1{background:#eaf4fd;border-color:#2878b5}.s2{background:#eaf7f1;border-color:#178b69}.s3{background:#f2edfa;border-color:#7958a4}.s4{background:#eef7f7;border-color:#337d82}
+  .stage-no{font-size:10px;font-weight:700;letter-spacing:.6px;color:#56636e}.stage h3,.input h3,.output h3{font-size:15px;margin:5px 0 4px}.desc{font-size:10.5px;color:#5b6873;line-height:1.35;min-height:28px}
+  .module{background:#fff;border:1px solid rgba(90,110,125,.35);border-radius:7px;padding:9px;margin-top:9px;font-size:10.5px;line-height:1.45}.module b{display:block;font-size:11.5px;margin-bottom:3px}.result{background:rgba(255,255,255,.58);font-weight:600;text-align:center}
+  .novelty{display:inline-block;color:#fff;border-radius:12px;padding:4px 8px;font-size:9.5px;font-weight:700;margin-bottom:6px}.n1{background:#2878b5}.n3{background:#d57a20}
+  .arrow{display:flex;align-items:center;justify-content:center;font-size:24px;color:#667684;font-weight:700}
+  .tag{background:#fff;border:1px solid #c9d2da;border-radius:6px;padding:7px;margin-top:8px;font-size:10.5px;line-height:1.4;text-align:center}
+  .evidence-rule{margin:12px 0 10px 188px;background:#263746;color:#fff;border-radius:7px;padding:8px 12px;text-align:center;font-size:10.5px;font-weight:600}
+  .memory-row{display:grid;grid-template-columns:170px 1fr 1fr 1fr;gap:11px;margin-top:10px}
+  .legend{background:#f6f8fa;border:1px solid #c8d0d7;border-radius:9px;padding:10px;font-size:10px;line-height:1.55}.memory{grid-column:2/5;background:#fff4e4;border:1.8px solid #d57a20;border-radius:10px;padding:12px;display:grid;grid-template-columns:245px 1fr 1fr;gap:10px;position:relative}.memory .mini{border-color:#e2bb8f}
+  .feedback-note{text-align:center;color:#b76316;font-size:10px;font-weight:700;margin-top:8px}.foot{font-size:9.5px;color:#63717c;text-align:right;margin-top:8px}
+  .options{margin-top:18px}
+</style>
+
+<h2>Terminology-Polished Complete Overview</h2>
+<p class="subtitle">Labels now follow common terminology from SZZ, vulnerability-inducing commit analysis, software evolution, and affected-version identification.</p>
+
+<div class="canvas-scroll">
+<div class="paper-figure">
+  <div class="fig-title">VulnGraph: From Vulnerability-Fixing Commits to Affected Releases</div>
+  <div class="fig-sub">LLM agents perform evidence-grounded semantic analysis; deterministic Git analysis reconstructs and propagates branch-local vulnerability states.</div>
+
+  <div class="repo-index">
+    <div><div class="repo-head">Repository History Index</div><div class="repo-note">Built once per project and reused across CVEs</div></div>
+    <div class="mini"><b>Commit DAG</b>parents · merges · refs<br>changed paths · patch identity</div>
+    <div class="mini"><b>Release-Tag Ancestry View</b>peeled release tags<br>ancestry partial order</div>
+    <div class="mini"><b>Repository Query Interface</b>show/grep · blame -w/-M/-C · log -L/-S/-G<br>rename tracing · merge parents · patch equivalence</div>
+  </div>
+
+  <div class="novelty-span">N2 · Evidence-Constrained Branch-Specific Vulnerability-State Reconstruction</div>
+
+  <div class="main-row">
+    <div class="input">
+      <div class="stage-no">INPUT</div><h3>Vulnerability Case</h3><div class="desc">One CVE analyzed against a frozen repository snapshot.</div>
+      <div class="tag"><b>Vulnerability Advisory</b><br>CVE description · CWE</div>
+      <div class="tag"><b>Vulnerability-Fixing Commits (VFCs)</b><br>fix families · patch hunks</div>
+      <div class="tag"><b>Project History</b><br>repository · branches · release tags</div>
+      <div class="tag"><b>Patch-Derived Evidence</b><br>revisions · paths · lines · functions</div>
+    </div>
+    <div class="stage s1">
+      <span class="novelty n1">N1 · ATTACKER-CONDITION GUIDANCE</span>
+      <div class="stage-no">STAGE 1</div><h3>Evidence-Grounded Root-Cause Analysis</h3><div class="desc">The Root Cause Agent explores the repository through controlled read-only Git tools.</div>
+      <div class="module"><b>Attack Feasibility Conditions</b>attacker-controlled input · entry point · trigger · exploit preconditions · vulnerable operation/sink · security impact</div>
+      <div class="module"><b>Provenance-Preserving Evidence Capture</b>tool result → source revision/path/line/hash → validated evidence record</div>
+      <div class="module result">Root-Cause Hypothesis<br>Vulnerable Predicate · Fix Predicate<br>Pre-Fix Statement Anchors</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="stage s2">
+      <div class="stage-no">STAGE 2</div><h3>SZZ-Based History Reconstruction</h3><div class="desc">Trace vulnerability-relevant pre-fix statements beyond one-step blame.</div>
+      <div class="module"><b>Anchor Statement Localization</b>system-proposed candidates + Agent-proposed locations → revision/path/line validation → traceable anchor IDs</div>
+      <div class="module"><b>Multi-Strategy History Tracing</b>blame variants · recursive blame · line/function history · rename/move/copy · merge-parent and backport analysis</div>
+      <div class="module result">Candidate VICs and Causal History Events<br>with before/after code and Git provenance</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="stage s3">
+      <div class="stage-no">STAGE 3</div><h3>Commit-Event Validation</h3><div class="desc">The Judge Agent validates candidate events rather than judging release tags.</div>
+      <div class="module"><b>Event-Role Classification</b>vulnerability introduction · prerequisite · refactoring/move · partial/complete fix · reintroduction · unrelated · uncertain</div>
+      <div class="module"><b>Branch-Local Boundary Resolution</b>introduction/fix event sets · fix families · conflicting evidence · abstention</div>
+      <div class="module result">Validated State-Transition Events<br>with confidence and uncertainty</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="stage s4">
+      <div class="stage-no">STAGE 4</div><h3>Branch-Aware State Propagation</h3><div class="desc">Deterministically reconstruct vulnerability state over the Git DAG.</div>
+      <div class="module"><b>Vulnerability-State Transitions</b>prerequisites and introductions activate the state; fixes and validated equivalents deactivate it</div>
+      <div class="module"><b>Non-Linear History Handling</b>branch divergence · backports · cherry-picks · merges · equivalent fixes · reintroduction</div>
+      <div class="module result">Release-Level Affectedness<br>AFFECTED · UNAFFECTED · INCONCLUSIVE</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="output">
+      <div class="stage-no">OUTPUT</div><h3>Affected Release Set</h3><div class="desc">Project release tags projected from propagated commit states.</div>
+      <div class="tag"><b>affected_versions</b><br>all predicted affected release tags</div>
+      <div class="tag"><b>evidence</b><br>supporting events and repository provenance</div>
+      <div class="tag"><b>uncertainty</b><br>unresolved branch or evidence conflicts</div>
+      <div class="tag"><b>Closed-World Output</b><br>omitted release tags are predicted unaffected</div>
+    </div>
+  </div>
+
+  <div class="evidence-rule">Evidence constraint: every LLM-generated claim, anchor, and event verdict must cite system-validated repository evidence; revisions, paths, and line locations are never accepted as free-form facts.</div>
+
+  <div class="memory-row">
+    <div class="legend"><b>Visual Encoding</b><br>Blue: semantic analysis<br>Green: history reconstruction<br>Purple: event validation<br>Teal: deterministic state propagation<br>Orange: continual adaptation</div>
+    <div class="memory">
+      <div><span class="novelty n3">N3 · GRAPH-BACKED CONTINUAL ADAPTATION</span><div class="repo-note">Reviewed earlier cases inform later cases under a temporal cutoff.</div></div>
+      <div class="mini"><b>Cross-CVE Evidence Memory</b>repository · CWE · attack condition · root-cause pattern · patch pattern · reviewed decisions and failures</div>
+      <div class="mini"><b>Chronology-Safe Prior Retrieval</b>prioritizes repository exploration, anchor/history search, event ranking, and abstention; never invents or rewrites Git facts</div>
+    </div>
+  </div>
+  <div class="feedback-note">↺ Reviewed outcomes feed future Root-Cause Analysis, History Reconstruction, and Commit-Event Validation</div>
+  <div class="foot">Ground-truth affected-version labels are isolated from the method and used only by the evaluator.</div>
+</div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="terminology_ok" onclick="toggleSelect(this)"><div class="letter">✓</div><div class="content"><h3>Terminology is now appropriate</h3><p>Proceed to spacing, arrow routing, typography, and vector export.</p></div></div>
+  <div class="option" data-choice="terminology_revise" onclick="toggleSelect(this)"><div class="letter">↺</div><div class="content"><h3>Terminology still needs revision</h3><p>Identify which stage or label remains unclear or non-standard.</p></div></div>
+</div>
